@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinel | Autonomous Defense</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* SENTINEL THEME: Tactical, Dark, Alert */
+        :root {
+            --bg-dark: #0f172a;       /* Navy Black */
+            --bg-card: #1e293b;       /* Lighter Navy */
+            --accent-red: #ef4444;    /* Alert Red */
+            --text-white: #f8fafc;
+            --text-grey: #94a3b8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { background-color: var(--bg-dark); color: var(--text-white); }
+
+        /* NAV */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1.5rem 5%; border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .brand { font-size: 1.5rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+        .brand span { color: var(--accent-red); }
+        .back-link { text-decoration: none; color: var(--text-grey); font-size: 0.9rem; }
+
+        /* HERO */
+        .hero {
+            padding: 8rem 5% 4rem;
+            text-align: center;
+            background: radial-gradient(circle at top, #1e293b 0%, #0f172a 70%);
+        }
+        h1 { font-size: 3rem; margin-bottom: 1rem; }
+        p.mission { color: var(--text-grey); font-size: 1.2rem; max-width: 600px; margin: 0 auto; }
+
+        /* PRODUCTS SECTION */
+        .products { padding: 4rem 5%; max-width: 1200px; margin: 0 auto; }
+        
+        .product-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6rem;
+            gap: 3rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 3rem;
+        }
+
+        .product-row:last-child { border-bottom: none; }
+        .product-row:nth-child(even) { flex-direction: row-reverse; }
+
+        .info { flex: 1; }
+        .visual {
+            flex: 1;
+            height: 300px;
+            background: linear-gradient(45deg, #1e293b, #334155);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            position: relative;
+        }
+        
+        /* "Targeting" corners for visual effect */
+        .visual::before {
+            content: ''; position: absolute; top: 10px; left: 10px; width: 20px; height: 20px;
+            border-top: 2px solid var(--accent-red); border-left: 2px solid var(--accent-red);
+        }
+        .visual::after {
+            content: ''; position: absolute; bottom: 10px; right: 10px; width: 20px; height: 20px;
+            border-bottom: 2px solid var(--accent-red); border-right: 2px solid var(--accent-red);
+        }
+
+        .label { color: var(--accent-red); font-weight: 700; letter-spacing: 1px; font-size: 0.9rem; text-transform: uppercase; margin-bottom: 0.5rem; display: block; }
+        h2 { font-size: 2.5rem; margin-bottom: 1rem; }
+        p.desc { color: var(--text-grey); line-height: 1.7; font-size: 1.1rem; }
+
+        footer { text-align: center; padding: 3rem; color: var(--text-grey); font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="brand">Sentinel<span>.</span></div>
+        <a href="../../index.html" class="back-link">← Shoonya Origins</a>
+    </nav>
+
+    <section class="hero">
+        <h1>Eyes in the Sky. <br>Order on the Ground.</h1>
+        <p class="mission">We provide next-generation aerial supremacy and battlefield situational awareness through autonomous drone swarms.</p>
+    </section>
+
+    <div class="products">
+
+        <div class="product-row">
+            <div class="info">
+                <span class="label">Tactical Strike Unit</span>
+                <h2>Hunter</h2>
+                <p class="desc">
+                    A high-speed, loitering munition capability designed for precision neutralization. 
+                    The Hunter system identifies threats autonomously and engages with minimal collateral damage, ensuring mission success in high-risk zones.
+                </p>
+            </div>
+            <div class="visual">🎯</div>
+        </div>
+
+        <div class="product-row">
+            <div class="info">
+                <span class="label">Reconnaissance & Pathfinding</span>
+                <h2>Navigator</h2>
+                <p class="desc">
+                    The silent observer. Navigator drones utilize advanced computer vision to map unknown terrain in real-time, identifying safe routes for infantry and spotting concealed hostiles without being detected.
+                </p>
+            </div>
+            <div class="visual">🦅</div>
+        </div>
+
+        <div class="product-row">
+            <div class="info">
+                <span class="label">C4I Integration</span>
+                <h2>Real-Time Battlefield Data</h2>
+                <p class="desc">
+                    Warfare is no longer about firepower; it is about information. Our mesh network links every drone and soldier, providing a live, 3D holographic view of the battlefield to command centers instantly.
+                </p>
+            </div>
+            <div class="visual">📡</div>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Sentinel Defense Systems. Restricted Access.</p>
+        <p>Shoonya Origins Conglomerate</p>
+    </footer>
+
+</body>
+</html>
