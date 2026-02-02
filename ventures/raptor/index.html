@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raptor | Automated Growth</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* RAPTOR THEME: Aggressive, High-Tech, Dark Mode */
+        :root {
+            --bg-black: #050505;
+            --neon-purple: #a855f7;
+            --neon-pink: #ec4899;
+            --text-white: #ffffff;
+            --text-dim: #a1a1aa;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { background-color: var(--bg-black); color: var(--text-white); overflow-x: hidden; }
+
+        /* NAV */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 2rem 5%; position: relative; z-index: 10;
+        }
+        .brand { 
+            font-size: 2rem; font-weight: 800; font-style: italic; 
+            background: linear-gradient(to right, var(--neon-purple), var(--neon-pink));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .back-link { text-decoration: none; color: var(--text-dim); font-weight: 700; transition: color 0.3s; }
+        .back-link:hover { color: var(--text-white); }
+
+        /* HERO */
+        .hero {
+            height: 90vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; padding: 0 5%; position: relative;
+        }
+        
+        /* Background Glow Effect */
+        .hero::before {
+            content: ''; position: absolute; width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, rgba(0,0,0,0) 70%);
+            z-index: -1;
+        }
+
+        h1 {
+            font-size: 5rem; line-height: 0.9; margin-bottom: 2rem;
+            text-transform: uppercase; letter-spacing: -2px;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(to right, var(--neon-purple), #fff);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle { font-size: 1.5rem; color: var(--text-dim); max-width: 600px; margin-bottom: 3rem; }
+
+        /* FEATURE CARDS */
+        .features { padding: 4rem 5%; }
+        .grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;
+            max-width: 1200px; margin: 0 auto;
+        }
+
+        .card {
+            background: var(--glass); border: 1px solid rgba(255,255,255,0.1);
+            padding: 3rem; border-radius: 20px; transition: transform 0.3s, border-color 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: var(--neon-purple);
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.2);
+        }
+
+        .card h3 { font-size: 1.8rem; margin-bottom: 1rem; color: white; }
+        .card p { color: var(--text-dim); font-size: 1.1rem; line-height: 1.5; }
+
+        /* STATISTICS BAR */
+        .stats-bar {
+            display: flex; justify-content: space-around; padding: 4rem 5%;
+            background: linear-gradient(90deg, #111, #0a0a0a); margin-top: 4rem;
+        }
+        .stat h2 { font-size: 3rem; color: var(--neon-pink); margin-bottom: 0.5rem; }
+        .stat span { text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem; color: var(--text-dim); }
+
+        footer { text-align: center; padding: 4rem; color: #333; font-size: 0.8rem; text-transform: uppercase; }
+
+        @media (max-width: 768px) { h1 { font-size: 3rem; } .stats-bar { flex-direction: column; gap: 3rem; text-align: center; } }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="brand">RAPTOR</div>
+        <a href="../../index.html" class="back-link">EXIT ///</a>
+    </nav>
+
+    <section class="hero">
+        <h1>Hunt.<br><span class="gradient-text">Capture.</span><br>Scale.</h1>
+        <p class="subtitle">The AI-driven growth engine that automates the entire lifecycle of client acquisition.</p>
+    </section>
+
+    <section class="features">
+        <div class="grid">
+            
+            <div class="card">
+                <h3>Automated Outreach</h3>
+                <p>No more cold calls. Raptor's algorithms identify high-value prospects and initiate personalized contact sequences at a scale human teams cannot match.</p>
+            </div>
+
+            <div class="card">
+                <h3>Dynamic Funnels</h3>
+                <p>Marketing pathways that adapt in real-time. If a user hesitates, the system changes the pitch instantly to maximize conversion probability.</p>
+            </div>
+
+            <div class="card">
+                <h3>Sentiment Analysis</h3>
+                <p>AI that reads between the lines. We analyze email replies and voice tones to gauge interest levels and trigger the perfect closing maneuver.</p>
+            </div>
+
+        </div>
+    </section>
+
+    <div class="stats-bar">
+        <div class="stat">
+            <h2>24/7</h2>
+            <span>Operation Time</span>
+        </div>
+        <div class="stat">
+            <h2>0.02s</h2>
+            <span>Response Latency</span>
+        </div>
+        <div class="stat">
+            <h2>100%</h2>
+            <span>Automation</span>
+        </div>
+    </div>
+
+    <footer>
+        System Active. &copy; 2026 Raptor Growth AI.
+    </footer>
+
+</body>
+</html>
