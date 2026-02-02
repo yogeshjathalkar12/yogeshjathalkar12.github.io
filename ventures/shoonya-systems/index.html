@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shoonya Systems | Digital Core</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* SHOONYA SYSTEMS THEME: Raw Code, Terminal, Engineering */
+        :root {
+            --terminal-bg: #0c0c0c;
+            --terminal-green: #00ff41;
+            --terminal-dim: #008f11;
+            --text-white: #e5e5e5;
+            --grid-line: rgba(0, 255, 65, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Fira Code', monospace; }
+        
+        body { background-color: var(--terminal-bg); color: var(--text-white); }
+
+        /* NAV */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1.5rem 5%; border-bottom: 1px solid var(--terminal-dim);
+        }
+        .brand { font-size: 1.2rem; font-weight: 600; color: var(--terminal-green); }
+        .brand::before { content: '>'; margin-right: 10px; }
+        .back-link { text-decoration: none; color: var(--text-white); font-size: 0.9rem; }
+        .back-link:hover { color: var(--terminal-green); text-decoration: underline; }
+
+        /* HERO */
+        .hero {
+            min-height: 80vh;
+            display: flex; flex-direction: column; justify-content: center;
+            padding: 0 5%;
+            background-image: linear-gradient(var(--grid-line) 1px, transparent 1px),
+            linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        h1 { font-size: 3.5rem; color: var(--text-white); margin-bottom: 1rem; }
+        .cursor { display: inline-block; width: 20px; height: 5px; background: var(--terminal-green); animation: blink 1s infinite; }
+        
+        p.subtitle { color: var(--terminal-green); max-width: 600px; line-height: 1.8; margin-bottom: 3rem; }
+
+        /* SERVICES LIST */
+        .services { padding: 4rem 5%; border-top: 1px solid var(--terminal-dim); }
+        .service-item {
+            margin-bottom: 3rem;
+            padding-left: 20px;
+            border-left: 2px solid var(--terminal-dim);
+        }
+        .service-item h3 { font-size: 1.5rem; margin-bottom: 0.5rem; color: white; }
+        .service-item p { color: #888; font-size: 0.9rem; max-width: 500px; }
+
+        /* FOOTER */
+        footer { padding: 3rem 5%; color: #444; font-size: 0.8rem; }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        @media (max-width: 768px) { h1 { font-size: 2.2rem; } }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="brand">sys.root_access</div>
+        <a href="../../index.html" class="back-link">[ .. ] Back</a>
+    </nav>
+
+    <section class="hero">
+        <p style="color: #666; margin-bottom: 10px;">// Initializing Core Architecture...</p>
+        <h1>Building the Digital<br>Nervous System<span class="cursor"></span></h1>
+        <br>
+        <p class="subtitle">
+            Shoonya Systems engineers the fundamental software layers that power our conglomerate. From custom operating systems to military-grade encryption protocols.
+        </p>
+    </section>
+
+    <section class="services">
+        
+        <div class="service-item">
+            <h3>01. Zero-Trust Architecture</h3>
+            <p>Developing cybersecurity frameworks where no device, user, or packet is trusted by default. Every byte is verified.</p>
+        </div>
+
+        <div class="service-item">
+            <h3>02. High-Performance Computing</h3>
+            <p>Designing the cloud infrastructure required to process Aether's data and Sentinel's video feeds in real-time.</p>
+        </div>
+
+        <div class="service-item">
+            <h3>03. Embedded Systems</h3>
+            <p>Writing low-level firmware for robotic actuators, drone flight controllers, and medical sensors.</p>
+        </div>
+
+    </section>
+
+    <footer>
+        <p>Shoonya Systems > STATUS: ONLINE</p>
+    </footer>
+
+</body>
+</html>
