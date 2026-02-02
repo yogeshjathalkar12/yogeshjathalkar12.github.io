@@ -1,1 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura | The Pulse of Tomorrow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* 1. MEDICAL THEME VARIABLES */
+        :root {
+            --primary: #059669;       /* Emerald Green */
+            --primary-dark: #064e3b;  /* Deep Forest */
+            --primary-light: #d1fae5; /* Mint wash */
+            --accent: #f97316;        /* Bright Orange */
+            --accent-hover: #ea580c;
+            --bg-white: #ffffff;
+            --bg-offwhite: #f8fafc;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+        }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        body {
+            background-color: var(--bg-white);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* 2. NAVIGATION */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 5%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .brand { font-size: 1.5rem; font-weight: 700; color: var(--primary-dark); letter-spacing: -0.5px; }
+        .brand span { color: var(--accent); }
+        .back-link { text-decoration: none; color: var(--text-light); font-weight: 600; font-size: 0.9rem; }
+        .back-link:hover { color: var(--primary); }
+
+        /* 3. HERO SECTION */
+        .hero {
+            padding: 8rem 5% 6rem;
+            text-align: center;
+            background: radial-gradient(circle at 50% 50%, var(--primary-light) 0%, white 70%);
+        }
+
+        h1 { font-size: 3.5rem; line-height: 1.1; margin-bottom: 1.5rem; color: var(--primary-dark); }
+        .highlight { color: var(--accent); }
+        p.subtitle { font-size: 1.25rem; color: var(--text-light); max-width: 700px; margin: 0 auto 3rem; }
+
+        .cta-button {
+            display: inline-block;
+            background-color: var(--accent);
+            color: white;
+            padding: 16px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 10px 25px rgba(249, 115, 22, 0.3);
+        }
+        .cta-button:hover { transform: translateY(-2px); box-shadow: 0 15px 35px rgba(249, 115, 22, 0.4); }
+
+        /* 4. CORE TECHNOLOGY (Grid) */
+        .tech-section { padding: 6rem 5%; background-color: var(--bg-offwhite); }
+        .section-header { text-align: center; margin-bottom: 4rem; }
+        .section-header h2 { font-size: 2.5rem; color: var(--primary-dark); margin-bottom: 1rem; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            border-top: 4px solid var(--primary);
+            transition: transform 0.3s;
+        }
+        .card:hover { transform: translateY(-5px); }
+        .icon { font-size: 2rem; margin-bottom: 1rem; }
+        .card h3 { margin-bottom: 1rem; color: var(--text-dark); }
+
+        /* 5. SPECIALIZED CARE (Elderly & NICU) */
+        .solutions-section { padding: 6rem 5%; max-width: 1200px; margin: 0 auto; }
+        
+        .solution-row {
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+            margin-bottom: 6rem;
+        }
+        
+        .solution-row:nth-child(even) { flex-direction: row-reverse; }
+
+        .solution-text { flex: 1; }
+        .solution-visual {
+            flex: 1;
+            height: 350px;
+            background: var(--primary-light);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        .solution-tag {
+            background: rgba(5, 150, 105, 0.1);
+            color: var(--primary);
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        /* 6. THE ECOSYSTEM APP */
+        .app-showcase {
+            padding: 6rem 5%;
+            background: var(--primary-dark);
+            color: white;
+            text-align: center;
+        }
+
+        .app-features {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-top: 3rem;
+        }
+
+        .feature-item {
+            background: rgba(255,255,255,0.1);
+            padding: 1.5rem;
+            border-radius: 12px;
+            min-width: 200px;
+            backdrop-filter: blur(5px);
+        }
+
+        /* FOOTER */
+        footer {
+            background-color: #f1f5f9;
+            color: var(--text-light);
+            text-align: center;
+            padding: 3rem 5%;
+            font-size: 0.9rem;
+        }
+        footer a { color: var(--primary); text-decoration: none; }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .solution-row { flex-direction: column !important; gap: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="brand">Aura<span>.</span></div>
+        <a href="../../index.html" class="back-link">← Back to Shoonya Origins</a>
+    </nav>
+
+    <section class="hero">
+        <h1>Health Care that makes <br> the <span class="highlight">Invisible, Visible.</span></h1>
+        <p class="subtitle">A holistic ecosystem combining non-invasive sensors, predictive AI, and personalized care for every stage of life.</p>
+        <a href="#solutions" class="cta-button">Explore Solutions</a>
+    </section>
+
+    <section class="tech-section">
+        <div class="section-header">
+            <h2>The Aura Engine</h2>
+            <p style="color: var(--text-light);">Integrated hardware and software intelligence.</p>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <div class="icon">🔮</div>
+                <h3>Predictive Health</h3>
+                <p>AI that doesn't just track history, but predicts future risks. Early warning systems for cardiac and respiratory anomalies.</p>
+            </div>
+            
+            <div class="card">
+                <div class="icon">🧬</div>
+                <h3>Integrated Sensors</h3>
+                <p>Seamlessly embedded sensors in living spaces and specialized hardware that track continuous vitals without intrusion.</p>
+            </div>
+
+            <div class="card">
+                <div class="icon">👤</div>
+                <h3>Personalized Care</h3>
+                <p>Health isn't one-size-fits-all. Our algorithms create unique biological profiles to tailor nutrition and medication.</p>
+            </div>
+
+            <div class="card">
+                <div class="icon">👁️</div>
+                <h3>EVM Technology</h3>
+                <p>Eulerian Video Magnification to detect pulse and blood volume changes using nothing but standard cameras.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="solutions-section" id="solutions">
+        
+        <div class="solution-row">
+            <div class="solution-text">
+                <span class="solution-tag">Elderly Care</span>
+                <h2 style="font-size: 2rem; margin-bottom: 1rem; color: var(--text-dark);">Dignity & Safety for Seniors</h2>
+                <p style="color: var(--text-light);">
+                    Remote monitoring systems designed for independence. Fall detection, medication reminders, and non-invasive heart monitoring allow seniors to live safely at home while keeping families connected.
+                </p>
+            </div>
+            <div class="solution-visual">👴</div>
+        </div>
+
+        <div class="solution-row">
+            <div class="solution-text">
+                <span class="solution-tag">Neonatal Care (NICU)</span>
+                <h2 style="font-size: 2rem; margin-bottom: 1rem; color: var(--text-dark);">Guardian of the First Breath</h2>
+                <p style="color: var(--text-light);">
+                    Contact-free vital monitoring for premature infants. By removing physical wires and sticky sensors, we reduce skin trauma and infection risk while maintaining ICU-grade precision.
+                </p>
+            </div>
+            <div class="solution-visual">👶</div>
+        </div>
+
+    </section>
+
+    <section class="app-showcase">
+        <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">The Aura Super App</h2>
+        <p style="opacity: 0.9; max-width: 600px; margin: 0 auto;">
+            One interface to control your health destiny. From nutrition to real-time doctor connectivity.
+        </p>
+
+        <div class="app-features">
+            <div class="feature-item">
+                <h3 style="margin-bottom:0.5rem;">🥗 NutriVision</h3>
+                <p style="font-size:0.9rem;">AI Calorie & Macro Scanning</p>
+            </div>
+            <div class="feature-item">
+                <h3 style="margin-bottom:0.5rem;">📊 Real-Time Vitals</h3>
+                <p style="font-size:0.9rem;">Live Dashboard Integration</p>
+            </div>
+            <div class="feature-item">
+                <h3 style="margin-bottom:0.5rem;">👨‍⚕️ Tele-Connect</h3>
+                <p style="font-size:0.9rem;">Instant Specialist Access</p>
+            </div>
+            <div class="feature-item">
+                <h3 style="margin-bottom:0.5rem;">🔔 Smart Alerts</h3>
+                <p style="font-size:0.9rem;">Predictive Emergency Warnings</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Aura Health. A <a href="../../index.html">Shoonya Origins</a> Company.</p>
+        <p style="margin-top: 10px; font-size: 0.8rem;">Pune, India | Privacy Policy</p>
+    </footer>
+
+</body>
+</html>
