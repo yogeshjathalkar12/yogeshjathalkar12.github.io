@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basis | Smart Urban Governance</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* BASIS THEME: Civic, Trustworthy, Collaborative */
+        :root {
+            --civic-blue: #2563eb;    /* Trust Blue */
+            --civic-dark: #1e3a8a;    /* Official Navy */
+            --clean-bg: #f8fafc;
+            --text-dark: #334155;
+            --text-light: #64748b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { background-color: var(--clean-bg); color: var(--text-dark); line-height: 1.6; }
+
+        /* NAV */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1.5rem 5%; background: white; border-bottom: 1px solid #e2e8f0;
+        }
+        .brand { font-size: 1.6rem; font-weight: 700; color: var(--civic-dark); }
+        .back-link { text-decoration: none; color: var(--text-light); font-size: 0.9rem; }
+
+        /* HERO */
+        .hero {
+            padding: 7rem 5%;
+            text-align: center;
+            background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+        }
+        h1 { font-size: 3rem; color: var(--civic-dark); margin-bottom: 1rem; line-height: 1.2; }
+        p.subtitle { font-size: 1.15rem; color: var(--text-light); max-width: 700px; margin: 0 auto 2.5rem; }
+        
+        .badge {
+            background: #dbeafe; color: var(--civic-blue); padding: 5px 15px; border-radius: 50px;
+            font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+            margin-bottom: 1.5rem; display: inline-block;
+        }
+
+        /* MISSION STATEMENT */
+        .mission-box {
+            max-width: 900px; margin: 0 auto 5rem; padding: 2rem;
+            background: white; border-left: 4px solid var(--civic-blue);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); border-radius: 0 12px 12px 0;
+        }
+        .mission-box p { font-style: italic; color: var(--text-dark); font-size: 1.1rem; }
+
+        /* SOLUTIONS GRID */
+        .solutions { padding: 4rem 5%; background: white; }
+        .grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 3rem;
+            max-width: 1200px; margin: 0 auto;
+        }
+
+        .solution-card {
+            padding: 2rem; border-radius: 12px; background: var(--clean-bg);
+            border: 1px solid #e2e8f0; transition: all 0.3s;
+        }
+        .solution-card:hover { border-color: var(--civic-blue); background: white; box-shadow: 0 10px 30px rgba(37, 99, 235, 0.1); }
+        
+        .icon-box {
+            width: 50px; height: 50px; background: var(--civic-dark); color: white;
+            display: flex; align-items: center; justify-content: center; border-radius: 8px;
+            margin-bottom: 1.5rem; font-size: 1.5rem;
+        }
+
+        h3 { font-size: 1.4rem; margin-bottom: 0.8rem; color: var(--civic-dark); }
+        p.desc { font-size: 0.95rem; color: var(--text-light); }
+
+        footer { text-align: center; padding: 3rem; color: var(--text-light); font-size: 0.9rem; background: #f1f5f9; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="brand">Basis</div>
+        <a href="../../index.html" class="back-link">← Shoonya Origins</a>
+    </nav>
+
+    <section class="hero">
+        <span class="badge">Public-Private Partnership</span>
+        <h1>Empowering Cities with <br>Data-Driven Intelligence.</h1>
+        <p class="subtitle">
+            We do not govern; we enable governance. Basis provides the digital nervous system that helps municipalities and organizations maintain urban hygiene, safety, and flow.
+        </p>
+    </section>
+
+    <div class="mission-box">
+        <p>
+            "Our mission is to serve as a force multiplier for local governments. By providing real-time data and automated logistics support, we help civic bodies solve complex urban challenges efficiently and transparently."
+        </p>
+    </div>
+
+    <section class="solutions">
+        <div class="grid">
+
+            <div class="solution-card">
+                <div class="icon-box">♻️</div>
+                <h3>Smart Waste Logistics</h3>
+                <p class="desc">
+                    Collaborating with sanitation departments to deploy sensor-based bin monitoring. We optimize collection routes in real-time to prevent overflow and reduce fuel consumption for fleet vehicles.
+                </p>
+            </div>
+
+            <div class="solution-card">
+                <div class="icon-box">🛣️</div>
+                <h3>Road Maintenance Grid</h3>
+                <p class="desc">
+                    A community-sourced reporting system that identifies potholes and structural wear. We aggregate this data into heatmaps, allowing public works departments to prioritize repairs where they are needed most.
+                </p>
+            </div>
+
+            <div class="solution-card">
+                <div class="icon-box">💧</div>
+                <h3>Sanitation Monitoring</h3>
+                <p class="desc">
+                    IoT-enabled systems for tracking public utility cleanliness and water quality. We provide actionable dashboards to ensure city standards are met proactively, not reactively.
+                </p>
+            </div>
+
+            <div class="solution-card">
+                <div class="icon-box">🏙️</div>
+                <h3>Unified City Dashboard</h3>
+                <p class="desc">
+                    Integrating disparate city data—from traffic flow to energy usage—into a single, secure interface for decision-makers to visualize the city's health at a glance.
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Basis Urban Management. Supporting Smarter Cities.</p>
+    </footer>
+
+</body>
+</html>
