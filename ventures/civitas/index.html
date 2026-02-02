@@ -1,1 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Civitas | Engineering Civilization</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* CIVITAS THEME: Industrial, Heavy, Reliable */
+        :root {
+            --safety-yellow: #fbbf24;
+            --concrete-grey: #374151;
+            --steel-light: #f3f4f6;
+            --text-dark: #111827;
+            --text-light: #6b7280;
+        }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { background-color: var(--steel-light); color: var(--text-dark); }
+
+        /* NAV */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1.5rem 5%; background: white; border-bottom: 4px solid var(--safety-yellow);
+        }
+        .brand { font-size: 1.8rem; font-weight: 800; color: var(--concrete-grey); text-transform: uppercase; }
+        .back-link { text-decoration: none; color: var(--text-light); font-weight: 600; }
+
+        /* HERO */
+        .hero {
+            padding: 6rem 5%; background: var(--concrete-grey); color: white; text-align: center;
+        }
+        h1 { font-size: 3.5rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 2px; }
+        .subtitle { color: #d1d5db; max-width: 600px; margin: 0 auto; font-size: 1.2rem; }
+
+        /* 10 MODULES GRID */
+        .modules-section { padding: 4rem 5%; }
+        .section-title { text-align: center; margin-bottom: 3rem; font-size: 2rem; color: var(--concrete-grey); }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .module-card {
+            background: white;
+            padding: 2rem;
+            border-left: 5px solid var(--safety-yellow);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        .module-card:hover { transform: translateY(-5px); background: #fffbeb; }
+        
+        .module-num { font-size: 0.8rem; font-weight: 800; color: var(--text-light); margin-bottom: 0.5rem; display: block; }
+        .module-card h3 { font-size: 1.3rem; margin-bottom: 0.5rem; color: var(--text-dark); }
+        .module-card p { font-size: 0.9rem; color: var(--text-light); line-height: 1.5; }
+
+        /* FOOTER */
+        footer { text-align: center; padding: 3rem; background: #e5e7eb; color: var(--text-light); margin-top: 4rem; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="brand">Civitas</div>
+        <a href="../../index.html" class="back-link">← Shoonya Origins</a>
+    </nav>
+
+    <section class="hero">
+        <h1>Forging the Physical World</h1>
+        <p class="subtitle">Heavy infrastructure, sustainable materials, and smart urbanization.</p>
+    </section>
+
+    <section class="modules-section">
+        <h2 class="section-title">The 10 Pillars of Infrastructure</h2>
+        <div class="grid">
+            
+            <div class="module-card">
+                <span class="module-num">01</span>
+                <h3>Smart Highways</h3>
+                <p>Self-healing asphalt roads embedded with sensors for traffic management and EV charging lanes.</p>
+            </div>
+
+            <div class="module-card">
+                <span class="module-num">02</span>
+                <h3>Vertical Living</h3>
+                <p>High-density, sustainable skyscraper complexes designed to reduce urban sprawl and maximize energy efficiency.</p>
+            </div>
+
+            <div class="module-card">
+                <span class="module-num">03</span>
+                <h3>Prefabrication</h3>
+                <p>Factory-built modular housing units that reduce construction time by 60% while increasing structural integrity.</p>
+            </div>
+
+            <div class="module-card">
+                <span class="module-num">04</span>
+                <h3>Carbon-Negative Material</h3>
+                <p>Next-gen cement alternatives that absorb CO2 during the curing process, turning buildings into carbon sinks.</p>
+            </div>
+
+            <div class="module-card">
+                <span class="module-num">05</span>
+                <h3>Robotic Fleet</h3>
+                <p>Autonomous excavators and cranes operating 24/7 with millimeter precision and zero human risk.</p>
+            </div>
+
+            <div class="module-card">
+                <span class="module-num">06</span>
+                <h3>Hydro-Engineering</h3>
+                <p>Advanced dam systems, river rejuvenation channels, and flood control networks for climate resilience.</p>
+            </div>
+
+            <div class="module-card">
+                <span class="module-num">07</span>
+                <h3>Subterranean Tunnels</h3>
+                <p>Dedicated utility and freight tunnels to clear surface congestion and protect critical supply lines.</p>
+            </div>
+
+            <div class="module-card">
+                <span class="module-num">08</span>
+                <h3>Power Matrix</h3>
+                <p>Solar-integrated roofing and structural batteries that allow infrastructure to power itself.</p>
+            </div>
+
+            <div class="module-card">
+                <span class="module-num">09</span>
+                <h3>Digital Twin Surveying</h3>
+                <p>Real-time AR measurement and drone mapping to create perfect digital replicas of construction sites.</p>
+            </div>
+
+            <div class="module-card">
+                <span class="module-num">10</span>
+                <h3>Seismic Defense</h3>
+                <p>Base-isolation technologies and flexible superstructures designed to withstand high-magnitude earthquakes.</p>
+            </div>
+
+        </div>
+    </section>
+
+    <footer>
+        &copy; 2026 Civitas Infrastructure. Part of the Shoonya Origins Ecosystem.
+    </footer>
+
+</body>
+</html>
