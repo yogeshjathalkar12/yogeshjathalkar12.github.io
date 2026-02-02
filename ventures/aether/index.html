@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aether | Research & Development</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        /* AETHER THEME: Space, Mystery, Future */
+        :root {
+            --bg-deep: #020617;
+            --accent-cyan: #22d3ee;
+            --accent-violet: #8b5cf6;
+            --glass: rgba(255, 255, 255, 0.03);
+            --text-glow: #e2e8f0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { 
+            background-color: var(--bg-deep); color: var(--text-glow); 
+            background: radial-gradient(circle at top right, #1e1b4b 0%, #020617 60%);
+            min-height: 100vh;
+        }
+
+        /* NAV */
+        nav {
+            display: flex; justify-content: center; align-items: center;
+            padding: 2rem;
+        }
+        .brand { 
+            font-size: 1rem; letter-spacing: 5px; text-transform: uppercase; 
+            opacity: 0.7; border: 1px solid rgba(255,255,255,0.2); 
+            padding: 10px 20px; border-radius: 50px;
+        }
+        .back-link {
+            position: absolute; left: 5%; top: 2.5rem;
+            text-decoration: none; color: rgba(255,255,255,0.3); font-size: 0.8rem;
+        }
+
+        /* CENTER CONTENT */
+        .container {
+            max-width: 1000px; margin: 0 auto; padding: 6rem 5%; text-align: center;
+        }
+
+        h1 {
+            font-size: 4rem; font-weight: 300; letter-spacing: -2px;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 2rem;
+        }
+
+        p.intro {
+            font-size: 1.2rem; line-height: 1.8; color: #94a3b8; margin-bottom: 5rem; font-weight: 300;
+        }
+
+        /* PROJECT CARDS */
+        .projects {
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem;
+        }
+
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 2.5rem;
+            border-radius: 20px;
+            flex: 1;
+            min-width: 280px;
+            text-align: left;
+            transition: transform 0.5s;
+        }
+        .card:hover { transform: translateY(-10px); background: rgba(255,255,255,0.05); }
+
+        .tag {
+            font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;
+            color: var(--accent-cyan); margin-bottom: 1rem; display: block;
+        }
+        
+        .card h2 { font-size: 1.5rem; margin-bottom: 1rem; font-weight: 400; }
+        .card p { font-size: 0.9rem; color: #64748b; }
+
+        footer { text-align: center; padding: 4rem; opacity: 0.3; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="../../index.html" class="back-link">← Return</a>
+        <div class="brand">Aether Labs</div>
+    </nav>
+
+    <div class="container">
+        <h1>Innovation from the<br>Unknown.</h1>
+        <p class="intro">
+            We operate at the bleeding edge of science. Aether is the experimental division dedicated to solving problems that don't exist yet, using technology that shouldn't be possible.
+        </p>
+
+        <div class="projects">
+            
+            <div class="card">
+                <span class="tag">Project: Synapse</span>
+                <h2>Brain-Computer Interface</h2>
+                <p>Non-invasive neural interpretation for controlling digital environments via thought.</p>
+            </div>
+
+            <div class="card">
+                <span class="tag">Project: Helios</span>
+                <h2>Solid State Energy</h2>
+                <p>High-density graphene battery storage for powering Sentinel drones indefinitely.</p>
+            </div>
+
+            <div class="card">
+                <span class="tag">Project: Void</span>
+                <h2>Quantum Cryptography</h2>
+                <p>Data transmission secured by the laws of quantum mechanics, theoretically unhackable.</p>
+            </div>
+
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2026 Shoonya Origins R&D Division.
+    </footer>
+
+</body>
+</html>
