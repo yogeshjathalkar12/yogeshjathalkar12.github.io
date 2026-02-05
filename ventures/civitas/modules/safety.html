@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Civitas | Module Detail</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        /* SAME INDUSTRIAL THEME */
+        :root {
+            --safety-yellow: #fbbf24;
+            --concrete-grey: #374151;
+            --steel-light: #f3f4f6;
+            --text-dark: #111827;
+            --text-light: #6b7280;
+            --success-green: #10b981;
+            --alert-red: #ef4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: var(--steel-light); color: var(--text-dark); }
+
+        /* NAV */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1.5rem 5%; background: white; border-bottom: 4px solid var(--safety-yellow);
+        }
+        .brand { font-size: 1.8rem; font-weight: 800; color: var(--concrete-grey); text-transform: uppercase; }
+        .back-link { text-decoration: none; color: var(--text-light); font-weight: 600; transition: 0.3s; }
+        .back-link:hover { color: var(--safety-yellow); }
+
+        /* HEADER */
+        .module-header {
+            padding: 6rem 5%; background: var(--concrete-grey); color: white;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .status-badge {
+            background: var(--safety-yellow); color: var(--concrete-grey);
+            padding: 0.5rem 1rem; border-radius: 4px; font-weight: 800; font-size: 0.8rem;
+            text-transform: uppercase; letter-spacing: 1px; display: inline-block; margin-bottom: 1rem;
+        }
+        .module-title { font-size: 3.5rem; margin-bottom: 1rem; text-transform: uppercase; font-weight: 800; }
+        .module-subtitle { color: #d1d5db; max-width: 700px; font-size: 1.2rem; line-height: 1.6; }
+
+        /* CONTENT GRID */
+        .content-section { padding: 4rem 5%; display: grid; grid-template-columns: 2fr 1fr; gap: 4rem; }
+        
+        .main-col h2 { font-size: 2rem; margin-bottom: 1.5rem; color: var(--concrete-grey); }
+        .main-col p { margin-bottom: 1.5rem; line-height: 1.8; color: var(--text-light); }
+        .tech-list { list-style: none; margin-bottom: 2rem; }
+        .tech-list li { margin-bottom: 1rem; padding-left: 1.5rem; position: relative; color: var(--text-dark); font-weight: 600; }
+        .tech-list li::before {
+            content: "►"; color: var(--safety-yellow); position: absolute; left: 0; font-size: 0.8rem; top: 3px;
+        }
+
+        /* SIDEBAR (Technical Specs) */
+        .sidebar-card {
+            background: white; padding: 2rem; border-left: 5px solid var(--safety-yellow);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .sidebar-title { font-size: 1.2rem; font-weight: 800; margin-bottom: 1.5rem; text-transform: uppercase; }
+        .spec-row { display: flex; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid #eee; }
+        .spec-label { color: var(--text-light); font-size: 0.9rem; }
+        .spec-value { font-weight: 700; color: var(--text-dark); font-size: 0.9rem; text-align: right; }
+
+        /* FOOTER */
+        footer { padding: 3rem 5%; background: #e5e7eb; text-align: center; color: var(--text-light); margin-top: 4rem; }
+
+        @media (max-width: 768px) { .content-section { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="brand">Civitas / M-01</div>
+        <a href="../index.html" class="back-link">← Return to Dashboard</a>
+    </nav>
+
+    <header class="module-header">
+        <span class="status-badge" id="m-status">DEPLOYMENT READY</span>
+        <h1 class="module-title" id="m-title">Sentinel Safety</h1>
+        <p class="module-subtitle" id="m-desc">
+            The "Eye" of the system. An autonomous computer vision layer that monitors site compliance 24/7, replacing fallible human audits with digital certainty.
+        </p>
+    </header>
+
+    <section class="content-section">
+        
+        <div class="main-col">
+            <h2>System Architecture</h2>
+            <p id="m-long-desc">
+                Sentinel uses a distributed network of edge-computing cameras to analyze visual data locally. Unlike cloud-based systems that suffer from latency, Sentinel processes frames in 30ms using YOLOv8 optimized models. It detects PPE violations (Helmet, Vest), Zone Intrusions, and Hazardous proximity instantly.
+            </p>
+            
+            <h2>Core Capabilities</h2>
+            <ul class="tech-list" id="m-features">
+                <li>Real-time PPE Detection (98% Accuracy)</li>
+                <li>Geofencing & Danger Zone Alerts</li>
+                <li>Automated Incident Logging & Reporting</li>
+                <li>Low-Latency Edge Processing (No Cloud Required)</li>
+            </ul>
+        </div>
+
+        <div class="sidebar">
+            <div class="sidebar-card">
+                <div class="sidebar-title">Technical Specifications</div>
+                
+                <div class="spec-row">
+                    <span class="spec-label">Model Architecture</span>
+                    <span class="spec-value" id="s-model">YOLOv8 Custom</span>
+                </div>
+                <div class="spec-row">
+                    <span class="spec-label">Hardware</span>
+                    <span class="spec-value" id="s-hw">NVIDIA Jetson Nano</span>
+                </div>
+                <div class="spec-row">
+                    <span class="spec-label">Latency</span>
+                    <span class="spec-value" id="s-lat">~30ms / Frame</span>
+                </div>
+                <div class="spec-row">
+                    <span class="spec-label">Connectivity</span>
+                    <span class="spec-value" id="s-con">Local LAN / 5G</span>
+                </div>
+                <div class="spec-row">
+                    <span class="spec-label">Language</span>
+                    <span class="spec-value" id="s-lang">Python / PyTorch</span>
+                </div>
+
+            </div>
+        </div>
+
+    </section>
+
+    <footer>
+        &copy; 2026 Civitas Automation Systems. All rights reserved.
+    </footer>
+
+</body>
+</html>
