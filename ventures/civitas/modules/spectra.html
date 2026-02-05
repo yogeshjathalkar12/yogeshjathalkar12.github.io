@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Civitas | Spectra Quality</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* THEME: Industrial Light + White Glass */
+        :root {
+            --bg-color: #f3f4f6;
+            --safety-yellow: #fbbf24;
+            --concrete-grey: #374151;
+            --text-dark: #111827;
+            --text-light: #6b7280;
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.9);
+            --glass-blur: 16px;
+            --shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { 
+            background-color: var(--bg-color); 
+            background-image: radial-gradient(at 50% 0%, rgba(251, 191, 36, 0.15) 0px, transparent 60%);
+            color: var(--text-dark); 
+            min-height: 100vh;
+        }
+
+        /* NAV */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1.5rem 5%;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(var(--glass-blur));
+            border-bottom: 2px solid #e5e7eb;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .brand { font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--concrete-grey); }
+        .back-link { text-decoration: none; color: var(--text-light); font-weight: 600; font-size: 0.9rem; }
+        .back-link:hover { color: var(--concrete-grey); }
+
+        /* HERO */
+        .hero { padding: 8rem 5% 4rem; text-align: center; max-width: 900px; margin: 0 auto; }
+        .status-badge { 
+            display: inline-block; padding: 0.5rem 1rem; background: var(--safety-yellow); color: var(--concrete-grey);
+            font-size: 0.75rem; font-weight: 800; letter-spacing: 2px; border-radius: 4px; margin-bottom: 1.5rem;
+        }
+        h1 { font-size: 4rem; margin-bottom: 1.5rem; line-height: 1.1; color: var(--concrete-grey); text-transform: uppercase; }
+        .hero p { font-size: 1.3rem; color: var(--text-light); font-weight: 300; line-height: 1.6; }
+
+        /* CONTENT GRID */
+        .value-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem; padding: 2rem 5% 8rem; max-width: 1400px; margin: 0 auto;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            border: 1px solid #fff;
+            padding: 3rem 2.5rem; border-radius: 12px;
+            backdrop-filter: blur(var(--glass-blur));
+            box-shadow: var(--shadow);
+            transition: transform 0.3s;
+        }
+        .card:hover { transform: translateY(-5px); background: #fff; }
+
+        .card-icon { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; margin-bottom: 1.5rem; display: block; }
+        
+        /* Accents */
+        .c-problem .card-icon { color: #ef4444; } /* Red */
+        .c-solution .card-icon { color: var(--safety-yellow); } /* Yellow */
+        .c-edge .card-icon { color: #10b981; } /* Green */
+
+        .card h3 { font-size: 1.6rem; margin-bottom: 1rem; color: var(--concrete-grey); }
+        .card p { color: var(--text-light); line-height: 1.7; font-size: 1rem; }
+
+        footer { text-align: center; padding: 2rem; color: var(--text-light); font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="brand">Civitas / M-04</div>
+        <a href="../index.html" class="back-link">← CLOSE MODULE</a>
+    </nav>
+
+    <section class="hero">
+        <span class="status-badge">DEPLOYMENT READY</span>
+        <h1>Spectra Quality</h1>
+        <p>X-Ray vision for infrastructure. Detecting the microscopic defects and structural weaknesses that human eyes miss.</p>
+    </section>
+
+    <section class="value-grid">
+        
+        <div class="card c-problem">
+            <span class="card-icon">The Friction</span>
+            <h3>Hidden Weakness</h3>
+            <p>Poor concrete curing or micro-fractures in welding often go unnoticed during visual inspections, leading to massive rework costs later.</p>
+        </div>
+
+        <div class="card c-solution">
+            <span class="card-icon">The Fix</span>
+            <h3>Spectral Analysis</h3>
+            <p>Our multi-spectrum sensors analyze surface temperatures and structural density in real-time, flagging quality issues instantly.</p>
+        </div>
+
+        <div class="card c-edge">
+            <span class="card-icon">The Advantage</span>
+            <h3>Brand Protection</h3>
+            <p>Deliver a product that is structurally perfect. Eliminate the risk of post-handover cracks and reputation damage.</p>
+        </div>
+
+    </section>
+
+    <footer>
+        &copy; 2026 Civitas Automation Ecosystem.
+    </footer>
+
+</body>
+</html>
