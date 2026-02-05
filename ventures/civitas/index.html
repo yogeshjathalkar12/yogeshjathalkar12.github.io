@@ -6,129 +6,115 @@
     <title>Civitas | The Nervous System of Infrastructure</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;700;800&display=swap" rel="stylesheet">
     <style>
-        /* CIVITAS THEME: Dark Glass & Industrial Steel */
+        /* CIVITAS THEME: Industrial Light + White Glass */
         :root {
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --glass-blur: 12px;
+            --bg-color: #f3f4f6;
             --safety-yellow: #fbbf24;
-            --text-white: #ffffff;
-            --text-grey: #9ca3af;
+            --concrete-grey: #374151;
+            --text-dark: #111827;
+            --text-light: #6b7280;
+            
+            /* GLASS VARS */
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.9);
+            --glass-blur: 12px;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         
         body { 
-            background-color: #0f172a; /* Deep Slate */
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(251, 191, 36, 0.15) 0px, transparent 50%);
-            background-attachment: fixed;
-            color: var(--text-white); 
+            background-color: var(--bg-color); 
+            background-image: radial-gradient(at 0% 0%, rgba(251, 191, 36, 0.1) 0px, transparent 50%);
+            color: var(--text-dark); 
             min-height: 100vh;
         }
 
-        /* NAVIGATION - Glass Header */
+        /* NAV: Frosted White Glass */
         nav {
             display: flex; justify-content: space-between; align-items: center;
             padding: 1.5rem 5%;
-            background: rgba(15, 23, 42, 0.6);
+            background: rgba(255, 255, 255, 0.85); /* High Opacity Glass */
             backdrop-filter: blur(var(--glass-blur));
-            border-bottom: 1px solid var(--glass-border);
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border-bottom: 4px solid var(--safety-yellow);
             position: sticky; top: 0; z-index: 100;
         }
-        .brand { font-size: 1.5rem; font-weight: 800; color: var(--text-white); text-transform: uppercase; letter-spacing: 2px; }
-        .brand span { color: var(--safety-yellow); }
-        .back-link { text-decoration: none; color: var(--text-grey); font-weight: 600; font-size: 0.9rem; transition: 0.3s; }
-        .back-link:hover { color: var(--text-white); }
+        .brand { font-size: 1.8rem; font-weight: 800; color: var(--concrete-grey); text-transform: uppercase; letter-spacing: 1px; }
+        .back-link { text-decoration: none; color: var(--text-light); font-weight: 600; font-size: 0.9rem; transition: 0.2s; }
+        .back-link:hover { color: var(--concrete-grey); }
 
-        /* HERO SECTION */
+        /* HERO */
         .hero {
-            padding: 8rem 5% 4rem; text-align: center;
+            padding: 6rem 5% 4rem; text-align: center;
         }
-        h1 { 
-            font-size: 4rem; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: -1px; 
-            background: linear-gradient(to right, #ffffff, #94a3b8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .subtitle { color: var(--text-grey); max-width: 700px; margin: 0 auto; font-size: 1.25rem; line-height: 1.6; font-weight: 300; }
+        h1 { font-size: 3.5rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 1px; color: var(--concrete-grey); }
+        .subtitle { color: var(--text-light); max-width: 700px; margin: 0 auto; font-size: 1.2rem; line-height: 1.6; }
 
         /* MODULES GRID */
         .modules-section { padding: 2rem 5% 6rem; }
         .section-title { 
             text-align: center; margin-bottom: 3rem; font-size: 0.9rem; 
-            color: var(--safety-yellow); text-transform: uppercase; letter-spacing: 3px; font-weight: 700;
+            color: var(--concrete-grey); text-transform: uppercase; letter-spacing: 3px; font-weight: 800;
+            opacity: 0.6;
         }
         
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 2rem;
             max-width: 1400px;
             margin: 0 auto;
         }
 
-        /* GLASS CARDS */
-        .module-link { text-decoration: none; display: block; }
+        /* LINKS */
+        .module-link { text-decoration: none; display: block; height: 100%; }
 
+        /* CARD: Frosted Glass Effect */
         .module-card {
             background: var(--glass-bg);
             backdrop-filter: blur(var(--glass-blur));
             -webkit-backdrop-filter: blur(var(--glass-blur));
             border: 1px solid var(--glass-border);
             padding: 2.5rem;
-            border-radius: 12px;
-            transition: all 0.3s ease;
+            border-left: 6px solid var(--safety-yellow);
+            box-shadow: var(--shadow);
+            border-radius: 0 12px 12px 0; /* Flat left edge for border */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
             height: 100%;
-            position: relative;
-            overflow: hidden;
         }
 
         .module-card:hover {
             transform: translateY(-8px);
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.3);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         }
-
-        /* Hover Glow Effect */
-        .module-card::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
-            background: var(--safety-yellow);
-            opacity: 0; transition: 0.3s;
-        }
-        .module-card:hover::before { opacity: 1; }
         
-        .module-num { 
-            font-size: 0.75rem; font-weight: 800; color: var(--safety-yellow); 
-            margin-bottom: 1rem; display: block; letter-spacing: 1px;
-        }
-        .module-card h3 { 
-            font-size: 1.5rem; margin-bottom: 0.75rem; color: var(--text-white); font-weight: 600; 
-        }
-        .module-card p { 
-            font-size: 0.95rem; color: var(--text-grey); line-height: 1.6; 
-        }
+        .module-num { font-size: 0.75rem; font-weight: 800; color: var(--text-light); margin-bottom: 1rem; display: block; letter-spacing: 1px; }
+        .module-card h3 { font-size: 1.4rem; margin-bottom: 0.75rem; color: var(--concrete-grey); font-weight: 800; }
+        .module-card p { font-size: 0.95rem; color: var(--text-light); line-height: 1.6; }
 
         /* HARDWARE CARD SPECIAL STYLE */
         .hw-card {
-            border: 1px solid var(--safety-yellow);
-            background: rgba(251, 191, 36, 0.05);
+            background: var(--concrete-grey);
+            border-left: 6px solid #000;
         }
+        .hw-card h3 { color: #fff; }
+        .hw-card p { color: #d1d5db; }
+        .hw-card .module-num { color: var(--safety-yellow); }
 
         /* FOOTER */
         footer { 
             text-align: center; padding: 3rem; 
-            border-top: 1px solid var(--glass-border);
-            color: var(--text-grey); font-size: 0.9rem;
+            background: rgba(255,255,255,0.5);
+            color: var(--text-light); font-size: 0.9rem; margin-top: 4rem;
         }
     </style>
 </head>
 <body>
 
     <nav>
-        <div class="brand">Civitas<span>.Core</span></div>
+        <div class="brand">Civitas</div>
         <a href="../../index.html" class="back-link">← Return to Origins</a>
     </nav>
 
@@ -215,8 +201,8 @@
 
             <a href="modules/rover.html" class="module-link">
                 <div class="module-card hw-card">
-                    <span class="module-num" style="color:#000;">10 | HARDWARE EXECUTOR</span>
-                    <h3 style="color:#fbbf24;">Civitas Rover</h3>
+                    <span class="module-num">10 | HARDWARE EXECUTOR</span>
+                    <h3>Civitas Rover</h3>
                     <p>Autonomous 6-wheel robotic unit designed for heavy material transport and hazardous entry.</p>
                 </div>
             </a>
