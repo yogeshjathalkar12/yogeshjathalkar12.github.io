@@ -2,117 +2,90 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Civitas | Digital Twin</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;700;800&display=swap" rel="stylesheet">
     <style>
-        /* THEME: Industrial Light + White Glass */
-        :root {
-            --bg-color: #f3f4f6;
-            --safety-yellow: #fbbf24;
-            --concrete-grey: #374151;
-            --text-dark: #111827;
-            --text-light: #6b7280;
-            --glass-bg: rgba(255, 255, 255, 0.75);
-            --glass-border: rgba(255, 255, 255, 0.9);
-            --glass-blur: 16px;
-            --shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
-        }
-
+        /* THEME: Industrial Light */
+        :root { --bg: #f3f4f6; --accent: #fbbf24; --dark: #374151; --glass: rgba(255,255,255,0.8); }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg); color: var(--dark); }
         
-        body { 
-            background-color: var(--bg-color); 
-            background-image: radial-gradient(at 50% 0%, rgba(251, 191, 36, 0.15) 0px, transparent 60%);
-            color: var(--text-dark); 
-            min-height: 100vh;
-        }
+        nav { padding: 1.5rem 5%; display: flex; justify-content: space-between; background: var(--glass); backdrop-filter: blur(10px); border-bottom: 2px solid #e5e7eb; }
+        .brand { font-weight: 800; text-transform: uppercase; color: var(--dark); }
+        .back-link { text-decoration: none; color: #6b7280; font-weight: 600; }
 
-        nav {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 1.5rem 5%;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(var(--glass-blur));
-            border-bottom: 2px solid #e5e7eb;
-            position: sticky; top: 0; z-index: 100;
+        /* SPLIT HERO */
+        .split-hero {
+            display: grid; grid-template-columns: 1fr 1fr; min-height: 80vh;
         }
-        .brand { font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--concrete-grey); }
-        .back-link { text-decoration: none; color: var(--text-light); font-weight: 600; font-size: 0.9rem; }
-        .back-link:hover { color: var(--concrete-grey); }
-
-        .hero { padding: 8rem 5% 4rem; text-align: center; max-width: 900px; margin: 0 auto; }
-        .status-badge { 
-            display: inline-block; padding: 0.5rem 1rem; background: #e5e7eb; color: var(--concrete-grey);
-            font-size: 0.75rem; font-weight: 800; letter-spacing: 2px; border-radius: 4px; margin-bottom: 1.5rem;
+        .hero-left {
+            padding: 6rem 5%; display: flex; flex-direction: column; justify-content: center;
+            border-right: 1px solid #e5e7eb;
         }
-        h1 { font-size: 4rem; margin-bottom: 1.5rem; line-height: 1.1; color: var(--concrete-grey); text-transform: uppercase; }
-        .hero p { font-size: 1.3rem; color: var(--text-light); font-weight: 300; line-height: 1.6; }
-
-        .value-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem; padding: 2rem 5% 8rem; max-width: 1400px; margin: 0 auto;
+        .hero-right {
+            background: #e5e7eb; padding: 6rem 5%; display: flex; flex-direction: column; justify-content: center;
+            position: relative; overflow: hidden;
         }
-
-        .card {
-            background: var(--glass-bg);
-            border: 1px solid #fff;
-            padding: 3rem 2.5rem; border-radius: 12px;
-            backdrop-filter: blur(var(--glass-blur));
-            box-shadow: var(--shadow);
-            transition: transform 0.3s;
-        }
-        .card:hover { transform: translateY(-5px); background: #fff; }
-
-        .card-icon { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; margin-bottom: 1.5rem; display: block; }
         
-        .c-problem .card-icon { color: #ef4444; }
-        .c-solution .card-icon { color: var(--safety-yellow); }
-        .c-edge .card-icon { color: #10b981; }
+        /* Typography */
+        h1 { font-size: 3.5rem; line-height: 1.1; margin-bottom: 1.5rem; text-transform: uppercase; }
+        .subtitle { font-size: 1.2rem; line-height: 1.6; color: #6b7280; margin-bottom: 2rem; }
+        .badge { background: var(--accent); color: var(--dark); padding: 0.5rem 1rem; font-weight: 800; font-size: 0.8rem; display: inline-block; margin-bottom: 1rem; border-radius: 4px; }
 
-        .card h3 { font-size: 1.6rem; margin-bottom: 1rem; color: var(--concrete-grey); }
-        .card p { color: var(--text-light); line-height: 1.7; font-size: 1rem; }
+        /* Comparison Box */
+        .comparison-box {
+            background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            margin-top: 2rem;
+        }
+        .comp-row { display: flex; justify-content: space-between; border-bottom: 1px solid #f3f4f6; padding: 1rem 0; }
+        .comp-label { font-weight: 700; color: var(--dark); }
+        .comp-val { color: #6b7280; }
 
-        footer { text-align: center; padding: 2rem; color: var(--text-light); font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
     <nav>
         <div class="brand">Civitas / M-07</div>
-        <a href="../index.html" class="back-link">← CLOSE MODULE</a>
+        <a href="../index.html" class="back-link">← CLOSE</a>
     </nav>
 
-    <section class="hero">
-        <span class="status-badge">PROTOTYPE (BETA)</span>
-        <h1>Digital Twin</h1>
-        <p>A living mirror of reality. We reconcile the "As-Built" physical site with your "As-Designed" blueprints in real-time.</p>
-    </section>
-
-    <section class="value-grid">
+    <div class="split-hero">
         
-        <div class="card c-problem">
-            <span class="card-icon">The Friction</span>
-            <h3>The Reality Gap</h3>
-            <p>What is on the blueprint is rarely what gets built. These discrepancies cause massive conflicts between plumbing, electrical, and structural teams.</p>
+        <div class="hero-left">
+            <span class="badge">PROTOTYPE (BETA)</span>
+            <h1>The Living Mirror</h1>
+            <p class="subtitle">Construction has a "Reality Gap." What is on the blueprint is rarely what gets built. We close that gap by overlaying the 3D BIM model directly onto the physical site.</p>
+            
+            <div class="comparison-box">
+                <div class="comp-row">
+                    <span class="comp-label">Conflict Detection</span>
+                    <span class="comp-val">Automated Clash Tests</span>
+                </div>
+                <div class="comp-row">
+                    <span class="comp-label">Progress Tracking</span>
+                    <span class="comp-val">4D Timeline Replay</span>
+                </div>
+                <div class="comp-row">
+                    <span class="comp-label">Remote Visit</span>
+                    <span class="comp-val">VR Site Walkthrough</span>
+                </div>
+            </div>
         </div>
 
-        <div class="card c-solution">
-            <span class="card-icon">The Fix</span>
-            <h3>Live Reconciliation</h3>
-            <p>We overlay your BIM models onto the live site feed. See exactly where a pipe *should* be versus where it *is* before you pour concrete.</p>
+        <div class="hero-right">
+            <h2 style="font-size: 2rem; opacity: 0.5; margin-bottom: 2rem;">USE CASE: THE PLUMBING CLASH</h2>
+            <div style="background: var(--dark); color: white; padding: 2rem; border-radius: 8px; margin-bottom: 1rem;">
+                <h3>Without Civitas</h3>
+                <p style="color: #9ca3af; margin-top: 0.5rem;">HVAC duct hits a beam. Work stops for 3 days. Rework costs ₹5 Lakhs.</p>
+            </div>
+            <div style="background: white; padding: 2rem; border-radius: 8px; border-left: 5px solid var(--accent);">
+                <h3>With Digital Twin</h3>
+                <p style="color: #6b7280; margin-top: 0.5rem;">System flags the clash in the virtual model 2 weeks early. Design updated instantly. Cost: ₹0.</p>
+            </div>
         </div>
 
-        <div class="card c-edge">
-            <span class="card-icon">The Advantage</span>
-            <h3>Conflict Resolution</h3>
-            <p>Catch design deviations immediately. Solve clashes in the virtual world for free, rather than fixing them in the physical world at great cost.</p>
-        </div>
-
-    </section>
-
-    <footer>
-        &copy; 2026 Civitas Automation Ecosystem.
-    </footer>
+    </div>
 
 </body>
 </html>
