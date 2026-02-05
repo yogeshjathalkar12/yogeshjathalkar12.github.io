@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Civitas | Reality Capture</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #f3f4f6; --accent: #fbbf24; --dark: #374151; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg); color: var(--dark); padding-bottom: 4rem; }
+        
+        nav { padding: 1.5rem 5%; display: flex; justify-content: space-between; background: white; border-bottom: 2px solid #e5e7eb; }
+        .brand { font-weight: 800; text-transform: uppercase; }
+        .back-link { text-decoration: none; color: #6b7280; font-weight: 600; }
+
+        /* HERO */
+        .header-sec { text-align: center; padding: 6rem 5% 4rem; }
+        h1 { font-size: 4rem; margin-bottom: 1rem; text-transform: uppercase; color: var(--dark); }
+        .lead { font-size: 1.5rem; color: #6b7280; max-width: 800px; margin: 0 auto; }
+
+        /* TIMELINE STEPS */
+        .process-container { max-width: 1000px; margin: 0 auto; display: grid; gap: 2rem; }
+        
+        .step-card {
+            background: white; padding: 2rem; border-radius: 12px; display: flex; align-items: center; gap: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); transition: transform 0.2s;
+        }
+        .step-card:hover { transform: translateX(10px); }
+        
+        .step-num { 
+            font-size: 3rem; font-weight: 800; color: #e5e7eb; min-width: 80px; 
+        }
+        .step-content h3 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .step-content p { color: #6b7280; line-height: 1.6; }
+        
+        /* DATA STATS ROW */
+        .stats-row { 
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; max-width: 1000px; margin: 4rem auto 0; 
+        }
+        .stat-box { text-align: center; background: var(--dark); color: white; padding: 2rem; border-radius: 12px; }
+        .stat-val { font-size: 2.5rem; font-weight: 800; color: var(--accent); display: block; margin-bottom: 0.5rem; }
+        .stat-label { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="brand">Civitas / M-08</div>
+        <a href="../index.html" class="back-link">← CLOSE</a>
+    </nav>
+
+    <header class="header-sec">
+        <h1>Reality Capture</h1>
+        <p class="lead">Instant Site Mapping. We turn physical space into digital data in minutes, not days.</p>
+    </header>
+
+    <div class="process-container">
+        
+        <div class="step-card">
+            <div class="step-num">01</div>
+            <div class="step-content">
+                <h3>LIDAR Scan</h3>
+                <p>Our portable SLAM unit scans the site as you walk. It captures 300,000 points per second, building a dense cloud of the terrain.</p>
+            </div>
+        </div>
+
+        <div class="step-card">
+            <div class="step-num">02</div>
+            <div class="step-content">
+                <h3>Edge Processing</h3>
+                <p>Data is processed locally on the device. No need to upload huge files to the cloud. The point cloud is aligned and cleaned in real-time.</p>
+            </div>
+        </div>
+
+        <div class="step-card">
+            <div class="step-num">03</div>
+            <div class="step-content">
+                <h3>Volumetric Analysis</h3>
+                <p>Select a stockpile of soil or gravel on the screen. The system calculates its exact volume and weight instantly for billing.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="stats-row">
+        <div class="stat-box">
+            <span class="stat-val">2 Min</span>
+            <span class="stat-label">Scan Time (1 Acre)</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-val">99.2%</span>
+            <span class="stat-label">Measurement Accuracy</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-val">Zero</span>
+            <span class="stat-label">Surveyors Needed</span>
+        </div>
+    </div>
+
+</body>
+</html>
