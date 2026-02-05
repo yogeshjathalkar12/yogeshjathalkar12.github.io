@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Civitas | Hardware</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* THEME: Hardware Dark Mode (Retained for distinct feel) */
+        :root { --bg: #1f2937; --accent: #fbbf24; --text: #f9fafb; --grey: #9ca3af; }
+        body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        nav { padding: 1.5rem 5%; display: flex; justify-content: space-between; border-bottom: 4px solid var(--accent); background: rgba(0,0,0,0.2); }
+        .back-link { color: var(--grey); text-decoration: none; }
+
+        /* HEADER */
+        .machine-header { padding: 6rem 5%; display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid #374151; }
+        .title-block h1 { font-size: 5rem; line-height: 1; margin-bottom: 1rem; text-transform: uppercase; }
+        .title-block .tagline { font-size: 1.5rem; color: var(--accent); font-weight: 300; }
+        .status { background: var(--accent); color: black; padding: 0.5rem 1rem; font-weight: 800; }
+
+        /* SPECS GRID */
+        .specs-container { display: grid; grid-template-columns: 2fr 1fr; gap: 4rem; padding: 4rem 5%; }
+        
+        .feature-list h3 { font-size: 2rem; margin-bottom: 1.5rem; border-left: 4px solid var(--accent); padding-left: 1rem; }
+        .feature-p { font-size: 1.1rem; line-height: 1.8; color: var(--grey); margin-bottom: 2rem; }
+        
+        .spec-table { width: 100%; border-collapse: collapse; }
+        .spec-table td { padding: 1.5rem 0; border-bottom: 1px solid #374151; }
+        .spec-key { color: var(--grey); font-weight: 600; }
+        .spec-val { text-align: right; font-weight: 800; font-size: 1.2rem; color: white; }
+
+        @media(max-width: 768px) { .machine-header { flex-direction: column; align-items: flex-start; } .specs-container { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div style="font-weight:800; letter-spacing:1px;">CIVITAS HARDWARE DIVISION</div>
+        <a href="../index.html" class="back-link">← RETURN TO DASHBOARD</a>
+    </nav>
+
+    <header class="machine-header">
+        <div class="title-block">
+            <h1>The Rover</h1>
+            <p class="tagline">Autonomous Heavy Logistics Unit (Bogie-6)</p>
+        </div>
+        <div class="status">DESIGN COMPLETE // READY</div>
+    </header>
+
+    <div class="specs-container">
+        
+        <div>
+            <h3>Mission Profile</h3>
+            <p class="feature-p">
+                The Civitas Rover is engineered to handle the "Three Ds" of construction: Dull, Dirty, and Dangerous tasks. It is not just a vehicle; it is a modular platform.
+            </p>
+            <p class="feature-p">
+                Built on a 6-wheel independent Bogie suspension, it can traverse rebar grids, mud, and rubble. Its primary tool-head is designed for **Automated Asphalt Layering**, but it can be reconfigured for brick transport or hazardous gas inspections.
+            </p>
+            
+            <h3 style="margin-top:3rem;">Autonomous Logic</h3>
+            <p class="feature-p">
+                Powered by a Jetson Nano cluster, the Rover uses LIDAR and Stereo Vision to navigate dynamic sites without GPS. It identifies workers and stops instantly to prevent collisions.
+            </p>
+        </div>
+
+        <div>
+            <table class="spec-table">
+                <tr>
+                    <td class="spec-key">Chassis Type</td>
+                    <td class="spec-val">6-Wheel Bogie</td>
+                </tr>
+                <tr>
+                    <td class="spec-key">Payload Capacity</td>
+                    <td class="spec-val">150 kg</td>
+                </tr>
+                <tr>
+                    <td class="spec-key">Drive Train</td>
+                    <td class="spec-val">6x Independent Hub Motors</td>
+                </tr>
+                <tr>
+                    <td class="spec-key">Compute Core</td>
+                    <td class="spec-val">NVIDIA Jetson Nano</td>
+                </tr>
+                <tr>
+                    <td class="spec-key">Runtime</td>
+                    <td class="spec-val">8 Hours (Continuous)</td>
+                </tr>
+                <tr>
+                    <td class="spec-key">Primary Sensor</td>
+                    <td class="spec-val">Velodyne LiDAR</td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+
+</body>
+</html>
