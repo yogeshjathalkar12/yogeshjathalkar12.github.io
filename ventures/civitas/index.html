@@ -34,7 +34,7 @@
         nav {
             display: flex; justify-content: space-between; align-items: center;
             padding: 1.5rem 5%;
-            background: rgba(255, 255, 255, 0.85); /* High Opacity Glass */
+            background: rgba(255, 255, 255, 0.85); 
             backdrop-filter: blur(var(--glass-blur));
             -webkit-backdrop-filter: blur(var(--glass-blur));
             border-bottom: 4px solid var(--safety-yellow);
@@ -52,7 +52,7 @@
         .subtitle { color: var(--text-light); max-width: 700px; margin: 0 auto; font-size: 1.2rem; line-height: 1.6; }
 
         /* MODULES GRID */
-        .modules-section { padding: 2rem 5% 6rem; }
+        .modules-section { padding: 2rem 5% 4rem; }
         .section-title { 
             text-align: center; margin-bottom: 3rem; font-size: 0.9rem; 
             color: var(--concrete-grey); text-transform: uppercase; letter-spacing: 3px; font-weight: 800;
@@ -70,7 +70,7 @@
         /* LINKS */
         .module-link { text-decoration: none; display: block; height: 100%; }
 
-        /* CARD: Frosted Glass Effect */
+        /* CARD */
         .module-card {
             background: var(--glass-bg);
             backdrop-filter: blur(var(--glass-blur));
@@ -79,7 +79,7 @@
             padding: 2.5rem;
             border-left: 6px solid var(--safety-yellow);
             box-shadow: var(--shadow);
-            border-radius: 0 12px 12px 0; /* Flat left edge for border */
+            border-radius: 0 12px 12px 0; 
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             height: 100%;
         }
@@ -103,11 +103,39 @@
         .hw-card p { color: #d1d5db; }
         .hw-card .module-num { color: var(--safety-yellow); }
 
+        /* FORM SECTION STYLE */
+        .form-section { padding: 4rem 5% 6rem; max-width: 800px; margin: 0 auto; }
+        .form-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            border-top: 6px solid var(--concrete-grey);
+        }
+        .form-container h2 { margin-bottom: 1rem; color: var(--concrete-grey); text-transform: uppercase; font-weight: 800; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 700; font-size: 0.8rem; color: var(--text-light); letter-spacing: 1px; }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 6px; background: rgba(255,255,255,0.8);
+            font-family: inherit; font-size: 1rem; outline: none; transition: 0.2s;
+        }
+        .form-group input:focus { border-color: var(--safety-yellow); }
+        .submit-btn {
+            background: var(--safety-yellow); color: var(--text-dark); border: none;
+            padding: 1.2rem 2rem; font-weight: 800; text-transform: uppercase; cursor: pointer;
+            width: 100%; border-radius: 6px; transition: 0.3s; letter-spacing: 1px;
+        }
+        .submit-btn:hover { background: #eab308; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(251, 191, 36, 0.3); }
+        .submit-btn:disabled { background: #d1d5db; cursor: not-allowed; transform: none; }
+        #form-status { margin-top: 1.5rem; text-align: center; font-weight: 700; font-size: 0.9rem; display: none; padding: 1rem; border-radius: 6px; }
+
         /* FOOTER */
         footer { 
             text-align: center; padding: 3rem; 
             background: rgba(255,255,255,0.5);
-            color: var(--text-light); font-size: 0.9rem; margin-top: 4rem;
+            color: var(--text-light); font-size: 0.9rem;
         }
     </style>
 </head>
@@ -124,7 +152,7 @@
     </section>
 
     <section class="modules-section">
-        <h2 class="section-title">Select Active Module</h2>
+        <h2 class="section-title">System Architecture</h2>
         <div class="grid">
             
             <a href="modules/safety.html" class="module-link">
@@ -177,7 +205,7 @@
 
             <a href="modules/digital-twin.html" class="module-link">
                 <div class="module-card">
-                    <span class="module-num">07 | VISUALIZATION (BETA)</span>
+                    <span class="module-num">07 | VISUALIZATION</span>
                     <h3>Digital Twin</h3>
                     <p>Live 4D visualization that reconciles the "As-Built" reality against the "As-Designed" BIM models.</p>
                 </div>
@@ -185,7 +213,7 @@
 
             <a href="modules/reality.html" class="module-link">
                 <div class="module-card">
-                    <span class="module-num">08 | SURVEYING (ALPHA)</span>
+                    <span class="module-num">08 | SURVEYING</span>
                     <h3>Reality Capture</h3>
                     <p>Instant SLAM-based point cloud generation for rapid site surveying and progress mapping.</p>
                 </div>
@@ -210,9 +238,80 @@
         </div>
     </section>
 
+    <section class="form-section">
+        <div class="form-container">
+            <h2>Strategic Partnership Inquiry</h2>
+            <p style="margin-bottom: 2rem; color: var(--text-light); line-height: 1.5;">
+                Civitas is currently selecting Alpha-stage partners for site-specific implementations. Submissions will be evaluated based on infrastructure scale and hardware compatibility.
+            </p>
+            
+            <form id="civitas-form">
+                <div class="form-group">
+                    <label>IDENTIFICATION (NAME / FIRM)</label>
+                    <input type="text" name="Name" placeholder="e.g., Nyati Group / Lead Engineer" required>
+                </div>
+                <div class="form-group">
+                    <label>CONTACT EMAIL</label>
+                    <input type="email" name="Email" placeholder="internal@domain.com" required>
+                </div>
+                <div class="form-group">
+                    <label>ENGAGEMENT TYPE</label>
+                    <select name="Category">
+                        <option value="Pilot Implementation">Pilot Site Implementation (Alpha)</option>
+                        <option value="Strategic Capital">Strategic Capital / Equity Partnership</option>
+                        <option value="Hardware Integration">Hardware Provisioning (Jetson/RealSense)</option>
+                        <option value="Technical Review">Technical Review / Feedback</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>PROPOSITION / REQUIREMENTS</label>
+                    <textarea name="Message" rows="4" placeholder="Briefly describe site requirements or partnership terms..."></textarea>
+                </div>
+                <button type="submit" class="submit-btn" id="submit-btn">Transmit to Vortex Engine</button>
+                <div id="form-status"></div>
+            </form>
+        </div>
+    </section>
+
     <footer> 
         &copy; 2026 Civitas Automation. Powered by Shoonya Origins.
     </footer>
+
+    <script>
+        // INSERT YOUR GOOGLE APPS SCRIPT URL HERE
+        const scriptURL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+        const form = document.getElementById('civitas-form');
+        const status = document.getElementById('form-status');
+        const btn = document.getElementById('submit-btn');
+
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            btn.disabled = true;
+            btn.innerText = "TRANSMITTING...";
+            status.style.display = "block";
+            status.innerText = "ESTABLISHING SECURE CONNECTION...";
+            status.style.color = "var(--text-light)";
+            status.style.background = "rgba(0,0,0,0.05)";
+
+            fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+                .then(response => {
+                    status.innerText = "TRANSMISSION SUCCESSFUL. CORE TEAM NOTIFIED.";
+                    status.style.color = "#059669"; 
+                    status.style.background = "rgba(5, 150, 105, 0.1)";
+                    form.reset();
+                    btn.disabled = false;
+                    btn.innerText = "TRANSMIT TO VORTEX ENGINE";
+                })
+                .catch(error => {
+                    console.error('Error!', error.message);
+                    status.innerText = "LINK FAILURE. PLEASE RETRY.";
+                    status.style.color = "#dc2626";
+                    status.style.background = "rgba(220, 38, 38, 0.1)";
+                    btn.disabled = false;
+                    btn.innerText = "RETRY TRANSMISSION";
+                });
+        });
+    </script>
 
 </body>
 </html>
