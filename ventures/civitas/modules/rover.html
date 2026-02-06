@@ -2,98 +2,157 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Civitas | Hardware</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Civitas | Hardware Division</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;700;800&display=swap" rel="stylesheet">
     <style>
-        /* THEME: Hardware Dark Mode (Retained for distinct feel) */
-        :root { --bg: #1f2937; --accent: #fbbf24; --text: #f9fafb; --grey: #9ca3af; }
-        body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; }
+        /* THEME: Hardware Dark Mode */
+        :root { 
+            --bg: #111827; 
+            --card-bg: #1f2937;
+            --accent: #fbbf24; 
+            --text: #f9fafb; 
+            --grey: #9ca3af; 
+            --danger: #ef4444;
+        }
         
-        nav { padding: 1.5rem 5%; display: flex; justify-content: space-between; border-bottom: 4px solid var(--accent); background: rgba(0,0,0,0.2); }
-        .back-link { color: var(--grey); text-decoration: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }
+        
+        nav { 
+            padding: 1.5rem 5%; display: flex; justify-content: space-between; 
+            border-bottom: 4px solid var(--accent); background: rgba(0,0,0,0.4);
+            position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px);
+        }
+        .back-link { color: var(--grey); text-decoration: none; font-weight: 600; font-size: 0.9rem; }
+        .back-link:hover { color: var(--accent); }
+
+        /* PHASE 2 OVERLAY HEADER */
+        .phase-banner {
+            background: var(--danger);
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #000;
+        }
 
         /* HEADER */
-        .machine-header { padding: 6rem 5%; display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid #374151; }
-        .title-block h1 { font-size: 5rem; line-height: 1; margin-bottom: 1rem; text-transform: uppercase; }
-        .title-block .tagline { font-size: 1.5rem; color: var(--accent); font-weight: 300; }
-        .status { background: var(--accent); color: black; padding: 0.5rem 1rem; font-weight: 800; }
+        .machine-header { padding: 6rem 5% 4rem; display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid #374151; }
+        .title-block h1 { font-size: 5.5rem; line-height: 0.9; margin-bottom: 1rem; text-transform: uppercase; font-weight: 800; }
+        .title-block .tagline { font-size: 1.5rem; color: var(--accent); font-weight: 300; letter-spacing: 1px; }
+        .status-badge { background: var(--accent); color: black; padding: 0.75rem 1.5rem; font-weight: 900; letter-spacing: 1px; }
+
+        /* WORK IN PROGRESS SECTION */
+        .wip-alert {
+            margin: 4rem 5% 0;
+            padding: 3rem;
+            border: 4px dashed var(--accent);
+            text-align: center;
+            background: rgba(251, 191, 36, 0.05);
+        }
+        .wip-alert h2 { font-size: 4rem; font-weight: 900; color: var(--accent); text-transform: uppercase; margin-bottom: 1rem; }
+        .wip-alert p { font-size: 1.5rem; font-weight: 700; color: #fff; }
 
         /* SPECS GRID */
         .specs-container { display: grid; grid-template-columns: 2fr 1fr; gap: 4rem; padding: 4rem 5%; }
         
-        .feature-list h3 { font-size: 2rem; margin-bottom: 1.5rem; border-left: 4px solid var(--accent); padding-left: 1rem; }
-        .feature-p { font-size: 1.1rem; line-height: 1.8; color: var(--grey); margin-bottom: 2rem; }
+        .feature-list h3 { font-size: 2rem; margin-bottom: 1.5rem; border-left: 6px solid var(--accent); padding-left: 1.5rem; text-transform: uppercase; font-weight: 800; }
+        .feature-p { font-size: 1.15rem; line-height: 1.8; color: var(--grey); margin-bottom: 2.5rem; }
         
-        .spec-table { width: 100%; border-collapse: collapse; }
-        .spec-table td { padding: 1.5rem 0; border-bottom: 1px solid #374151; }
-        .spec-key { color: var(--grey); font-weight: 600; }
-        .spec-val { text-align: right; font-weight: 800; font-size: 1.2rem; color: white; }
+        .spec-table { width: 100%; border-collapse: collapse; background: var(--card-bg); padding: 2rem; border-radius: 8px; }
+        .spec-table td { padding: 1.5rem; border-bottom: 1px solid #374151; }
+        .spec-key { color: var(--grey); font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
+        .spec-val { text-align: right; font-weight: 800; font-size: 1.2rem; color: var(--accent); }
 
-        @media(max-width: 768px) { .machine-header { flex-direction: column; align-items: flex-start; } .specs-container { grid-template-columns: 1fr; } }
+        footer { padding: 4rem; text-align: center; border-top: 1px solid #374151; color: var(--grey); font-size: 0.8rem; letter-spacing: 2px; }
+
+        @media(max-width: 768px) { 
+            .machine-header { flex-direction: column; align-items: flex-start; gap: 2rem; } 
+            .title-block h1 { font-size: 3.5rem; }
+            .specs-container { grid-template-columns: 1fr; } 
+            .wip-alert h2 { font-size: 2.5rem; }
+        }
     </style>
 </head>
 <body>
 
+    <div class="phase-banner">Civitas Phase 02 // Strategic Deployment</div>
+
     <nav>
-        <div style="font-weight:800; letter-spacing:1px;">CIVITAS HARDWARE DIVISION</div>
-        <a href="../index.html" class="back-link">← RETURN TO DASHBOARD</a>
+        <div style="font-weight:900; letter-spacing:2px; color: var(--accent);">CIVITAS HARDWARE</div>
+        <a href="../index.html" class="back-link">← BACK TO SYSTEM</a>
     </nav>
 
     <header class="machine-header">
         <div class="title-block">
             <h1>The Rover</h1>
-            <p class="tagline">Autonomous Heavy Logistics Unit (Bogie-6)</p>
+            <p class="tagline">Bogie-6 Autonomous Logistics Platform</p>
         </div>
-        <div class="status">DESIGN COMPLETE // READY</div>
+        <div class="status-badge">STAGED: AUGUST 2026</div>
     </header>
+
+    <div class="wip-alert">
+        <h2>WORK IN PROGRESS</h2>
+        <p>Currently in R&D Lifecycle | Expected Completion: AUGUST 2026</p>
+    </div>
 
     <div class="specs-container">
         
         <div>
-            <h3>Mission Profile</h3>
+            <h3>Proprietary Locomotion</h3>
             <p class="feature-p">
-                The Civitas Rover is engineered to handle the "Three Ds" of construction: Dull, Dirty, and Dangerous tasks. It is not just a vehicle; it is a modular platform.
-            </p>
-            <p class="feature-p">
-                Built on a 6-wheel independent Bogie suspension, it can traverse rebar grids, mud, and rubble. Its primary tool-head is designed for **Automated Asphalt Layering**, but it can be reconfigured for brick transport or hazardous gas inspections.
+                The Rover utilizes a high-torque **6-Wheel Bogie Suspension** system, enabling it to navigate high-impedance construction environments including loose rubble, rebar mesh, and 30-degree inclines.
             </p>
             
-            <h3 style="margin-top:3rem;">Autonomous Logic</h3>
+            <h3>Autonomous Logic Cluster</h3>
             <p class="feature-p">
-                Powered by a Jetson Nano cluster, the Rover uses LIDAR and Stereo Vision to navigate dynamic sites without GPS. It identifies workers and stops instantly to prevent collisions.
+                Driven by an NVIDIA Jetson Nano parallel-processing unit. The system runs real-time SLAM (Simultaneous Localization and Mapping) to operate in GPS-denied environments like underground parking structures or internal shafts.
+            </p>
+
+            <h3>Modular Toolhead</h3>
+            <p class="feature-p">
+                The August 2026 update introduces the **Vortex-1 Asphalt Manipulator**, allowing for automated precision layering on urban road projects with sub-centimeter accuracy.
             </p>
         </div>
 
         <div>
             <table class="spec-table">
                 <tr>
-                    <td class="spec-key">Chassis Type</td>
-                    <td class="spec-val">6-Wheel Bogie</td>
+                    <td class="spec-key">Release Phase</td>
+                    <td class="spec-val">Phase 02</td>
                 </tr>
                 <tr>
-                    <td class="spec-key">Payload Capacity</td>
-                    <td class="spec-val">150 kg</td>
+                    <td class="spec-key">Target Date</td>
+                    <td class="spec-val">AUG 2026</td>
                 </tr>
                 <tr>
-                    <td class="spec-key">Drive Train</td>
-                    <td class="spec-val">6x Independent Hub Motors</td>
+                    <td class="spec-key">Payload Limit</td>
+                    <td class="spec-val">150 KG</td>
                 </tr>
                 <tr>
-                    <td class="spec-key">Compute Core</td>
-                    <td class="spec-val">NVIDIA Jetson Nano</td>
+                    <td class="spec-key">Compute Architecture</td>
+                    <td class="spec-val">Jetson Cluster</td>
                 </tr>
                 <tr>
-                    <td class="spec-key">Runtime</td>
-                    <td class="spec-val">8 Hours (Continuous)</td>
+                    <td class="spec-key">Navigation</td>
+                    <td class="spec-val">LIDAR / SLAM</td>
                 </tr>
                 <tr>
-                    <td class="spec-key">Primary Sensor</td>
-                    <td class="spec-val">Velodyne LiDAR</td>
+                    <td class="spec-key">Development Status</td>
+                    <td class="spec-val" style="color:var(--danger)">ACTIVE R&D</td>
                 </tr>
             </table>
         </div>
 
     </div>
+
+    <footer>
+        CIVITAS AUTOMATION | HARDWARE DIVISION | EST. 2026
+    </footer>
 
 </body>
 </html>
