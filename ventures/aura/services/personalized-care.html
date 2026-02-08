@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personalized Care | Aura</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* MEDICAL THEME VARIABLES */
+        :root {
+            --primary: #059669;       /* Emerald Green */
+            --primary-dark: #064e3b;  /* Deep Forest */
+            --primary-light: #d1fae5; /* Mint wash */
+            --accent: #f97316;        /* Bright Orange */
+            --bg-white: #ffffff;
+            --bg-offwhite: #f8fafc;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        body {
+            background-color: var(--bg-white);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* BETA BADGE */
+        .beta-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--accent);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
+        }
+
+        /* NAVIGATION */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 5%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .brand { font-size: 1.5rem; font-weight: 700; color: var(--primary-dark); text-decoration: none; }
+        .brand span { color: var(--accent); }
+        .back-link { text-decoration: none; color: var(--text-light); font-weight: 600; font-size: 0.9rem; }
+
+        /* CONTENT SECTION */
+        .page-header {
+            padding: 6rem 5% 4rem;
+            text-align: center;
+            background: radial-gradient(circle at 50% 50%, #fff7ed 0%, white 70%); /* Subtle orange tint */
+        }
+
+        .tag {
+            background: rgba(249, 115, 22, 0.1);
+            color: var(--accent);
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        h1 { font-size: 3.5rem; color: var(--primary-dark); margin-bottom: 1.5rem; }
+        .subtitle { font-size: 1.25rem; color: var(--text-light); max-width: 800px; margin: 0 auto; }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 0 5% 6rem;
+            align-items: center;
+        }
+
+        .visual-container {
+            background: var(--bg-offwhite);
+            height: 450px;
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #e2e8f0;
+            position: relative;
+        }
+
+        .dna-icon { font-size: 5rem; animation: float 3s infinite ease-in-out; }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .tech-content h2 { font-size: 2.2rem; color: var(--primary-dark); margin-bottom: 1.5rem; }
+        .tech-content p { color: var(--text-light); font-size: 1.1rem; margin-bottom: 2rem; }
+
+        .feature-list { list-style: none; }
+        .feature-list li {
+            margin-bottom: 1.2rem;
+            padding-left: 35px;
+            position: relative;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .feature-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        /* FOOTER */
+        footer {
+            background-color: #f1f5f9;
+            color: var(--text-light);
+            text-align: center;
+            padding: 3rem 5%;
+            font-size: 0.9rem;
+            border-top: 1px solid #e2e8f0;
+        }
+        footer a { color: var(--primary); text-decoration: none; }
+
+        @media (max-width: 968px) {
+            .detail-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="beta-badge">BETA v0.8</div>
+
+    <nav>
+        <a href="index.html" class="brand">Aura<span>.</span></a>
+        <a href="index.html" class="back-link">← Back to Overview</a>
+    </nav>
+
+    <section class="page-header">
+        <span class="tag">Human-Centric AI</span>
+        <h1>Personalized Care</h1>
+        <p class="subtitle">Health isn't a statistic. It’s a signature. We build a digital mirror of your unique biological profile.</p>
+    </section>
+
+    <div class="detail-grid">
+        <div class="visual-container">
+            <div class="dna-icon">👤</div>
+            <p style="margin-top: 20px; font-weight: 700; color: var(--accent);">Aura Digital Twin™ Active</p>
+        </div>
+
+        <div class="tech-content">
+            <h2>Your Biology, Decoded</h2>
+            <p>
+                Standard medical alerts are often based on population averages. Aura learns *your* specific baseline over time, ensuring that care is accurate and interventions are meaningful.
+            </p>
+            
+            <ul class="feature-list">
+                <li><strong>Baseline Learning:</strong> Our AI requires a 7-day calibration period to understand your unique heart rate variability and respiratory patterns.</li>
+                <li><strong>Circadian Alignment:</strong> Insights that respect your body’s natural clock—adjusting monitoring sensitivity during sleep vs. active hours.</li>
+                <li><strong>Dynamic Nutrition:</strong> Integration with NutriVision to correlate dietary intake with physiological recovery markers.</li>
+                <li><strong>Family Connectivity:</strong> A shared dashboard that allows loved ones to see wellness trends without compromising privacy.</li>
+            </ul>
+        </div>
+    </div>
+
+    <section style="padding: 4rem 5%; text-align: center; background: var(--bg-offwhite);">
+        <h2 style="color: var(--primary-dark); margin-bottom: 1.5rem;">Precision for Every Body</h2>
+        <p style="max-width: 700px; margin: 0 auto 2rem; color: var(--text-light);">
+            By analyzing thousands of data points daily, Aura creates a preventive shield tailored specifically to you.
+        </p>
+        <div style="display: flex; justify-content: center; gap: 20px;">
+            <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                <span style="font-weight: 700; color: var(--primary);">98%</span>
+                <p style="font-size: 0.8rem;">False Alarm Reduction</p>
+            </div>
+            <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                <span style="font-weight: 700; color: var(--accent);">24/7</span>
+                <p style="font-size: 0.8rem;">Active Calibration</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Aura Health. A <a href="../../index.html">Shoonya Origins</a> Company.</p>
+    </footer>
+
+</body>
+</html>
