@@ -14,7 +14,213 @@
             --bg-white: #ffffff;
             --bg-offwhite: #f8fafc;
             --text-dark: #1e293b;
-            --text-light: #64748b;
+            --text-light: #64748b;<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura | The Pulse of Tomorrow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #059669; /* Emerald Green */
+            --accent: #f97316;  /* Bright Orange */
+            --bg: #fafafa;
+            --text: #1f2937;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        nav {
+            padding: 1.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--white);
+            border-bottom: 1px solid #e5e7eb;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--primary);
+            letter-spacing: -1px;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 100px 5%;
+            text-align: center;
+            background: radial-gradient(circle at top right, #ecfdf5, transparent);
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            color: var(--text);
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: #4b5563;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 12px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        /* Tech Grid */
+        .section-title {
+            text-align: center;
+            margin: 80px 0 40px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            padding: 0 5%;
+        }
+
+        .card {
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: 20px;
+            border: 1px solid #f3f4f6;
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+
+        .card h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        /* Specialized Care */
+        .care-section {
+            background: var(--text);
+            color: var(--white);
+            padding: 80px 5%;
+            margin-top: 100px;
+        }
+
+        .care-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+        }
+
+        .badge {
+            background: var(--accent);
+            color: var(--white);
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        footer {
+            padding: 40px 5%;
+            text-align: center;
+            border-top: 1px solid #e5e7eb;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">AURA</div>
+        <div>
+            <a href="https://shoonyaorigins.com" style="text-decoration: none; color: var(--text); font-weight: 600;">Part of Shoonya Origins</a>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <span class="badge">BETA v0.8</span>
+        <h1>Health Care that makes the<br><span style="color: var(--primary)">Invisible, Visible.</span></h1>
+        <p>Using advanced Eulerian Video Magnification (EVM) and Predictive AI to monitor vitals without a single wire.</p>
+        <a href="#tech" class="btn-primary">Explore Technology</a>
+    </header>
+
+    <section id="tech">
+        <div class="section-title">
+            <h2>The Aura Engine</h2>
+        </div>
+        <div class="grid">
+            <div class="card">
+                <h3>Predictive Health</h3>
+                <p>AI algorithms that identify health anomalies before they manifest physically.</p>
+            </div>
+            <div class="card">
+                <h3>EVM Technology</h3>
+                <p>Amplify micro-movements in video to track pulse and respiration rates contactless.</p>
+            </div>
+            <div class="card">
+                <h3>Integrated Sensors</h3>
+                <p>Multi-spectral data fusion for a 360-degree view of patient wellness.</p>
+            </div>
+            <div class="card">
+                <h3>Personalized Care</h3>
+                <p>Health insights tailored specifically to individual genetic and lifestyle markers.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="care-section">
+        <div class="care-grid">
+            <div>
+                <span class="badge" style="background: var(--primary)">Solutions</span>
+                <h2 style="font-size: 2.5rem; margin-bottom: 1.5rem;">Specialized Care</h2>
+                <p style="color: #9ca3af;">We focus on the most vulnerable stages of life where precision is not just required—it is vital.</p>
+            </div>
+            <div>
+                <h3 style="color: var(--accent); margin-bottom: 0.5rem;">Elderly Care</h3>
+                <p style="margin-bottom: 2rem;">Fall detection and cardiac monitoring for independent living.</p>
+                
+                <h3 style="color: var(--accent); margin-bottom: 0.5rem;">Neonatal (NICU)</h3>
+                <p>Contactless monitoring for newborns, eliminating the stress of adhesive sensors on fragile skin.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Shoonya Origins. Built for the future of humanity.</p>
+    </footer>
+
+</body>
+</html>
+
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
