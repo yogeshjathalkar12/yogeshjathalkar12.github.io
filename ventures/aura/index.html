@@ -3,18 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura | Shoonya Origins</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <title>Aura | The Health Ecosystem</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #059669;       /* Emerald */
-            --primary-dark: #064e3b;
-            --accent: #f97316;        /* Orange */
-            --glass: rgba(255, 255, 255, 0.6);
-            --glass-border: rgba(255, 255, 255, 0.4);
-            --text-main: #0f172a;
-            --text-muted: #475569;
+            --primary: #10b981;       /* Neon Emerald */
+            --primary-dark: #064e3b;  /* Deep Forest */
+            --bg-deep: #022c22;       /* Almost Black Green */
+            --accent: #f97316;        /* Safety Orange */
+            --text-main: #ecfdf5;     /* Mint White */
+            --text-muted: #6ee7b7;    /* Soft Green */
+            --glass: rgba(6, 78, 59, 0.4); 
+            --glass-hover: rgba(6, 78, 59, 0.7);
+            --border: rgba(52, 211, 153, 0.2);
         }
 
         * {
@@ -25,13 +26,13 @@
         }
 
         body {
-            background: #f8fafc;
+            background-color: var(--bg-deep);
             color: var(--text-main);
             overflow-x: hidden;
             min-height: 100vh;
         }
 
-        /* --- ANIMATED MESH BACKGROUND --- */
+        /* --- AMBIENT BACKGROUND --- */
         .ambient-bg {
             position: fixed;
             top: 0;
@@ -39,16 +40,10 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            background: radial-gradient(at 0% 0%, rgba(5, 150, 105, 0.15) 0px, transparent 50%),
-                        radial-gradient(at 100% 0%, rgba(249, 115, 22, 0.15) 0px, transparent 50%),
-                        radial-gradient(at 100% 100%, rgba(5, 150, 105, 0.1) 0px, transparent 50%);
+            background: 
+                radial-gradient(circle at 15% 50%, rgba(16, 185, 129, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(6, 78, 59, 0.4) 0%, transparent 50%);
             filter: blur(60px);
-            animation: pulse-bg 10s ease-in-out infinite alternate;
-        }
-
-        @keyframes pulse-bg {
-            0% { transform: scale(1); opacity: 0.8; }
-            100% { transform: scale(1.1); opacity: 1; }
         }
 
         /* --- NAVIGATION --- */
@@ -57,175 +52,160 @@
             justify-content: space-between;
             align-items: center;
             padding: 24px 8%;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
+            background: rgba(2, 44, 34, 0.8);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
         .logo {
             font-size: 1.5rem;
             font-weight: 800;
-            letter-spacing: -0.5px;
-            color: var(--primary-dark);
+            letter-spacing: -1px;
+            color: white;
             text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
 
-        .logo span { color: var(--accent); }
-
-        .nav-link {
-            text-decoration: none;
-            color: var(--text-muted);
-            font-weight: 500;
-            font-size: 0.95rem;
-            transition: 0.3s;
-        }
-        
-        .nav-link:hover { color: var(--primary); }
+        .logo span { color: var(--primary); }
 
         /* --- HERO SECTION --- */
         .hero {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
             text-align: center;
-            padding: 0 5%;
-            position: relative;
+            padding: 100px 5% 60px;
         }
 
-        .pill-badge {
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid var(--glass-border);
-            padding: 8px 20px;
-            border-radius: 100px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--accent);
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-            backdrop-filter: blur(4px);
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-
-        h1 {
-            font-size: clamp(3rem, 6vw, 5rem);
-            line-height: 1.1;
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
             font-weight: 800;
-            letter-spacing: -2px;
-            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--text-main) 100%);
+            margin-bottom: 1rem;
+            line-height: 1.1;
+            background: linear-gradient(to right, white, var(--text-muted));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 1.5rem;
         }
 
-        p.lead {
-            font-size: 1.25rem;
+        .hero p {
             color: var(--text-muted);
+            font-size: 1.2rem;
             max-width: 600px;
-            line-height: 1.7;
-            margin-bottom: 3rem;
+            margin: 0 auto;
         }
 
-        /* --- BUTTONS --- */
-        .cta-group {
-            display: flex;
-            gap: 1.5rem;
+        /* --- SERVICES GRID --- */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            padding: 40px 8% 100px;
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
-        .btn {
-            padding: 16px 36px;
-            border-radius: 12px;
-            font-weight: 600;
+        /* CARD STYLING */
+        .card {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 32px;
             text-decoration: none;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 280px;
+            backdrop-filter: blur(10px);
             position: relative;
             overflow: hidden;
         }
 
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 10px 30px rgba(5, 150, 105, 0.3);
+        .card:hover {
+            transform: translateY(-8px);
+            background: var(--glass-hover);
+            border-color: var(--primary);
+            box-shadow: 0 10px 40px rgba(16, 185, 129, 0.1);
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 40px rgba(5, 150, 105, 0.4);
-            background: var(--primary-dark);
-        }
-
-        .btn-glass {
-            background: rgba(255,255,255,0.5);
-            color: var(--primary-dark);
-            border: 1px solid var(--glass-border);
-        }
-
-        .btn-glass:hover {
-            background: rgba(255,255,255,0.8);
-            transform: translateY(-2px);
-        }
-
-        /* --- FEATURE GRID (Bottom Overlay) --- */
-        .glass-grid {
+        /* Status Badges */
+        .badge {
             position: absolute;
-            bottom: 5%;
-            width: 90%;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
+            top: 20px;
+            right: 20px;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
 
-        .glass-card {
-            background: var(--glass);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            padding: 24px;
-            border-radius: 20px;
-            transition: transform 0.3s ease;
+        .badge-beta {
+            background: rgba(249, 115, 22, 0.2);
+            color: var(--accent);
+            border: 1px solid rgba(249, 115, 22, 0.4);
+            animation: pulse 2s infinite;
         }
 
-        .glass-card:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.85);
+        .badge-live {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--primary);
+            border: 1px solid rgba(16, 185, 129, 0.4);
         }
 
-        .glass-card h3 {
-            font-size: 1.1rem;
-            margin-bottom: 8px;
-            color: var(--primary-dark);
+        /* Card Content */
+        .card-num {
+            font-size: 4rem;
+            font-weight: 800;
+            color: rgba(255, 255, 255, 0.05);
+            position: absolute;
+            bottom: -10px;
+            right: 10px;
+            line-height: 1;
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .card p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .arrow-icon {
+            margin-top: 20px;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.9rem;
             display: flex;
             align-items: center;
             gap: 8px;
+            opacity: 0.8;
         }
 
-        .glass-card p {
+        .card:hover .arrow-icon {
+            opacity: 1;
+            gap: 12px; /* Slide effect */
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(249, 115, 22, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.3);
+            border-top: 1px solid var(--border);
             font-size: 0.9rem;
-            color: var(--text-muted);
-            line-height: 1.5;
-        }
-
-        /* --- MOBILE TWEAKS --- */
-        @media (max-width: 768px) {
-            .glass-grid {
-                position: relative;
-                margin-top: 4rem;
-                bottom: auto;
-            }
-            h1 { font-size: 2.5rem; }
         }
     </style>
 </head>
@@ -235,39 +215,85 @@
 
     <nav>
         <a href="#" class="logo">Aura<span>.</span></a>
-        <a href="https://shoonyaorigins.com" class="nav-link">Part of Shoonya Origins</a>
+        <div style="font-size: 0.9rem; color: var(--text-muted);">Shoonya Origins Conglomerate</div>
     </nav>
 
     <section class="hero">
-        <div class="pill-badge">v1.0 &bull; System Operational</div>
-        
-        <h1>Making the Invisible,<br>Visible.</h1>
-        
-        <p class="lead">
-            Advanced biometrics through Eulerian Video Magnification. 
-            Monitor vitals contactless, powered by Shoonya AI.
-        </p>
-
-        <div class="cta-group">
-            <a href="#dashboard" class="btn btn-primary">Launch Dashboard</a>
-            <a href="#tech" class="btn btn-glass">How it Works</a>
-        </div>
-
-        <div class="glass-grid">
-            <div class="glass-card">
-                <h3><span style="color: var(--accent)">●</span> EVM Technology</h3>
-                <p>Amplify micro-movements to detect pulse and respiration from standard video.</p>
-            </div>
-            <div class="glass-card">
-                <h3><span style="color: var(--primary)">●</span> Predictive AI</h3>
-                <p>Forecasting health anomalies before they manifest physically.</p>
-            </div>
-            <div class="glass-card">
-                <h3><span style="color: #6366f1">●</span> Non-Invasive</h3>
-                <p>Zero wires. Zero contact. Perfect for NICU and Elderly care.</p>
-            </div>
-        </div>
+        <h1>The Future of <span style="color: var(--primary)">Vitality</span></h1>
+        <p>A unified ecosystem for predictive, preventative, and personalized care.</p>
     </section>
+
+    <section class="grid-container">
+
+        <a href="evm.html" class="card">
+            <div class="badge badge-beta">Beta &bull; In Prod</div>
+            <div>
+                <h3>EVM Technology</h3>
+                <p>Eulerian Video Magnification. Contactless vital monitoring that amplifies micro-movements to detect pulse and respiration.</p>
+            </div>
+            <div class="arrow-icon">View Tech →</div>
+            <div class="card-num">01</div>
+        </a>
+
+        <a href="predictive-health.html" class="card">
+            <div class="badge badge-live">Live</div>
+            <div>
+                <h3>Predictive Health</h3>
+                <p>Moving beyond diagnosis. Our AI models forecast health anomalies and risks before they manifest physically.</p>
+            </div>
+            <div class="arrow-icon">Explore Models →</div>
+            <div class="card-num">02</div>
+        </a>
+
+        <a href="environment.html" class="card">
+            <div>
+                <h3>Environmental Intel</h3>
+                <p>Real-time analysis of pollution levels, air quality index (AQI), and surrounding hazards affecting your biology.</p>
+            </div>
+            <div class="arrow-icon">Check Status →</div>
+            <div class="card-num">03</div>
+        </a>
+
+        <a href="app-download.html" class="card">
+            <div>
+                <h3>Aura Mobile App</h3>
+                <p>Your central command center. Access all health data, alerts, and family monitoring from a single dashboard.</p>
+            </div>
+            <div class="arrow-icon">Download →</div>
+            <div class="card-num">04</div>
+        </a>
+
+        <a href="nutrition.html" class="card">
+            <div>
+                <h3>Nutrition Analytics</h3>
+                <p>AI-driven food monitoring. Track calories, micro-nutrients, and metabolic impact with a simple photo.</p>
+            </div>
+            <div class="arrow-icon">Start Tracking →</div>
+            <div class="card-num">05</div>
+        </a>
+
+        <a href="trainer.html" class="card">
+            <div>
+                <h3>Personalized Trainer</h3>
+                <p>Computer Vision fitness coaching. The camera corrects your form and counts reps in real-time.</p>
+            </div>
+            <div class="arrow-icon">Start Workout →</div>
+            <div class="card-num">06</div>
+        </a>
+
+        <a href="specialized-care.html" class="card" style="grid-column: span 1;"> <div>
+                <h3>Specialized Care</h3>
+                <p>Non-invasive monitoring for <strong>NICU</strong> (Neonatal) and <strong>Elderly</strong> care, including Sleep Apnea detection.</p>
+            </div>
+            <div class="arrow-icon">View Solutions →</div>
+            <div class="card-num">07</div>
+        </a>
+
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Shoonya Origins &bull; Making the Invisible, Visible.</p>
+    </footer>
 
 </body>
 </html>
