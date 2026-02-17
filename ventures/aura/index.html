@@ -3,197 +3,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura | Visualizing Vitality</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>Aura | Specialized Care</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #059669;
+            --primary-dark: #065f46;
+            --primary-light: #ecfdf5;
             --accent: #f97316;
-            --glass: rgba(255, 255, 255, 0.45);
-            --glass-border: rgba(255, 255, 255, 0.3);
+            --bg-white: #ffffff;
+            --bg-offwhite: #f8fafc;
+            --text-dark: #0f172a;
+            --text-light: #64748b;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { 
+            background-color: var(--bg-white); 
+            color: var(--text-dark); 
+            line-height: 1.6; 
         }
 
-        body {
-            background: #fdfcfb;
-            color: #1a202c;
-            overflow-x: hidden;
-            min-height: 100vh;
+        /* BETA BADGE */
+        .beta-badge { 
+            position: absolute; 
+            top: 20px; 
+            right: 20px; 
+            background: var(--accent); 
+            color: white; 
+            padding: 6px 16px; 
+            border-radius: 50px; 
+            font-size: 0.75rem; 
+            font-weight: 700; 
+            z-index: 1000; 
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2); 
         }
 
-        /* Flowing Background - Mesh Gradient Effect */
-        .bg-flow {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: 
-                radial-gradient(at 0% 0%, #ecfdf5 0px, transparent 50%),
-                radial-gradient(at 100% 0%, #fff7ed 0px, transparent 50%),
-                radial-gradient(at 100% 100%, #ecfdf5 0px, transparent 50%),
-                radial-gradient(at 0% 100%, #fff7ed 0px, transparent 50%);
-            filter: blur(80px);
-            opacity: 0.8;
+        nav { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 1.5rem 5%; 
+            background: rgba(255, 255, 255, 0.8); 
+            backdrop-filter: blur(10px); 
+            -webkit-backdrop-filter: blur(10px);
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+            border-bottom: 1px solid #e2e8f0; 
         }
 
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.5rem 10%;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--glass-border);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+        .brand { font-size: 1.5rem; font-weight: 700; color: var(--primary-dark); text-decoration: none; }
+        .back-link { text-decoration: none; color: var(--text-light); font-weight: 600; font-size: 0.9rem; transition: 0.3s; }
+        .back-link:hover { color: var(--primary); }
+
+        .page-header { 
+            padding: 6rem 5% 4rem; 
+            text-align: center; 
+            background: radial-gradient(circle at 50% 50%, var(--primary-light) 0%, white 70%); 
         }
 
-        .logo {
-            font-weight: 800;
-            font-size: 1.6rem;
-            letter-spacing: -1.5px;
-            color: var(--primary);
+        .tag { 
+            background: rgba(5, 150, 105, 0.1); 
+            color: var(--primary); 
+            padding: 6px 12px; 
+            border-radius: 50px; 
+            font-size: 0.8rem; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            margin-bottom: 1rem; 
+            display: inline-block; 
         }
 
-        .hero {
-            padding: 120px 10% 80px;
-            text-align: center;
+        h1 { font-size: 3.5rem; color: var(--text-dark); margin-bottom: 1.5rem; }
+        .subtitle { font-size: 1.25rem; color: var(--text-light); max-width: 800px; margin: 0 auto; }
+
+        .detail-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 4rem; 
+            max-width: 1200px; 
+            margin: 4rem auto; 
+            padding: 0 5% 6rem; 
         }
 
-        .hero h1 {
-            font-size: clamp(2.5rem, 5vw, 4.5rem);
-            font-weight: 800;
-            line-height: 1.1;
-            margin-bottom: 1.5rem;
-            letter-spacing: -2px;
+        .visual-container { 
+            background: var(--bg-offwhite); 
+            height: 450px; 
+            border-radius: 24px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            border: 1px solid #e2e8f0; 
+            position: relative; 
         }
 
-        .text-gradient {
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .chart-mockup { width: 80%; height: 10px; background: #e2e8f0; border-radius: 10px; position: relative; overflow: hidden; }
+        .chart-fill { position: absolute; height: 100%; width: 65%; background: var(--primary); animation: grow 2s ease-out; }
+
+        @keyframes grow { from { width: 0; } to { width: 65%; } }
+
+        .tech-content h2 { font-size: 2.2rem; color: var(--primary-dark); margin-bottom: 1.5rem; }
+        .tech-content p { color: var(--text-light); font-size: 1.1rem; margin-bottom: 2rem; }
+
+        .feature-list { list-style: none; }
+        .feature-list li { 
+            margin-bottom: 1.2rem; 
+            padding-left: 35px; 
+            position: relative; 
+            color: var(--text-dark); 
+            font-weight: 500; 
+        }
+        .feature-list li::before { 
+            content: "◆"; 
+            position: absolute; 
+            left: 0; 
+            color: var(--primary); 
         }
 
-        .hero p {
-            font-size: 1.25rem;
-            color: #4a5568;
-            max-width: 600px;
-            margin: 0 auto 2.5rem;
+        .care-highlight { margin-bottom: 2rem; }
+        .care-highlight h3 { color: var(--accent); margin-bottom: 0.5rem; }
+
+        footer { 
+            background-color: #f1f5f9; 
+            color: var(--text-light); 
+            text-align: center; 
+            padding: 3rem 5%; 
+            font-size: 0.9rem; 
+            border-top: 1px solid #e2e8f0; 
         }
 
-        /* Glass Cards */
-        .container {
-            padding: 0 10% 100px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2.5rem;
-        }
-
-        .glass-card {
-            background: var(--glass);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            border-radius: 32px; /* Very rounded for that organic feel */
-            padding: 3rem;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-        }
-
-        .glass-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            background: rgba(255, 255, 255, 0.6);
-            border-color: var(--primary);
-        }
-
-        .glass-card h3 {
-            font-size: 1.5rem;
-            color: var(--primary);
-            margin-bottom: 1rem;
-        }
-
-        .btn {
-            background: var(--primary);
-            color: white;
-            padding: 14px 32px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            display: inline-block;
-            transition: 0.3s ease;
-            box-shadow: 0 4px 15px rgba(5, 150, 105, 0.2);
-        }
-
-        .btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(5, 150, 105, 0.3);
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 6px 16px;
-            background: rgba(5, 150, 105, 0.1);
-            color: var(--primary);
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            margin-bottom: 1rem;
-        }
-
-        footer {
-            text-align: center;
-            padding: 50px;
-            color: #718096;
-            font-size: 0.9rem;
+        @media (max-width: 968px) { 
+            .detail-grid { grid-template-columns: 1fr; } 
+            h1 { font-size: 2.5rem; } 
         }
     </style>
 </head>
 <body>
 
-    <div class="bg-flow"></div>
+    <div class="beta-badge">BETA v0.8</div>
 
     <nav>
-        <div class="logo">AURA</div>
-        <div style="font-size: 0.9rem; font-weight: 600; opacity: 0.7;">Shoonya Origins</div>
+        <a href="#" class="brand">Aura<span>.</span></a>
+        <a href="https://shoonyaorigins.com" class="back-link">← Back to Overview</a>
     </nav>
 
-    <header class="hero">
-        <div class="badge">Intelligence in Motion</div>
-        <h1>Making the <span class="text-gradient">Invisible</span><br>Pulse Visible.</h1>
-        <p>Contactless monitoring through EVM technology. No wires, no stress—just pure clarity.</p>
-        <a href="#" class="btn">Get Started</a>
+    <header class="page-header">
+        <div class="tag">AI Engine</div>
+        <h1>Specialized Care</h1>
+        <p class="subtitle">We focus on the most vulnerable stages of life where precision is not just required—it is vital.</p>
     </header>
 
-    <section class="container">
-        <div class="glass-card">
-            <div class="badge" style="background: rgba(249, 115, 22, 0.1); color: var(--accent);">AI Focus</div>
-            <h3>EVM Engine</h3>
-            <p>Amplify sub-visual signals to detect pulse and respiration from any standard video feed.</p>
+    <section class="detail-grid">
+        <div class="visual-container">
+            <div style="margin-bottom: 20px; font-weight: 800; color: var(--primary);">SYSTEM ACTIVE</div>
+            <div class="chart-mockup">
+                <div class="chart-fill"></div>
+            </div>
         </div>
 
-        <div class="glass-card">
-            <h3>Predictive Care</h3>
-            <p>Moving from reactive treatment to proactive wellness using Shoonya's proprietary models.</p>
-        </div>
+        <div class="tech-content">
+            <h2>Predictive Health</h2>
+            <p>Moving the needle from diagnostic to prognostic. We don't just tell you what happened—we tell you what's next.</p>
+            
+            <div class="care-highlight">
+                <h3>Elderly Care</h3>
+                <p>Fall detection and cardiac monitoring for independent living.</p>
+            </div>
 
-        <div class="glass-card">
-            <h3>Super-App Integration</h3>
-            <p>Your entire health ecosystem connected seamlessly through the Aura dashboard.</p>
+            <div class="care-highlight">
+                <h3>Neonatal (NICU)</h3>
+                <p>Contactless monitoring for newborns, eliminating the stress of adhesive sensors on fragile skin.</p>
+            </div>
+
+            <ul class="feature-list">
+                <li>Contactless Vital Monitoring</li>
+                <li>Real-time Stress Detection</li>
+                <li>Predictive Anomaly Alerts</li>
+            </ul>
         </div>
     </section>
 
     <footer>
-        <p>&copy; 2026 Shoonya Origins &bull; Part of the Sentinel-Aura Conglomerate</p>
+        <p>&copy; 2026 Shoonya Origins. Built for the future of humanity.</p>
     </footer>
 
 </body>
