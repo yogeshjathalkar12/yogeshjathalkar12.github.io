@@ -3,192 +3,271 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura | Specialized Care</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <title>Aura | Shoonya Origins</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #059669;
-            --primary-dark: #065f46;
-            --primary-light: #ecfdf5;
-            --accent: #f97316;
-            --bg-white: #ffffff;
-            --bg-offwhite: #f8fafc;
-            --text-dark: #0f172a;
-            --text-light: #64748b;
+            --primary: #059669;       /* Emerald */
+            --primary-dark: #064e3b;
+            --accent: #f97316;        /* Orange */
+            --glass: rgba(255, 255, 255, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --text-main: #0f172a;
+            --text-muted: #475569;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background: #f8fafc;
+            color: var(--text-main);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* --- ANIMATED MESH BACKGROUND --- */
+        .ambient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(at 0% 0%, rgba(5, 150, 105, 0.15) 0px, transparent 50%),
+                        radial-gradient(at 100% 0%, rgba(249, 115, 22, 0.15) 0px, transparent 50%),
+                        radial-gradient(at 100% 100%, rgba(5, 150, 105, 0.1) 0px, transparent 50%);
+            filter: blur(60px);
+            animation: pulse-bg 10s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse-bg {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.1); opacity: 1; }
+        }
+
+        /* --- NAVIGATION --- */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 8%;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--primary-dark);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo span { color: var(--accent); }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: 0.3s;
+        }
         
-        body { 
-            background-color: var(--bg-white); 
-            color: var(--text-dark); 
-            line-height: 1.6; 
+        .nav-link:hover { color: var(--primary); }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 5%;
+            position: relative;
         }
 
-        /* BETA BADGE */
-        .beta-badge { 
-            position: absolute; 
-            top: 20px; 
-            right: 20px; 
-            background: var(--accent); 
-            color: white; 
-            padding: 6px 16px; 
-            border-radius: 50px; 
-            font-size: 0.75rem; 
-            font-weight: 700; 
-            z-index: 1000; 
-            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2); 
+        .pill-badge {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid var(--glass-border);
+            padding: 8px 20px;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            backdrop-filter: blur(4px);
+            animation: float 3s ease-in-out infinite;
         }
 
-        nav { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 1.5rem 5%; 
-            background: rgba(255, 255, 255, 0.8); 
-            backdrop-filter: blur(10px); 
-            -webkit-backdrop-filter: blur(10px);
-            position: sticky; 
-            top: 0; 
-            z-index: 100; 
-            border-bottom: 1px solid #e2e8f0; 
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
         }
 
-        .brand { font-size: 1.5rem; font-weight: 700; color: var(--primary-dark); text-decoration: none; }
-        .back-link { text-decoration: none; color: var(--text-light); font-weight: 600; font-size: 0.9rem; transition: 0.3s; }
-        .back-link:hover { color: var(--primary); }
-
-        .page-header { 
-            padding: 6rem 5% 4rem; 
-            text-align: center; 
-            background: radial-gradient(circle at 50% 50%, var(--primary-light) 0%, white 70%); 
+        h1 {
+            font-size: clamp(3rem, 6vw, 5rem);
+            line-height: 1.1;
+            font-weight: 800;
+            letter-spacing: -2px;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--text-main) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
         }
 
-        .tag { 
-            background: rgba(5, 150, 105, 0.1); 
-            color: var(--primary); 
-            padding: 6px 12px; 
-            border-radius: 50px; 
-            font-size: 0.8rem; 
-            font-weight: 700; 
-            text-transform: uppercase; 
-            margin-bottom: 1rem; 
-            display: inline-block; 
+        p.lead {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            line-height: 1.7;
+            margin-bottom: 3rem;
         }
 
-        h1 { font-size: 3.5rem; color: var(--text-dark); margin-bottom: 1.5rem; }
-        .subtitle { font-size: 1.25rem; color: var(--text-light); max-width: 800px; margin: 0 auto; }
-
-        .detail-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 4rem; 
-            max-width: 1200px; 
-            margin: 4rem auto; 
-            padding: 0 5% 6rem; 
+        /* --- BUTTONS --- */
+        .cta-group {
+            display: flex;
+            gap: 1.5rem;
         }
 
-        .visual-container { 
-            background: var(--bg-offwhite); 
-            height: 450px; 
-            border-radius: 24px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            border: 1px solid #e2e8f0; 
-            position: relative; 
+        .btn {
+            padding: 16px 36px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        .chart-mockup { width: 80%; height: 10px; background: #e2e8f0; border-radius: 10px; position: relative; overflow: hidden; }
-        .chart-fill { position: absolute; height: 100%; width: 65%; background: var(--primary); animation: grow 2s ease-out; }
-
-        @keyframes grow { from { width: 0; } to { width: 65%; } }
-
-        .tech-content h2 { font-size: 2.2rem; color: var(--primary-dark); margin-bottom: 1.5rem; }
-        .tech-content p { color: var(--text-light); font-size: 1.1rem; margin-bottom: 2rem; }
-
-        .feature-list { list-style: none; }
-        .feature-list li { 
-            margin-bottom: 1.2rem; 
-            padding-left: 35px; 
-            position: relative; 
-            color: var(--text-dark); 
-            font-weight: 500; 
-        }
-        .feature-list li::before { 
-            content: "◆"; 
-            position: absolute; 
-            left: 0; 
-            color: var(--primary); 
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 10px 30px rgba(5, 150, 105, 0.3);
         }
 
-        .care-highlight { margin-bottom: 2rem; }
-        .care-highlight h3 { color: var(--accent); margin-bottom: 0.5rem; }
-
-        footer { 
-            background-color: #f1f5f9; 
-            color: var(--text-light); 
-            text-align: center; 
-            padding: 3rem 5%; 
-            font-size: 0.9rem; 
-            border-top: 1px solid #e2e8f0; 
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(5, 150, 105, 0.4);
+            background: var(--primary-dark);
         }
 
-        @media (max-width: 968px) { 
-            .detail-grid { grid-template-columns: 1fr; } 
-            h1 { font-size: 2.5rem; } 
+        .btn-glass {
+            background: rgba(255,255,255,0.5);
+            color: var(--primary-dark);
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn-glass:hover {
+            background: rgba(255,255,255,0.8);
+            transform: translateY(-2px);
+        }
+
+        /* --- FEATURE GRID (Bottom Overlay) --- */
+        .glass-grid {
+            position: absolute;
+            bottom: 5%;
+            width: 90%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            padding: 24px;
+            border-radius: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.85);
+        }
+
+        .glass-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .glass-card p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* --- MOBILE TWEAKS --- */
+        @media (max-width: 768px) {
+            .glass-grid {
+                position: relative;
+                margin-top: 4rem;
+                bottom: auto;
+            }
+            h1 { font-size: 2.5rem; }
         }
     </style>
 </head>
 <body>
 
-    <div class="beta-badge">BETA v0.8</div>
+    <div class="ambient-bg"></div>
 
     <nav>
-        <a href="#" class="brand">Aura<span>.</span></a>
-        <a href="https://shoonyaorigins.com" class="back-link">← Back to Overview</a>
+        <a href="#" class="logo">Aura<span>.</span></a>
+        <a href="https://shoonyaorigins.com" class="nav-link">Part of Shoonya Origins</a>
     </nav>
 
-    <header class="page-header">
-        <div class="tag">AI Engine</div>
-        <h1>Specialized Care</h1>
-        <p class="subtitle">We focus on the most vulnerable stages of life where precision is not just required—it is vital.</p>
-    </header>
+    <section class="hero">
+        <div class="pill-badge">v1.0 &bull; System Operational</div>
+        
+        <h1>Making the Invisible,<br>Visible.</h1>
+        
+        <p class="lead">
+            Advanced biometrics through Eulerian Video Magnification. 
+            Monitor vitals contactless, powered by Shoonya AI.
+        </p>
 
-    <section class="detail-grid">
-        <div class="visual-container">
-            <div style="margin-bottom: 20px; font-weight: 800; color: var(--primary);">SYSTEM ACTIVE</div>
-            <div class="chart-mockup">
-                <div class="chart-fill"></div>
-            </div>
+        <div class="cta-group">
+            <a href="#dashboard" class="btn btn-primary">Launch Dashboard</a>
+            <a href="#tech" class="btn btn-glass">How it Works</a>
         </div>
 
-        <div class="tech-content">
-            <h2>Predictive Health</h2>
-            <p>Moving the needle from diagnostic to prognostic. We don't just tell you what happened—we tell you what's next.</p>
-            
-            <div class="care-highlight">
-                <h3>Elderly Care</h3>
-                <p>Fall detection and cardiac monitoring for independent living.</p>
+        <div class="glass-grid">
+            <div class="glass-card">
+                <h3><span style="color: var(--accent)">●</span> EVM Technology</h3>
+                <p>Amplify micro-movements to detect pulse and respiration from standard video.</p>
             </div>
-
-            <div class="care-highlight">
-                <h3>Neonatal (NICU)</h3>
-                <p>Contactless monitoring for newborns, eliminating the stress of adhesive sensors on fragile skin.</p>
+            <div class="glass-card">
+                <h3><span style="color: var(--primary)">●</span> Predictive AI</h3>
+                <p>Forecasting health anomalies before they manifest physically.</p>
             </div>
-
-            <ul class="feature-list">
-                <li>Contactless Vital Monitoring</li>
-                <li>Real-time Stress Detection</li>
-                <li>Predictive Anomaly Alerts</li>
-            </ul>
+            <div class="glass-card">
+                <h3><span style="color: #6366f1">●</span> Non-Invasive</h3>
+                <p>Zero wires. Zero contact. Perfect for NICU and Elderly care.</p>
+            </div>
         </div>
     </section>
-
-    <footer>
-        <p>&copy; 2026 Shoonya Origins. Built for the future of humanity.</p>
-    </footer>
 
 </body>
 </html>
