@@ -3,19 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura | The Health Ecosystem</title>
+    <title>Aura | Shoonya Origins</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #10b981;       /* Neon Emerald */
-            --primary-dark: #064e3b;  /* Deep Forest */
-            --bg-deep: #022c22;       /* Almost Black Green */
+            /* Vibrant Green Palette */
+            --primary: #059669;       /* Emerald */
+            --primary-light: #34d399; /* Bright Mint */
+            --primary-dark: #064e3b;  /* Deep Green Text */
             --accent: #f97316;        /* Safety Orange */
-            --text-main: #ecfdf5;     /* Mint White */
-            --text-muted: #6ee7b7;    /* Soft Green */
-            --glass: rgba(6, 78, 59, 0.4); 
-            --glass-hover: rgba(6, 78, 59, 0.7);
-            --border: rgba(52, 211, 153, 0.2);
+            
+            /* Clean Backgrounds */
+            --bg-main: #f0fdf4;       /* Very Light Mint Tint */
+            --glass-white: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(5, 150, 105, 0.2);
+            --glass-hover: rgba(255, 255, 255, 0.85);
+            
+            --text-main: #022c22;
+            --text-muted: #374151;
         }
 
         * {
@@ -26,14 +31,14 @@
         }
 
         body {
-            background-color: var(--bg-deep);
+            background-color: var(--bg-main);
             color: var(--text-main);
             overflow-x: hidden;
             min-height: 100vh;
         }
 
-        /* --- AMBIENT BACKGROUND --- */
-        .ambient-bg {
+        /* --- HEAVY GREEN AMBIENT FLOW --- */
+        .ambient-flow {
             position: fixed;
             top: 0;
             left: 0;
@@ -41,9 +46,11 @@
             height: 100%;
             z-index: -1;
             background: 
-                radial-gradient(circle at 15% 50%, rgba(16, 185, 129, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 85% 30%, rgba(6, 78, 59, 0.4) 0%, transparent 50%);
-            filter: blur(60px);
+                radial-gradient(at 0% 0%, rgba(52, 211, 153, 0.4) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(249, 115, 22, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(5, 150, 105, 0.2) 0px, transparent 50%),
+                radial-gradient(at 0% 50%, rgba(16, 185, 129, 0.2) 0px, transparent 50%);
+            filter: blur(80px);
         }
 
         /* --- NAVIGATION --- */
@@ -51,248 +58,248 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 24px 8%;
-            background: rgba(2, 44, 34, 0.8);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
+            padding: 20px 8%;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--glass-border);
             position: sticky;
             top: 0;
             z-index: 1000;
         }
 
         .logo {
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             font-weight: 800;
             letter-spacing: -1px;
-            color: white;
+            color: var(--primary-dark);
             text-decoration: none;
         }
-
         .logo span { color: var(--primary); }
 
-        /* --- HERO SECTION --- */
+        /* --- HERO --- */
         .hero {
             text-align: center;
-            padding: 100px 5% 60px;
+            padding: 80px 5% 50px;
         }
 
         .hero h1 {
-            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
             font-weight: 800;
-            margin-bottom: 1rem;
             line-height: 1.1;
-            background: linear-gradient(to right, white, var(--text-muted));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+            color: var(--primary-dark);
         }
 
         .hero p {
-            color: var(--text-muted);
             font-size: 1.2rem;
-            max-width: 600px;
+            color: var(--text-muted);
+            max-width: 650px;
             margin: 0 auto;
         }
 
-        /* --- SERVICES GRID --- */
+        /* --- GRID SYSTEM --- */
         .grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 24px;
-            padding: 40px 8% 100px;
+            padding: 20px 8% 100px;
             max-width: 1400px;
             margin: 0 auto;
         }
 
-        /* CARD STYLING */
+        /* --- GLASS CARDS --- */
         .card {
-            background: var(--glass);
-            border: 1px solid var(--border);
+            background: var(--glass-white);
+            border: 1px solid var(--glass-border);
             border-radius: 24px;
-            padding: 32px;
+            padding: 30px;
             text-decoration: none;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 280px;
-            backdrop-filter: blur(10px);
+            min-height: 260px;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 4px 20px rgba(5, 150, 105, 0.05); /* Subtle green shadow */
         }
 
         .card:hover {
             transform: translateY(-8px);
             background: var(--glass-hover);
             border-color: var(--primary);
-            box-shadow: 0 10px 40px rgba(16, 185, 129, 0.1);
+            box-shadow: 0 15px 30px rgba(5, 150, 105, 0.15);
         }
 
-        /* Status Badges */
-        .badge {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 6px 14px;
-            border-radius: 50px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-
-        .badge-beta {
-            background: rgba(249, 115, 22, 0.2);
-            color: var(--accent);
-            border: 1px solid rgba(249, 115, 22, 0.4);
-            animation: pulse 2s infinite;
-        }
-
-        .badge-live {
-            background: rgba(16, 185, 129, 0.2);
-            color: var(--primary);
-            border: 1px solid rgba(16, 185, 129, 0.4);
-        }
-
-        /* Card Content */
-        .card-num {
-            font-size: 4rem;
-            font-weight: 800;
-            color: rgba(255, 255, 255, 0.05);
-            position: absolute;
-            bottom: -10px;
-            right: 10px;
-            line-height: 1;
-        }
-
+        /* Typography inside cards */
         .card h3 {
-            font-size: 1.5rem;
-            color: white;
-            margin-bottom: 12px;
+            font-size: 1.4rem;
+            color: var(--primary-dark);
+            margin-bottom: 10px;
             font-weight: 700;
         }
 
         .card p {
             font-size: 0.95rem;
             color: var(--text-muted);
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
-        .arrow-icon {
-            margin-top: 20px;
+        /* Number Watermark */
+        .card-num {
+            position: absolute;
+            bottom: -15px;
+            right: 15px;
+            font-size: 5rem;
+            font-weight: 900;
             color: var(--primary);
-            font-weight: 600;
+            opacity: 0.08;
+            pointer-events: none;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        .badge-beta {
+            background: rgba(249, 115, 22, 0.1);
+            color: var(--accent);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+        }
+        .badge-live {
+            background: rgba(5, 150, 105, 0.1);
+            color: var(--primary);
+            border: 1px solid rgba(5, 150, 105, 0.3);
+        }
+
+        /* Arrow Link */
+        .link-text {
+            margin-top: 20px;
             font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--primary);
             display: flex;
             align-items: center;
-            gap: 8px;
-            opacity: 0.8;
+            gap: 6px;
         }
-
-        .card:hover .arrow-icon {
-            opacity: 1;
-            gap: 12px; /* Slide effect */
-        }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(249, 115, 22, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
-        }
+        .card:hover .link-text { gap: 10px; }
 
         footer {
             text-align: center;
             padding: 40px;
-            color: rgba(255, 255, 255, 0.3);
-            border-top: 1px solid var(--border);
+            color: var(--text-muted);
             font-size: 0.9rem;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
         }
     </style>
 </head>
 <body>
 
-    <div class="ambient-bg"></div>
+    <div class="ambient-flow"></div>
 
     <nav>
         <a href="#" class="logo">Aura<span>.</span></a>
-        <div style="font-size: 0.9rem; color: var(--text-muted);">Shoonya Origins Conglomerate</div>
+        <div style="font-size: 0.9rem; font-weight: 600; color: var(--primary-dark); opacity: 0.7;">Shoonya Origins</div>
     </nav>
 
-    <section class="hero">
-        <h1>The Future of <span style="color: var(--primary)">Vitality</span></h1>
-        <p>A unified ecosystem for predictive, preventative, and personalized care.</p>
-    </section>
+    <header class="hero">
+        <h1>Making the <span style="color: var(--primary)">Invisible</span>, Visible.</h1>
+        <p>A unified health ecosystem powered by Sensor Fusion and EVM technology.</p>
+    </header>
 
     <section class="grid-container">
 
         <a href="evm.html" class="card">
-            <div class="badge badge-beta">Beta &bull; In Prod</div>
-            <div>
-                <h3>EVM Technology</h3>
-                <p>Eulerian Video Magnification. Contactless vital monitoring that amplifies micro-movements to detect pulse and respiration.</p>
-            </div>
-            <div class="arrow-icon">View Tech →</div>
             <div class="card-num">01</div>
+            <div>
+                <span class="badge badge-beta">Beta &bull; In Prod</span>
+                <h3>EVM Technology</h3>
+                <p>Eulerian Video Magnification. Amplifying micro-movements to detect vitals from standard video.</p>
+            </div>
+            <div class="link-text">View Tech →</div>
         </a>
 
-        <a href="predictive-health.html" class="card">
-            <div class="badge badge-live">Live</div>
-            <div>
-                <h3>Predictive Health</h3>
-                <p>Moving beyond diagnosis. Our AI models forecast health anomalies and risks before they manifest physically.</p>
-            </div>
-            <div class="arrow-icon">Explore Models →</div>
+        <a href="predictive.html" class="card">
             <div class="card-num">02</div>
+            <div>
+                <span class="badge badge-live">Live Models</span>
+                <h3>Predictive Health</h3>
+                <p>AI forecasting that identifies health risks and anomalies before they become physical symptoms.</p>
+            </div>
+            <div class="link-text">Explore Models →</div>
         </a>
 
         <a href="environment.html" class="card">
-            <div>
-                <h3>Environmental Intel</h3>
-                <p>Real-time analysis of pollution levels, air quality index (AQI), and surrounding hazards affecting your biology.</p>
-            </div>
-            <div class="arrow-icon">Check Status →</div>
             <div class="card-num">03</div>
+            <div>
+                <span class="badge badge-live">Live Data</span>
+                <h3>Environmental Intel</h3>
+                <p>Real-time AQI, pollution tracking, and surrounding hazard analysis.</p>
+            </div>
+            <div class="link-text">Check Surroundings →</div>
         </a>
 
-        <a href="app-download.html" class="card">
+        <a href="app.html" class="card">
+            <div class="card-num">04</div>
             <div>
                 <h3>Aura Mobile App</h3>
-                <p>Your central command center. Access all health data, alerts, and family monitoring from a single dashboard.</p>
+                <p>The central command hub. Monitor family health and receive alerts instantly.</p>
             </div>
-            <div class="arrow-icon">Download →</div>
-            <div class="card-num">04</div>
+            <div class="link-text">Download →</div>
         </a>
 
         <a href="nutrition.html" class="card">
+            <div class="card-num">05</div>
             <div>
                 <h3>Nutrition Analytics</h3>
-                <p>AI-driven food monitoring. Track calories, micro-nutrients, and metabolic impact with a simple photo.</p>
+                <p>Calorie and micro-nutrient tracking via computer vision food recognition.</p>
             </div>
-            <div class="arrow-icon">Start Tracking →</div>
-            <div class="card-num">05</div>
+            <div class="link-text">Start Tracking →</div>
         </a>
 
         <a href="trainer.html" class="card">
+            <div class="card-num">06</div>
             <div>
                 <h3>Personalized Trainer</h3>
-                <p>Computer Vision fitness coaching. The camera corrects your form and counts reps in real-time.</p>
+                <p>Real-time form correction and rep counting using camera-based pose estimation.</p>
             </div>
-            <div class="arrow-icon">Start Workout →</div>
-            <div class="card-num">06</div>
+            <div class="link-text">Start Workout →</div>
         </a>
 
-        <a href="specialized-care.html" class="card" style="grid-column: span 1;"> <div>
-                <h3>Specialized Care</h3>
-                <p>Non-invasive monitoring for <strong>NICU</strong> (Neonatal) and <strong>Elderly</strong> care, including Sleep Apnea detection.</p>
-            </div>
-            <div class="arrow-icon">View Solutions →</div>
+        <a href="neonatal.html" class="card">
             <div class="card-num">07</div>
+            <div>
+                <span class="badge badge-live" style="border-color: var(--accent); color: var(--accent); background: rgba(249,115,22,0.1);">Sensor Fusion</span>
+                <h3>Neonatal Care</h3>
+                <p>Non-invasive monitoring for NICU. Combining thermal and optical sensors for zero-contact baby care.</p>
+            </div>
+            <div class="link-text">View Solutions →</div>
+        </a>
+
+        <a href="elderly.html" class="card">
+            <div class="card-num">08</div>
+            <div>
+                <h3>Elderly Care</h3>
+                <p>Dedicated monitoring for Sleep Apnea, fall detection, and cardiac irregularities.</p>
+            </div>
+            <div class="link-text">View Solutions →</div>
         </a>
 
     </section>
 
     <footer>
-        <p>&copy; 2026 Shoonya Origins &bull; Making the Invisible, Visible.</p>
+        <p>&copy; 2026 Shoonya Origins. All systems operational.</p>
     </footer>
 
 </body>
