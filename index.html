@@ -7,18 +7,52 @@
     <link rel="icon" type="image/png" href="images/favicon.png">
     <meta name="google-site-verification" content="B8lE_HL53IWDazD-NuitU_ISBLoD6tV-ZgGqyIu8K-E" />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
     <style>
-        /* 1. VISIONARY THEME SETUP */
+        /* 1. THEME VARIABLES */
         :root {
-            --primary: #673de6;
-            --primary-dark: #502bb5;
+            /* Default Light Mode Colors */
+            --primary: #673de6; /* Keep branding purple for logos/buttons in light mode */
+            --accent-glow: rgba(103, 61, 230, 0.3); /* Purple shadow for light mode */
             --text-dark: #1e293b;
             --text-light: #64748b;
+            
             --bg-gradient: linear-gradient(135deg, #f8f9ff 0%, #eef1ff 100%);
+            --header-bg: rgba(255, 255, 255, 0.85);
+            --card-bg: rgba(255, 255, 255, 0.6);
+            --card-border: rgba(255, 255, 255, 0.5);
+            
             --shadow: 0 20px 50px rgba(0,0,0,0.1);
-            --card-hover-shadow: 0 30px 70px rgba(103, 61, 230, 0.3);
+            --blur-overlay: radial-gradient(circle at 50% 110%, rgba(255, 255, 255, 1) 25%, rgba(255, 255, 255, 0.9) 45%, rgba(255, 255, 255, 0.5) 65%, rgba(255, 255, 255, 0) 85%);
+            
+            /* The Bulb State (Off by default in light mode) */
+            --bulb-color: #cbd5e1; 
+            --bulb-glow: none;
         }
 
+        /* 2. DARK MODE (The "Industrial/Tungsten" Theme) */
+        body.dark-mode {
+            /* The Yellow Aesthetic */
+            --primary: #fbbf24; /* Warm Amber/Yellow */
+            --accent-glow: rgba(251, 191, 36, 0.25); /* Yellow glow behind cards */
+            
+            --text-dark: #fefce8; /* Soft warm white */
+            --text-light: #9ca3af; /* Grey */
+            
+            --bg-gradient: linear-gradient(135deg, #0c0a09 0%, #1c1917 100%); /* Warm Black (softer than pure black) */
+            --header-bg: rgba(12, 10, 9, 0.85);
+            --card-bg: rgba(28, 25, 23, 0.6);
+            --card-border: rgba(251, 191, 36, 0.1); /* Subtle yellow rim */
+            
+            --blur-overlay: radial-gradient(circle at 50% 110%, rgba(12, 10, 9, 1) 25%, rgba(12, 10, 9, 0.9) 45%, rgba(12, 10, 9, 0.5) 65%, rgba(12, 10, 9, 0) 85%);
+            
+            /* Bulb turns ON in dark mode */
+            --bulb-color: #ffaa00;
+            --bulb-glow: drop-shadow(0 0 15px rgba(255, 170, 0, 0.8));
+        }
+
+        html { scroll-behavior: smooth; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         
         body {
@@ -26,23 +60,108 @@
             color: var(--text-dark);
             line-height: 1.6;
             min-height: 100vh;
+            overflow-x: hidden;
+            transition: background 0.5s ease, color 0.5s ease;
         }
 
-        /* 2. HEADER & HERO */
+        /* 3. THE HANGING LIGHTBULB SWITCH */
+        .lamp-container {
+            position: fixed;
+            top: 0;
+            right: 10%;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* The wire holding the bulb */
+        .wire {
+            width: 2px;
+            height: 60px;
+            background: #475569;
+            z-index: 1;
+        }
+
+        /* The bulb fixture */
+        .bulb-fixture {
+            position: relative;
+            z-index: 2;
+            cursor: pointer;
+        }
+
+        /* The Bulb Itself */
+        .bulb {
+            width: 40px;
+            height: 40px;
+            background: var(--bulb-color);
+            border-radius: 50%;
+            border: 2px solid #475569;
+            /* The Glow Effect */
+            filter: var(--bulb-glow);
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* The metal socket above the bulb */
+        .socket {
+            width: 20px;
+            height: 15px;
+            background: #334155;
+            margin: 0 auto -5px; /* Pull bulb up into socket */
+            position: relative;
+            z-index: 1;
+            border-radius: 2px;
+        }
+
+        /* The Pull String */
+        .pull-string {
+            width: 1px;
+            height: 60px;
+            background: #94a3b8;
+            margin: 0 auto;
+            position: relative;
+            top: -2px;
+            cursor: pointer;
+            transition: height 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            /* Interaction target size increased for easier clicking */
+        }
+        
+        .knob {
+            width: 8px;
+            height: 14px;
+            background: #64748b;
+            border-radius: 4px;
+            position: absolute;
+            bottom: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* Pull Animation */
+        .lamp-container:active .pull-string,
+        .lamp-container.pulled .pull-string {
+            height: 85px; /* Stretches when pulled */
+        }
+
+
+        /* 4. HEADER & HERO */
         header {
-            background: rgba(255, 255, 255, 0.9);
+            background: var(--header-bg);
             backdrop-filter: blur(10px);
             padding: 1.5rem 5%;
             position: sticky; top: 0; z-index: 100;
             border-bottom: 1px solid rgba(0,0,0,0.05);
             display: flex; justify-content: space-between; align-items: center;
+            transition: background 0.5s ease;
         }
 
         .logo { font-size: 1.5rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px; }
-        .logo span { color: var(--primary); }
+        .logo span { color: var(--primary); transition: color 0.5s ease; }
 
         .hero-section {
-            padding: 7rem 20px 5rem;
+            padding: 8rem 20px 6rem;
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -51,15 +170,38 @@
         .hero-section::before {
             content: ''; position: absolute; top: -50%; left: 50%; transform: translateX(-50%);
             width: 800px; height: 800px;
-            background: radial-gradient(circle, rgba(103,61,230,0.1) 0%, rgba(0,0,0,0) 70%);
+            background: radial-gradient(circle, var(--accent-glow) 0%, rgba(0,0,0,0) 70%); /* Uses the yellow glow in dark mode */
             z-index: -1;
+            transition: background 0.5s ease;
+            animation: pulse-glow 10s infinite alternate;
+        }
+
+        @keyframes pulse-glow {
+            0% { transform: translateX(-50%) scale(1); opacity: 0.8; }
+            100% { transform: translateX(-50%) scale(1.2); opacity: 0.5; }
         }
 
         h1 { font-size: 3.5rem; color: var(--text-dark); margin-bottom: 1.5rem; line-height: 1.1; font-weight: 800; }
         
         .gradient-text {
-            background: linear-gradient(135deg, #2f2f2f 0%, #673de6 100%);
+            /* Fallback */
+            background: linear-gradient(135deg, #673de6 0%, #2f2f2f 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: gradient-move 5s ease infinite;
+            transition: background 0.5s ease;
+        }
+
+        /* Special Gradient for Dark Mode (Golden/Yellow) */
+        body.dark-mode .gradient-text {
+            background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        @keyframes gradient-move {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         p.subtitle {
@@ -67,12 +209,17 @@
             max-width: 650px; margin-left: auto; margin-right: auto;
         }
 
-        /* 3. THE ECOSYSTEM GRID */
+        /* GRID & CARDS */
         .container { max-width: 1300px; margin: 0 auto; padding: 0 20px 6rem; }
         
         .section-label {
             text-align: center; text-transform: uppercase; letter-spacing: 2px;
             font-size: 0.85rem; color: var(--primary); font-weight: 700; margin-bottom: 3rem;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: color 0.5s ease;
         }
 
         .grid {
@@ -81,7 +228,6 @@
             gap: 2.5rem;
         }
 
-        /* 4. SEAMLESS CARD DESIGN */
         .card-link { text-decoration: none; color: inherit; display: block; }
 
         .card {
@@ -89,62 +235,51 @@
             height: 500px;
             border-radius: 24px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            box-shadow: var(--shadow);
             transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            border: 1px solid var(--card-border);
             
-            /* Background Config */
             background-size: cover;
             background-position: center;
-            
             display: flex;
             align-items: flex-end;
         }
 
+        /* THE YELLOW GLOW ON HOVER */
         .card:hover {
             transform: translateY(-10px) scale(1.02);
-            box-shadow: var(--card-hover-shadow);
+            /* This variable changes to Yellow in Dark Mode */
+            box-shadow: 0 30px 70px var(--accent-glow);
         }
 
-        /* THE CURVED BLUR OVERLAY */
         .card::before {
             content: '';
             position: absolute;
             inset: 0;
             z-index: 1;
-            /* Creates the seamless transition from image to white text area */
-            background: radial-gradient(
-                circle at 50% 110%, 
-                rgba(255, 255, 255, 1) 25%, 
-                rgba(255, 255, 255, 0.9) 45%, 
-                rgba(255, 255, 255, 0.5) 65%, 
-                rgba(255, 255, 255, 0) 85%
-            );
+            background: var(--blur-overlay);
+            transition: background 0.5s ease;
         }
 
-        /* --- THEMATIC BACKGROUNDS (UPDATED FOR SENTINEL.PNG) --- */
-        
-        /* 1. Sentinel is now using the image */
+        /* KEEPING YOUR IMAGES */
         .bg-sentinel { background-image: url('images/sentinel.png'); }
-
-        /* 2. Others are still gradients (Change these when you add more PNGs) */
-        .bg-aura     { background-image: url('images/aura.png'); /* url('images/aura.png'); */ }
-        .bg-civitas  { background-image: url('images/civitas.png'); /* url('images/civitas.png'); */ }
+        .bg-aura     { background-image: url('images/aura.png'); }
+        .bg-civitas  { background-image: url('images/civitas.png'); }
         .bg-basis    { background-image: url('images/basis.png');  }
         .bg-raptor   { background-image: url('images/raptor.png');  }
         .bg-aether   { background-image: url('images/aether.png');  }
         .bg-systems  { background-image: url('images/systems.png');  }
 
-
-        /* CONTENT CONTAINER */
         .card-content {
             position: relative;
             z-index: 2;
             padding: 2.5rem;
             width: 100%;
+            transition: transform 0.4s ease;
         }
 
-        /* TAGS */
+        .card:hover .card-content { transform: translateY(-5px); }
+
         .card-tag {
             position: absolute;
             top: 2rem;
@@ -162,8 +297,13 @@
             border: 1px solid rgba(255,255,255,0.4);
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
+        
+        body.dark-mode .card-tag {
+            background: rgba(0, 0, 0, 0.6);
+            border-color: rgba(251, 191, 36, 0.3); /* Slight yellow border */
+            color: #fbbf24;
+        }
 
-        /* Text Styling */
         .card-title { 
             font-size: 2.2rem; 
             font-weight: 800; 
@@ -171,6 +311,8 @@
             color: var(--text-dark);
             text-shadow: 0 2px 10px rgba(255,255,255,0.5); 
         }
+        
+        body.dark-mode .card-title { text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
 
         .card-desc {
             color: var(--text-light);
@@ -179,31 +321,56 @@
             font-weight: 500;
         }
 
-        /* 5. CONTACT FORM SECTION */
+        /* FORM */
         .contact-section {
-            background: white;
+            background: var(--header-bg);
             padding: 5rem 20px;
-            border-top: 1px solid #e0e0e0;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            transition: background 0.5s ease;
         }
 
         .form-container {
             max-width: 600px;
             margin: 0 auto;
-            background: #f8f9ff;
+            background: var(--bg-gradient);
             padding: 3rem;
             border-radius: 24px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--card-border);
         }
 
         .form-group { margin-bottom: 1.5rem; }
         label { display: block; margin-bottom: 0.5rem; color: var(--text-dark); font-weight: 600; font-size: 0.9rem; }
-        input, textarea { width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 1rem; transition: border-color 0.3s; background: white; }
-        input:focus, textarea:focus { outline: none; border-color: var(--primary); }
-        .submit-btn { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: background 0.3s; }
-        .submit-btn:hover { background: var(--primary-dark); }
+        
+        input, textarea { 
+            width: 100%; 
+            padding: 14px; 
+            border: 2px solid #e2e8f0; 
+            border-radius: 12px; 
+            font-size: 1rem; 
+            transition: all 0.3s; 
+            background: var(--card-bg); 
+            color: var(--text-dark);
+        }
+        
+        body.dark-mode input, body.dark-mode textarea {
+            border-color: #44403c;
+            background: rgba(12, 10, 9, 0.5);
+        }
+        
+        body.dark-mode input:focus, body.dark-mode textarea:focus {
+            border-color: #fbbf24; /* Yellow focus border */
+        }
 
-        /* 6. FOOTER */
-        footer { background: #1e1e24; color: #a0a0a5; padding: 4rem 20px; text-align: center; }
+        input:focus, textarea:focus { outline: none; border-color: var(--primary); }
+        .submit-btn { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: background 0.3s, transform 0.2s; }
+        
+        /* Dark mode button text correction */
+        body.dark-mode .submit-btn { color: #1c1917; } /* Dark text on yellow button */
+        
+        .submit-btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
+
+        footer { background: #0b0f19; color: #a0a0a5; padding: 4rem 20px; text-align: center; }
         .footer-links { margin: 2rem 0; display: flex; justify-content: center; gap: 2rem; }
         .footer-links a { color: white; text-decoration: none; font-weight: 500; transition: color 0.3s; }
         .footer-links a:hover { color: var(--primary); }
@@ -212,25 +379,39 @@
             h1 { font-size: 2.5rem; }
             .card { height: 450px; }
             .form-container { padding: 1.5rem; }
+            .lamp-container { right: 5%; }
         }
     </style>
 </head>
 <body>
 
-    <header>
+    <div class="lamp-container" id="lightSwitch" title="Pull to toggle">
+        <div class="wire"></div>
+        <div class="socket"></div>
+        <div class="bulb"></div>
+        <div class="pull-string">
+            <div class="knob"></div>
+        </div>
+    </div>
+
+    <header data-aos="fade-down" data-aos-duration="1000">
         <div class="logo">Shoonya<span>Origins</span></div>
     </header>
 
     <section class="hero-section">
-        <h1>We Build the <br><span class="gradient-text">Future of Humanity.</span></h1>
-        <p class="subtitle">A conglomerate dedicated to Defense, Health, Infrastructure, and Intelligence.</p>
+        <h1 data-aos="fade-up" data-aos-duration="1200">
+            Technology in <br><span class="gradient-text">Service of Humanity.</span>
+        </h1>
+        <p class="subtitle" data-aos="fade-up" data-aos-delay="200" data-aos-duration="1200">
+            An innovation ecosystem advancing Defense, Health, Infrastructure, and Intelligence.
+        </p>
     </section>
 
     <div class="container">
-        <div class="section-label">Our Ecosystem</div>
+        <div class="section-label" data-aos="fade-in" data-aos-delay="400">Our Ecosystem</div>
         <div class="grid">
             
-            <a href="ventures/sentinel/index.html" class="card-link">
+            <a href="ventures/sentinel/index.html" class="card-link" data-aos="fade-up" data-aos-delay="0">
                 <div class="card bg-sentinel">
                     <span class="card-tag">Defense</span>
                     <div class="card-content">
@@ -240,7 +421,7 @@
                 </div>
             </a>
 
-            <a href="ventures/aura/index.html" class="card-link">
+            <a href="ventures/aura/index.html" class="card-link" data-aos="fade-up" data-aos-delay="100">
                 <div class="card bg-aura">
                     <span class="card-tag">Health</span>
                     <div class="card-content">
@@ -250,7 +431,7 @@
                 </div>
             </a>
 
-            <a href="ventures/civitas/index.html" class="card-link">
+            <a href="ventures/civitas/index.html" class="card-link" data-aos="fade-up" data-aos-delay="200">
                 <div class="card bg-civitas">
                     <span class="card-tag">Infrastructure</span>
                     <div class="card-content">
@@ -260,7 +441,7 @@
                 </div>
             </a>
 
-            <a href="ventures/basis/index.html" class="card-link">
+            <a href="ventures/basis/index.html" class="card-link" data-aos="fade-up" data-aos-delay="300">
                 <div class="card bg-basis">
                     <span class="card-tag">Urban Management</span>
                     <div class="card-content">
@@ -270,7 +451,7 @@
                 </div>
             </a>
 
-            <a href="ventures/raptor/index.html" class="card-link">
+            <a href="ventures/raptor/index.html" class="card-link" data-aos="fade-up" data-aos-delay="0">
                 <div class="card bg-raptor">
                     <span class="card-tag">Marketing AI</span>
                     <div class="card-content">
@@ -280,7 +461,7 @@
                 </div>
             </a>
 
-            <a href="ventures/aether/index.html" class="card-link">
+            <a href="ventures/aether/index.html" class="card-link" data-aos="fade-up" data-aos-delay="100">
                 <div class="card bg-aether">
                     <span class="card-tag">Deep Tech</span>
                     <div class="card-content">
@@ -290,7 +471,7 @@
                 </div>
             </a>
 
-            <a href="ventures/shoonya-systems/index.html" class="card-link">
+            <a href="ventures/shoonya-systems/index.html" class="card-link" data-aos="fade-up" data-aos-delay="200">
                 <div class="card bg-systems">
                     <span class="card-tag">Software</span>
                     <div class="card-content">
@@ -305,10 +486,10 @@
 
     <section class="contact-section" id="contact">
         <div class="container">
-            <div class="section-label">Get in Touch</div>
-            <h2 style="text-align: center; font-size: 2rem; margin-bottom: 2rem; color: var(--text-dark);">Partner with Shoonya</h2>
+            <div class="section-label" data-aos="fade-in">Get in Touch</div>
+            <h2 style="text-align: center; font-size: 2rem; margin-bottom: 2rem; color: var(--text-dark);" data-aos="fade-up">Partner with Shoonya</h2>
             
-            <div class="form-container">
+            <div class="form-container" data-aos="zoom-in" data-aos-duration="1000">
                 <form action="https://formsubmit.co/YOUR_EMAIL_HERE" method="POST">
                     <input type="text" name="_honey" style="display:none">
                     <input type="hidden" name="_next" value="https://shoonyaorigins.com">
@@ -341,8 +522,40 @@
         <p style="font-size: 0.8rem; margin-top: 1rem; opacity: 0.5;">Pune, India</p>
     </footer>
 
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            offset: 100,
+            duration: 800,
+            easing: 'ease-out-cubic',
+            once: true
+        });
+
+        const switchElement = document.getElementById('lightSwitch');
+        const body = document.body;
+
+        // Check local storage
+        if (localStorage.getItem('theme') === 'dark') {
+            body.classList.add('dark-mode');
+        }
+
+        switchElement.addEventListener('click', () => {
+            // Animate the pull string
+            switchElement.classList.add('pulled');
+
+            setTimeout(() => {
+                body.classList.toggle('dark-mode');
+                switchElement.classList.remove('pulled');
+                
+                // Save preference
+                if (body.classList.contains('dark-mode')) {
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    localStorage.setItem('theme', 'light');
+                }
+            }, 250); // Timing matches the short pull animation
+        });
+    </script>
+
 </body>
 </html>
-
-
-
