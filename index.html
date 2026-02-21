@@ -6,54 +6,61 @@
     <title>Shoonya Origins | Innovating Tomorrow</title>
     <link rel="icon" type="image/png" href="images/favicon.png">
     <meta name="google-site-verification" content="B8lE_HL53IWDazD-NuitU_ISBLoD6tV-ZgGqyIu8K-E" />
+    
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700;800&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
     <style>
-        /* 1. THEME VARIABLES */
+        /* =========================================
+           1. THEME VARIABLES & SETUP
+           ========================================= */
         :root {
-            /* Default Light Mode Colors */
-            --primary: #673de6; /* Keep branding purple for logos/buttons in light mode */
-            --accent-glow: rgba(103, 61, 230, 0.3); /* Purple shadow for light mode */
+            /* DEFAULT: Light Mode Variables */
+            --primary: #673de6; 
+            --accent-glow: rgba(103, 61, 230, 0.3);
             --text-dark: #1e293b;
             --text-light: #64748b;
-            
             --bg-gradient: linear-gradient(135deg, #f8f9ff 0%, #eef1ff 100%);
             --header-bg: rgba(255, 255, 255, 0.85);
             --card-bg: rgba(255, 255, 255, 0.6);
             --card-border: rgba(255, 255, 255, 0.5);
-            
             --shadow: 0 20px 50px rgba(0,0,0,0.1);
             --blur-overlay: radial-gradient(circle at 50% 110%, rgba(255, 255, 255, 1) 25%, rgba(255, 255, 255, 0.9) 45%, rgba(255, 255, 255, 0.5) 65%, rgba(255, 255, 255, 0) 85%);
             
-            /* The Bulb State (Off by default in light mode) */
+            /* Bulb State (Off by default) */
             --bulb-color: #cbd5e1; 
             --bulb-glow: none;
+            --btn-text: #673de6; /* Purple text for buttons in light mode */
         }
 
-        /* 2. DARK MODE (The "Industrial/Tungsten" Theme) */
+        /* Dark Mode Overrides (Only active when .dark-mode class is added) */
         body.dark-mode {
-            /* The Yellow Aesthetic */
-            --primary: #fbbf24; /* Warm Amber/Yellow */
-            --accent-glow: rgba(251, 191, 36, 0.25); /* Yellow glow behind cards */
-            
-            --text-dark: #fefce8; /* Soft warm white */
-            --text-light: #9ca3af; /* Grey */
-            
-            --bg-gradient: linear-gradient(135deg, #0c0a09 0%, #1c1917 100%); /* Warm Black (softer than pure black) */
+            --primary: #fbbf24; /* Warm Yellow */
+            --accent-glow: rgba(251, 191, 36, 0.25);
+            --text-dark: #fefce8;
+            --text-light: #9ca3af;
+            --bg-gradient: linear-gradient(135deg, #0c0a09 0%, #1c1917 100%);
             --header-bg: rgba(12, 10, 9, 0.85);
             --card-bg: rgba(28, 25, 23, 0.6);
-            --card-border: rgba(251, 191, 36, 0.1); /* Subtle yellow rim */
-            
+            --card-border: rgba(251, 191, 36, 0.1);
             --blur-overlay: radial-gradient(circle at 50% 110%, rgba(12, 10, 9, 1) 25%, rgba(12, 10, 9, 0.9) 45%, rgba(12, 10, 9, 0.5) 65%, rgba(12, 10, 9, 0) 85%);
             
-            /* Bulb turns ON in dark mode */
+            /* Bulb On State */
             --bulb-color: #ffaa00;
             --bulb-glow: drop-shadow(0 0 15px rgba(255, 170, 0, 0.8));
+            --btn-text: #fbbf24; /* Yellow text for buttons in dark mode */
         }
 
-        html { scroll-behavior: smooth; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        html { 
+            scroll-behavior: smooth; 
+        }
+
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+        }
         
         body {
             background: var(--bg-gradient);
@@ -64,7 +71,9 @@
             transition: background 0.5s ease, color 0.5s ease;
         }
 
-        /* 3. THE HANGING LIGHTBULB SWITCH */
+        /* =========================================
+           2. THE LIGHT SWITCH (HANGING BULB)
+           ========================================= */
         .lamp-container {
             position: fixed;
             top: 0;
@@ -75,103 +84,114 @@
             align-items: center;
         }
 
-        /* The wire holding the bulb */
-        .wire {
-            width: 2px;
-            height: 60px;
-            background: #475569;
-            z-index: 1;
+        .wire { 
+            width: 2px; 
+            height: 60px; 
+            background: #475569; 
+            z-index: 1; 
         }
 
-        /* The bulb fixture */
-        .bulb-fixture {
-            position: relative;
-            z-index: 2;
-            cursor: pointer;
+        .bulb-fixture { 
+            position: relative; 
+            z-index: 2; 
+            cursor: pointer; 
         }
 
-        /* The Bulb Itself */
         .bulb {
-            width: 40px;
-            height: 40px;
+            width: 40px; 
+            height: 40px; 
             background: var(--bulb-color);
-            border-radius: 50%;
+            border-radius: 50%; 
             border: 2px solid #475569;
-            /* The Glow Effect */
-            filter: var(--bulb-glow);
+            filter: var(--bulb-glow); 
             transition: all 0.3s ease;
-            position: relative;
+            position: relative; 
             z-index: 2;
         }
-        
-        /* The metal socket above the bulb */
-        .socket {
-            width: 20px;
-            height: 15px;
-            background: #334155;
-            margin: 0 auto -5px; /* Pull bulb up into socket */
-            position: relative;
-            z-index: 1;
-            border-radius: 2px;
+
+        .socket { 
+            width: 20px; 
+            height: 15px; 
+            background: #334155; 
+            margin: 0 auto -5px; 
+            position: relative; 
+            z-index: 1; 
+            border-radius: 2px; 
         }
 
-        /* The Pull String */
         .pull-string {
-            width: 1px;
-            height: 60px;
-            background: #94a3b8;
+            width: 1px; 
+            height: 60px; 
+            background: #94a3b8; 
             margin: 0 auto;
-            position: relative;
-            top: -2px;
+            position: relative; 
+            top: -2px; 
             cursor: pointer;
             transition: height 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            /* Interaction target size increased for easier clicking */
-        }
-        
-        .knob {
-            width: 8px;
-            height: 14px;
-            background: #64748b;
-            border-radius: 4px;
-            position: absolute;
-            bottom: -14px;
-            left: 50%;
-            transform: translateX(-50%);
         }
 
-        /* Pull Animation */
-        .lamp-container:active .pull-string,
-        .lamp-container.pulled .pull-string {
-            height: 85px; /* Stretches when pulled */
+        .knob { 
+            width: 8px; 
+            height: 14px; 
+            background: #64748b; 
+            border-radius: 4px; 
+            position: absolute; 
+            bottom: -14px; 
+            left: 50%; 
+            transform: translateX(-50%); 
         }
 
+        .lamp-container:active .pull-string, 
+        .lamp-container.pulled .pull-string { 
+            height: 85px; 
+        }
 
-        /* 4. HEADER & HERO */
+        /* =========================================
+           3. HEADER & HERO SECTION
+           ========================================= */
         header {
-            background: var(--header-bg);
+            background: var(--header-bg); 
             backdrop-filter: blur(10px);
-            padding: 1.5rem 5%;
-            position: sticky; top: 0; z-index: 100;
+            padding: 1.5rem 5%; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100;
             border-bottom: 1px solid rgba(0,0,0,0.05);
-            display: flex; justify-content: space-between; align-items: center;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
             transition: background 0.5s ease;
         }
 
-        .logo { font-size: 1.5rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px; }
-        .logo span { color: var(--primary); transition: color 0.5s ease; }
+        .logo { 
+            font-size: 1.5rem; 
+            font-weight: 800; 
+            color: var(--text-dark); 
+            letter-spacing: -0.5px; 
+        }
+
+        .logo span { 
+            color: var(--primary); 
+            transition: color 0.5s ease; 
+        }
 
         .hero-section {
-            padding: 8rem 20px 6rem;
-            text-align: center;
-            position: relative;
+            padding: 8rem 20px 6rem; 
+            text-align: center; 
+            position: relative; 
             overflow: hidden;
         }
 
         .hero-section::before {
-            content: ''; position: absolute; top: -50%; left: 50%; transform: translateX(-50%);
-            width: 800px; height: 800px;
-            background: radial-gradient(circle, var(--accent-glow) 0%, rgba(0,0,0,0) 70%); /* Uses the yellow glow in dark mode */
-            z-index: -1;
+            content: ''; 
+            position: absolute; 
+            top: -50%; 
+            left: 50%; 
+            transform: translateX(-50%);
+            width: 800px; 
+            height: 800px;
+            background: radial-gradient(circle, var(--accent-glow) 0%, rgba(0,0,0,0) 70%);
+            z-index: -1; 
             transition: background 0.5s ease;
             animation: pulse-glow 10s infinite alternate;
         }
@@ -181,87 +201,109 @@
             100% { transform: translateX(-50%) scale(1.2); opacity: 0.5; }
         }
 
-        h1 { font-size: 3.5rem; color: var(--text-dark); margin-bottom: 1.5rem; line-height: 1.1; font-weight: 800; }
+        h1 { 
+            font-size: 3.5rem; 
+            color: var(--text-dark); 
+            margin-bottom: 1.5rem; 
+            line-height: 1.1; 
+            font-weight: 800; 
+        }
         
         .gradient-text {
-            /* Fallback */
             background: linear-gradient(135deg, #673de6 0%, #2f2f2f 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-size: 200% auto;
-            animation: gradient-move 5s ease infinite;
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto; 
+            animation: gradient-move 5s ease infinite; 
             transition: background 0.5s ease;
         }
 
-        /* Special Gradient for Dark Mode (Golden/Yellow) */
         body.dark-mode .gradient-text {
             background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent;
         }
 
-        @keyframes gradient-move {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        @keyframes gradient-move { 
+            0% { background-position: 0% 50%; } 
+            50% { background-position: 100% 50%; } 
+            100% { background-position: 0% 50%; } 
         }
 
-        p.subtitle {
-            font-size: 1.25rem; color: var(--text-light); margin-bottom: 3rem;
-            max-width: 650px; margin-left: auto; margin-right: auto;
+        p.subtitle { 
+            font-size: 1.25rem; 
+            color: var(--text-light); 
+            margin-bottom: 3rem; 
+            max-width: 650px; 
+            margin-left: auto; 
+            margin-right: auto; 
         }
 
-        /* GRID & CARDS */
-        .container { max-width: 1300px; margin: 0 auto; padding: 0 20px 6rem; }
-        
+        /* =========================================
+           4. CARDS, GRID & BUTTONS
+           ========================================= */
+        .container { 
+            max-width: 1300px; 
+            margin: 0 auto; 
+            padding: 0 20px 6rem; 
+        }
+
         .section-label {
-            text-align: center; text-transform: uppercase; letter-spacing: 2px;
-            font-size: 0.85rem; color: var(--primary); font-weight: 700; margin-bottom: 3rem;
-            position: relative;
-            display: inline-block;
-            left: 50%;
+            text-align: center; 
+            text-transform: uppercase; 
+            letter-spacing: 2px;
+            font-size: 0.85rem; 
+            color: var(--primary); 
+            font-weight: 700; 
+            margin-bottom: 3rem;
+            position: relative; 
+            display: inline-block; 
+            left: 50%; 
             transform: translateX(-50%);
             transition: color 0.5s ease;
         }
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 2.5rem;
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
+            gap: 2.5rem; 
         }
 
-        .card-link { text-decoration: none; color: inherit; display: block; }
+        .card-link { 
+            text-decoration: none; 
+            color: inherit; 
+            display: block; 
+        }
 
         .card {
-            position: relative;
-            height: 500px;
-            border-radius: 24px;
+            position: relative; 
+            height: 500px; 
+            border-radius: 24px; 
             overflow: hidden;
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow); 
             transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
             border: 1px solid var(--card-border);
-            
-            background-size: cover;
+            background-size: cover; 
             background-position: center;
-            display: flex;
+            display: flex; 
             align-items: flex-end;
         }
 
-        /* THE YELLOW GLOW ON HOVER */
-        .card:hover {
-            transform: translateY(-10px) scale(1.02);
-            /* This variable changes to Yellow in Dark Mode */
-            box-shadow: 0 30px 70px var(--accent-glow);
+        .card:hover { 
+            transform: translateY(-10px) scale(1.02); 
+            box-shadow: 0 30px 70px var(--accent-glow); 
         }
 
-        .card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            z-index: 1;
-            background: var(--blur-overlay);
-            transition: background 0.5s ease;
+        .card::before { 
+            content: ''; 
+            position: absolute; 
+            inset: 0; 
+            z-index: 1; 
+            background: var(--blur-overlay); 
+            transition: background 0.5s ease; 
         }
 
-        /* KEEPING YOUR IMAGES */
+        /* Card Background Images */
         .bg-sentinel { background-image: url('images/sentinel.png'); }
         .bg-aura     { background-image: url('images/aura.png'); }
         .bg-civitas  { background-image: url('images/civitas.png'); }
@@ -271,77 +313,120 @@
         .bg-systems  { background-image: url('images/systems.png');  }
 
         .card-content {
-            position: relative;
-            z-index: 2;
-            padding: 2.5rem;
+            position: relative; 
+            z-index: 2; 
+            padding: 2.5rem; 
             width: 100%;
             transition: transform 0.4s ease;
         }
 
-        .card:hover .card-content { transform: translateY(-5px); }
+        .card:hover .card-content { 
+            transform: translateY(-5px); 
+        }
 
         .card-tag {
-            position: absolute;
-            top: 2rem;
-            left: 2rem;
+            position: absolute; 
+            top: 2rem; 
+            left: 2rem; 
             z-index: 3;
-            padding: 8px 16px;
+            padding: 8px 16px; 
             background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(15px);
+            backdrop-filter: blur(15px); 
             border-radius: 50px;
-            font-size: 0.75rem;
-            font-weight: 700;
+            font-size: 0.75rem; 
+            font-weight: 700; 
             text-transform: uppercase;
-            letter-spacing: 1px;
-            color: white;
+            letter-spacing: 1px; 
+            color: white; 
             border: 1px solid rgba(255,255,255,0.4);
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-        
-        body.dark-mode .card-tag {
-            background: rgba(0, 0, 0, 0.6);
-            border-color: rgba(251, 191, 36, 0.3); /* Slight yellow border */
-            color: #fbbf24;
+
+        body.dark-mode .card-tag { 
+            background: rgba(0, 0, 0, 0.6); 
+            border-color: rgba(251, 191, 36, 0.3); 
+            color: #fbbf24; 
         }
 
         .card-title { 
             font-size: 2.2rem; 
             font-weight: 800; 
-            margin-bottom: 1rem; 
-            color: var(--text-dark);
+            margin-bottom: 0.5rem; 
+            color: var(--text-dark); 
             text-shadow: 0 2px 10px rgba(255,255,255,0.5); 
         }
+
+        body.dark-mode .card-title { 
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8); 
+        }
+
+        .card-desc { 
+            color: var(--text-light); 
+            font-size: 1.05rem; 
+            line-height: 1.6; 
+            font-weight: 500; 
+            margin-bottom: 1.5rem; 
+        }
+
+        /* NEW: 'Click to Explore' Button */
+        .card-btn {
+            display: inline-block;
+            font-size: 0.9rem; 
+            font-weight: 700;
+            color: var(--btn-text); /* Dynamically changes based on theme */
+            transition: all 0.3s ease;
+            position: relative;
+        }
         
-        body.dark-mode .card-title { text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
-
-        .card-desc {
-            color: var(--text-light);
-            font-size: 1.05rem;
-            line-height: 1.6;
-            font-weight: 500;
+        .card-btn::after {
+            content: ' →';
+            opacity: 0;
+            transform: translateX(-5px);
+            transition: all 0.3s ease;
+            display: inline-block;
         }
 
-        /* FORM */
-        .contact-section {
-            background: var(--header-bg);
-            padding: 5rem 20px;
-            border-top: 1px solid rgba(0,0,0,0.05);
-            transition: background 0.5s ease;
+        .card:hover .card-btn::after {
+            opacity: 1;
+            transform: translateX(0);
         }
-
-        .form-container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: var(--bg-gradient);
-            padding: 3rem;
-            border-radius: 24px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--card-border);
-        }
-
-        .form-group { margin-bottom: 1.5rem; }
-        label { display: block; margin-bottom: 0.5rem; color: var(--text-dark); font-weight: 600; font-size: 0.9rem; }
         
+        .card:hover .card-btn {
+            text-decoration: underline;
+        }
+
+        /* =========================================
+           5. CONTACT FORM & FOOTER
+           ========================================= */
+        .contact-section { 
+            background: var(--header-bg); 
+            padding: 5rem 20px; 
+            border-top: 1px solid rgba(0,0,0,0.05); 
+            transition: background 0.5s ease; 
+        }
+
+        .form-container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            background: var(--bg-gradient); 
+            padding: 3rem; 
+            border-radius: 24px; 
+            box-shadow: var(--shadow); 
+            border: 1px solid var(--card-border); 
+        }
+
+        .form-group { 
+            margin-bottom: 1.5rem; 
+        }
+
+        label { 
+            display: block; 
+            margin-bottom: 0.5rem; 
+            color: var(--text-dark); 
+            font-weight: 600; 
+            font-size: 0.9rem; 
+        }
+
         input, textarea { 
             width: 100%; 
             padding: 14px; 
@@ -350,42 +435,109 @@
             font-size: 1rem; 
             transition: all 0.3s; 
             background: var(--card-bg); 
-            color: var(--text-dark);
-        }
-        
-        body.dark-mode input, body.dark-mode textarea {
-            border-color: #44403c;
-            background: rgba(12, 10, 9, 0.5);
-        }
-        
-        body.dark-mode input:focus, body.dark-mode textarea:focus {
-            border-color: #fbbf24; /* Yellow focus border */
+            color: var(--text-dark); 
         }
 
-        input:focus, textarea:focus { outline: none; border-color: var(--primary); }
-        .submit-btn { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: background 0.3s, transform 0.2s; }
+        body.dark-mode input, body.dark-mode textarea { 
+            border-color: #44403c; 
+            background: rgba(12, 10, 9, 0.5); 
+        }
+
+        body.dark-mode input:focus, body.dark-mode textarea:focus { 
+            border-color: #fbbf24; 
+        }
+
+        input:focus, textarea:focus { 
+            outline: none; 
+            border-color: var(--primary); 
+        }
+
+        .submit-btn { 
+            width: 100%; 
+            padding: 16px; 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            border-radius: 12px; 
+            font-size: 1.1rem; 
+            font-weight: 700; 
+            cursor: pointer; 
+            transition: background 0.3s, transform 0.2s; 
+        }
         
         /* Dark mode button text correction */
-        body.dark-mode .submit-btn { color: #1c1917; } /* Dark text on yellow button */
-        
-        .submit-btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
+        body.dark-mode .submit-btn { color: #1c1917; } 
 
-        footer { background: #0b0f19; color: #a0a0a5; padding: 4rem 20px; text-align: center; }
-        .footer-links { margin: 2rem 0; display: flex; justify-content: center; gap: 2rem; }
-        .footer-links a { color: white; text-decoration: none; font-weight: 500; transition: color 0.3s; }
-        .footer-links a:hover { color: var(--primary); }
+        .submit-btn:hover { 
+            filter: brightness(1.1); 
+            transform: translateY(-2px); 
+        }
 
+        footer { 
+            background: #0b0f19; 
+            color: #a0a0a5; 
+            padding: 4rem 20px; 
+            text-align: center; 
+        }
+
+        .footer-links { 
+            margin: 2rem 0; 
+            display: flex; 
+            justify-content: center; 
+            gap: 2rem; 
+        }
+
+        .footer-links a { 
+            color: white; 
+            text-decoration: none; 
+            font-weight: 500; 
+            transition: color 0.3s; 
+        }
+
+        .footer-links a:hover { 
+            color: var(--primary); 
+        }
+
+        /* =========================================
+           6. MOBILE RESPONSIVENESS FIXES
+           ========================================= */
         @media (max-width: 768px) {
-            h1 { font-size: 2.5rem; }
+            /* Adjust Typography */
+            h1 { font-size: 2.2rem; }
+            .card-title { font-size: 1.8rem; }
+            .subtitle { font-size: 1rem; }
+            
+            /* Adjust Layout Spacing */
+            .hero-section { padding: 6rem 15px 4rem; }
+            .container { padding: 0 15px 4rem; }
+            .contact-section { padding: 3rem 15px; }
+            
+            /* Force Single Column Grid */
+            .grid { 
+                grid-template-columns: 1fr; 
+                gap: 1.5rem; 
+            }
+            
+            /* Card & Form Adjustments */
             .card { height: 450px; }
+            .card-content { padding: 1.5rem; }
             .form-container { padding: 1.5rem; }
+            
+            /* Lamp Position for Mobile */
             .lamp-container { right: 5%; }
+            .wire { height: 40px; }
+        }
+        
+        @media (max-width: 480px) {
+            h1 { font-size: 2rem; }
+            .logo { font-size: 1.2rem; }
+            .footer-links { flex-direction: column; gap: 1rem; }
         }
     </style>
 </head>
 <body>
 
-    <div class="lamp-container" id="lightSwitch" title="Pull to toggle">
+    <div class="lamp-container" id="lightSwitch" title="Pull to switch theme">
         <div class="wire"></div>
         <div class="socket"></div>
         <div class="bulb"></div>
@@ -417,6 +569,7 @@
                     <div class="card-content">
                         <h3 class="card-title">Sentinel</h3>
                         <p class="card-desc">Next-generation drone technology and aerial defense systems protecting national interests.</p>
+                        <div class="card-btn">Click to Explore</div>
                     </div>
                 </div>
             </a>
@@ -427,6 +580,7 @@
                     <div class="card-content">
                         <h3 class="card-title">Aura</h3>
                         <p class="card-desc">A non-invasive health ecosystem predicting vitals using Eulerian Video Magnification.</p>
+                        <div class="card-btn">Click to Explore</div>
                     </div>
                 </div>
             </a>
@@ -437,6 +591,7 @@
                     <div class="card-content">
                         <h3 class="card-title">Civitas</h3>
                         <p class="card-desc">Heavy infrastructure and sustainable construction projects laying the foundation for tomorrow.</p>
+                        <div class="card-btn">Click to Explore</div>
                     </div>
                 </div>
             </a>
@@ -447,6 +602,7 @@
                     <div class="card-content">
                         <h3 class="card-title">Basis</h3>
                         <p class="card-desc">Smart city management: Pothole repair, waste robotics, and river rejuvenation systems.</p>
+                        <div class="card-btn">Click to Explore</div>
                     </div>
                 </div>
             </a>
@@ -457,6 +613,7 @@
                     <div class="card-content">
                         <h3 class="card-title">Raptor</h3>
                         <p class="card-desc">AI-driven growth engine automating sales pitches, marketing funnels, and client acquisition.</p>
+                        <div class="card-btn">Click to Explore</div>
                     </div>
                 </div>
             </a>
@@ -467,6 +624,7 @@
                     <div class="card-content">
                         <h3 class="card-title">Aether Labs</h3>
                         <p class="card-desc">Pure research in quantum mechanics, wave physics, and advanced hardware development.</p>
+                        <div class="card-btn">Click to Explore</div>
                     </div>
                 </div>
             </a>
@@ -477,6 +635,7 @@
                     <div class="card-content">
                         <h3 class="card-title">Shoonya Systems</h3>
                         <p class="card-desc">B2B Technology solutions: Custom apps, database management, and Computer Vision integration.</p>
+                        <div class="card-btn">Click to Explore</div>
                     </div>
                 </div>
             </a>
@@ -524,36 +683,38 @@
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        AOS.init({
-            offset: 100,
-            duration: 800,
-            easing: 'ease-out-cubic',
-            once: true
+        // 1. Initialize Animation on Scroll
+        AOS.init({ 
+            offset: 100, 
+            duration: 800, 
+            easing: 'ease-out-cubic', 
+            once: true 
         });
 
+        // 2. Light Switch Logic
         const switchElement = document.getElementById('lightSwitch');
         const body = document.body;
 
-        // Check local storage
-        if (localStorage.getItem('theme') === 'dark') {
-            body.classList.add('dark-mode');
+        // Check for saved theme (If no save, default is LIGHT)
+        if (localStorage.getItem('theme') === 'dark') { 
+            body.classList.add('dark-mode'); 
         }
 
+        // Toggle Event
         switchElement.addEventListener('click', () => {
-            // Animate the pull string
             switchElement.classList.add('pulled');
-
+            
             setTimeout(() => {
                 body.classList.toggle('dark-mode');
                 switchElement.classList.remove('pulled');
                 
-                // Save preference
-                if (body.classList.contains('dark-mode')) {
-                    localStorage.setItem('theme', 'dark');
-                } else {
-                    localStorage.setItem('theme', 'light');
+                // Save Preference
+                if (body.classList.contains('dark-mode')) { 
+                    localStorage.setItem('theme', 'dark'); 
+                } else { 
+                    localStorage.setItem('theme', 'light'); 
                 }
-            }, 250); // Timing matches the short pull animation
+            }, 250);
         });
     </script>
 
