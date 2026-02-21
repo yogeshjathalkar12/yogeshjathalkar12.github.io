@@ -30,10 +30,10 @@
             /* Bulb State (Off by default) */
             --bulb-color: #cbd5e1; 
             --bulb-glow: none;
-            --btn-text: #673de6; /* Purple text for buttons in light mode */
+            --btn-text: #673de6; 
         }
 
-        /* Dark Mode Overrides (Only active when .dark-mode class is added) */
+        /* Dark Mode Overrides */
         body.dark-mode {
             --primary: #fbbf24; /* Warm Yellow */
             --accent-glow: rgba(251, 191, 36, 0.25);
@@ -48,7 +48,7 @@
             /* Bulb On State */
             --bulb-color: #ffaa00;
             --bulb-glow: drop-shadow(0 0 15px rgba(255, 170, 0, 0.8));
-            --btn-text: #fbbf24; /* Yellow text for buttons in dark mode */
+            --btn-text: #0c0a09;
         }
 
         html { 
@@ -68,19 +68,20 @@
             line-height: 1.6;
             min-height: 100vh;
             overflow-x: hidden;
-            transition: background 0.5s ease, color 0.5s ease;
+            /* SLOW TRANSITION: 1.5 seconds for a heavy, smooth feel */
+            transition: background 1.5s ease, color 1.5s ease;
         }
 
         /* =========================================
            2. THE LIGHT SWITCH (HANGING BULB)
            ========================================= */
         .lamp-container {
-            position: fixed;
-            top: 0;
-            right: 10%;
+            position: fixed; 
+            top: 0; 
+            right: 10%; 
             z-index: 1000;
-            display: flex;
-            flex-direction: column;
+            display: flex; 
+            flex-direction: column; 
             align-items: center;
         }
 
@@ -104,7 +105,7 @@
             border-radius: 50%; 
             border: 2px solid #475569;
             filter: var(--bulb-glow); 
-            transition: all 0.3s ease;
+            transition: all 0.3s ease; /* Bulb lights up quickly */
             position: relative; 
             z-index: 2;
         }
@@ -140,14 +141,14 @@
             left: 50%; 
             transform: translateX(-50%); 
         }
-
+        
         .lamp-container:active .pull-string, 
         .lamp-container.pulled .pull-string { 
             height: 85px; 
         }
 
         /* =========================================
-           3. HEADER & HERO SECTION
+           3. HEADER & HERO
            ========================================= */
         header {
             background: var(--header-bg); 
@@ -160,7 +161,7 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center;
-            transition: background 0.5s ease;
+            transition: background 1.5s ease;
         }
 
         .logo { 
@@ -168,18 +169,19 @@
             font-weight: 800; 
             color: var(--text-dark); 
             letter-spacing: -0.5px; 
+            transition: color 1.5s ease; 
         }
 
         .logo span { 
             color: var(--primary); 
-            transition: color 0.5s ease; 
+            transition: color 1.5s ease; 
         }
 
-        .hero-section {
+        .hero-section { 
             padding: 8rem 20px 6rem; 
             text-align: center; 
             position: relative; 
-            overflow: hidden;
+            overflow: hidden; 
         }
 
         .hero-section::before {
@@ -192,7 +194,7 @@
             height: 800px;
             background: radial-gradient(circle, var(--accent-glow) 0%, rgba(0,0,0,0) 70%);
             z-index: -1; 
-            transition: background 0.5s ease;
+            transition: background 1.5s ease;
             animation: pulse-glow 10s infinite alternate;
         }
 
@@ -207,6 +209,7 @@
             margin-bottom: 1.5rem; 
             line-height: 1.1; 
             font-weight: 800; 
+            transition: color 1.5s ease; 
         }
         
         .gradient-text {
@@ -215,7 +218,7 @@
             -webkit-text-fill-color: transparent;
             background-size: 200% auto; 
             animation: gradient-move 5s ease infinite; 
-            transition: background 0.5s ease;
+            transition: background 1.5s ease;
         }
 
         body.dark-mode .gradient-text {
@@ -237,10 +240,11 @@
             max-width: 650px; 
             margin-left: auto; 
             margin-right: auto; 
+            transition: color 1.5s ease; 
         }
 
         /* =========================================
-           4. CARDS, GRID & BUTTONS
+           4. CARDS & GRID
            ========================================= */
         .container { 
             max-width: 1300px; 
@@ -260,7 +264,7 @@
             display: inline-block; 
             left: 50%; 
             transform: translateX(-50%);
-            transition: color 0.5s ease;
+            transition: color 1.5s ease;
         }
 
         .grid { 
@@ -284,7 +288,7 @@
             transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
             border: 1px solid var(--card-border);
             background-size: cover; 
-            background-position: center;
+            background-position: center; 
             display: flex; 
             align-items: flex-end;
         }
@@ -300,10 +304,10 @@
             inset: 0; 
             z-index: 1; 
             background: var(--blur-overlay); 
-            transition: background 0.5s ease; 
+            transition: background 1.5s ease; 
         }
 
-        /* Card Background Images */
+        /* IMAGES */
         .bg-sentinel { background-image: url('images/sentinel.png'); }
         .bg-aura     { background-image: url('images/aura.png'); }
         .bg-civitas  { background-image: url('images/civitas.png'); }
@@ -312,12 +316,12 @@
         .bg-aether   { background-image: url('images/aether.png');  }
         .bg-systems  { background-image: url('images/systems.png');  }
 
-        .card-content {
+        .card-content { 
             position: relative; 
             z-index: 2; 
             padding: 2.5rem; 
-            width: 100%;
-            transition: transform 0.4s ease;
+            width: 100%; 
+            transition: transform 0.4s ease; 
         }
 
         .card:hover .card-content { 
@@ -339,7 +343,8 @@
             letter-spacing: 1px; 
             color: white; 
             border: 1px solid rgba(255,255,255,0.4);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            transition: all 1.5s ease;
         }
 
         body.dark-mode .card-tag { 
@@ -354,6 +359,7 @@
             margin-bottom: 0.5rem; 
             color: var(--text-dark); 
             text-shadow: 0 2px 10px rgba(255,255,255,0.5); 
+            transition: color 1.5s ease; 
         }
 
         body.dark-mode .card-title { 
@@ -366,43 +372,44 @@
             line-height: 1.6; 
             font-weight: 500; 
             margin-bottom: 1.5rem; 
+            transition: color 1.5s ease; 
         }
 
-        /* NEW: 'Click to Explore' Button */
+        /* Click to Explore Button */
         .card-btn {
-            display: inline-block;
+            display: inline-block; 
             font-size: 0.9rem; 
             font-weight: 700;
-            color: var(--btn-text); /* Dynamically changes based on theme */
-            transition: all 0.3s ease;
+            color: var(--btn-text); 
+            transition: all 0.3s ease; 
             position: relative;
         }
-        
-        .card-btn::after {
-            content: ' →';
-            opacity: 0;
-            transform: translateX(-5px);
-            transition: all 0.3s ease;
-            display: inline-block;
+
+        .card-btn::after { 
+            content: ' →'; 
+            opacity: 0; 
+            transform: translateX(-5px); 
+            transition: all 0.3s ease; 
+            display: inline-block; 
         }
 
-        .card:hover .card-btn::after {
-            opacity: 1;
-            transform: translateX(0);
+        .card:hover .card-btn::after { 
+            opacity: 1; 
+            transform: translateX(0); 
         }
-        
-        .card:hover .card-btn {
-            text-decoration: underline;
+
+        .card:hover .card-btn { 
+            text-decoration: underline; 
         }
 
         /* =========================================
-           5. CONTACT FORM & FOOTER
+           5. FORM & FOOTER
            ========================================= */
         .contact-section { 
             background: var(--header-bg); 
             padding: 5rem 20px; 
             border-top: 1px solid rgba(0,0,0,0.05); 
-            transition: background 0.5s ease; 
+            transition: background 1.5s ease; 
         }
 
         .form-container { 
@@ -413,20 +420,20 @@
             border-radius: 24px; 
             box-shadow: var(--shadow); 
             border: 1px solid var(--card-border); 
+            transition: background 1.5s ease, border-color 1.5s ease; 
         }
-
-        .form-group { 
-            margin-bottom: 1.5rem; 
-        }
-
+        
+        .form-group { margin-bottom: 1.5rem; }
+        
         label { 
             display: block; 
             margin-bottom: 0.5rem; 
             color: var(--text-dark); 
             font-weight: 600; 
             font-size: 0.9rem; 
+            transition: color 1.5s ease; 
         }
-
+        
         input, textarea { 
             width: 100%; 
             padding: 14px; 
@@ -451,7 +458,7 @@
             outline: none; 
             border-color: var(--primary); 
         }
-
+        
         .submit-btn { 
             width: 100%; 
             padding: 16px; 
@@ -462,11 +469,12 @@
             font-size: 1.1rem; 
             font-weight: 700; 
             cursor: pointer; 
-            transition: background 0.3s, transform 0.2s; 
+            transition: background 1.5s, transform 0.2s; 
         }
-        
-        /* Dark mode button text correction */
-        body.dark-mode .submit-btn { color: #1c1917; } 
+
+        body.dark-mode .submit-btn { 
+            color: #1c1917; 
+        } 
 
         .submit-btn:hover { 
             filter: brightness(1.1); 
@@ -498,36 +506,26 @@
             color: var(--primary); 
         }
 
-        /* =========================================
-           6. MOBILE RESPONSIVENESS FIXES
-           ========================================= */
+        /* Mobile Fixes */
         @media (max-width: 768px) {
-            /* Adjust Typography */
             h1 { font-size: 2.2rem; }
             .card-title { font-size: 1.8rem; }
             .subtitle { font-size: 1rem; }
             
-            /* Adjust Layout Spacing */
             .hero-section { padding: 6rem 15px 4rem; }
             .container { padding: 0 15px 4rem; }
             .contact-section { padding: 3rem 15px; }
             
-            /* Force Single Column Grid */
-            .grid { 
-                grid-template-columns: 1fr; 
-                gap: 1.5rem; 
-            }
+            .grid { grid-template-columns: 1fr; gap: 1.5rem; }
             
-            /* Card & Form Adjustments */
             .card { height: 450px; }
             .card-content { padding: 1.5rem; }
             .form-container { padding: 1.5rem; }
             
-            /* Lamp Position for Mobile */
             .lamp-container { right: 5%; }
             .wire { height: 40px; }
         }
-        
+
         @media (max-width: 480px) {
             h1 { font-size: 2rem; }
             .logo { font-size: 1.2rem; }
@@ -537,7 +535,7 @@
 </head>
 <body>
 
-    <div class="lamp-container" id="lightSwitch" title="Pull to switch theme">
+    <div class="lamp-container" id="lightSwitch" title="Pull to toggle">
         <div class="wire"></div>
         <div class="socket"></div>
         <div class="bulb"></div>
@@ -691,19 +689,24 @@
             once: true 
         });
 
-        // 2. Light Switch Logic
+        // 2. SWITCH LOGIC (Simple Slow Fade)
         const switchElement = document.getElementById('lightSwitch');
         const body = document.body;
+        let isAnimating = false; 
 
-        // Check for saved theme (If no save, default is LIGHT)
+        // Check for saved theme (Default is LIGHT)
         if (localStorage.getItem('theme') === 'dark') { 
             body.classList.add('dark-mode'); 
         }
 
-        // Toggle Event
         switchElement.addEventListener('click', () => {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            // Animate the Pull String
             switchElement.classList.add('pulled');
-            
+
+            // Wait briefly for the pull string to go down (250ms), then toggle theme
             setTimeout(() => {
                 body.classList.toggle('dark-mode');
                 switchElement.classList.remove('pulled');
@@ -714,7 +717,9 @@
                 } else { 
                     localStorage.setItem('theme', 'light'); 
                 }
-            }, 250);
+
+                isAnimating = false; 
+            }, 250); 
         });
     </script>
 
