@@ -5,22 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aura | Shoonya Origins</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
     <style>
         :root {
-            /* Vibrant Green Palette */
-            --primary: #059669;       /* Emerald */
-            --primary-light: #34d399; /* Bright Mint */
-            --primary-dark: #064e3b;  /* Deep Green Text */
-            --accent: #f97316;        /* Safety Orange */
+            /* --- LIGHT THEME (DEFAULT) --- */
+            --primary: #059669;        /* Emerald */
+            --primary-light: #34d399;  /* Bright Mint */
+            --primary-dark: #064e3b;   /* Deep Green Text */
+            --accent: #f97316;         /* Safety Orange */
             
-            /* Clean Backgrounds */
-            --bg-main: #f0fdf4;       /* Very Light Mint Tint */
-            --glass-white: rgba(255, 255, 255, 0.65);
+            /* Backgrounds */
+            --bg-main: #f0fdf4;        /* Very Light Mint Tint */
+            --glass-bg: rgba(255, 255, 255, 0.65);
             --glass-border: rgba(5, 150, 105, 0.2);
             --glass-hover: rgba(255, 255, 255, 0.85);
             
+            /* Text */
             --text-main: #022c22;
             --text-muted: #374151;
+            
+            /* Blob Colors */
+            --blob-1: rgba(52, 211, 153, 0.4);
+            --blob-2: rgba(249, 115, 22, 0.15);
+            
+            /* Transitions */
+            --transition-speed: 0.4s;
+        }
+
+        /* --- DARK THEME OVERRIDES --- */
+        [data-theme="dark"] {
+            --bg-main: #020617;        /* Deep Space Black/Green */
+            --glass-bg: rgba(15, 23, 42, 0.6); /* Dark Glass */
+            --glass-border: rgba(52, 211, 153, 0.15);
+            --glass-hover: rgba(30, 41, 59, 0.8);
+            
+            --text-main: #ecfdf5;      /* Mint White */
+            --text-muted: #94a3b8;     /* Slate Grey */
+            --primary-dark: #6ee7b7;   /* Light Emerald */
+            
+            --blob-1: rgba(5, 150, 105, 0.25);
+            --blob-2: rgba(249, 115, 22, 0.1);
         }
 
         * {
@@ -35,22 +60,27 @@
             color: var(--text-main);
             overflow-x: hidden;
             min-height: 100vh;
+            transition: background-color var(--transition-speed), color var(--transition-speed);
         }
 
-        /* --- HEAVY GREEN AMBIENT FLOW --- */
+        /* --- ANIMATED AMBIENT FLOW --- */
         .ambient-flow {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1;
             background: 
-                radial-gradient(at 0% 0%, rgba(52, 211, 153, 0.4) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(249, 115, 22, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(5, 150, 105, 0.2) 0px, transparent 50%),
-                radial-gradient(at 0% 50%, rgba(16, 185, 129, 0.2) 0px, transparent 50%);
+                radial-gradient(at 0% 0%, var(--blob-1) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, var(--blob-2) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, var(--blob-1) 0px, transparent 50%),
+                radial-gradient(at 0% 50%, var(--blob-2) 0px, transparent 50%);
             filter: blur(80px);
+            animation: breathe 10s ease-in-out infinite alternate;
+            transition: background 1s ease;
+        }
+
+        @keyframes breathe {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
         }
 
         /* --- NAVIGATION --- */
@@ -58,29 +88,68 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 8%;
-            background: rgba(255, 255, 255, 0.7);
+            padding: 15px 8%; /* Slightly tighter padding */
+            background: var(--glass-bg);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--glass-border);
             position: sticky;
             top: 0;
             z-index: 1000;
+            transition: background var(--transition-speed), border-color var(--transition-speed);
         }
 
         .logo {
             font-size: 1.6rem;
             font-weight: 800;
             letter-spacing: -1px;
-            color: var(--primary-dark);
+            color: var(--text-main);
             text-decoration: none;
+            transition: color var(--transition-speed);
         }
         .logo span { color: var(--primary); }
+
+        /* NAV RIGHT CONTAINER (Stacks text and button) */
+        .nav-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+
+        .brand-sub {
+            font-size: 0.85rem; 
+            font-weight: 700; 
+            color: var(--text-muted); 
+            opacity: 0.8;
+            letter-spacing: 0.5px;
+        }
+
+        /* COMPACT THEME TOGGLE */
+        .theme-toggle {
+            cursor: pointer;
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            padding: 4px 12px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem; /* Smaller font */
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: 0.3s;
+        }
+        .theme-toggle:hover {
+            background: var(--glass-hover);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
 
         /* --- HERO --- */
         .hero {
             text-align: center;
-            padding: 80px 5% 50px;
+            padding: 80px 5% 60px;
         }
 
         .hero h1 {
@@ -88,7 +157,8 @@
             font-weight: 800;
             line-height: 1.1;
             margin-bottom: 1.5rem;
-            color: var(--primary-dark);
+            color: var(--text-main);
+            transition: color var(--transition-speed);
         }
 
         .hero p {
@@ -96,6 +166,7 @@
             color: var(--text-muted);
             max-width: 650px;
             margin: 0 auto;
+            transition: color var(--transition-speed);
         }
 
         /* --- GRID SYSTEM --- */
@@ -103,14 +174,14 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 24px;
-            padding: 20px 8% 100px;
+            padding: 0 8% 100px;
             max-width: 1400px;
             margin: 0 auto;
         }
 
         /* --- GLASS CARDS --- */
         .card {
-            background: var(--glass-white);
+            background: var(--glass-bg);
             border: 1px solid var(--glass-border);
             border-radius: 24px;
             padding: 30px;
@@ -122,7 +193,7 @@
             min-height: 260px;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(5, 150, 105, 0.05); /* Subtle green shadow */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         }
 
         .card:hover {
@@ -132,21 +203,21 @@
             box-shadow: 0 15px 30px rgba(5, 150, 105, 0.15);
         }
 
-        /* Typography inside cards */
         .card h3 {
             font-size: 1.4rem;
-            color: var(--primary-dark);
+            color: var(--text-main);
             margin-bottom: 10px;
             font-weight: 700;
+            transition: color var(--transition-speed);
         }
 
         .card p {
             font-size: 0.95rem;
             color: var(--text-muted);
             line-height: 1.5;
+            transition: color var(--transition-speed);
         }
 
-        /* Number Watermark */
         .card-num {
             position: absolute;
             bottom: -15px;
@@ -158,7 +229,6 @@
             pointer-events: none;
         }
 
-        /* Badges */
         .badge {
             display: inline-block;
             padding: 4px 12px;
@@ -179,7 +249,6 @@
             border: 1px solid rgba(5, 150, 105, 0.3);
         }
 
-        /* Arrow Link */
         .link-text {
             margin-top: 20px;
             font-size: 0.9rem;
@@ -188,15 +257,108 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            transition: gap 0.2s;
         }
         .card:hover .link-text { gap: 10px; }
 
+        /* --- CONTACT FORM SECTION --- */
+        .contact-section {
+            padding: 40px 8% 80px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .form-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-card h2 {
+            color: var(--text-main);
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.5);
+            color: var(--text-main);
+            font-family: inherit;
+            transition: 0.3s;
+        }
+        [data-theme="dark"] .form-group input, 
+        [data-theme="dark"] .form-group textarea, 
+        [data-theme="dark"] .form-group select {
+            background: rgba(0, 0, 0, 0.2);
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        }
+
+        .submit-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.3s;
+            font-size: 1rem;
+        }
+        .submit-btn:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(5, 150, 105, 0.2);
+        }
+
+        /* --- FOOTER --- */
         footer {
             text-align: center;
-            padding: 40px;
-            color: var(--text-muted);
-            font-size: 0.9rem;
+            padding: 60px 8%;
             border-top: 1px solid var(--glass-border);
+            background: rgba(255,255,255,0.02);
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .social-link {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .social-link:hover { color: var(--primary); }
+
+        .copyright {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            opacity: 0.7;
         }
 
         @media (max-width: 768px) {
@@ -208,19 +370,26 @@
 
     <div class="ambient-flow"></div>
 
-    <nav>
+    <nav data-aos="fade-down" data-aos-duration="800">
         <a href="#" class="logo">Aura<span>.</span></a>
-        <div style="font-size: 0.9rem; font-weight: 600; color: var(--primary-dark); opacity: 0.7;">Shoonya Origins</div>
+        
+        <div class="nav-right">
+            <div class="brand-sub">Shoonya Origins</div>
+        </div>
     </nav>
 
-    <header class="hero">
+    <header class="hero" data-aos="fade-up" data-aos-duration="1000">
         <h1>Making the <span style="color: var(--primary)">Invisible</span>, Visible.</h1>
         <p>A unified health ecosystem powered by Sensor Fusion and EVM technology.</p>
     </header>
 
+    <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">
+                <span id="themeIcon">🌙</span> <span>Mode</span>
+            </button>
+
     <section class="grid-container">
 
-        <a href="evm.html" class="card">
+        <a href="evm.html" class="card" data-aos="fade-up" data-aos-delay="0">
             <div class="card-num">01</div>
             <div>
                 <span class="badge badge-beta">Beta &bull; In Prod</span>
@@ -230,7 +399,7 @@
             <div class="link-text">View Tech →</div>
         </a>
 
-        <a href="predictive.html" class="card">
+        <a href="predictive.html" class="card" data-aos="fade-up" data-aos-delay="100">
             <div class="card-num">02</div>
             <div>
                 <span class="badge badge-live">Live Models</span>
@@ -240,7 +409,7 @@
             <div class="link-text">Explore Models →</div>
         </a>
 
-        <a href="environment.html" class="card">
+        <a href="environment.html" class="card" data-aos="fade-up" data-aos-delay="200">
             <div class="card-num">03</div>
             <div>
                 <span class="badge badge-live">Live Data</span>
@@ -250,7 +419,7 @@
             <div class="link-text">Check Surroundings →</div>
         </a>
 
-        <a href="app.html" class="card">
+        <a href="app.html" class="card" data-aos="fade-up" data-aos-delay="0">
             <div class="card-num">04</div>
             <div>
                 <h3>Aura Mobile App</h3>
@@ -259,7 +428,7 @@
             <div class="link-text">Download →</div>
         </a>
 
-        <a href="nutrition.html" class="card">
+        <a href="nutrition.html" class="card" data-aos="fade-up" data-aos-delay="100">
             <div class="card-num">05</div>
             <div>
                 <h3>Nutrition Analytics</h3>
@@ -268,7 +437,7 @@
             <div class="link-text">Start Tracking →</div>
         </a>
 
-        <a href="trainer.html" class="card">
+        <a href="trainer.html" class="card" data-aos="fade-up" data-aos-delay="200">
             <div class="card-num">06</div>
             <div>
                 <h3>Personalized Trainer</h3>
@@ -277,7 +446,7 @@
             <div class="link-text">Start Workout →</div>
         </a>
 
-        <a href="neonatal.html" class="card">
+        <a href="neonatal.html" class="card" data-aos="fade-up" data-aos-delay="0">
             <div class="card-num">07</div>
             <div>
                 <span class="badge badge-live" style="border-color: var(--accent); color: var(--accent); background: rgba(249,115,22,0.1);">Sensor Fusion</span>
@@ -287,7 +456,7 @@
             <div class="link-text">View Solutions →</div>
         </a>
 
-        <a href="elderly.html" class="card">
+        <a href="elderly.html" class="card" data-aos="fade-up" data-aos-delay="100">
             <div class="card-num">08</div>
             <div>
                 <h3>Elderly Care</h3>
@@ -298,9 +467,68 @@
 
     </section>
 
+    <section class="contact-section" data-aos="fade-up">
+        <div class="form-card">
+            <h2>Join the Health Revolution</h2>
+            <p style="color: var(--text-muted); margin-bottom: 30px;">Interested in piloting Aura technology? Get in touch.</p>
+            
+            <form>
+                <div class="form-group">
+                    <label>Name / Organization</label>
+                    <input type="text" placeholder="e.g. Acme Health or Dr. Smith" required>
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" placeholder="you@domain.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Interest Area</label>
+                    <select>
+                        <option>General Inquiry</option>
+                        <option>EVM Licensing</option>
+                        <option>Hospital Partnership</option>
+                        <option>App Beta Access</option>
+                    </select>
+                </div>
+                <button type="submit" class="submit-btn">Request Access</button>
+            </form>
+        </div>
+    </section>
+
     <footer>
-        <p>&copy; 2026 Shoonya Origins. All systems operational.</p>
+        <div class="social-links">
+            <a href="#" class="social-link">LinkedIn</a>
+            <a href="#" class="social-link">Twitter / X</a>
+            <a href="#" class="social-link">Email Us</a>
+        </div>
+        <p class="copyright">&copy; 2026 Shoonya Origins. All systems operational.</p>
     </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ once: true, offset: 50, duration: 800, easing: 'ease-out-cubic' });
+
+        const themeBtn = document.getElementById('themeBtn');
+        const themeIcon = document.getElementById('themeIcon');
+        const html = document.documentElement;
+
+        if (localStorage.getItem('theme') === 'dark') {
+            html.setAttribute('data-theme', 'dark');
+            themeIcon.innerText = '☀️';
+        }
+
+        function toggleTheme() {
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.removeAttribute('data-theme');
+                themeIcon.innerText = '🌙';
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                themeIcon.innerText = '☀️';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+    </script>
 
 </body>
 </html>
