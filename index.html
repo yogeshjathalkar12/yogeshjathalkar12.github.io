@@ -48,7 +48,7 @@
             /* Bulb On State */
             --bulb-color: #ffaa00;
             --bulb-glow: drop-shadow(0 0 15px rgba(255, 170, 0, 0.8));
-            --btn-text: #0c0a09;
+            --btn-text: #fbbf24;
         }
 
         html { 
@@ -170,6 +170,8 @@
             color: var(--text-dark); 
             letter-spacing: -0.5px; 
             transition: color 1.5s ease; 
+            cursor: pointer; /* Hint that logo is clickable */
+            user-select: none;
         }
 
         .logo span { 
@@ -380,7 +382,7 @@
             display: inline-block; 
             font-size: 0.9rem; 
             font-weight: 700;
-            color: var(--btn-text); 
+            color: var(--btn-text); /* Dynamically changes with theme */
             transition: all 0.3s ease; 
             position: relative;
         }
@@ -463,7 +465,7 @@
             width: 100%; 
             padding: 16px; 
             background: var(--primary); 
-            color: white; 
+            color: var(--btn-text-filled); /* Dynamic text color */
             border: none; 
             border-radius: 12px; 
             font-size: 1.1rem; 
@@ -471,10 +473,6 @@
             cursor: pointer; 
             transition: background 1.5s, transform 0.2s; 
         }
-
-        body.dark-mode .submit-btn { 
-            color: #1c1917; 
-        } 
 
         .submit-btn:hover { 
             filter: brightness(1.1); 
@@ -506,26 +504,55 @@
             color: var(--primary); 
         }
 
+        /* =========================================
+           6. THE HIDDEN GAME (THE VOID) STYLES
+           ========================================= */
+        #gameCanvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 9999; background: #000; cursor: none; opacity: 0;
+            pointer-events: none; transition: opacity 1s ease-in-out; display: none;
+        }
+        
+        #gameUI {
+            position: fixed; top: 20px; left: 20px; z-index: 10000;
+            color: #fff; font-family: 'Courier New', monospace; pointer-events: none; display: none;
+        }
+
+        #gameOverlay, #warningScreen {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 10000; text-align: center; color: #fff; font-family: 'Courier New', monospace; display: none;
+        }
+        
+        /* WARNING SCREEN RED */
+        #warningScreen { color: #ff3333; width: 90%; }
+        
+        .active-game #gameCanvas, .active-game #gameUI, .active-game #gameOverlay {
+            display: block; opacity: 1; pointer-events: auto;
+        }
+        
+        /* BLAST ANIMATION (Slow Fade to White) */
+        #blastOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 10001; background: white; pointer-events: none;
+            opacity: 0; transition: opacity 3s cubic-bezier(0.5, 0, 0.5, 1);
+        }
+        #blastOverlay.active { opacity: 1; }
+
         /* Mobile Fixes */
         @media (max-width: 768px) {
             h1 { font-size: 2.2rem; }
             .card-title { font-size: 1.8rem; }
             .subtitle { font-size: 1rem; }
-            
             .hero-section { padding: 6rem 15px 4rem; }
             .container { padding: 0 15px 4rem; }
             .contact-section { padding: 3rem 15px; }
-            
             .grid { grid-template-columns: 1fr; gap: 1.5rem; }
-            
             .card { height: 450px; }
             .card-content { padding: 1.5rem; }
             .form-container { padding: 1.5rem; }
-            
             .lamp-container { right: 5%; }
             .wire { height: 40px; }
         }
-
         @media (max-width: 480px) {
             h1 { font-size: 2rem; }
             .logo { font-size: 1.2rem; }
@@ -545,7 +572,7 @@
     </div>
 
     <header data-aos="fade-down" data-aos-duration="1000">
-        <div class="logo">Shoonya<span>Origins</span></div>
+        <div class="logo" id="logoTrigger">Shoonya<span>Origins</span></div>
     </header>
 
     <section class="hero-section">
@@ -679,6 +706,24 @@
         <p style="font-size: 0.8rem; margin-top: 1rem; opacity: 0.5;">Pune, India</p>
     </footer>
 
+    <canvas id="gameCanvas"></canvas>
+    <div id="blastOverlay"></div>
+    
+    <div id="gameUI">
+        <div>MASS: <span id="scoreVal">0</span></div>
+        <div>PRESS 'ESC' TO EXIT</div>
+    </div>
+    <div id="gameOverlay">
+        <h2 style="font-size: 2rem; margin-bottom: 20px;">SYSTEM OVERRIDE DETECTED</h2>
+        <p>ENTERING THE VOID...</p>
+        <p style="margin-top: 20px; font-size: 0.8rem; opacity: 0.7;">Click to Start</p>
+    </div>
+    
+    <div id="warningScreen">
+        <h1 style="font-size: 2rem;">⚠ CRITICAL MASS STABILITY LOSS ⚠</h1>
+        <p style="margin-top: 1rem;">SINGULARITY IMMINENT...</p>
+    </div>
+
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
         // 1. Initialize Animation on Scroll
@@ -689,15 +734,12 @@
             once: true 
         });
 
-        // 2. SWITCH LOGIC (Simple Slow Fade)
+        // 2. SWITCH LOGIC (Simple Slow Fade, Default Day)
         const switchElement = document.getElementById('lightSwitch');
         const body = document.body;
         let isAnimating = false; 
 
-        // Check for saved theme (Default is LIGHT)
-        if (localStorage.getItem('theme') === 'dark') { 
-            body.classList.add('dark-mode'); 
-        }
+        // No localStorage checking here = Always default to Day Mode
 
         switchElement.addEventListener('click', () => {
             if (isAnimating) return;
@@ -710,17 +752,182 @@
             setTimeout(() => {
                 body.classList.toggle('dark-mode');
                 switchElement.classList.remove('pulled');
-                
-                // Save Preference
-                if (body.classList.contains('dark-mode')) { 
-                    localStorage.setItem('theme', 'dark'); 
-                } else { 
-                    localStorage.setItem('theme', 'light'); 
-                }
-
                 isAnimating = false; 
             }, 250); 
         });
+
+        // 3. THE HIDDEN GAME LOGIC (The Void)
+        const logoTrigger = document.getElementById('logoTrigger');
+        let clickCount = 0;
+        let clickTimer;
+        
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const gameOverlay = document.getElementById('gameOverlay');
+        const scoreVal = document.getElementById('scoreVal');
+        const warningScreen = document.getElementById('warningScreen');
+        const blastOverlay = document.getElementById('blastOverlay');
+        
+        let gameActive = false;
+        let animationId;
+        let player = { x: 0, y: 0, r: 10, color: '#fff' };
+        let particles = [];
+        let score = 0;
+        let mouseX = 0;
+        let mouseY = 0;
+
+        // Trigger Listener (5 Clicks rapidly)
+        logoTrigger.addEventListener('click', () => {
+            clickCount++;
+            clearTimeout(clickTimer);
+            clickTimer = setTimeout(() => { clickCount = 0; }, 500); 
+            
+            if (clickCount >= 5) {
+                startGameSequence();
+                clickCount = 0;
+            }
+        });
+
+        function startGameSequence() {
+            body.classList.add('active-game');
+            gameOverlay.style.display = 'block';
+            resizeCanvas();
+            window.addEventListener('click', initGame, { once: true });
+        }
+
+        function initGame() {
+            gameOverlay.style.display = 'none';
+            gameActive = true;
+            score = 0;
+            particles = [];
+            scoreVal.innerText = score;
+            loop();
+        }
+
+        // --- NEW: BLAST AND RESTART LOGIC ---
+        function triggerBlastAndRestart() {
+            gameActive = false; // Stop Game Loop
+            cancelAnimationFrame(animationId);
+            
+            // 1. Show Warning
+            warningScreen.style.display = 'block';
+            
+            // 2. Wait 1.5 seconds, then BLAST
+            setTimeout(() => {
+                blastOverlay.classList.add('active'); // Fade to White (3s duration)
+                
+                // 3. Wait for blast to fill screen (2s), then RESET behind the white curtain
+                setTimeout(() => {
+                    // Reset Game State
+                    score = 20;
+                    scoreVal.innerText = score;
+                    particles = [];
+                    warningScreen.style.display = 'none';
+                    
+                    // 4. Fade out blast and resume
+                    blastOverlay.classList.remove('active');
+                    
+                    // Small delay to let blast clear before moving
+                    setTimeout(() => {
+                        gameActive = true;
+                        loop();
+                    }, 2000);
+                    
+                }, 3000); // Duration of the white-out
+                
+            }, 1500); // Duration of the warning
+        }
+
+        // Game Loop
+        function loop() {
+            if (!gameActive) return;
+            
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            player.x += (mouseX - player.x) * 0.1;
+            player.y += (mouseY - player.y) * 0.1;
+
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, Math.max(5, player.r + (score/10)), 0, Math.PI * 2);
+            ctx.fillStyle = '#fff';
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = '#fff';
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            if (Math.random() < 0.05) spawnParticle();
+
+            particles.forEach((p, index) => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life--;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = p.type === 'good' ? '#00ffff' : '#ff0000';
+                ctx.fill();
+
+                const dist = Math.hypot(player.x - p.x, player.y - p.y);
+                const playerRadius = Math.max(5, player.r + (score/10));
+                
+                if (dist < playerRadius + p.r) {
+                    if (p.type === 'good') {
+                        score += 10;
+                    } else {
+                        // BAD PARTICLE LOGIC
+                        if (score <= 0) {
+                            triggerBlastAndRestart();
+                            return; 
+                        } else {
+                            score = Math.max(0, score - 20); 
+                            canvas.style.transform = `translate(${Math.random()*10-5}px, ${Math.random()*10-5}px)`;
+                            setTimeout(() => canvas.style.transform = 'none', 50);
+                        }
+                    }
+                    scoreVal.innerText = score;
+                    particles.splice(index, 1);
+                }
+
+                if (p.life <= 0) particles.splice(index, 1);
+            });
+
+            if (gameActive) animationId = requestAnimationFrame(loop);
+        }
+
+        function spawnParticle() {
+            const type = Math.random() > 0.3 ? 'good' : 'bad'; 
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                vx: (Math.random() - 0.5) * 2,
+                vy: (Math.random() - 0.5) * 2,
+                r: Math.random() * 3 + 1,
+                life: 200,
+                type: type
+            });
+        }
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        window.addEventListener('resize', resizeCanvas);
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && gameActive) {
+                gameActive = false;
+                cancelAnimationFrame(animationId);
+                body.classList.remove('active-game');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        });
+
     </script>
 
 </body>
