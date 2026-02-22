@@ -3,359 +3,496 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Civitas | The Nervous System of Infrastructure</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;700;800&display=swap" rel="stylesheet">
+    <title>The Construct | The Nervous System of Infrastructure</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <style>
         /* =========================================
-           1. THEME VARIABLES
+           1. CORE VARIABLES & THEME
            ========================================= */
         :root {
             /* DAY MODE */
-            --bg-color: #f3f4f6;
-            --bg-pattern: radial-gradient(at 0% 0%, rgba(251, 191, 36, 0.1) 0px, transparent 50%);
+            --bg-color: #f0f4f8;
+            --bg-pattern: 
+                linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+            --bg-size: 40px 40px;
+            
             --safety-yellow: #fbbf24;
-            --concrete-grey: #374151;
-            --text-dark: #111827;
-            --text-light: #6b7280;
+            --concrete-grey: #334155;
+            --text-dark: #0f172a;
+            --text-light: #64748b;
             
-            /* GLASS */
-            --glass-bg: rgba(255, 255, 255, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.9);
-            --glass-blur: 12px;
-            --shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
             
-            /* GLOW SETTINGS (DAY) */
-            --card-glow-idle: rgba(251, 191, 36, 0.3);
-            --card-glow-hover: rgba(251, 191, 36, 0.6);
-
-            /* BULB */
-            --bulb-color: #cbd5e1;
-            --bulb-glow: none;
-            --btn-text: #111827;
+            --cable-color: #cbd5e1;
+            --card-glow: rgba(251, 191, 36, 0.4);
+            
+            --panel-bg: #ffffff;
+            --panel-text: #334155;
         }
 
-        /* NIGHT MODE (Blueprint View) */
+        /* NIGHT MODE */
         body.dark-mode {
-            --bg-color: #0f172a; 
+            --bg-color: #0b1120; 
             --bg-pattern: 
-                linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
-            --bg-size: 40px 40px;
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
             
             --safety-yellow: #fbbf24; 
             --concrete-grey: #e2e8f0; 
             --text-dark: #f8fafc;
             --text-light: #94a3b8; 
             
-            --glass-bg: rgba(30, 41, 59, 0.6);
+            --glass-bg: rgba(15, 23, 42, 0.85);
             --glass-border: rgba(255, 255, 255, 0.1);
-            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
             
-            /* GLOW SETTINGS (NIGHT) */
-            --card-glow-idle: rgba(251, 191, 36, 0.15);
-            --card-glow-hover: rgba(251, 191, 36, 0.8);
-
-            /* BULB ON */
-            --bulb-color: #fbbf24;
-            --bulb-glow: drop-shadow(0 0 15px rgba(251, 191, 36, 0.8));
-            --btn-text: #0f172a;
+            --cable-color: #1e293b;
+            --card-glow: rgba(6, 182, 212, 0.6);
+            
+            --panel-bg: #0f172a;
+            --panel-text: #94a3b8;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
         
         body { 
             background-color: var(--bg-color); 
             background-image: var(--bg-pattern);
-            background-size: var(--bg-size, auto); 
+            background-size: var(--bg-size);
             color: var(--text-dark); 
+            font-family: 'Plus Jakarta Sans', sans-serif;
             min-height: 100vh;
-            overflow-x: hidden;
-            transition: background 1.2s cubic-bezier(0.4, 0, 0.2, 1), color 1.2s ease;
+            overflow-x: hidden; 
+            transition: background 0.8s ease;
         }
 
         /* =========================================
-           2. LIGHT SWITCH
+           2. HEADER & CONTROLS
            ========================================= */
-        .lamp-container {
-            position: fixed; top: 0; right: 2rem; z-index: 1000;
-            display: flex; flex-direction: column; align-items: center;
-        }
-        .wire { width: 2px; height: 60px; background: #475569; z-index: 1; }
-        .bulb {
-            width: 40px; height: 40px; background: var(--bulb-color);
-            border-radius: 50%; border: 2px solid #475569;
-            filter: var(--bulb-glow); transition: all 0.3s ease;
-            position: relative; z-index: 2; cursor: pointer;
-        }
-        .socket { width: 20px; height: 15px; background: #334155; margin: 0 auto -5px; position: relative; z-index: 1; border-radius: 2px; }
-        .pull-string {
-            width: 1px; height: 60px; background: #94a3b8; margin: 0 auto;
-            position: relative; top: -2px; cursor: pointer;
-            transition: height 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .knob { width: 8px; height: 14px; background: #64748b; border-radius: 4px; position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%); }
-        .lamp-container:active .pull-string, .lamp-container.pulled .pull-string { height: 85px; }
-
-        /* NAV */
-        nav {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 1.5rem 5%;
-            background: var(--glass-bg); 
-            backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            border-bottom: 4px solid var(--safety-yellow);
-            position: sticky; top: 0; z-index: 100;
-            transition: background 1.2s ease, border 1.2s ease;
-        }
+        
+        /* BRAND (Top Left of Content) - UPDATED */
         .brand { 
-            font-size: 1.8rem; font-weight: 800; color: var(--concrete-grey); 
-            text-transform: uppercase; letter-spacing: 1px; 
+            position: fixed; top: 2rem; left: 22%; /* Right of Sidebar */
+            z-index: 100;
+            font-size: 1.5rem; font-weight: 800; 
+            color: var(--concrete-grey); 
+            text-transform: uppercase; 
+            letter-spacing: 3px; /* Increased spacing */
             cursor: pointer; user-select: none;
+            /* Removed mix-blend-mode for solid grey color */
         }
-        .back-link { text-decoration: none; color: var(--text-light); font-weight: 600; font-size: 0.9rem; transition: 0.2s; }
-        .back-link:hover { color: var(--concrete-grey); }
 
-        /* HERO */
-        .hero { padding: 6rem 5% 4rem; text-align: center; }
-        h1 { font-size: 3.5rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 1px; color: var(--concrete-grey); transition: color 1.2s ease; }
-        .subtitle { color: var(--text-light); max-width: 700px; margin: 0 auto; font-size: 1.2rem; line-height: 1.6; transition: color 1.2s ease; }
+        /* RETURN LINK (Top Right, Left of Lamp) */
+        .back-link { 
+            position: fixed; top: 2.5rem; right: 90px; /* Left of Lamp */
+            z-index: 100;
+            text-decoration: none; color: var(--text-light); 
+            font-weight: 600; font-size: 0.85rem; letter-spacing: 0.5px;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+        .back-link:hover { color: var(--safety-yellow); }
 
-        /* MODULES GRID */
-        .modules-section { padding: 2rem 5% 4rem; }
-        .section-title { 
-            text-align: center; margin-bottom: 3rem; font-size: 0.9rem; 
-            color: var(--concrete-grey); text-transform: uppercase; letter-spacing: 3px; font-weight: 800;
-            opacity: 0.6; transition: color 1.2s ease;
+        /* LIGHT SWITCH (Far Right) */
+        .lamp-container {
+            position: fixed; top: 0; right: 2rem; 
+            z-index: 1000; display: flex; flex-direction: column; align-items: center; pointer-events: auto;
+        }
+        .wire { width: 2px; height: 60px; background: #475569; }
+        .bulb { width: 40px; height: 40px; background: #cbd5e1; border-radius: 50%; border: 2px solid #475569; position: relative; z-index: 2; cursor: pointer; transition: 0.3s; }
+        .pull-string { width: 1px; height: 60px; background: #94a3b8; cursor: pointer; transition: height 0.2s; }
+        .knob { width: 8px; height: 14px; background: #64748b; border-radius: 4px; position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%); }
+        .lamp-container:active .pull-string { height: 85px; }
+        body.dark-mode .bulb { background: #fbbf24; box-shadow: 0 0 20px #fbbf24; }
+
+        .hero {
+            height: 90vh;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center;
+            padding: 0 10% 0 30%;
+            position: relative;
+            z-index: 1;
         }
         
-        .grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem; max-width: 1400px; margin: 0 auto;
+        /* STEEL & GOLD GRADIENT TEXT */
+        h1 { 
+            font-size: 4rem; margin-bottom: 1rem; line-height: 1.1; font-weight: 800;
+            background: linear-gradient(135deg, var(--concrete-grey) 30%, var(--safety-yellow) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0px 4px 10px rgba(0,0,0,0.05);
+        }
+        body.dark-mode h1 {
+            background: linear-gradient(135deg, #e2e8f0 30%, var(--safety-yellow) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .module-link { text-decoration: none; display: block; height: 100%; }
+        .subtitle { font-size: 1.25rem; color: var(--text-light); max-width: 600px; }
+
+        /* =========================================
+           3. SYSTEM MONITOR (LEFT SIDE PANEL)
+           ========================================= */
+        .sys-monitor {
+            position: fixed;
+            top: 0; left: 0;
+            width: 20%; 
+            height: 100vh;
+            background: var(--panel-bg);
+            border-right: 1px solid var(--glass-border);
+            padding: 2rem;
+            display: flex; flex-direction: column;
+            z-index: 90;
+            box-shadow: 5px 0 30px rgba(0,0,0,0.05);
+            transition: background 0.5s ease;
+        }
+
+        .sys-header {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem; font-weight: bold;
+            color: var(--text-light);
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 1rem; margin-bottom: 2rem;
+            display: flex; justify-content: space-between;
+        }
+        .sys-status { color: #10b981; animation: blink 2s infinite; }
+
+        .sys-list { list-style: none; flex-grow: 1; overflow-y: auto; }
+        .sys-item {
+            padding: 0.8rem; margin-bottom: 0.5rem; border-radius: 6px;
+            cursor: pointer; transition: 0.2s; font-size: 0.9rem;
+            color: var(--panel-text); border: 1px solid transparent;
+            display: flex; justify-content: space-between;
+        }
+        .sys-item:hover { background: rgba(0,0,0,0.05); }
+        .sys-item.active {
+            background: rgba(251, 191, 36, 0.1);
+            border-color: var(--safety-yellow);
+            color: var(--text-dark);
+            font-weight: bold;
+        }
+        body.dark-mode .sys-item.active { background: rgba(6, 182, 212, 0.1); border-color: #06b6d4; color: #fff; }
+
+        .sys-details {
+            margin-top: auto;
+            background: rgba(0,0,0,0.03);
+            border-radius: 8px;
+            padding: 1.5rem;
+            border: 1px solid var(--glass-border);
+        }
+        .detail-label { font-family: 'JetBrains Mono'; font-size: 0.65rem; color: var(--text-light); display: block; margin-bottom: 5px; }
+        .detail-value { font-size: 1.1rem; font-weight: 800; color: var(--concrete-grey); margin-bottom: 1rem; }
+        
+        .tech-specs-list {
+            list-style: none; padding: 0;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-light);
+        }
+        .tech-specs-list li { margin-bottom: 5px; display: flex; }
+        .tech-specs-list li::before { content: '>'; color: var(--safety-yellow); margin-right: 8px; }
+
+        /* =========================================
+           4. THE MAP LAYOUT
+           ========================================= */
+        .map-container {
+            position: relative;
+            width: 80%;
+            margin-left: 20%; 
+            height: 4200px; 
+            overflow: hidden;
+            padding-bottom: 200px;
+        }
+
+        /* Removed .bg-city to maintain consistent grid size */
+
+        .cable-svg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0;
+        }
+        .cable-path {
+            fill: none; stroke: var(--cable-color); stroke-width: 2; stroke-dasharray: 10;
+            transition: stroke 0.8s ease;
+        }
+
+        .card-wrapper {
+            position: absolute;
+            width: 400px;
+            transition: all 0.5s ease;
+        }
+
+        #c-safety    { top: 5%;  left: 5%; }
+        #c-logistics { top: 15%; right: 15%; }
+        #c-oracle    { top: 25%; left: 10%; }
+        #c-quality   { top: 35%; left: 50%; transform: translateX(-50%); }
+        #c-eco       { top: 45%; right: 5%; }
+        #c-bio       { top: 55%; left: 5%; }
+        #c-twin      { top: 65%; right: 20%; }
+        #c-reality   { top: 75%; left: 15%; }
+        #c-vortex    { top: 85%; left: 45%; }
+        #c-rover     { top: 92%; left: 55%; } 
 
         .module-card {
             background: var(--glass-bg);
-            backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur));
+            backdrop-filter: blur(12px);
             border: 1px solid var(--glass-border);
             padding: 2.5rem;
-            border-left: 6px solid var(--safety-yellow);
-            border-radius: 0 12px 12px 0; 
-            transition: transform 0.3s ease, box-shadow 0.3s ease, background 1.2s ease;
-            height: 100%;
-            
-            /* ALWAYS ON GLOW (Subtle) */
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05), 0 0 20px var(--card-glow-idle);
-        }
-
-        /* HOVER GLOW (Intense) */
-        .module-card:hover {
-            transform: translateY(-8px);
-            background: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1), 0 0 40px var(--card-glow-hover);
-        }
-        body.dark-mode .module-card:hover { background: rgba(30, 41, 59, 0.9); }
-        
-        .module-num { font-size: 0.75rem; font-weight: 800; color: var(--text-light); margin-bottom: 1rem; display: block; letter-spacing: 1px; }
-        .module-card h3 { font-size: 1.4rem; margin-bottom: 0.75rem; color: var(--concrete-grey); font-weight: 800; }
-        .module-card p { font-size: 0.95rem; color: var(--text-light); line-height: 1.6; }
-
-        /* HARDWARE CARD */
-        .hw-card { background: var(--concrete-grey); border-left: 6px solid #000; }
-        body.dark-mode .hw-card { background: #1e293b; border-left: 6px solid #fbbf24; }
-        .hw-card h3 { color: #fff; }
-        .hw-card p { color: #d1d5db; }
-        .hw-card .module-num { color: var(--safety-yellow); }
-
-        /* FORM */
-        .form-section { padding: 4rem 5% 6rem; max-width: 800px; margin: 0 auto; }
-        .form-container {
-            background: var(--glass-bg);
-            backdrop-filter: blur(var(--glass-blur));
-            border: 1px solid var(--glass-border);
-            padding: 3rem;
             border-radius: 12px;
+            border-left: 6px solid var(--safety-yellow);
             box-shadow: var(--shadow);
-            border-top: 6px solid var(--concrete-grey);
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+        }
+        .module-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1), 0 0 40px var(--card-glow);
+            z-index: 10;
+            background: rgba(255,255,255,0.98);
+        }
+        body.dark-mode .module-card:hover { background: rgba(30, 41, 59, 0.98); }
+
+        .module-id { 
+            font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; 
+            color: var(--text-light); display: block; margin-bottom: 0.8rem; 
+            border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 0.5rem;
+        }
+        
+        .module-card h3 { font-size: 1.6rem; color: var(--concrete-grey); margin-bottom: 1rem; font-weight: 800; }
+        .module-card p { font-size: 1.1rem; color: var(--text-dark); line-height: 1.6; margin-bottom: 0; font-weight: 500; }
+
+        .hw-card { background: var(--concrete-grey) !important; border-left-color: #000; }
+        body.dark-mode .hw-card { background: #1e293b !important; border-left-color: #fbbf24; }
+        .hw-card h3, .hw-card p, .hw-card .module-id { color: white !important; }
+
+        /* =========================================
+           5. FORM & FOOTER
+           ========================================= */
+        .form-section { padding: 4rem 10% 6rem 20%; max-width: 1200px; margin: 0 auto; position: relative; z-index: 2; }
+        .form-container {
+            background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--glass-border); padding: 3rem; border-radius: 12px;
+            box-shadow: var(--shadow); border-top: 6px solid var(--concrete-grey);
             transition: background 1.2s ease;
         }
         body.dark-mode .form-container { border-top-color: var(--safety-yellow); }
-
-        .form-container h2 { margin-bottom: 1rem; color: var(--concrete-grey); text-transform: uppercase; font-weight: 800; }
+        
         .form-group { margin-bottom: 1.5rem; }
-        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 700; font-size: 0.8rem; color: var(--text-light); letter-spacing: 1px; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 700; font-size: 0.8rem; color: var(--text-light); }
         .form-group input, .form-group textarea, .form-group select {
-            width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 6px; background: rgba(255,255,255,0.8);
-            font-family: inherit; font-size: 1rem; outline: none; transition: 0.2s;
+            width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 6px;
+            background: rgba(255,255,255,0.8); font-family: inherit; font-size: 1rem; outline: none; transition: 0.2s;
         }
         body.dark-mode .form-group input, body.dark-mode .form-group textarea, body.dark-mode .form-group select { 
             background: rgba(15, 23, 42, 0.5); border-color: #334155; color: white; 
         }
         .form-group input:focus { border-color: var(--safety-yellow); }
-        
         .submit-btn {
             background: var(--safety-yellow); color: var(--btn-text); border: none;
             padding: 1.2rem 2rem; font-weight: 800; text-transform: uppercase; cursor: pointer;
-            width: 100%; border-radius: 6px; transition: 0.3s; letter-spacing: 1px;
+            width: 100%; border-radius: 6px; transition: 0.3s;
         }
-        .submit-btn:hover { background: #eab308; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(251, 191, 36, 0.3); }
-        #form-status { margin-top: 1.5rem; text-align: center; font-weight: 700; font-size: 0.9rem; display: none; padding: 1rem; border-radius: 6px; }
-
-        footer { text-align: center; padding: 3rem; background: rgba(255,255,255,0.5); color: var(--text-light); font-size: 0.9rem; }
+        .submit-btn:hover { background: #eab308; transform: translateY(-2px); }
+        
+        footer { 
+            text-align: center; padding: 4rem 2rem 2rem 22%;
+            background: rgba(255,255,255,0.5); color: var(--text-light); font-size: 0.9rem; 
+            position: relative; z-index: 2; border-top: 1px solid var(--glass-border);
+        }
         body.dark-mode footer { background: rgba(15, 23, 42, 0.5); }
+        
+        .social-links { display: flex; justify-content: center; gap: 2rem; margin-bottom: 2rem; }
+        .social-link { color: var(--concrete-grey); text-decoration: none; font-weight: 800; text-transform: uppercase; font-size: 0.8rem; transition: 0.3s; }
+        .social-link:hover { color: var(--safety-yellow); }
+        body.dark-mode .social-link { color: var(--text-light); }
+        body.dark-mode .social-link:hover { color: var(--safety-yellow); }
 
         /* =========================================
-           3. THE GAME: DRONE PATROL
+           6. GAME OVERLAY
            ========================================= */
-        #gameCanvas {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 9999; background: #0f172a; 
-            display: none; cursor: none; /* Hide default cursor */
-        }
-        #gameUI {
-            position: fixed; top: 20px; left: 20px; z-index: 10000;
-            color: #fbbf24; font-family: 'Courier New', monospace; font-weight: bold; font-size: 1.2rem;
-            display: none; pointer-events: none;
-        }
-        #gameOverlay {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            z-index: 10000; text-align: center; color: #fff; 
-            font-family: 'Courier New', monospace; display: none;
-        }
+        #gameCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background: #0f172a; display: none; cursor: none; }
+        #gameUI { position: fixed; top: 20px; left: 20px; z-index: 10000; color: #fbbf24; font-family: 'Courier New', monospace; font-weight: bold; font-size: 1.2rem; display: none; pointer-events: none; }
+        #gameOverlay { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10000; text-align: center; color: #fff; font-family: 'Courier New', monospace; display: none; }
         #gameOverlay h2 { color: #fbbf24; margin-bottom: 10px; font-size: 2rem;}
-        
-        .active-game #gameCanvas, 
-        .active-game #gameUI, 
-        .active-game #gameOverlay { display: block; }
+        .active-game #gameCanvas, .active-game #gameUI, .active-game #gameOverlay { display: block; }
 
-        /* Mobile Fixes */
-        @media (max-width: 768px) {
-            h1 { font-size: 2.2rem; }
-            .hero { padding: 6rem 15px 4rem; }
-            .grid { grid-template-columns: 1fr; }
-            .lamp-container { right: 5%; }
+        @media (max-width: 1000px) {
+            .sys-monitor { display: none; }
+            .map-container { margin-left: 0; width: 100%; height: auto; padding-bottom: 4rem; }
+            .hero { padding: 6rem 5% 4rem; }
+            .brand { position: relative; left: auto; top: auto; margin-bottom: 1rem; }
+            .back-link { position: relative; right: auto; top: auto; display: block; text-align: center; margin-bottom: 1rem; }
+            .form-section { padding: 4rem 5%; }
+            footer { padding: 3rem 5%; }
+            .card-wrapper { position: relative; width: 90%; margin: 3rem auto; top: auto !important; left: auto !important; transform: none !important; }
+            .cable-svg { display: none; }
         }
     </style>
 </head>
 <body>
 
-    <div class="lamp-container" id="lightSwitch" title="Switch View Mode">
+    <div class="lamp-container" id="lightSwitch">
         <div class="wire"></div>
         <div class="socket"></div>
         <div class="bulb"></div>
-        <div class="pull-string">
-            <div class="knob"></div>
+        <div class="pull-string"><div class="knob"></div></div>
+    </div>
+
+    <a href="../../index.html" class="back-link">← Return to Origins</a>
+
+    <div class="brand" id="gameTrigger">THE CONSTRUCT</div>
+
+    <div class="sys-monitor">
+        <div class="sys-header">
+            <span>CONSTRUCT.OS</span>
+            <span class="sys-status">● ONLINE</span>
+        </div>
+        
+        <ul class="sys-list">
+            <li class="sys-item active" onclick="scrollToId('hero-top')"><span>00. OVERVIEW</span></li>
+            <li class="sys-item" onclick="scrollToId('c-safety')"><span>01. SAFETY</span></li>
+            <li class="sys-item" onclick="scrollToId('c-logistics')"><span>02. LOGISTICS</span></li>
+            <li class="sys-item" onclick="scrollToId('c-oracle')"><span>03. FINANCE</span></li>
+            <li class="sys-item" onclick="scrollToId('c-quality')"><span>04. QUALITY</span></li>
+            <li class="sys-item" onclick="scrollToId('c-eco')"><span>05. ECO</span></li>
+            <li class="sys-item" onclick="scrollToId('c-bio')"><span>06. BIO</span></li>
+            <li class="sys-item" onclick="scrollToId('c-twin')"><span>07. TWIN</span></li>
+            <li class="sys-item" onclick="scrollToId('c-reality')"><span>08. REALITY</span></li>
+            <li class="sys-item" onclick="scrollToId('c-vortex')"><span>09. VORTEX</span></li>
+            <li class="sys-item" onclick="scrollToId('c-rover')"><span>10. ROVER</span></li>
+        </ul>
+
+        <div class="sys-details" id="sys-details">
+            <span class="detail-label">TECHNICAL TELEMETRY</span>
+            <div class="detail-value" id="detail-title">SYSTEM IDLE</div>
+            <ul class="tech-specs-list" id="detail-specs">
+                <li>Hover over module</li>
+                <li>to view specifications.</li>
+            </ul>
         </div>
     </div>
 
-    <nav data-aos="fade-down">
-        <div class="brand" id="gameTrigger">Civitas</div>
-        <a href="../../index.html" class="back-link">← Return to Origins</a>
-    </nav>
-
-    <section class="hero" data-aos="fade-up">
+    <div id="hero-top" class="hero">
         <h1>The Central Nervous System<br>of Construction</h1>
         <p class="subtitle">We don't just build. We engineer the automated ecosystem that manages Safety, Logistics, and Quality with military-grade precision.</p>
-    </section>
+    </div>
 
-    <section class="modules-section">
-        <h2 class="section-title" data-aos="fade-in">System Architecture</h2>
-        <div class="grid">
-            
-            <a href="modules/safety.html" class="module-link" data-aos="fade-up" data-aos-delay="0">
-                <div class="module-card">
-                    <span class="module-num">01 | SAFETY</span>
+    <div class="map-container">
+        <svg class="cable-svg" xmlns="http://www.w3.org/2000/svg">
+            <path class="cable-path" d="M 100 100 Q 500 200 1200 450 T 200 800 T 700 1200 T 1200 1550 T 100 1950 T 1100 2350 T 200 2750 T 600 3150 T 700 3450 T 900 3900" vector-effect="non-scaling-stroke"/>
+        </svg>
+
+        <div class="card-wrapper" id="c-safety" data-aos="fade-right">
+            <a href="modules/safety.html" style="text-decoration:none">
+                <div class="module-card" data-specs="Latency: <10ms|Coverage: 360 Site Wide|Alerts: Instant Push">
+                    <span class="module-id">ID: CNSTRCT-01</span>
                     <h3>Sentinel Safety</h3>
-                    <p>AI computer vision that detects PPE violations and hazards instantly. Replaces manual audits with digital certainty.</p>
+                    <p>Reduce liability by 100%. Our AI detects safety violations instantly, preventing costly accidents and slashing insurance premiums.</p>
                 </div>
             </a>
-
-            <a href="modules/quantum.html" class="module-link" data-aos="fade-up" data-aos-delay="100">
-                <div class="module-card">
-                    <span class="module-num">02 | LOGISTICS</span>
-                    <h3>Quantum Logistics</h3>
-                    <p>Automated inventory tracking using IoT sensors. Eliminates material shrinkage and prevents theft.</p>
-                </div>
-            </a>
-
-            <a href="modules/oracle.html" class="module-link" data-aos="fade-up" data-aos-delay="200">
-                <div class="module-card">
-                    <span class="module-num">03 | FINANCE</span>
-                    <h3>Predictive Oracle</h3>
-                    <p>Financial burn-rate forecasting AI. Predicts project delays and budget overruns weeks in advance.</p>
-                </div>
-            </a>
-
-            <a href="modules/spectra.html" class="module-link" data-aos="fade-up" data-aos-delay="0">
-                <div class="module-card">
-                    <span class="module-num">04 | QUALITY</span>
-                    <h3>Spectra Quality</h3>
-                    <p>Surface anomaly detection. Uses sensor fusion to identify micro-fractures in concrete and structural defects.</p>
-                </div>
-            </a>
-
-            <a href="modules/eco.html" class="module-link" data-aos="fade-up" data-aos-delay="100">
-                <div class="module-card">
-                    <span class="module-num">05 | SUSTAINABILITY</span>
-                    <h3>Eco Recovery</h3>
-                    <p>Circular economy protocols. Automates waste classification and recycling tracking to meet Green standards.</p>
-                </div>
-            </a>
-
-            <a href="modules/bio.html" class="module-link" data-aos="fade-up" data-aos-delay="200">
-                <div class="module-card">
-                    <span class="module-num">06 | WORKFORCE</span>
-                    <h3>Bio-Ergonomics</h3>
-                    <p>Workforce health monitoring. Tracks environmental conditions and vitals to prevent fatigue and heatstroke.</p>
-                </div>
-            </a>
-
-            <a href="modules/digital-twin.html" class="module-link" data-aos="fade-up" data-aos-delay="0">
-                <div class="module-card">
-                    <span class="module-num">07 | VISUALIZATION</span>
-                    <h3>Digital Twin</h3>
-                    <p>Live 4D visualization that reconciles the "As-Built" reality against the "As-Designed" BIM models.</p>
-                </div>
-            </a>
-
-            <a href="modules/reality.html" class="module-link" data-aos="fade-up" data-aos-delay="100">
-                <div class="module-card">
-                    <span class="module-num">08 | SURVEYING</span>
-                    <h3>Reality Capture</h3>
-                    <p>Instant SLAM-based point cloud generation for rapid site surveying and progress mapping.</p>
-                </div>
-            </a>
-
-            <a href="modules/vortex.html" class="module-link" data-aos="fade-up" data-aos-delay="200">
-                <div class="module-card">
-                    <span class="module-num">09 | CORE SYSTEM</span>
-                    <h3>Vortex Neural Engine</h3>
-                    <p>The distributed processing hub that coordinates all sensors, agents, and data streams.</p>
-                </div>
-            </a>
-
-            <a href="modules/rover.html" class="module-link" data-aos="fade-up" data-aos-delay="300">
-                <div class="module-card hw-card">
-                    <span class="module-num">10 | HARDWARE EXECUTOR</span>
-                    <h3>Civitas Rover</h3>
-                    <p>Autonomous 6-wheel robotic unit designed for heavy material transport and hazardous entry.</p>
-                </div>
-            </a>
-
         </div>
-    </section>
+
+        <div class="card-wrapper" id="c-logistics" data-aos="fade-left">
+            <a href="modules/quantum.html" style="text-decoration:none">
+                <div class="module-card" data-specs="Tracking: RFID / BLE|Accuracy: +/- 1.5m|Sync: ERP Integrated">
+                    <span class="module-id">ID: CNSTRCT-02</span>
+                    <h3>Quantum Logistics</h3>
+                    <p>Zero material shrinkage. We track every brick and beam in real-time, ensuring you never pay for lost or stolen assets again.</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="card-wrapper" id="c-oracle" data-aos="zoom-in">
+            <a href="modules/oracle.html" style="text-decoration:none">
+                <div class="module-card" data-specs="Model: Monte Carlo|Horizon: 12 Weeks|Data: 50k Points/Day">
+                    <span class="module-id">ID: CNSTRCT-03</span>
+                    <h3>Predictive Oracle</h3>
+                    <p>Eliminate budget overruns. Our AI predicts financial bottlenecks weeks in advance, protecting your profit margin from delays.</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="card-wrapper" id="c-quality" data-aos="fade-up">
+            <a href="modules/spectra.html" style="text-decoration:none">
+                <div class="module-card" data-specs="Sensors: Thermal/LiDAR|Res: < 2mm|Output: Auto-PDF">
+                    <span class="module-id">ID: CNSTRCT-04</span>
+                    <h3>Spectra Quality</h3>
+                    <p>Zero structural rework. We detect micro-fractures during the pour, ensuring perfect structural integrity and avoiding million-dollar repairs.</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="card-wrapper" id="c-eco" data-aos="fade-left">
+            <a href="modules/eco.html" style="text-decoration:none">
+                <div class="module-card" data-specs="Compliance: LEED/BREEAM|Tracking: Carbon/Water|Diversion: Real-time %">
+                    <span class="module-id">ID: CNSTRCT-05</span>
+                    <h3>Eco Recovery</h3>
+                    <p>Turn waste into revenue. We automate recycling tracking to meet Green Standards and monetize scrap material streams.</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="card-wrapper" id="c-bio" data-aos="fade-right">
+            <a href="modules/bio.html" style="text-decoration:none">
+                <div class="module-card" data-specs="Vitals: HR / Temp|Env: Wet Bulb / AQI|Privacy: GDPR Safe">
+                    <span class="module-id">ID: CNSTRCT-06</span>
+                    <h3>Bio-Ergonomics</h3>
+                    <p>Maximize workforce uptime. We prevent heatstroke and fatigue, ensuring your team operates at peak efficiency safely.</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="card-wrapper" id="c-twin" data-aos="fade-left">
+            <a href="modules/digital-twin.html" style="text-decoration:none">
+                <div class="module-card" data-specs="Dim: 4D (Time)|Format: IFC / Revit|Sync: Real-time">
+                    <span class="module-id">ID: CNSTRCT-07</span>
+                    <h3>Digital Twin</h3>
+                    <p>Perfect reconciliation. Compare "As-Built" vs "As-Designed" daily to catch deviation errors in millimeters, not meters.</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="card-wrapper" id="c-reality" data-aos="fade-right">
+            <a href="modules/reality.html" style="text-decoration:none">
+                <div class="module-card" data-specs="Tech: Lidar SLAM|Density: High-Res|Compute: Edge">
+                    <span class="module-id">ID: CNSTRCT-08</span>
+                    <h3>Reality Capture</h3>
+                    <p>Automated daily surveying. Our drones generate point clouds in minutes, giving you a daily snapshot of progress.</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="card-wrapper" id="c-vortex" data-aos="zoom-in">
+            <a href="modules/vortex.html" style="text-decoration:none">
+                <div class="module-card" data-specs="Type: Mesh Network|Uptime: 99.99%|Encryption: AES-256">
+                    <span class="module-id">ID: CNSTRCT-09</span>
+                    <h3>Vortex Neural Engine</h3>
+                    <p>Automated site management. The central brain that coordinates sensors and data, making decisions while you sleep.</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="card-wrapper" id="c-rover" data-aos="fade-up">
+            <a href="modules/rover.html" style="text-decoration:none">
+                <div class="module-card hw-card" data-specs="Payload: 500kg|Runtime: 12 Hours|Autonomy: Level 4">
+                    <span class="module-id">ID: CNSTRCT-10</span>
+                    <h3>Construct Rover</h3>
+                    <p>24/7 autonomous logistics. Our heavy-lift rovers move material day and night, keeping your site moving non-stop.</p>
+                </div>
+            </a>
+        </div>
+    </div>
 
     <section class="form-section" data-aos="fade-up">
         <div class="form-container">
             <h2>Strategic Partnership Inquiry</h2>
             <p style="margin-bottom: 2rem; color: var(--text-light); line-height: 1.5;">
-                Civitas is currently selecting Alpha-stage partners for site-specific implementations. Submissions will be evaluated based on infrastructure scale and hardware compatibility.
+                The Construct is currently selecting Alpha-stage partners for site-specific implementations.
             </p>
-            
-            <form id="civitas-form">
+            <form id="construct-form">
                 <div class="form-group">
                     <label>IDENTIFICATION (NAME / FIRM)</label>
                     <input type="text" name="Name" placeholder="e.g., xyz Group / Lead Engineer" required>
@@ -369,13 +506,13 @@
                     <select name="Category">
                         <option value="Pilot Implementation">Pilot Site Implementation (Alpha)</option>
                         <option value="Strategic Capital">Strategic Capital / Equity Partnership</option>
-                        <option value="Hardware Integration">Hardware Provisioning (Jetson/RealSense)</option>
+                        <option value="Hardware Integration">Hardware Provisioning</option>
                         <option value="Technical Review">Technical Review / Feedback</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label>PROPOSITION / REQUIREMENTS</label>
-                    <textarea name="Message" rows="4" placeholder="Briefly describe site requirements or partnership terms..."></textarea>
+                    <textarea name="Message" rows="4" placeholder="Briefly describe site requirements..."></textarea>
                 </div>
                 <button type="submit" class="submit-btn" id="submit-btn">Transmit to Vortex Engine</button>
                 <div id="form-status"></div>
@@ -384,7 +521,16 @@
     </section>
 
     <footer> 
-        &copy; 2026 Civitas Automation. Powered by Shoonya Origins.
+        <div class="social-links">
+            <a href="#" class="social-link">LinkedIn</a>
+            <a href="#" class="social-link">Twitter / X</a>
+            <a href="mailto:contact@theconstruct.tech" class="social-link">Email</a>
+        </div>
+        <p style="opacity:0.6; font-size:0.8rem;">
+            &copy; 2026 The Construct. A Shoonya Origins Venture.<br>
+            <a href="#" style="color:inherit; text-decoration:none; margin:0 10px;">Privacy Policy</a> | 
+            <a href="#" style="color:inherit; text-decoration:none; margin:0 10px;">Terms of Service</a>
+        </p>
     </footer>
 
     <canvas id="gameCanvas"></canvas>
@@ -395,16 +541,81 @@
     <div id="gameOverlay">
         <h2>DRONE DEPLOYMENT READY</h2>
         <p>MISSION: IDENTIFY AND REPAIR SITE ANOMALIES.</p>
-        <p style="margin-top: 15px; font-size: 0.8rem; color: #ccc;">HOVER over Damage (Red) or Waste (Orange) to repair.<br>Do not ignore alerts.</p>
         <button id="startGameBtn" style="margin-top: 20px; padding: 10px 20px; background: #fbbf24; border:none; font-weight:bold; cursor:pointer;">LAUNCH DRONE</button>
     </div>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        // 1. ANIMATION INIT
-        AOS.init({ offset: 50, duration: 800, once: true });
+        AOS.init({ duration: 800, once: false, mirror: true });
 
-        // 2. THEME TOGGLE LOGIC
+        // 1. DYNAMIC SIDE PANEL LOGIC (Distance Sync)
+        const detailTitle = document.getElementById('detail-title');
+        const detailSpecs = document.getElementById('detail-specs');
+        const cards = document.querySelectorAll('.module-card');
+        const listItems = document.querySelectorAll('.sys-item');
+
+        // Hover Effect
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                const title = card.querySelector('h3').innerText;
+                const specsData = card.getAttribute('data-specs');
+                detailTitle.innerText = title;
+                detailSpecs.innerHTML = '';
+                if (specsData) {
+                    specsData.split('|').forEach(spec => {
+                        const li = document.createElement('li');
+                        li.innerText = spec;
+                        detailSpecs.appendChild(li);
+                    });
+                }
+            });
+        });
+
+        function scrollToId(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        window.addEventListener('scroll', () => {
+            const wrappers = document.querySelectorAll('.card-wrapper');
+            let current = '';
+            let minDistance = Infinity;
+            const viewportCenter = window.scrollY + window.innerHeight / 2;
+
+            wrappers.forEach(wrapper => {
+                const rect = wrapper.getBoundingClientRect();
+                const wrapperCenter = window.scrollY + rect.top + (rect.height / 2);
+                const distance = Math.abs(viewportCenter - wrapperCenter);
+
+                if (distance < minDistance && distance < window.innerHeight * 0.6) {
+                    minDistance = distance;
+                    current = wrapper.getAttribute('id');
+                }
+            });
+
+            listItems.forEach(li => {
+                li.classList.remove('active');
+                if(li.getAttribute('onclick').includes(current)) {
+                    li.classList.add('active');
+                    if(current) {
+                        const targetCard = document.getElementById(current).querySelector('.module-card');
+                        const title = targetCard.querySelector('h3').innerText;
+                        const specsData = targetCard.getAttribute('data-specs');
+                        
+                        detailTitle.innerText = title;
+                        detailSpecs.innerHTML = '';
+                        if (specsData) {
+                            specsData.split('|').forEach(spec => {
+                                const li = document.createElement('li');
+                                li.innerText = spec;
+                                detailSpecs.appendChild(li);
+                            });
+                        }
+                    }
+                }
+            });
+        });
+
+        // 2. THEME TOGGLE
         const switchElement = document.getElementById('lightSwitch');
         const body = document.body;
         let isAnimating = false;
@@ -420,41 +631,7 @@
             }, 250);
         });
 
-        // 3. FORM HANDLING
-        const scriptURL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
-        const form = document.getElementById('civitas-form');
-        const status = document.getElementById('form-status');
-        const btn = document.getElementById('submit-btn');
-
-        form.addEventListener('submit', e => {
-            e.preventDefault();
-            btn.disabled = true;
-            btn.innerText = "TRANSMITTING...";
-            status.style.display = "block";
-            status.innerText = "ESTABLISHING SECURE CONNECTION...";
-            status.style.color = "var(--text-light)";
-            status.style.background = "rgba(0,0,0,0.05)";
-
-            fetch(scriptURL, { method: 'POST', body: new FormData(form)})
-                .then(response => {
-                    status.innerText = "TRANSMISSION SUCCESSFUL. CORE TEAM NOTIFIED.";
-                    status.style.color = "#059669"; 
-                    status.style.background = "rgba(5, 150, 105, 0.1)";
-                    form.reset();
-                    btn.disabled = false;
-                    btn.innerText = "TRANSMIT TO VORTEX ENGINE";
-                })
-                .catch(error => {
-                    console.error('Error!', error.message);
-                    status.innerText = "LINK FAILURE. PLEASE RETRY.";
-                    status.style.color = "#dc2626";
-                    status.style.background = "rgba(220, 38, 38, 0.1)";
-                    btn.disabled = false;
-                    btn.innerText = "RETRY TRANSMISSION";
-                });
-        });
-
-        // 4. GAME LOGIC: "DRONE PATROL"
+        // 3. GAME LOGIC: ADVANCED PHYSICS
         const gameTrigger = document.getElementById('gameTrigger');
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
@@ -467,15 +644,12 @@
         let clickTimer;
         let gameActive = false;
         let animId;
-
-        // Game State
-        let drone = { x: 0, y: 0, r: 15 };
-        let targets = []; // {x, y, type, life, maxLife}
+        let drone = { x: 0, y: 0, angle: 0 };
+        let targets = []; 
         let score = 0;
         let health = 100;
         let spawnTimer = 0;
         
-        // Trigger
         gameTrigger.addEventListener('click', () => {
             clickCount++;
             clearTimeout(clickTimer);
@@ -513,118 +687,148 @@
         }
         window.addEventListener('resize', resize);
 
-        // Drone follows mouse
         window.addEventListener('mousemove', e => {
             drone.x = e.clientX;
             drone.y = e.clientY;
         });
 
+        // ASSET DRAWING
+        function drawDrone(x, y) {
+            ctx.save();
+            ctx.translate(x, y);
+            drone.angle += 0.5;
+            
+            // X-Frame
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(-20, -20); ctx.lineTo(20, 20);
+            ctx.moveTo(20, -20); ctx.lineTo(-20, 20);
+            ctx.stroke();
+
+            // Central Hub
+            ctx.fillStyle = '#fbbf24';
+            ctx.beginPath(); ctx.arc(0, 0, 8, 0, Math.PI*2); ctx.fill();
+
+            // LED Lights
+            ctx.fillStyle = (Date.now() % 500 < 250) ? 'red' : '#333';
+            ctx.beginPath(); ctx.arc(0, 0, 3, 0, Math.PI*2); ctx.fill();
+
+            // Rotors
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+            const positions = [[-20, -20], [20, -20], [-20, 20], [20, 20]];
+            positions.forEach(pos => {
+                ctx.beginPath();
+                ctx.arc(pos[0], pos[1], 12 + Math.sin(drone.angle * 2)*3, 0, Math.PI*2);
+                ctx.fill();
+            });
+            ctx.restore();
+        }
+
+        function drawCrack(x, y, life) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.strokeStyle = `rgba(239, 68, 68, ${life/100})`;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            // Jagged line
+            ctx.moveTo(-15, -15);
+            ctx.lineTo(-5, -5);
+            ctx.lineTo(-10, 5);
+            ctx.lineTo(5, 0);
+            ctx.lineTo(15, 15);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        function drawDebris(x, y, life) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.fillStyle = `rgba(245, 158, 11, ${life/100})`;
+            // Random pile of rubble
+            ctx.beginPath();
+            ctx.moveTo(-10, 10);
+            ctx.lineTo(-5, -5);
+            ctx.lineTo(0, 5);
+            ctx.lineTo(5, -10);
+            ctx.lineTo(10, 10);
+            ctx.fill();
+            ctx.restore();
+        }
+
         function loop() {
             if(!gameActive) return;
-
-            // Clear
             ctx.fillStyle = '#0f172a';
             ctx.fillRect(0,0, canvas.width, canvas.height);
-
-            // Draw Grid
+            
+            // Grid
             ctx.strokeStyle = 'rgba(255,255,255,0.05)';
             ctx.lineWidth = 1;
             for(let i=0; i<canvas.width; i+=50) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,canvas.height); ctx.stroke(); }
             for(let i=0; i<canvas.height; i+=50) { ctx.beginPath(); ctx.moveTo(0,i); ctx.lineTo(canvas.width,i); ctx.stroke(); }
 
-            // Spawn Targets
             spawnTimer++;
-            if(spawnTimer > 60) { // Spawn every second approx
+            if(spawnTimer > 50) { 
                 let type = Math.random() > 0.5 ? 'damage' : 'waste';
                 targets.push({
-                    x: Math.random() * (canvas.width - 40) + 20,
-                    y: Math.random() * (canvas.height - 40) + 20,
+                    x: Math.random() * (canvas.width - 60) + 30,
+                    y: Math.random() * (canvas.height - 60) + 30,
                     type: type,
-                    life: 100, // How long it takes to fix
-                    age: 0     // How long it's been active
+                    life: 100, 
+                    age: 0     
                 });
                 spawnTimer = 0;
             }
 
-            // Process Targets
+            // Loop Targets
             for(let i = targets.length - 1; i >= 0; i--) {
                 let t = targets[i];
                 t.age++;
-
-                // If ignored too long, damage health
-                if(t.age > 400) {
-                    health -= 5;
-                    healthEl.innerText = health;
-                    targets.splice(i, 1);
-                    continue;
-                }
-
-                // Check distance to drone
-                let dx = drone.x - t.x;
-                let dy = drone.y - t.y;
-                let dist = Math.hypot(dx, dy);
-
-                // Repairing?
-                if(dist < 80) { // Repair range
-                    t.life -= 2;
-                    // Draw Laser
-                    ctx.beginPath();
-                    ctx.moveTo(drone.x, drone.y);
-                    ctx.lineTo(t.x, t.y);
-                    ctx.strokeStyle = '#fbbf24';
-                    ctx.lineWidth = 2;
-                    ctx.stroke();
-                }
-
-                // Fixed?
-                if(t.life <= 0) {
-                    score += 500;
-                    scoreEl.innerText = score.toLocaleString();
-                    targets.splice(i, 1);
-                    continue;
-                }
-
-                // Draw Target
-                ctx.fillStyle = t.type === 'damage' ? '#ef4444' : '#f59e0b'; // Red or Orange
-                ctx.beginPath();
-                if(t.type === 'damage') {
-                    // Draw "X" or jagged crack
-                    ctx.arc(t.x, t.y, 10, 0, Math.PI*2);
-                } else {
-                    // Draw "Square" pile
-                    ctx.rect(t.x-10, t.y-10, 20, 20);
-                }
-                ctx.fill();
                 
-                // Draw Health Bar of Target
-                ctx.fillStyle = 'white';
-                ctx.fillRect(t.x - 15, t.y - 20, 30 * (t.life/100), 4);
+                // Decay
+                if(t.age > 400) {
+                    health -= 10; healthEl.innerText = health;
+                    targets.splice(i, 1); continue;
+                }
+                
+                // MULTI-TARGET INTERACTION
+                let dist = Math.hypot(drone.x - t.x, drone.y - t.y);
+                if(dist < 200) { 
+                    t.life -= 2;
+                    // Laser Beam
+                    ctx.beginPath(); 
+                    ctx.moveTo(drone.x, drone.y); 
+                    ctx.lineTo(t.x, t.y);
+                    ctx.strokeStyle = 'rgba(251, 191, 36, 0.8)'; 
+                    ctx.lineWidth = 2; 
+                    ctx.stroke();
+                    
+                    // Hit Effect
+                    ctx.fillStyle = '#fff';
+                    ctx.beginPath(); ctx.arc(t.x, t.y, 3, 0, Math.PI*2); ctx.fill();
+                }
+                
+                if(t.life <= 0) {
+                    score += 500; scoreEl.innerText = score.toLocaleString();
+                    targets.splice(i, 1); continue;
+                }
+
+                if(t.type === 'damage') { drawCrack(t.x, t.y, t.life); } else { drawDebris(t.x, t.y, t.life); }
+                
+                // Health Bar
+                ctx.fillStyle = 'white'; ctx.fillRect(t.x - 15, t.y - 20, 30 * (t.life/100), 3);
             }
 
-            // Draw Drone
-            ctx.fillStyle = '#fff';
-            ctx.beginPath(); ctx.arc(drone.x, drone.y, 8, 0, Math.PI*2); ctx.fill();
-            // Rotors
-            let offset = (Date.now() / 20) % 10;
-            ctx.fillStyle = 'rgba(255,255,255,0.5)';
-            ctx.beginPath(); ctx.arc(drone.x-15, drone.y-15, 10, 0, Math.PI*2); ctx.fill();
-            ctx.beginPath(); ctx.arc(drone.x+15, drone.y-15, 10, 0, Math.PI*2); ctx.fill();
-            ctx.beginPath(); ctx.arc(drone.x-15, drone.y+15, 10, 0, Math.PI*2); ctx.fill();
-            ctx.beginPath(); ctx.arc(drone.x+15, drone.y+15, 10, 0, Math.PI*2); ctx.fill();
-
-            // Fail State
-            if(health <= 0) {
-                gameOver();
-                return;
-            }
-
+            drawDrone(drone.x, drone.y);
+            
+            if(health <= 0) { gameOver(); return; }
             animId = requestAnimationFrame(loop);
         }
 
         function gameOver() {
             gameActive = false;
             cancelAnimationFrame(animId);
-            gameOverlay.innerHTML = "<h2 style='color:red'>SITE CRITICAL</h2><p>PROJECT SHUTDOWN INITIATED.</p><button onclick='location.reload()' style='margin-top:20px; padding:10px;'>REBOOT SYSTEM</button>";
+            gameOverlay.innerHTML = "<h2 style='color:red'>SITE CRITICAL</h2><button onclick='location.reload()' style='margin-top:20px; padding:10px;'>REBOOT SYSTEM</button>";
             gameOverlay.style.display = 'block';
         }
 
@@ -633,8 +837,6 @@
                 location.reload();
             }
         });
-
     </script>
-
 </body>
 </html>
