@@ -72,24 +72,32 @@
         }
 
         /* =========================================
-           2. HEADER & CONTROLS
+           2. HEADER BAR (NEW OPAQUE STYLE)
            ========================================= */
         
-        /* BRAND (Top Left of Content) - UPDATED */
+        /* The Solid Bar itself */
+        .site-header {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100px;
+            background-color: var(--bg-color);
+            border-bottom: 4px solid var(--safety-yellow);
+            z-index: 85; /* Below Sidebar (90), Above Content */
+            transition: background 0.8s ease;
+        }
+
+        /* BRAND (Top Left of Content) */
         .brand { 
-            position: fixed; top: 2rem; left: 22%; /* Right of Sidebar */
+            position: fixed; top: 2.2rem; left: 22%; /* Right of Sidebar */
             z-index: 100;
             font-size: 1.5rem; font-weight: 800; 
             color: var(--concrete-grey); 
             text-transform: uppercase; 
-            letter-spacing: 3px; /* Increased spacing */
+            letter-spacing: 3px; 
             cursor: pointer; user-select: none;
-            /* Removed mix-blend-mode for solid grey color */
         }
 
         /* RETURN LINK (Top Right, Left of Lamp) */
         .back-link { 
-            position: fixed; top: 2.5rem; right: 90px; /* Left of Lamp */
+            position: fixed; top: 2.5rem; right: 90px; 
             z-index: 100;
             text-decoration: none; color: var(--text-light); 
             font-weight: 600; font-size: 0.85rem; letter-spacing: 0.5px;
@@ -110,31 +118,6 @@
         .lamp-container:active .pull-string { height: 85px; }
         body.dark-mode .bulb { background: #fbbf24; box-shadow: 0 0 20px #fbbf24; }
 
-        .hero {
-            height: 90vh;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            text-align: center;
-            padding: 0 10% 0 30%;
-            position: relative;
-            z-index: 1;
-        }
-        
-        /* STEEL & GOLD GRADIENT TEXT */
-        h1 { 
-            font-size: 4rem; margin-bottom: 1rem; line-height: 1.1; font-weight: 800;
-            background: linear-gradient(135deg, var(--concrete-grey) 30%, var(--safety-yellow) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0px 4px 10px rgba(0,0,0,0.05);
-        }
-        body.dark-mode h1 {
-            background: linear-gradient(135deg, #e2e8f0 30%, var(--safety-yellow) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .subtitle { font-size: 1.25rem; color: var(--text-light); max-width: 600px; }
-
         /* =========================================
            3. SYSTEM MONITOR (LEFT SIDE PANEL)
            ========================================= */
@@ -147,7 +130,7 @@
             border-right: 1px solid var(--glass-border);
             padding: 2rem;
             display: flex; flex-direction: column;
-            z-index: 90;
+            z-index: 90; /* Sits ON TOP of the header bar */
             box-shadow: 5px 0 30px rgba(0,0,0,0.05);
             transition: background 0.5s ease;
         }
@@ -159,6 +142,7 @@
             border-bottom: 1px solid var(--glass-border);
             padding-bottom: 1rem; margin-bottom: 2rem;
             display: flex; justify-content: space-between;
+            margin-top: 1rem; /* Push down slightly to align with header visual */
         }
         .sys-status { color: #10b981; animation: blink 2s infinite; }
 
@@ -196,7 +180,35 @@
         .tech-specs-list li::before { content: '>'; color: var(--safety-yellow); margin-right: 8px; }
 
         /* =========================================
-           4. THE MAP LAYOUT
+           4. MAIN CONTENT
+           ========================================= */
+        .hero {
+            height: 90vh;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center;
+            padding: 0 10% 0 30%;
+            position: relative;
+            z-index: 1;
+            margin-top: 100px; /* Offset for fixed header */
+        }
+        
+        h1 { 
+            font-size: 4rem; margin-bottom: 1rem; line-height: 1.1; font-weight: 800;
+            background: linear-gradient(135deg, var(--concrete-grey) 30%, var(--safety-yellow) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0px 4px 10px rgba(0,0,0,0.05);
+        }
+        body.dark-mode h1 {
+            background: linear-gradient(135deg, #e2e8f0 30%, var(--safety-yellow) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle { font-size: 1.25rem; color: var(--text-light); max-width: 600px; }
+
+        /* =========================================
+           5. THE MAP LAYOUT
            ========================================= */
         .map-container {
             position: relative;
@@ -206,8 +218,6 @@
             overflow: hidden;
             padding-bottom: 200px;
         }
-
-        /* Removed .bg-city to maintain consistent grid size */
 
         .cable-svg {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -269,7 +279,7 @@
         .hw-card h3, .hw-card p, .hw-card .module-id { color: white !important; }
 
         /* =========================================
-           5. FORM & FOOTER
+           6. FORM & FOOTER
            ========================================= */
         .form-section { padding: 4rem 10% 6rem 20%; max-width: 1200px; margin: 0 auto; position: relative; z-index: 2; }
         .form-container {
@@ -311,7 +321,7 @@
         body.dark-mode .social-link:hover { color: var(--safety-yellow); }
 
         /* =========================================
-           6. GAME OVERLAY
+           7. GAME OVERLAY
            ========================================= */
         #gameCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background: #0f172a; display: none; cursor: none; }
         #gameUI { position: fixed; top: 20px; left: 20px; z-index: 10000; color: #fbbf24; font-family: 'Courier New', monospace; font-weight: bold; font-size: 1.2rem; display: none; pointer-events: none; }
@@ -329,10 +339,13 @@
             footer { padding: 3rem 5%; }
             .card-wrapper { position: relative; width: 90%; margin: 3rem auto; top: auto !important; left: auto !important; transform: none !important; }
             .cable-svg { display: none; }
+            .site-header { display: none; } /* Hide fixed header on mobile for space */
         }
     </style>
 </head>
 <body>
+
+    <header class="site-header"></header>
 
     <div class="lamp-container" id="lightSwitch">
         <div class="wire"></div>
