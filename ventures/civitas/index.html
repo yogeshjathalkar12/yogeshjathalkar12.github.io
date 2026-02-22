@@ -5,72 +5,137 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Civitas | The Nervous System of Infrastructure</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;700;800&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <style>
-        /* CIVITAS THEME: Industrial Light + White Glass */
+        /* =========================================
+           1. THEME VARIABLES
+           ========================================= */
         :root {
+            /* DAY MODE */
             --bg-color: #f3f4f6;
+            --bg-pattern: radial-gradient(at 0% 0%, rgba(251, 191, 36, 0.1) 0px, transparent 50%);
             --safety-yellow: #fbbf24;
             --concrete-grey: #374151;
             --text-dark: #111827;
             --text-light: #6b7280;
             
-            /* GLASS VARS */
+            /* GLASS */
             --glass-bg: rgba(255, 255, 255, 0.7);
             --glass-border: rgba(255, 255, 255, 0.9);
             --glass-blur: 12px;
             --shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+            
+            /* GLOW SETTINGS (DAY) */
+            --card-glow-idle: rgba(251, 191, 36, 0.3);
+            --card-glow-hover: rgba(251, 191, 36, 0.6);
+
+            /* BULB */
+            --bulb-color: #cbd5e1;
+            --bulb-glow: none;
+            --btn-text: #111827;
+        }
+
+        /* NIGHT MODE (Blueprint View) */
+        body.dark-mode {
+            --bg-color: #0f172a; 
+            --bg-pattern: 
+                linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+            --bg-size: 40px 40px;
+            
+            --safety-yellow: #fbbf24; 
+            --concrete-grey: #e2e8f0; 
+            --text-dark: #f8fafc;
+            --text-light: #94a3b8; 
+            
+            --glass-bg: rgba(30, 41, 59, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            
+            /* GLOW SETTINGS (NIGHT) */
+            --card-glow-idle: rgba(251, 191, 36, 0.15);
+            --card-glow-hover: rgba(251, 191, 36, 0.8);
+
+            /* BULB ON */
+            --bulb-color: #fbbf24;
+            --bulb-glow: drop-shadow(0 0 15px rgba(251, 191, 36, 0.8));
+            --btn-text: #0f172a;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         
         body { 
             background-color: var(--bg-color); 
-            background-image: radial-gradient(at 0% 0%, rgba(251, 191, 36, 0.1) 0px, transparent 50%);
+            background-image: var(--bg-pattern);
+            background-size: var(--bg-size, auto); 
             color: var(--text-dark); 
             min-height: 100vh;
+            overflow-x: hidden;
+            transition: background 1.2s cubic-bezier(0.4, 0, 0.2, 1), color 1.2s ease;
         }
 
-        /* NAV: Frosted White Glass */
+        /* =========================================
+           2. LIGHT SWITCH
+           ========================================= */
+        .lamp-container {
+            position: fixed; top: 0; right: 2rem; z-index: 1000;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .wire { width: 2px; height: 60px; background: #475569; z-index: 1; }
+        .bulb {
+            width: 40px; height: 40px; background: var(--bulb-color);
+            border-radius: 50%; border: 2px solid #475569;
+            filter: var(--bulb-glow); transition: all 0.3s ease;
+            position: relative; z-index: 2; cursor: pointer;
+        }
+        .socket { width: 20px; height: 15px; background: #334155; margin: 0 auto -5px; position: relative; z-index: 1; border-radius: 2px; }
+        .pull-string {
+            width: 1px; height: 60px; background: #94a3b8; margin: 0 auto;
+            position: relative; top: -2px; cursor: pointer;
+            transition: height 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .knob { width: 8px; height: 14px; background: #64748b; border-radius: 4px; position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%); }
+        .lamp-container:active .pull-string, .lamp-container.pulled .pull-string { height: 85px; }
+
+        /* NAV */
         nav {
             display: flex; justify-content: space-between; align-items: center;
             padding: 1.5rem 5%;
-            background: rgba(255, 255, 255, 0.85); 
+            background: var(--glass-bg); 
             backdrop-filter: blur(var(--glass-blur));
             -webkit-backdrop-filter: blur(var(--glass-blur));
             border-bottom: 4px solid var(--safety-yellow);
             position: sticky; top: 0; z-index: 100;
+            transition: background 1.2s ease, border 1.2s ease;
         }
-        .brand { font-size: 1.8rem; font-weight: 800; color: var(--concrete-grey); text-transform: uppercase; letter-spacing: 1px; }
+        .brand { 
+            font-size: 1.8rem; font-weight: 800; color: var(--concrete-grey); 
+            text-transform: uppercase; letter-spacing: 1px; 
+            cursor: pointer; user-select: none;
+        }
         .back-link { text-decoration: none; color: var(--text-light); font-weight: 600; font-size: 0.9rem; transition: 0.2s; }
         .back-link:hover { color: var(--concrete-grey); }
 
         /* HERO */
-        .hero {
-            padding: 6rem 5% 4rem; text-align: center;
-        }
-        h1 { font-size: 3.5rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 1px; color: var(--concrete-grey); }
-        .subtitle { color: var(--text-light); max-width: 700px; margin: 0 auto; font-size: 1.2rem; line-height: 1.6; }
+        .hero { padding: 6rem 5% 4rem; text-align: center; }
+        h1 { font-size: 3.5rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 1px; color: var(--concrete-grey); transition: color 1.2s ease; }
+        .subtitle { color: var(--text-light); max-width: 700px; margin: 0 auto; font-size: 1.2rem; line-height: 1.6; transition: color 1.2s ease; }
 
         /* MODULES GRID */
         .modules-section { padding: 2rem 5% 4rem; }
         .section-title { 
             text-align: center; margin-bottom: 3rem; font-size: 0.9rem; 
             color: var(--concrete-grey); text-transform: uppercase; letter-spacing: 3px; font-weight: 800;
-            opacity: 0.6;
+            opacity: 0.6; transition: color 1.2s ease;
         }
         
         .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem; max-width: 1400px; margin: 0 auto;
         }
 
-        /* LINKS */
         .module-link { text-decoration: none; display: block; height: 100%; }
 
-        /* CARD */
         .module-card {
             background: var(--glass-bg);
             backdrop-filter: blur(var(--glass-blur));
@@ -78,32 +143,34 @@
             border: 1px solid var(--glass-border);
             padding: 2.5rem;
             border-left: 6px solid var(--safety-yellow);
-            box-shadow: var(--shadow);
             border-radius: 0 12px 12px 0; 
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background 1.2s ease;
             height: 100%;
+            
+            /* ALWAYS ON GLOW (Subtle) */
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05), 0 0 20px var(--card-glow-idle);
         }
 
+        /* HOVER GLOW (Intense) */
         .module-card:hover {
             transform: translateY(-8px);
-            background: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1), 0 0 40px var(--card-glow-hover);
         }
+        body.dark-mode .module-card:hover { background: rgba(30, 41, 59, 0.9); }
         
         .module-num { font-size: 0.75rem; font-weight: 800; color: var(--text-light); margin-bottom: 1rem; display: block; letter-spacing: 1px; }
         .module-card h3 { font-size: 1.4rem; margin-bottom: 0.75rem; color: var(--concrete-grey); font-weight: 800; }
         .module-card p { font-size: 0.95rem; color: var(--text-light); line-height: 1.6; }
 
-        /* HARDWARE CARD SPECIAL STYLE */
-        .hw-card {
-            background: var(--concrete-grey);
-            border-left: 6px solid #000;
-        }
+        /* HARDWARE CARD */
+        .hw-card { background: var(--concrete-grey); border-left: 6px solid #000; }
+        body.dark-mode .hw-card { background: #1e293b; border-left: 6px solid #fbbf24; }
         .hw-card h3 { color: #fff; }
         .hw-card p { color: #d1d5db; }
         .hw-card .module-num { color: var(--safety-yellow); }
 
-        /* FORM SECTION STYLE */
+        /* FORM */
         .form-section { padding: 4rem 5% 6rem; max-width: 800px; margin: 0 auto; }
         .form-container {
             background: var(--glass-bg);
@@ -113,7 +180,10 @@
             border-radius: 12px;
             box-shadow: var(--shadow);
             border-top: 6px solid var(--concrete-grey);
+            transition: background 1.2s ease;
         }
+        body.dark-mode .form-container { border-top-color: var(--safety-yellow); }
+
         .form-container h2 { margin-bottom: 1rem; color: var(--concrete-grey); text-transform: uppercase; font-weight: 800; }
         .form-group { margin-bottom: 1.5rem; }
         .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 700; font-size: 0.8rem; color: var(--text-light); letter-spacing: 1px; }
@@ -121,41 +191,81 @@
             width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 6px; background: rgba(255,255,255,0.8);
             font-family: inherit; font-size: 1rem; outline: none; transition: 0.2s;
         }
+        body.dark-mode .form-group input, body.dark-mode .form-group textarea, body.dark-mode .form-group select { 
+            background: rgba(15, 23, 42, 0.5); border-color: #334155; color: white; 
+        }
         .form-group input:focus { border-color: var(--safety-yellow); }
+        
         .submit-btn {
-            background: var(--safety-yellow); color: var(--text-dark); border: none;
+            background: var(--safety-yellow); color: var(--btn-text); border: none;
             padding: 1.2rem 2rem; font-weight: 800; text-transform: uppercase; cursor: pointer;
             width: 100%; border-radius: 6px; transition: 0.3s; letter-spacing: 1px;
         }
         .submit-btn:hover { background: #eab308; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(251, 191, 36, 0.3); }
-        .submit-btn:disabled { background: #d1d5db; cursor: not-allowed; transform: none; }
         #form-status { margin-top: 1.5rem; text-align: center; font-weight: 700; font-size: 0.9rem; display: none; padding: 1rem; border-radius: 6px; }
 
-        /* FOOTER */
-        footer { 
-            text-align: center; padding: 3rem; 
-            background: rgba(255,255,255,0.5);
-            color: var(--text-light); font-size: 0.9rem;
+        footer { text-align: center; padding: 3rem; background: rgba(255,255,255,0.5); color: var(--text-light); font-size: 0.9rem; }
+        body.dark-mode footer { background: rgba(15, 23, 42, 0.5); }
+
+        /* =========================================
+           3. THE GAME: DRONE PATROL
+           ========================================= */
+        #gameCanvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 9999; background: #0f172a; 
+            display: none; cursor: none; /* Hide default cursor */
+        }
+        #gameUI {
+            position: fixed; top: 20px; left: 20px; z-index: 10000;
+            color: #fbbf24; font-family: 'Courier New', monospace; font-weight: bold; font-size: 1.2rem;
+            display: none; pointer-events: none;
+        }
+        #gameOverlay {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 10000; text-align: center; color: #fff; 
+            font-family: 'Courier New', monospace; display: none;
+        }
+        #gameOverlay h2 { color: #fbbf24; margin-bottom: 10px; font-size: 2rem;}
+        
+        .active-game #gameCanvas, 
+        .active-game #gameUI, 
+        .active-game #gameOverlay { display: block; }
+
+        /* Mobile Fixes */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.2rem; }
+            .hero { padding: 6rem 15px 4rem; }
+            .grid { grid-template-columns: 1fr; }
+            .lamp-container { right: 5%; }
         }
     </style>
 </head>
 <body>
 
-    <nav>
-        <div class="brand">Civitas</div>
+    <div class="lamp-container" id="lightSwitch" title="Switch View Mode">
+        <div class="wire"></div>
+        <div class="socket"></div>
+        <div class="bulb"></div>
+        <div class="pull-string">
+            <div class="knob"></div>
+        </div>
+    </div>
+
+    <nav data-aos="fade-down">
+        <div class="brand" id="gameTrigger">Civitas</div>
         <a href="../../index.html" class="back-link">← Return to Origins</a>
     </nav>
 
-    <section class="hero">
+    <section class="hero" data-aos="fade-up">
         <h1>The Central Nervous System<br>of Construction</h1>
         <p class="subtitle">We don't just build. We engineer the automated ecosystem that manages Safety, Logistics, and Quality with military-grade precision.</p>
     </section>
 
     <section class="modules-section">
-        <h2 class="section-title">System Architecture</h2>
+        <h2 class="section-title" data-aos="fade-in">System Architecture</h2>
         <div class="grid">
             
-            <a href="modules/safety.html" class="module-link">
+            <a href="modules/safety.html" class="module-link" data-aos="fade-up" data-aos-delay="0">
                 <div class="module-card">
                     <span class="module-num">01 | SAFETY</span>
                     <h3>Sentinel Safety</h3>
@@ -163,7 +273,7 @@
                 </div>
             </a>
 
-            <a href="modules/quantum.html" class="module-link">
+            <a href="modules/quantum.html" class="module-link" data-aos="fade-up" data-aos-delay="100">
                 <div class="module-card">
                     <span class="module-num">02 | LOGISTICS</span>
                     <h3>Quantum Logistics</h3>
@@ -171,7 +281,7 @@
                 </div>
             </a>
 
-            <a href="modules/oracle.html" class="module-link">
+            <a href="modules/oracle.html" class="module-link" data-aos="fade-up" data-aos-delay="200">
                 <div class="module-card">
                     <span class="module-num">03 | FINANCE</span>
                     <h3>Predictive Oracle</h3>
@@ -179,7 +289,7 @@
                 </div>
             </a>
 
-            <a href="modules/spectra.html" class="module-link">
+            <a href="modules/spectra.html" class="module-link" data-aos="fade-up" data-aos-delay="0">
                 <div class="module-card">
                     <span class="module-num">04 | QUALITY</span>
                     <h3>Spectra Quality</h3>
@@ -187,7 +297,7 @@
                 </div>
             </a>
 
-            <a href="modules/eco.html" class="module-link">
+            <a href="modules/eco.html" class="module-link" data-aos="fade-up" data-aos-delay="100">
                 <div class="module-card">
                     <span class="module-num">05 | SUSTAINABILITY</span>
                     <h3>Eco Recovery</h3>
@@ -195,7 +305,7 @@
                 </div>
             </a>
 
-            <a href="modules/bio.html" class="module-link">
+            <a href="modules/bio.html" class="module-link" data-aos="fade-up" data-aos-delay="200">
                 <div class="module-card">
                     <span class="module-num">06 | WORKFORCE</span>
                     <h3>Bio-Ergonomics</h3>
@@ -203,7 +313,7 @@
                 </div>
             </a>
 
-            <a href="modules/digital-twin.html" class="module-link">
+            <a href="modules/digital-twin.html" class="module-link" data-aos="fade-up" data-aos-delay="0">
                 <div class="module-card">
                     <span class="module-num">07 | VISUALIZATION</span>
                     <h3>Digital Twin</h3>
@@ -211,7 +321,7 @@
                 </div>
             </a>
 
-            <a href="modules/reality.html" class="module-link">
+            <a href="modules/reality.html" class="module-link" data-aos="fade-up" data-aos-delay="100">
                 <div class="module-card">
                     <span class="module-num">08 | SURVEYING</span>
                     <h3>Reality Capture</h3>
@@ -219,7 +329,7 @@
                 </div>
             </a>
 
-            <a href="modules/vortex.html" class="module-link">
+            <a href="modules/vortex.html" class="module-link" data-aos="fade-up" data-aos-delay="200">
                 <div class="module-card">
                     <span class="module-num">09 | CORE SYSTEM</span>
                     <h3>Vortex Neural Engine</h3>
@@ -227,7 +337,7 @@
                 </div>
             </a>
 
-            <a href="modules/rover.html" class="module-link">
+            <a href="modules/rover.html" class="module-link" data-aos="fade-up" data-aos-delay="300">
                 <div class="module-card hw-card">
                     <span class="module-num">10 | HARDWARE EXECUTOR</span>
                     <h3>Civitas Rover</h3>
@@ -238,7 +348,7 @@
         </div>
     </section>
 
-    <section class="form-section">
+    <section class="form-section" data-aos="fade-up">
         <div class="form-container">
             <h2>Strategic Partnership Inquiry</h2>
             <p style="margin-bottom: 2rem; color: var(--text-light); line-height: 1.5;">
@@ -277,8 +387,40 @@
         &copy; 2026 Civitas Automation. Powered by Shoonya Origins.
     </footer>
 
+    <canvas id="gameCanvas"></canvas>
+    <div id="gameUI">
+        <div>CAPITAL SAVED: $<span id="scoreVal">0</span></div>
+        <div>SITE INTEGRITY: <span id="healthVal">100</span>%</div>
+    </div>
+    <div id="gameOverlay">
+        <h2>DRONE DEPLOYMENT READY</h2>
+        <p>MISSION: IDENTIFY AND REPAIR SITE ANOMALIES.</p>
+        <p style="margin-top: 15px; font-size: 0.8rem; color: #ccc;">HOVER over Damage (Red) or Waste (Orange) to repair.<br>Do not ignore alerts.</p>
+        <button id="startGameBtn" style="margin-top: 20px; padding: 10px 20px; background: #fbbf24; border:none; font-weight:bold; cursor:pointer;">LAUNCH DRONE</button>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        // INSERT YOUR GOOGLE APPS SCRIPT URL HERE
+        // 1. ANIMATION INIT
+        AOS.init({ offset: 50, duration: 800, once: true });
+
+        // 2. THEME TOGGLE LOGIC
+        const switchElement = document.getElementById('lightSwitch');
+        const body = document.body;
+        let isAnimating = false;
+
+        switchElement.addEventListener('click', () => {
+            if (isAnimating) return;
+            isAnimating = true;
+            switchElement.classList.add('pulled');
+            setTimeout(() => {
+                body.classList.toggle('dark-mode');
+                switchElement.classList.remove('pulled');
+                isAnimating = false;
+            }, 250);
+        });
+
+        // 3. FORM HANDLING
         const scriptURL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
         const form = document.getElementById('civitas-form');
         const status = document.getElementById('form-status');
@@ -311,6 +453,187 @@
                     btn.innerText = "RETRY TRANSMISSION";
                 });
         });
+
+        // 4. GAME LOGIC: "DRONE PATROL"
+        const gameTrigger = document.getElementById('gameTrigger');
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const gameOverlay = document.getElementById('gameOverlay');
+        const startBtn = document.getElementById('startGameBtn');
+        const scoreEl = document.getElementById('scoreVal');
+        const healthEl = document.getElementById('healthVal');
+
+        let clickCount = 0;
+        let clickTimer;
+        let gameActive = false;
+        let animId;
+
+        // Game State
+        let drone = { x: 0, y: 0, r: 15 };
+        let targets = []; // {x, y, type, life, maxLife}
+        let score = 0;
+        let health = 100;
+        let spawnTimer = 0;
+        
+        // Trigger
+        gameTrigger.addEventListener('click', () => {
+            clickCount++;
+            clearTimeout(clickTimer);
+            clickTimer = setTimeout(() => { clickCount = 0; }, 500);
+            if(clickCount >= 5) openGame();
+        });
+
+        function openGame() {
+            body.classList.add('active-game');
+            gameOverlay.style.display = 'block';
+            resize();
+        }
+
+        startBtn.addEventListener('click', () => {
+            gameOverlay.style.display = 'none';
+            resetGame();
+            gameActive = true;
+            loop();
+        });
+
+        function resetGame() {
+            drone.x = canvas.width / 2;
+            drone.y = canvas.height / 2;
+            targets = [];
+            score = 0;
+            health = 100;
+            spawnTimer = 0;
+            scoreEl.innerText = "0";
+            healthEl.innerText = "100";
+        }
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+
+        // Drone follows mouse
+        window.addEventListener('mousemove', e => {
+            drone.x = e.clientX;
+            drone.y = e.clientY;
+        });
+
+        function loop() {
+            if(!gameActive) return;
+
+            // Clear
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(0,0, canvas.width, canvas.height);
+
+            // Draw Grid
+            ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+            ctx.lineWidth = 1;
+            for(let i=0; i<canvas.width; i+=50) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,canvas.height); ctx.stroke(); }
+            for(let i=0; i<canvas.height; i+=50) { ctx.beginPath(); ctx.moveTo(0,i); ctx.lineTo(canvas.width,i); ctx.stroke(); }
+
+            // Spawn Targets
+            spawnTimer++;
+            if(spawnTimer > 60) { // Spawn every second approx
+                let type = Math.random() > 0.5 ? 'damage' : 'waste';
+                targets.push({
+                    x: Math.random() * (canvas.width - 40) + 20,
+                    y: Math.random() * (canvas.height - 40) + 20,
+                    type: type,
+                    life: 100, // How long it takes to fix
+                    age: 0     // How long it's been active
+                });
+                spawnTimer = 0;
+            }
+
+            // Process Targets
+            for(let i = targets.length - 1; i >= 0; i--) {
+                let t = targets[i];
+                t.age++;
+
+                // If ignored too long, damage health
+                if(t.age > 400) {
+                    health -= 5;
+                    healthEl.innerText = health;
+                    targets.splice(i, 1);
+                    continue;
+                }
+
+                // Check distance to drone
+                let dx = drone.x - t.x;
+                let dy = drone.y - t.y;
+                let dist = Math.hypot(dx, dy);
+
+                // Repairing?
+                if(dist < 80) { // Repair range
+                    t.life -= 2;
+                    // Draw Laser
+                    ctx.beginPath();
+                    ctx.moveTo(drone.x, drone.y);
+                    ctx.lineTo(t.x, t.y);
+                    ctx.strokeStyle = '#fbbf24';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+
+                // Fixed?
+                if(t.life <= 0) {
+                    score += 500;
+                    scoreEl.innerText = score.toLocaleString();
+                    targets.splice(i, 1);
+                    continue;
+                }
+
+                // Draw Target
+                ctx.fillStyle = t.type === 'damage' ? '#ef4444' : '#f59e0b'; // Red or Orange
+                ctx.beginPath();
+                if(t.type === 'damage') {
+                    // Draw "X" or jagged crack
+                    ctx.arc(t.x, t.y, 10, 0, Math.PI*2);
+                } else {
+                    // Draw "Square" pile
+                    ctx.rect(t.x-10, t.y-10, 20, 20);
+                }
+                ctx.fill();
+                
+                // Draw Health Bar of Target
+                ctx.fillStyle = 'white';
+                ctx.fillRect(t.x - 15, t.y - 20, 30 * (t.life/100), 4);
+            }
+
+            // Draw Drone
+            ctx.fillStyle = '#fff';
+            ctx.beginPath(); ctx.arc(drone.x, drone.y, 8, 0, Math.PI*2); ctx.fill();
+            // Rotors
+            let offset = (Date.now() / 20) % 10;
+            ctx.fillStyle = 'rgba(255,255,255,0.5)';
+            ctx.beginPath(); ctx.arc(drone.x-15, drone.y-15, 10, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(drone.x+15, drone.y-15, 10, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(drone.x-15, drone.y+15, 10, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(drone.x+15, drone.y+15, 10, 0, Math.PI*2); ctx.fill();
+
+            // Fail State
+            if(health <= 0) {
+                gameOver();
+                return;
+            }
+
+            animId = requestAnimationFrame(loop);
+        }
+
+        function gameOver() {
+            gameActive = false;
+            cancelAnimationFrame(animId);
+            gameOverlay.innerHTML = "<h2 style='color:red'>SITE CRITICAL</h2><p>PROJECT SHUTDOWN INITIATED.</p><button onclick='location.reload()' style='margin-top:20px; padding:10px;'>REBOOT SYSTEM</button>";
+            gameOverlay.style.display = 'block';
+        }
+
+        window.addEventListener('keydown', e => {
+            if(e.key === 'Escape' && body.classList.contains('active-game')) {
+                location.reload();
+            }
+        });
+
     </script>
 
 </body>
