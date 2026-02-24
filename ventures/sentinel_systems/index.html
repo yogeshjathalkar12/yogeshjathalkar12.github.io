@@ -1,2 +1,496 @@
-<p> the tab for shoonya systems 
-</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinel Systems | Autonomous Defense Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* SENTINEL THEME: Tactical, Dark, Alert */
+        :root {
+            --bg-dark: #0f172a;       /* Navy Black */
+            --bg-card: #1e293b;       /* Lighter Navy */
+            --bg-hover: #334155;      /* Slate Hover */
+            --accent-red: #ef4444;    /* Alert Red */
+            --text-white: #f8fafc;
+            --text-grey: #94a3b8;
+            --border-light: rgba(255,255,255,0.05);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { 
+            background-color: var(--bg-dark); 
+            color: var(--text-white); 
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* UTILITIES */
+        a { text-decoration: none; transition: 0.3s; }
+        ul { list-style: none; }
+
+        /* NAV */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1.5rem 5%; 
+            border-bottom: 1px solid var(--border-light);
+            background: rgba(15, 23, 42, 0.95);
+            position: sticky; top: 0; z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+        .brand { font-size: 1.5rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+        .brand span { color: var(--accent-red); }
+        
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { 
+            color: var(--text-grey); 
+            font-size: 0.9rem; 
+            font-weight: 600; 
+            text-transform: uppercase; 
+            letter-spacing: 1px;
+        }
+        .nav-links a:hover { color: var(--accent-red); }
+
+        /* HERO */
+        .hero {
+            padding: 8rem 5% 6rem;
+            text-align: center;
+            background: radial-gradient(circle at top, #1e293b 0%, #0f172a 70%);
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .hero-tag {
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            color: var(--accent-red);
+            font-weight: 700;
+            letter-spacing: 2px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 0.5rem 1rem;
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        h1 { font-size: 3.5rem; margin-bottom: 1.5rem; line-height: 1.1; }
+        .hero p { color: var(--text-grey); font-size: 1.2rem; max-width: 700px; margin: 0 auto 3rem; }
+
+        .cta-buttons { display: flex; gap: 1rem; justify-content: center; }
+        
+        .btn {
+            padding: 1rem 2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            border-radius: 2px;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            background-color: var(--accent-red);
+            color: white;
+            border: 1px solid var(--accent-red);
+        }
+        .btn-primary:hover { background-color: #dc2626; border-color: #dc2626; }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--text-grey);
+            border: 1px solid var(--text-grey);
+        }
+        .btn-secondary:hover { color: white; border-color: white; }
+
+        /* STATS SECTION */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            border-bottom: 1px solid var(--border-light);
+        }
+        .stat-card {
+            padding: 3rem 2rem;
+            text-align: center;
+            border-right: 1px solid var(--border-light);
+            background: var(--bg-dark);
+        }
+        .stat-card:last-child { border-right: none; }
+        
+        .stat-number {
+            display: block;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-red);
+            margin-bottom: 0.5rem;
+        }
+        .stat-label {
+            color: var(--text-grey);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        /* COMMON SECTION STYLES */
+        section { padding: 6rem 5%; max-width: 1400px; margin: 0 auto; }
+        
+        .section-header { text-align: center; margin-bottom: 4rem; }
+        .section-tag { color: var(--accent-red); font-weight: 700; letter-spacing: 2px; font-size: 0.8rem; text-transform: uppercase; display: block; margin-bottom: 1rem; }
+        h2 { font-size: 2.5rem; margin-bottom: 1rem; }
+        .section-description { color: var(--text-grey); max-width: 600px; margin: 0 auto; }
+
+        /* SYSTEMS GRID (Targeting Cards) */
+        .systems-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .system-card {
+            background: var(--bg-card);
+            padding: 2.5rem;
+            position: relative;
+            transition: 0.3s;
+            border: 1px solid transparent;
+        }
+
+        /* The "Targeting Corners" Effect */
+        .system-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 20px; height: 20px;
+            border-top: 2px solid var(--accent-red); border-left: 2px solid var(--accent-red);
+            opacity: 0.5; transition: 0.3s;
+        }
+        .system-card::after {
+            content: ''; position: absolute; bottom: 0; right: 0; width: 20px; height: 20px;
+            border-bottom: 2px solid var(--accent-red); border-right: 2px solid var(--accent-red);
+            opacity: 0.5; transition: 0.3s;
+        }
+
+        .system-card:hover { transform: translateY(-5px); background: var(--bg-hover); }
+        .system-card:hover::before, .system-card:hover::after { opacity: 1; width: 30px; height: 30px; }
+
+        .system-icon { font-size: 2.5rem; margin-bottom: 1.5rem; }
+        .system-card h3 { font-size: 1.5rem; margin-bottom: 1rem; color: var(--text-white); }
+        .system-card p { color: var(--text-grey); font-size: 1rem; margin-bottom: 1.5rem; }
+        
+        .feature-list li {
+            color: var(--text-grey);
+            font-size: 0.9rem;
+            padding: 0.3rem 0;
+            padding-left: 1.2rem;
+            position: relative;
+        }
+        .feature-list li::before {
+            content: '+';
+            position: absolute; left: 0; color: var(--accent-red); font-weight: bold;
+        }
+
+        /* TECH GRID */
+        .technology { background: #131c31; /* Slightly distinctive bg */ width: 100vw; max-width: 100%; }
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        .tech-item {
+            background: var(--bg-dark);
+            border: 1px solid var(--border-light);
+            padding: 2rem;
+            transition: 0.3s;
+        }
+        .tech-item:hover { border-color: var(--accent-red); }
+        .tech-item h4 { color: var(--text-white); margin-bottom: 0.5rem; font-size: 1.1rem; }
+        .tech-item p { color: var(--text-grey); font-size: 0.95rem; }
+
+        /* ROADMAP */
+        .timeline-container {
+            max-width: 800px; margin: 0 auto; position: relative; padding: 2rem 0;
+        }
+        /* Vertical Line */
+        .timeline-container::before {
+            content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; 
+            background: rgba(255,255,255,0.1); transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 4rem; position: relative;
+        }
+        .timeline-item:last-child { margin-bottom: 0; }
+        .timeline-item:nth-child(even) { flex-direction: row-reverse; }
+
+        /* The Red Dot Marker */
+        .timeline-marker {
+            position: absolute; left: 50%; width: 12px; height: 12px; 
+            background: var(--bg-dark); border: 2px solid var(--accent-red);
+            transform: translateX(-50%); z-index: 2;
+        }
+
+        .timeline-content {
+            width: 45%;
+            background: var(--bg-card);
+            padding: 2rem;
+            border: 1px solid var(--border-light);
+            position: relative;
+        }
+        /* Connector line from card to center */
+        .timeline-content::after {
+            content: ''; position: absolute; top: 50%; 
+            width: 20px; height: 1px; background: var(--accent-red); opacity: 0.3;
+        }
+        .timeline-item:nth-child(odd) .timeline-content { text-align: right; }
+        .timeline-item:nth-child(odd) .timeline-content::after { right: -20px; }
+        .timeline-item:nth-child(even) .timeline-content { text-align: left; }
+        .timeline-item:nth-child(even) .timeline-content::after { left: -20px; }
+
+        .timeline-phase { color: var(--accent-red); font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; margin-bottom: 0.5rem; }
+        .timeline-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .timeline-desc { color: var(--text-grey); font-size: 0.9rem; }
+
+        /* CTA & FOOTER */
+        .cta-section {
+            text-align: center; border-top: 1px solid var(--border-light); padding: 8rem 5%;
+        }
+        
+        footer {
+            background: var(--bg-card); padding: 4rem 5%; text-align: center; border-top: 1px solid var(--border-light);
+        }
+        .footer-logo { font-weight: 700; font-size: 1.2rem; margin-bottom: 1.5rem; display: block; letter-spacing: 2px; }
+        .footer-links { justify-content: center; margin-bottom: 2rem; }
+        .footer-copyright { color: var(--text-grey); font-size: 0.8rem; opacity: 0.6; }
+
+        /* MEDIA QUERIES */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .nav-links { display: none; }
+            .timeline-container::before { left: 20px; }
+            .timeline-item, .timeline-item:nth-child(even) { flex-direction: column; align-items: flex-start; }
+            .timeline-marker { left: 20px; }
+            .timeline-content { width: 100%; margin-left: 50px; text-align: left !important; }
+            .timeline-content::after { display: none; }
+        }
+
+        /* ANIMATIONS */
+        .fade-in { opacity: 0; transform: translateY(20px); transition: 0.6s ease-out; }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="brand">Sentinel<span>.</span></div>
+        <ul class="nav-links">
+            <li><a href="#systems">Systems</a></li>
+            <li><a href="#technology">Technology</a></li>
+            <li><a href="#roadmap">Roadmap</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <section class="hero">
+        <span class="hero-tag">Indigenous Defense Innovation</span>
+        <h1>Autonomous Multi-Domain<br>Defense Platform</h1>
+        <p>Physics-powered AI systems delivering asymmetric defense capabilities across land, air, and maritime domains. 100% indigenous technology for complete strategic sovereignty.</p>
+        <div class="cta-buttons">
+            <a href="#systems" class="btn btn-primary">Explore Systems</a>
+            <a href="#contact" class="btn btn-secondary">Request Proposal</a>
+        </div>
+    </section>
+
+    <div class="stats fade-in">
+        <div class="stat-card">
+            <span class="stat-number">100%</span>
+            <span class="stat-label">Indigenous Technology</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number">4</span>
+            <span class="stat-label">Operational Domains</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number">12</span>
+            <span class="stat-label">Integrated Systems</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number">0</span>
+            <span class="stat-label">Foreign Dependencies</span>
+        </div>
+    </div>
+
+    <section id="systems">
+        <div class="section-header fade-in">
+            <span class="section-tag">Core Capabilities</span>
+            <h2>Integrated Defense Systems</h2>
+            <p class="section-description">Four technology pillars working in synergy to deliver comprehensive defense capabilities across all operational domains.</p>
+        </div>
+
+        <div class="systems-grid">
+            <div class="system-card fade-in">
+                <div class="system-icon">⚡</div>
+                <h3>Counter-Autonomous Warfare</h3>
+                <p>Neutralize enemy autonomous systems through physics-based exploitation of sensor and electronic vulnerabilities.</p>
+                <ul class="feature-list">
+                    <li>LiDAR saturation & blinding</li>
+                    <li>Accelerometer resonance disruption</li>
+                    <li>Directed energy burn-out (HPM)</li>
+                    <li>Non-kinetic electronic warfare</li>
+                </ul>
+            </div>
+
+            <div class="system-card fade-in">
+                <div class="system-icon">👁️</div>
+                <h3>Surveillance & Tracking</h3>
+                <p>AI-powered detection of threats invisible to human operators with persistent target acquisition.</p>
+                <ul class="feature-list">
+                    <li>Navigator Hunter intent recognition</li>
+                    <li>Soldier-robot sensor fusion</li>
+                    <li>EVM bio-surveillance</li>
+                    <li>Real-time 3D environment mapping</li>
+                </ul>
+            </div>
+
+            <div class="system-card fade-in">
+                <div class="system-icon">🤖</div>
+                <h3>Multi-Domain Robotics</h3>
+                <p>Autonomous platforms operating across land, air, and maritime environments in GPS-denied conditions.</p>
+                <ul class="feature-list">
+                    <li>Multi-terrain adaptive rovers</li>
+                    <li>Edge-computing UAV swarms</li>
+                    <li>Biomimetic underwater platforms</li>
+                    <li>Coordinated swarm behavior</li>
+                </ul>
+            </div>
+
+            <div class="system-card fade-in">
+                <div class="system-icon">🧠</div>
+                <h3>Intelligence & Simulation</h3>
+                <p>Predictive analysis and virtual testing through global data fusion and physics-based modeling.</p>
+                <ul class="feature-list">
+                    <li>Automated physics engine</li>
+                    <li>Virtual material discovery</li>
+                    <li>Global predictive intelligence</li>
+                    <li>Continuous tactical evolution</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <div class="technology" id="technology">
+        <section>
+            <div class="section-header fade-in">
+                <span class="section-tag">Innovation Stack</span>
+                <h2>Core Technologies</h2>
+                <p class="section-description">Cutting-edge algorithms and hardware creating capabilities unavailable to conventional defense contractors.</p>
+            </div>
+
+            <div class="tech-grid">
+                <div class="tech-item fade-in">
+                    <h4>Visual-Inertial Odometry</h4>
+                    <p>GPS-independent navigation fusing camera and IMU data for operation in jammed environments.</p>
+                </div>
+                <div class="tech-item fade-in">
+                    <h4>Eulerian Video Magnification</h4>
+                    <p>Amplifies invisible micro-motions and color changes for bio-surveillance and structural analysis.</p>
+                </div>
+                <div class="tech-item fade-in">
+                    <h4>Eddy Current Induction</h4>
+                    <p>High-power microwave systems inducing currents that permanently destroy enemy electronics.</p>
+                </div>
+                <div class="tech-item fade-in">
+                    <h4>Quantum Machine Learning</h4>
+                    <p>Processing thousands of parameters for predictive modeling and strategic intelligence.</p>
+                </div>
+                <div class="tech-item fade-in">
+                    <h4>Computational Materials Science</h4>
+                    <p>Virtual discovery of advanced materials through atomic-scale simulation and AI prediction.</p>
+                </div>
+                <div class="tech-item fade-in">
+                    <h4>Mesh Networking Protocols</h4>
+                    <p>Decentralized communication enabling swarm coordination without single points of failure.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <section id="roadmap">
+        <div class="section-header fade-in">
+            <span class="section-tag">Development Plan</span>
+            <h2>12-Month Roadmap</h2>
+            <p class="section-description">Phased development delivering incremental capabilities while building toward complete integration.</p>
+        </div>
+
+        <div class="timeline-container">
+            <div class="timeline-item fade-in">
+                <div class="timeline-marker"></div>
+                <div class="timeline-content">
+                    <div class="timeline-phase">Phase 1 (Months 1-3)</div>
+                    <div class="timeline-title">Foundation</div>
+                    <div class="timeline-desc">Navigator Hunter proof-of-concept, EVM surveillance prototype, basic rover platform, and commercial partnership finalization.</div>
+                </div>
+            </div>
+
+            <div class="timeline-item fade-in">
+                <div class="timeline-marker"></div>
+                <div class="timeline-content">
+                    <div class="timeline-phase">Phase 2 (Months 4-9)</div>
+                    <div class="timeline-title">Development</div>
+                    <div class="timeline-desc">Full multi-terrain rover, UAV swarm integration, physics engine core, material discovery platform, and Ray AUV prototypes.</div>
+                </div>
+            </div>
+
+            <div class="timeline-item fade-in">
+                <div class="timeline-marker"></div>
+                <div class="timeline-content">
+                    <div class="timeline-phase">Phase 3 (Months 10-12)</div>
+                    <div class="timeline-title">Integration</div>
+                    <div class="timeline-desc">Complete sensor fusion network, soldier HUD integration, directed energy systems, intelligence platform alpha, and field trials.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="cta-section fade-in">
+        <h2>Ready to Redefine Defense?</h2>
+        <p class="section-description" style="margin-bottom: 3rem;">Join us in building the technological foundation for India's strategic autonomy.</p>
+        <div class="cta-buttons">
+            <a href="mailto:contact@sentinelsystems.in" class="btn btn-primary">Get in Touch</a>
+            <a href="#" class="btn btn-secondary">Download Proposal</a>
+        </div>
+    </section>
+
+    <footer>
+        <span class="footer-logo">SENTINEL SYSTEMS</span>
+        <ul class="nav-links footer-links">
+            <li><a href="#systems">Systems</a></li>
+            <li><a href="#technology">Technology</a></li>
+            <li><a href="#roadmap">Roadmap</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <div class="footer-copyright">
+            © 2026 Sentinel Systems. All rights reserved. | Confidential & Proprietary | Made in India
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Simple Fade In Observer
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    </script>
+
+</body>
+</html>
