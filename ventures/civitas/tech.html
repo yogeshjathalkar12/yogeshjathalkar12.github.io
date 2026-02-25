@@ -1,1 +1,307 @@
 tech
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shoonya Origins | Technical Portfolio & Strategic Roadmap</title>
+    <style>
+        :root {
+            --primary: #0a0a0a;
+            --accent: #00ff88;
+            --text: #e0e0e0;
+            --card-bg: #1a1a1a;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--primary);
+            color: var(--text);
+            font-family: var(--font-main);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        header {
+            background: linear-gradient(180deg, #000 0%, #111 100%);
+            padding: 4rem 2rem;
+            text-align: center;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        h2 {
+            color: var(--accent);
+            font-size: 1.5rem;
+            margin-top: 10px;
+            font-weight: 300;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #fff;
+            text-transform: uppercase;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 2rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 255, 136, 0.1);
+            border-color: var(--accent);
+        }
+
+        .card h3 {
+            color: var(--accent);
+            font-size: 2rem;
+            margin-top: 0;
+            border-bottom: 1px solid #444;
+            padding-bottom: 15px;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #333;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        .specs-list, .use-case-list {
+            margin-top: 20px;
+            padding-left: 20px;
+        }
+
+        .specs-list li {
+            color: #bbb;
+            margin-bottom: 8px;
+        }
+
+        .cta-section {
+            text-align: center;
+            margin-top: 5rem;
+            padding: 4rem;
+            background: #111;
+            border-top: 1px solid #333;
+        }
+
+        .btn {
+            background: var(--accent);
+            color: #000;
+            padding: 15px 40px;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #fff;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 2rem;
+            border-top: 1px solid #222;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Shoonya Origins</h1>
+    <h2>Innovating the Infrastructure of Tomorrow</h2>
+    <p style="color: #888; margin-top: 20px;">Defense | Health | Infrastructure | Intelligence</p>
+</header>
+
+<div class="container">
+    <h2 class="section-title">Technical Roadmap & Project Ecosystem</h2>
+    
+    <div class="grid">
+        <div class="card">
+            <h3>SENTINEL</h3>
+            <p style="color: #aaa; font-style: italic;">Next-Generation Autonomous Security & Drone Defense</p>
+            <p>A fully autonomous site-monitoring ecosystem designed to replace manual security with AI-driven computer vision and drone patrols.</p>
+            
+            <div style="margin: 15px 0;">
+                <span class="tag">OpenCV</span>
+                <span class="tag">Python</span>
+                <span class="tag">YOLO v8</span>
+                <span class="tag">Drone Automation</span>
+            </div>
+
+            <h4>Technical Requirements:</h4>
+            <ul class="specs-list">
+                <li>High-resolution IP Cameras with RTSP support.</li>
+                <li>Edge Computing Unit (NVIDIA Jetson / Raspberry Pi 5) for on-site inference.</li>
+                <li>Low-latency network (4G/5G or Local Wi-Fi mesh).</li>
+                <li>Python environment with PyTorch/TensorFlow support.</li>
+            </ul>
+
+            <h4>Strategic Use Cases:</h4>
+            <ul class="use-case-list">
+                <li><strong>Construction Site Security:</strong> 24/7 automated theft detection and perimeter breaches.</li>
+                <li><strong>Workforce Safety:</strong> Real-time detection of workers without helmets/vests.</li>
+                <li><strong>Defense:</strong> Autonomous perimeter patrols for sensitive zones.</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h3>CIVITAS</h3>
+            <p style="color: #aaa; font-style: italic;">Smart Infrastructure & Modular Construction</p>
+            <p>A modular infrastructure framework focusing on rapid deployment, sustainability, and smart-city integration.</p>
+            
+            <div style="margin: 15px 0;">
+                <span class="tag">CAD/BIM</span>
+                <span class="tag">IoT Integration</span>
+                <span class="tag">Sustainable Materials</span>
+            </div>
+
+            <h4>Technical Requirements:</h4>
+            <ul class="specs-list">
+                <li>Integration with Building Information Modeling (BIM) software (AutoCAD/Revit).</li>
+                <li>IoT Sensor grid for structural health monitoring.</li>
+                <li>Modular fabrication units for rapid assembly.</li>
+            </ul>
+
+            <h4>Strategic Use Cases:</h4>
+            <ul class="use-case-list">
+                <li><strong>Rapid Urbanization:</strong> Deploying modular housing for expanding cities.</li>
+                <li><strong>Disaster Relief:</strong> Quick-deploy shelters with integrated power/water.</li>
+                <li><strong>Smart Townships:</strong> Pre-fitted modules with embedded sensors for utilities.</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h3>AURA</h3>
+            <p style="color: #aaa; font-style: italic;">Non-Invasive Predictive Health</p>
+            <p>A health-tech ecosystem utilizing Eulerian Video Magnification (EVM) to detect vital signs via standard video feeds without physical contact.</p>
+            
+            <div style="margin: 15px 0;">
+                <span class="tag">EVM Algorithms</span>
+                <span class="tag">Signal Processing</span>
+                <span class="tag">Tele-medicine</span>
+            </div>
+
+            <h4>Technical Requirements:</h4>
+            <ul class="specs-list">
+                <li>High-FPS video capture devices (Standard webcams/Industrial cams).</li>
+                <li>Advanced signal processing algorithms (MIT EVM Codebase).</li>
+                <li>Cloud-based analytics dashboard for patient history.</li>
+            </ul>
+
+            <h4>Strategic Use Cases:</h4>
+            <ul class="use-case-list">
+                <li><strong>Remote Patient Monitoring:</strong> Checking vitals without wearables.</li>
+                <li><strong>Elderly Care:</strong> Non-intrusive health tracking in luxury retirement homes.</li>
+                <li><strong>Public Health Safety:</strong> Mass screening for fever/pulse anomalies in airports/malls.</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h3>RAPTOR</h3>
+            <p style="color: #aaa; font-style: italic;">AI Marketing & Market Intelligence</p>
+            <p>An AI-driven growth engine that automates market research, lead generation, and sales funnel optimization.</p>
+            
+            <div style="margin: 15px 0;">
+                <span class="tag">NLP</span>
+                <span class="tag">Data Scraping</span>
+                <span class="tag">Predictive Analytics</span>
+            </div>
+
+            <h4>Technical Requirements:</h4>
+            <ul class="specs-list">
+                <li>Access to public datasets and social media APIs.</li>
+                <li>Natural Language Processing (NLP) models for sentiment analysis.</li>
+                <li>CRM integration (Salesforce/HubSpot).</li>
+            </ul>
+
+            <h4>Strategic Use Cases:</h4>
+            <ul class="use-case-list">
+                <li><strong>Real Estate Sales:</strong> Predicting buyer intent based on digital footprint.</li>
+                <li><strong>Automated Outreach:</strong> Generating personalized pitches for B2B clients.</li>
+                <li><strong>Competitor Analysis:</strong> Real-time tracking of market pricing trends.</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h3>BASIS</h3>
+            <p style="color: #aaa; font-style: italic;">Urban Management & Public Works</p>
+            <p>Smart city management tools focusing on automated maintenance, waste robotics, and environmental rejuvenation.</p>
+            
+            <div style="margin: 15px 0;">
+                <span class="tag">Robotics</span>
+                <span class="tag">Waste Management</span>
+                <span class="tag">GIS Mapping</span>
+            </div>
+
+            <h4>Technical Requirements:</h4>
+            <ul class="specs-list">
+                <li>Autonomous rover units for waste collection/pothole repair.</li>
+                <li>GIS mapping software for city-wide grid management.</li>
+                <li>Hydraulic systems for heavy repair tasks.</li>
+            </ul>
+
+            <h4>Strategic Use Cases:</h4>
+            <ul class="use-case-list">
+                <li><strong>Pothole Repair:</strong> Automated detection and patch-work vehicles.</li>
+                <li><strong>River Cleaning:</strong> Autonomous boats for surface waste collection.</li>
+                <li><strong>Smart Waste:</strong> Bins that auto-sort and notify collection trucks.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="cta-section">
+    <h2>Ready for Deployment</h2>
+    <p style="max-width: 600px; margin: 0 auto 30px auto; color: #ccc;">
+        Shoonya Origins is currently in its seed phase, seeking strategic partnerships for pilot deployments in the Construction (EPC) and Real Estate sectors.
+    </p>
+    <a href="mailto:contact@shoonyaorigins.com" class="btn">Request Technical Brief</a>
+</div>
+
+<footer>
+    <p>&copy; 2026 Shoonya Origins. Built for the Future of Humanity.</p>
+    <p>Pune, Maharashtra, India</p>
+</footer>
+
+</body>
+</html>
+
