@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinel-Mobile | Aerostatic ESM Network</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #000000;
+            --surface: #0a0a0a;
+            --surface-highlight: #111111;
+            --border: #222222;
+            --text-main: #e0e0e0;
+            --text-muted: #666666;
+            --accent: #ffffff;
+            --spacing: 2rem;
+            --danger: #ff3333; /* For critical alerts/status */
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 var(--spacing); }
+
+        /* --- Navigation --- */
+        nav {
+            padding: 2rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 4rem;
+        }
+        .back-link { text-decoration: none; color: var(--text-muted); font-size: 0.8rem; font-family: 'Space Mono'; letter-spacing: 1px; transition: color 0.3s; }
+        .back-link:hover { color: var(--accent); }
+        .brand { font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; border: 1px solid var(--text-muted); padding: 0.5rem 1rem; }
+
+        /* --- Hero Section --- */
+        .hero { padding: 6rem 0; border-bottom: 1px solid var(--border); }
+        .hero h1 {
+            font-size: clamp(3rem, 6vw, 5rem);
+            font-weight: 900;
+            line-height: 0.95;
+            margin-bottom: 2rem;
+            letter-spacing: -3px;
+            color: var(--text-main);
+        }
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin-bottom: 3rem;
+        }
+        .hero-tags { display: flex; gap: 1rem; font-family: 'Space Mono'; font-size: 0.75rem; color: var(--accent); text-transform: uppercase; }
+        .hero-tag { border: 1px solid var(--border); padding: 0.5rem 1rem; }
+
+        /* --- High-Level Stats --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            border-left: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            margin-bottom: 8rem;
+        }
+        .stat-item {
+            padding: 3rem 2rem;
+            border-bottom: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            position: relative;
+        }
+        .stat-label { font-family: 'Space Mono'; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 1rem; display: block; letter-spacing: 1px; }
+        .stat-value { font-size: 2.5rem; font-weight: 700; line-height: 1; margin-bottom: 0.5rem; color: var(--accent); }
+        .stat-sub { font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; }
+
+        /* --- Section Dividers --- */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 4rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+        }
+        .section-title { font-family: 'Space Mono'; font-size: 1rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; }
+        .section-index { color: var(--text-muted); font-family: 'Space Mono'; }
+
+        /* --- Deep Technical Cards --- */
+        .tech-card {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 4rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            margin-bottom: 2rem;
+            transition: border-color 0.3s;
+        }
+        .tech-card:hover { border-color: var(--text-muted); }
+        
+        .tech-content { padding: 3rem; }
+        .tech-visual { 
+            background: var(--surface-highlight); 
+            border-left: 1px solid var(--border); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            font-size: 5rem;
+            filter: grayscale(1) opacity(0.5);
+        }
+
+        .tech-title { font-size: 2rem; margin-bottom: 1rem; font-weight: 700; letter-spacing: -1px; }
+        .tech-desc { color: var(--text-muted); margin-bottom: 2rem; font-size: 1.05rem; max-width: 600px; }
+
+        .specs-table { width: 100%; border-collapse: collapse; font-family: 'Space Mono'; font-size: 0.85rem; }
+        .specs-table td { padding: 1rem 0; border-bottom: 1px solid var(--border); }
+        .specs-table td:first-child { color: var(--text-muted); width: 40%; }
+        .specs-table td:last-child { color: var(--accent); text-align: right; }
+        .specs-table tr:last-child td { border-bottom: none; }
+
+        /* --- Capabilities Grid --- */
+        .capabilities-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1px;
+            background: var(--border); /* Creates grid lines */
+            border: 1px solid var(--border);
+            margin-bottom: 8rem;
+        }
+        .capability-item { background: var(--bg); padding: 3rem; }
+        .cap-icon { font-size: 2rem; margin-bottom: 1.5rem; display: block; filter: grayscale(1); }
+        .cap-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; color: var(--accent); }
+        .cap-text { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; }
+        .cap-metric { font-family: 'Space Mono'; font-size: 0.8rem; color: var(--accent); border: 1px solid var(--border); padding: 0.5rem; display: inline-block; }
+
+        /* --- Strategic Block --- */
+        .strategic-block {
+            background: var(--surface);
+            padding: 4rem;
+            border: 1px solid var(--border);
+            margin-top: 4rem;
+        }
+        .strategic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+        .impact-number { font-size: 3rem; font-weight: 900; color: var(--accent); line-height: 1; margin-bottom: 0.5rem; letter-spacing: -2px; }
+        .impact-label { font-family: 'Space Mono'; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 1rem; }
+
+        /* --- Footer --- */
+        footer { padding: 4rem 0; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 0.8rem; }
+        .footer-logo { font-family: 'Space Mono'; font-weight: 700; margin-bottom: 1rem; color: var(--accent); }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .tech-card { grid-template-columns: 1fr; }
+            .tech-visual { height: 200px; border-left: none; border-bottom: 1px solid var(--border); order: -1; }
+            .capabilities-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr; border-right: none; }
+            .stat-item { border-right: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <nav>
+            <a href="../../index.html" class="back-link">← // SHOONYA ORIGINS</a>
+            <div class="brand">SENTINEL SYSTEMS</div>
+        </nav>
+
+        <section class="hero">
+            <h1>EYES IN THE SKY.<br>ORDER ON THE GROUND.</h1>
+            <p>India's first 100% indigenous Aerostatic-Hybrid ESM Network. Engineered for persistent border surveillance, sub-100m localization, and total SAR denial in contested high-altitude environments.</p>
+            <div class="hero-tags">
+                <span class="hero-tag">TRL-7 Ready</span>
+                <span class="hero-tag">Indigenous Design</span>
+                <span class="hero-tag">Restricted Export</span>
+            </div>
+        </section>
+
+        <section class="stats-grid">
+            <div class="stat-item">
+                <span class="stat-label">Coverage Depth</span>
+                <div class="stat-value">40-70 KM</div>
+                <div class="stat-sub">Into hostile territory at 300m altitude radio horizon.</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Localization</span>
+                <div class="stat-value">< 100 M</div>
+                <div class="stat-sub">High-precision TDOA triangulation with < 10ns sync.</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Persistence</span>
+                <div class="stat-value">72+ HRS</div>
+                <div class="stat-sub">Continuous tethered operation via HVAC transmission.</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">RCS Signature</span>
+                <div class="stat-value">< 0.1 M²</div>
+                <div class="stat-sub">FSS Stealth Skin denies enemy SAR satellite tracking.</div>
+            </div>
+        </section>
+
+        <div class="section-header">
+            <span class="section-title">System Architecture</span>
+            <span class="section-index">01</span>
+        </div>
+
+        <article class="tech-card">
+            <div class="tech-content">
+                <div class="stat-label">Ground Segment</div>
+                <h2 class="tech-title">Mobile Control Station</h2>
+                <p class="tech-desc">Built on the Toyota Hilux 4x4 platform. Features an automated "Scout-and-Scoot" deployment system capable of field activation in under 2 minutes.</p>
+                <table class="specs-table">
+                    <tr><td>Compute Core</td><td>NVIDIA Jetson Orin AGX</td></tr>
+                    <tr><td>Deployment Mechanism</td><td>Automated Scissor Lift</td></tr>
+                    <tr><td>Network Sync</td><td>GPSDO < 10ns Accuracy</td></tr>
+                    <tr><td>Data Uplink</td><td>Encrypted SATCOM (AFNET)</td></tr>
+                    <tr><td>Power Storage</td><td>10kWh LiFePO4 Bank</td></tr>
+                </table>
+            </div>
+            <div class="tech-visual">🚙</div>
+        </article>
+
+        <article class="tech-card">
+            <div class="tech-content">
+                <div class="stat-label">Aerial Segment</div>
+                <h2 class="tech-title">Aerostatic Hybrid UAS</h2>
+                <p class="tech-desc">A blended-wing lenticular platform leveraging helium buoyancy to offset 70% of payload weight. Designed for stability in thin Himalayan air up to 5km altitude.</p>
+                <table class="specs-table">
+                    <tr><td>Envelope Material</td><td>Teflon-Coated Aramid</td></tr>
+                    <tr><td>Buoyancy Vol</td><td>13m³ Helium</td></tr>
+                    <tr><td>Stealth Tech</td><td>Frequency Selective Surface (FSS)</td></tr>
+                    <tr><td>Wind Stability</td><td>40 Knots (Active Fins)</td></tr>
+                    <tr><td>Thermal Sig</td><td>< 50W (vs 2000W Standard)</td></tr>
+                </table>
+            </div>
+            <div class="tech-visual">🎈</div>
+        </article>
+
+        <div class="section-header" style="margin-top: 8rem;">
+            <span class="section-title">Operational Advantage</span>
+            <span class="section-index">02</span>
+        </div>
+
+        <section class="capabilities-grid">
+            <div class="capability-item">
+                <span class="cap-icon">📡</span>
+                <h3 class="cap-title">Distributed Aperture Synthesis</h3>
+                <p class="cap-text">
+                    By treating 5 separate nodes as a single virtual antenna with a 200km baseline, the network achieves a 10-15 dB sensitivity gain over single-node systems.
+                </p>
+                <span class="cap-metric">DETECTS LPI RADARS</span>
+            </div>
+
+            <div class="capability-item">
+                <span class="cap-icon">🛡️</span>
+                <h3 class="cap-title">Multi-Spectral Stealth</h3>
+                <p class="cap-text">
+                    Engineered for survival. FSS skin reflects X-band/Ku-band SAR frequencies. Acoustic signature is < 40 dB, quieter than human conversation.
+                </p>
+                <span class="cap-metric">INVISIBLE TO SATELLITES</span>
+            </div>
+
+            <div class="capability-item">
+                <span class="cap-icon">📶</span>
+                <h3 class="cap-title">Wideband Spectrum Dominance</h3>
+                <p class="cap-text">
+                    Continuous monitoring of 0.5-18 GHz frequencies, covering 95% of military radar bands including Early Warning, Fire Control, and Missile Guidance.
+                </p>
+                <span class="cap-metric">50+ CONCURRENT TARGETS</span>
+            </div>
+
+            <div class="capability-item">
+                <span class="cap-icon">🏔️</span>
+                <h3 class="cap-title">Himalayan Reliability</h3>
+                <p class="cap-text">
+                    While conventional drones lose 40% lift at 4km AMSL, Sentinel's buoyancy compensation maintains full payload capability in thin air.
+                </p>
+                <span class="cap-metric">OPS CEILING: 5000M</span>
+            </div>
+        </section>
+
+        <section class="strategic-block">
+            <div class="stat-label">Strategic Value</div>
+            <h2 class="tech-title">Atmanirbhar Bharat & Force Multiplication</h2>
+            <p class="tech-desc">Delivering sovereign defense capabilities while reducing dependency on foreign OEMs.</p>
+            
+            <div class="strategic-grid">
+                <div>
+                    <div class="impact-number">10:1</div>
+                    <div class="impact-label">Force Ratio</div>
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">
+                        A single 5-node system replaces 50+ manual surveillance personnel, automating threat detection.
+                    </p>
+                </div>
+                <div>
+                    <div class="impact-number">100%</div>
+                    <div class="impact-label">Indigenous Tech</div>
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">
+                        Zero foreign dependencies. All core algorithms and stealth materials developed in-house.
+                    </p>
+                </div>
+                <div>
+                    <div class="impact-number">60s</div>
+                    <div class="impact-label">Decision Loop</div>
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">
+                        Less than 60 seconds from signal interception to classified transmission on AFNET.
+                    </p>
+                </div>
+                <div>
+                    <div class="impact-number">90%</div>
+                    <div class="impact-label">Cost Efficiency</div>
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">
+                        Significant lifecycle savings compared to imported UAVs or satellite assets.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <div class="footer-logo">SENTINEL SYSTEMS</div>
+            <p>Restricted Access // Defense Industrial License Required</p>
+            <p style="margin-top: 1rem;">© 2026 Shoonya Origins Conglomerate. All Rights Reserved.</p>
+        </footer>
+    </div>
+
+</body>
+</html>
