@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Charaka — A Legacy of 2500 Years | Aura | ShoonyaOrigins</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --soft-gold: #F5E6C8;
+    --dark: #0D0D14;
+    --dark2: #13131E;
+    --dark3: #1A1A2E;
+    --cream: #FDFAF4;
+    --text: #E8E4DC;
+    --muted: #888888;
+    --rust: #8B3A2A;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.4;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 4rem 2rem;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 30%, rgba(201,168,76,0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 20% 80%, rgba(139,58,42,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 70%, rgba(45,45,100,0.08) 0%, transparent 60%);
+  }
+
+  .mandala {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0.04;
+    animation: rotateMandala 60s linear infinite;
+  }
+
+  @keyframes rotateMandala {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+
+  .hero-eyebrow {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.35em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 0.3s;
+  }
+
+  .hero-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(3.5rem, 10vw, 8rem);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-align: center;
+    line-height: 0.9;
+    color: white;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 0.6s;
+    position: relative;
+  }
+
+  .hero-title span {
+    display: block;
+    color: var(--gold);
+    font-weight: 400;
+    font-style: italic;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.2rem, 3vw, 2rem);
+    letter-spacing: 0.2em;
+    margin-top: 1rem;
+  }
+
+  .hero-rule {
+    width: 1px;
+    height: 80px;
+    background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+    margin: 2.5rem auto;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 0.9s;
+  }
+
+  .hero-quote {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1rem, 2vw, 1.3rem);
+    font-style: italic;
+    color: rgba(245,230,200,0.75);
+    text-align: center;
+    max-width: 600px;
+    line-height: 1.8;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 1.2s;
+  }
+
+  .hero-quote cite {
+    display: block;
+    font-size: 0.75rem;
+    font-style: normal;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    margin-top: 0.8rem;
+    text-transform: uppercase;
+  }
+
+  .scroll-indicator {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 2s;
+  }
+
+  .scroll-indicator span {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--gold), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.2); }
+  }
+
+  /* ── SECTIONS ── */
+  section {
+    padding: 6rem 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.4em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, var(--gold), transparent);
+    max-width: 100px;
+  }
+
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 300;
+    line-height: 1.2;
+    margin-bottom: 2rem;
+    color: white;
+  }
+
+  .section-title em {
+    color: var(--gold);
+    font-style: italic;
+  }
+
+  .body-text {
+    font-size: 1rem;
+    line-height: 1.9;
+    color: rgba(232,228,220,0.75);
+    font-weight: 300;
+    max-width: 680px;
+  }
+
+  .body-text + .body-text {
+    margin-top: 1.2rem;
+  }
+
+  /* ── CHARAKA SECTION ── */
+  .charaka-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+    margin-top: 3rem;
+  }
+
+  @media (max-width: 768px) {
+    .charaka-grid { grid-template-columns: 1fr; gap: 2rem; }
+  }
+
+  .charaka-number {
+    font-family: 'Cinzel', serif;
+    font-size: 8rem;
+    font-weight: 700;
+    color: rgba(201,168,76,0.08);
+    line-height: 1;
+    position: absolute;
+    top: -2rem;
+    left: -1rem;
+    pointer-events: none;
+  }
+
+  /* ── QUOTE BLOCK ── */
+  .quote-block {
+    border-left: 1px solid var(--gold);
+    padding: 1.5rem 2rem;
+    margin: 3rem 0;
+    background: rgba(201,168,76,0.03);
+    position: relative;
+  }
+
+  .quote-block::before {
+    content: '"';
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 4rem;
+    color: var(--gold);
+    opacity: 0.3;
+    position: absolute;
+    top: -0.5rem;
+    left: 1rem;
+    line-height: 1;
+  }
+
+  .quote-block p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    font-style: italic;
+    line-height: 1.8;
+    color: var(--soft-gold);
+    padding-top: 1rem;
+  }
+
+  .quote-block cite {
+    display: block;
+    font-size: 0.7rem;
+    font-style: normal;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    margin-top: 0.8rem;
+    text-transform: uppercase;
+  }
+
+  /* ── PROBLEM SECTION ── */
+  .problem-section {
+    background: var(--dark2);
+    max-width: 100%;
+    padding: 6rem 2rem;
+  }
+
+  .problem-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .problem-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+
+  .problem-card {
+    padding: 2rem;
+    border: 1px solid rgba(201,168,76,0.1);
+    background: rgba(201,168,76,0.02);
+    position: relative;
+    transition: border-color 0.3s ease, background 0.3s ease;
+  }
+
+  .problem-card:hover {
+    border-color: rgba(201,168,76,0.3);
+    background: rgba(201,168,76,0.05);
+  }
+
+  .problem-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 2px;
+    height: 0;
+    background: var(--gold);
+    transition: height 0.3s ease;
+  }
+
+  .problem-card:hover::before { height: 100%; }
+
+  .problem-card h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    color: var(--gold);
+    margin-bottom: 0.8rem;
+    text-transform: uppercase;
+  }
+
+  .problem-card p {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: rgba(232,228,220,0.6);
+    font-weight: 300;
+  }
+
+  /* ── SOLUTION SECTION ── */
+  .solution-items {
+    margin-top: 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .solution-item {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 2rem;
+    padding: 2.5rem 0;
+    border-bottom: 1px solid rgba(201,168,76,0.1);
+    align-items: start;
+    transition: background 0.3s ease;
+  }
+
+  .solution-item:hover {
+    background: rgba(201,168,76,0.02);
+    padding-left: 1rem;
+    padding-right: 1rem;
+    margin: 0 -1rem;
+  }
+
+  .solution-num {
+    font-family: 'Cinzel', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: rgba(201,168,76,0.2);
+    line-height: 1;
+    padding-top: 0.2rem;
+  }
+
+  .solution-content h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 0.5rem;
+  }
+
+  .solution-content p {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: rgba(232,228,220,0.6);
+    font-weight: 300;
+  }
+
+  /* ── VISION SECTION ── */
+  .vision-section {
+    background: linear-gradient(135deg, var(--dark3) 0%, var(--dark) 100%);
+    max-width: 100%;
+    padding: 6rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .vision-section::before {
+    content: 'CHARAKA';
+    position: absolute;
+    font-family: 'Cinzel', serif;
+    font-size: 15rem;
+    font-weight: 700;
+    color: rgba(201,168,76,0.02);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .vision-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .vision-list {
+    list-style: none;
+    margin-top: 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .vision-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding: 1.2rem 1.5rem;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(201,168,76,0.08);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: rgba(232,228,220,0.75);
+    transition: all 0.3s ease;
+  }
+
+  .vision-list li:hover {
+    background: rgba(201,168,76,0.04);
+    border-color: rgba(201,168,76,0.2);
+    transform: translateX(8px);
+  }
+
+  .vision-list li::before {
+    content: '→';
+    color: var(--gold);
+    font-size: 0.85rem;
+    margin-top: 0.1rem;
+    flex-shrink: 0;
+  }
+
+  /* ── STRUCTURE SECTION ── */
+  .structure-tree {
+    margin-top: 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+  }
+
+  .tree-node {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    position: relative;
+  }
+
+  .tree-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 2px;
+    margin-left: 2rem;
+  }
+
+  .tree-connector-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--gold), rgba(201,168,76,0.3));
+  }
+
+  .tree-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--gold);
+    flex-shrink: 0;
+  }
+
+  .tree-box {
+    padding: 1.2rem 2rem;
+    border: 1px solid rgba(201,168,76,0.2);
+    min-width: 280px;
+  }
+
+  .tree-box.parent {
+    background: var(--dark3);
+    border-color: var(--gold);
+  }
+
+  .tree-box.child {
+    background: rgba(201,168,76,0.04);
+    border-color: rgba(201,168,76,0.15);
+    margin-left: 3rem;
+  }
+
+  .tree-box.grandchild {
+    background: rgba(201,168,76,0.02);
+    border-color: rgba(201,168,76,0.08);
+    margin-left: 6rem;
+  }
+
+  .tree-box h4 {
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    color: var(--gold);
+    margin-bottom: 0.3rem;
+  }
+
+  .tree-box p {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  /* ── PARTNER SECTION ── */
+  .partner-section {
+    background: var(--dark2);
+    max-width: 100%;
+    padding: 6rem 2rem;
+  }
+
+  .partner-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .partner-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1px;
+    margin-top: 3rem;
+    background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.1);
+  }
+
+  .partner-item {
+    padding: 2.5rem;
+    background: var(--dark2);
+    transition: background 0.3s ease;
+  }
+
+  .partner-item:hover {
+    background: rgba(201,168,76,0.04);
+  }
+
+  .partner-item h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 0.8rem;
+  }
+
+  .partner-item p {
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: rgba(232,228,220,0.55);
+    font-weight: 300;
+  }
+
+  /* ── CTA ── */
+  .cta-section {
+    max-width: 100%;
+    padding: 8rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(201,168,76,0.06) 0%, transparent 70%);
+  }
+
+  .cta-section .section-title {
+    font-size: clamp(2rem, 6vw, 4.5rem);
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 2rem;
+  }
+
+  .cta-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    font-style: italic;
+    color: rgba(245,230,200,0.6);
+    max-width: 500px;
+    margin: 0 auto 3rem;
+    line-height: 1.7;
+  }
+
+  .cta-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.1rem 2.5rem;
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gold);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: -1;
+  }
+
+  .cta-button:hover {
+    color: var(--dark);
+  }
+
+  .cta-button:hover::before {
+    transform: translateX(0);
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid rgba(201,168,76,0.15);
+    padding: 3rem 2rem;
+    text-align: center;
+  }
+
+  .footer-logo {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+  }
+
+  .footer-sub {
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── DIVIDER ── */
+  .gold-divider {
+    width: 60px;
+    height: 1px;
+    background: var(--gold);
+    margin: 2rem 0;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 1.5rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(to bottom, rgba(13,13,20,0.95), transparent);
+    backdrop-filter: blur(10px);
+  }
+
+  .nav-logo {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+  }
+
+  .nav-links a:hover { color: var(--gold); }
+
+  @media (max-width: 600px) {
+    .nav-links { display: none; }
+    nav { padding: 1.2rem 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="https://shoonyaorigins.com" class="nav-logo">ShoonyaOrigins</a>
+  <ul class="nav-links">
+    <li><a href="#charaka">Charaka</a></li>
+    <li><a href="#problem">The Problem</a></li>
+    <li><a href="#solution">Aura</a></li>
+    <li><a href="#vision">Vision</a></li>
+    <li><a href="#partner">Partner</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg"></div>
+
+  <!-- Mandala SVG -->
+  <svg class="mandala" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="200" cy="200" r="180" stroke="#C9A84C" stroke-width="0.5"/>
+    <circle cx="200" cy="200" r="150" stroke="#C9A84C" stroke-width="0.3"/>
+    <circle cx="200" cy="200" r="120" stroke="#C9A84C" stroke-width="0.5"/>
+    <circle cx="200" cy="200" r="90" stroke="#C9A84C" stroke-width="0.3"/>
+    <circle cx="200" cy="200" r="60" stroke="#C9A84C" stroke-width="0.5"/>
+    <circle cx="200" cy="200" r="30" stroke="#C9A84C" stroke-width="0.3"/>
+    <line x1="200" y1="20" x2="200" y2="380" stroke="#C9A84C" stroke-width="0.3"/>
+    <line x1="20" y1="200" x2="380" y2="200" stroke="#C9A84C" stroke-width="0.3"/>
+    <line x1="73" y1="73" x2="327" y2="327" stroke="#C9A84C" stroke-width="0.3"/>
+    <line x1="327" y1="73" x2="73" y2="327" stroke="#C9A84C" stroke-width="0.3"/>
+    <polygon points="200,40 340,260 60,260" fill="none" stroke="#C9A84C" stroke-width="0.4"/>
+    <polygon points="200,360 60,140 340,140" fill="none" stroke="#C9A84C" stroke-width="0.4"/>
+    <polygon points="200,80 310,245 90,245" fill="none" stroke="#C9A84C" stroke-width="0.2"/>
+    <polygon points="200,320 90,155 310,155" fill="none" stroke="#C9A84C" stroke-width="0.2"/>
+  </svg>
+
+  <p class="hero-eyebrow">Aura · ShoonyaOrigins · Project</p>
+
+  <h1 class="hero-title">
+    Charaka
+    <span>A Legacy of 2500 Years</span>
+  </h1>
+
+  <div class="hero-rule"></div>
+
+  <blockquote class="hero-quote">
+    "The physician who explores the body with the lamp of knowledge and fails not to observe — that alone is the true healer."
+    <cite>— Charaka Samhita</cite>
+  </blockquote>
+
+  <div class="scroll-indicator">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</div>
+
+<!-- CHARAKA SECTION -->
+<section id="charaka">
+  <p class="section-label reveal">The Origin</p>
+  <h2 class="section-title reveal">Who Was <em>Charaka</em></h2>
+
+  <div class="charaka-grid">
+    <div>
+      <p class="body-text reveal">Before 500 BCE, when the Western world still believed illness was divine punishment, a wandering physician walked the Indian subcontinent carrying a vision that would shape medicine for millennia.</p>
+      <p class="body-text reveal">His name was Charaka. The word itself means <em style="color:var(--gold); font-style:italic;">wanderer</em> — one who travels everywhere bringing healing to people. He was not born into institutions. He walked toward suffering.</p>
+      <p class="body-text reveal">Charaka was India's first evidence-based physician. He described blood circulation, identified diabetes and tuberculosis, and outlined eight major medical disciplines — all before the Common Era.</p>
+    </div>
+    <div>
+      <div class="quote-block reveal">
+        <p>"Of all types of evidence, the most dependable are those directly observed. Direct observation is the most remarkable feature of medicine."</p>
+        <cite>— Charaka Samhita, Vimanasthana</cite>
+      </div>
+      <p class="body-text reveal">His most profound contribution was not a treatment. It was a philosophy: medicine must be rational, evidence-based and observable. Data — not tradition alone — is the foundation of true medicine.</p>
+    </div>
+  </div>
+
+  <div class="quote-block reveal" style="margin-top: 3rem;">
+    <p>"He should be compassionate towards all, devoted to truth, seeking the good of all creatures."</p>
+    <cite>— Charaka Samhita, on the qualities of a true physician</cite>
+  </div>
+
+  <p class="body-text reveal" style="margin-top: 2rem;">His work was so vast that it took another scholar — Dridhabala — generations later to complete the missing chapters. Charaka left a door open, trusting that those who came after him would walk through it. <strong style="color:white;">2500 years later — Project Charaka walks through it.</strong></p>
+</section>
+
+<!-- PROBLEM SECTION -->
+<div class="problem-section" id="problem">
+  <div class="problem-inner">
+    <p class="section-label reveal">The Crisis</p>
+    <h2 class="section-title reveal">The Problem Charaka<br><em>Could Not Solve Alone</em></h2>
+    <p class="body-text reveal">Despite 2500 years of practice, Ayurveda today faces a credibility crisis. The problem is not that Ayurveda doesn't work. The problem is that nobody has ever built the infrastructure to find out — with rigour, with scale, with integrity.</p>
+
+    <div class="problem-grid">
+      <div class="problem-card reveal">
+        <h3>No Clinical Data</h3>
+        <p>Billions believe in Ayurveda. But the global medical community dismisses it because there is no peer-reviewed, large-scale clinical evidence proving what works and what does not.</p>
+      </div>
+      <div class="problem-card reveal">
+        <h3>No Standard Protocols</h3>
+        <p>Every practitioner treats differently. There is no unified, measurable, reproducible system. What one vaidya prescribes, another contradicts.</p>
+      </div>
+      <div class="problem-card reveal">
+        <h3>No Outcome Tracking</h3>
+        <p>Patients complete treatments with no systematic record of what changed, what improved, what failed. The knowledge dies with each practitioner.</p>
+      </div>
+      <div class="problem-card reveal">
+        <h3>No Accountability</h3>
+        <p>Malpractice in Ayurveda goes undetected. Patients have no way to know if their treatment is optimal or if they are being misled.</p>
+      </div>
+      <div class="problem-card reveal">
+        <h3>No Global Recognition</h3>
+        <p>WHO, major research institutions and insurance bodies do not recognise Ayurveda as evidence-based medicine. This limits its reach, funding and future.</p>
+      </div>
+      <div class="problem-card reveal">
+        <h3>No Unified Intelligence</h3>
+        <p>Ancient wisdom exists in silos — in texts, in practitioners, in isolated clinics. There is no system to collect, learn from and improve upon it collectively.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SOLUTION SECTION -->
+<section id="solution">
+  <p class="section-label reveal">The Initiative</p>
+  <h2 class="section-title reveal">What Project Charaka<br><em>Is Building</em></h2>
+  <p class="body-text reveal">Project Charaka is a clinical intelligence initiative by Aura — a technology venture under ShoonyaOrigins. We are building the infrastructure that Charaka always needed but never had.</p>
+
+  <div class="solution-items">
+    <div class="solution-item reveal">
+      <div class="solution-num">01</div>
+      <div class="solution-content">
+        <h3>Real-Time Vital Monitoring</h3>
+        <p>Non-invasive sensors track physiological markers throughout treatment — pulse, sleep, stress biomarkers, metabolic indicators — giving clinicians live data Charaka could only observe manually.</p>
+      </div>
+    </div>
+    <div class="solution-item reveal">
+      <div class="solution-num">02</div>
+      <div class="solution-content">
+        <h3>AI-Driven Outcome Analysis</h3>
+        <p>Machine learning models identify patterns across thousands of patients — which treatments work for which conditions, which protocols produce measurable results, which do not.</p>
+      </div>
+    </div>
+    <div class="solution-item reveal">
+      <div class="solution-num">03</div>
+      <div class="solution-content">
+        <h3>Standardised Clinical Protocols</h3>
+        <p>For the first time, Ayurvedic treatments are documented in a reproducible, standardised format — enabling comparison, validation and improvement over time.</p>
+      </div>
+    </div>
+    <div class="solution-item reveal">
+      <div class="solution-num">04</div>
+      <div class="solution-content">
+        <h3>Practitioner Accountability</h3>
+        <p>Every treatment decision is recorded. Outcomes are tracked. The system identifies the gap between what was prescribed and what actually worked — protecting patients at scale.</p>
+      </div>
+    </div>
+    <div class="solution-item reveal">
+      <div class="solution-num">05</div>
+      <div class="solution-content">
+        <h3>Peer-Reviewed Research Output</h3>
+        <p>The aggregated, anonymised data generates academic papers, clinical studies and research publications that the global medical community can engage with, challenge and build upon.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VISION SECTION -->
+<div class="vision-section" id="vision">
+  <div class="vision-inner">
+    <p class="section-label reveal">The Larger Vision</p>
+    <h2 class="section-title reveal">Beyond Ayurveda.<br><em>All of Medicine.</em></h2>
+    <p class="body-text reveal">Project Charaka is the first chapter of something much larger. Aura's full vision is to become the world's clinical intelligence layer for all medicine — alternative and conventional.</p>
+
+    <ul class="vision-list">
+      <li class="reveal">Test what works and what does not — across Ayurveda, homeopathy, naturopathy and integrative medicine</li>
+      <li class="reveal">Give every individual the right to know if they are being treated correctly</li>
+      <li class="reveal">Stop malpractice through data-driven accountability at scale</li>
+      <li class="reveal">Assist drug discovery by identifying patterns in real-world treatment outcomes</li>
+      <li class="reveal">Improve standard medical practice through continuous learning from clinical data</li>
+      <li class="reveal">Become a tool used by both doctors and patients — democratising medical knowledge globally</li>
+    </ul>
+
+    <div class="quote-block reveal" style="margin-top: 3rem; border-color: rgba(201,168,76,0.3);">
+      <p>"Diverse treatises on medicine are in circulation. The student must select one devoted to truth."</p>
+      <cite>— Charaka Samhita, Vimanasthana</cite>
+    </div>
+  </div>
+</div>
+
+<!-- STRUCTURE SECTION -->
+<section>
+  <p class="section-label reveal">Architecture</p>
+  <h2 class="section-title reveal">Where Project Charaka<br><em>Lives</em></h2>
+
+  <div class="structure-tree reveal">
+    <div class="tree-node">
+      <div class="tree-box parent">
+        <h4>ShoonyaOrigins</h4>
+        <p>Parent Company · The Ecosystem · Pune, India</p>
+      </div>
+    </div>
+    <div class="tree-connector">
+      <div class="tree-connector-line"></div>
+    </div>
+    <div class="tree-node">
+      <div class="tree-box child">
+        <h4>Aura</h4>
+        <p>Health Intelligence Venture · Clinical Technology Platform</p>
+      </div>
+    </div>
+    <div class="tree-connector" style="margin-left: 5rem;">
+      <div class="tree-connector-line"></div>
+    </div>
+    <div class="tree-node">
+      <div class="tree-box grandchild">
+        <h4>Project Charaka</h4>
+        <p>Clinical Validation Initiative · A Legacy of 2500 Years</p>
+      </div>
+    </div>
+  </div>
+
+  <p class="body-text reveal" style="margin-top: 3rem;">All intellectual property generated through Project Charaka is owned entirely by ShoonyaOrigins. The platform is not for acquisition — it is infrastructure for humanity. Institutions pay to use Aura. ShoonyaOrigins owns Aura. Forever.</p>
+</section>
+
+<!-- PARTNER SECTION -->
+<div class="partner-section" id="partner">
+  <div class="partner-inner">
+    <p class="section-label reveal">The Opportunity</p>
+    <h2 class="section-title reveal">The Founding<br><em>Partner</em></h2>
+    <p class="body-text reveal">Project Charaka is looking for one founding institutional partner — a wellness property, hospital, research institution or foundation that wants to be at the centre of this legacy. This position cannot be bought. It can only be built. And it can only be built once.</p>
+
+    <div class="partner-grid">
+      <div class="partner-item reveal">
+        <h3>Global Category Leadership</h3>
+        <p>The first institution to generate peer-reviewed clinical evidence for Ayurveda becomes the world authority on evidence-based wellness. A position no competitor can ever claim.</p>
+      </div>
+      <div class="partner-item reveal">
+        <h3>Hub for Global Collaboration</h3>
+        <p>Research institutions, universities and hospitals worldwide will seek to collaborate with the founding partner. You become the centre of the network, not a node in it.</p>
+      </div>
+      <div class="partner-item reveal">
+        <h3>Technology Infrastructure</h3>
+        <p>Full deployment of the Aura platform — real-time patient monitoring, AI-driven outcome analysis, clinical documentation — tailored to your institution.</p>
+      </div>
+      <div class="partner-item reveal">
+        <h3>Legacy Positioning</h3>
+        <p>That kind of positioning is not just prestige. It is legacy. Your institution becomes historically significant — the place where 2500 years of Ayurvedic knowledge was finally proven.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-section" id="contact">
+  <h2 class="section-title reveal">The opportunity to be first<br><em>will not stay open forever.</em></h2>
+  <p class="cta-text reveal">Charaka started this 2500 years ago. We are completing it now. The only question is — with whom.</p>
+  <a href="mailto:contact@shoonyaorigins.com" class="cta-button reveal">
+    Begin the Conversation
+    <span>→</span>
+  </a>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Project Charaka · Aura · ShoonyaOrigins</div>
+  <div class="footer-sub" style="margin-top:0.5rem;">Pune, India · shoonyaorigins.com · contact@shoonyaorigins.com</div>
+  <div class="footer-sub" style="margin-top:1.5rem; font-size:0.65rem; opacity:0.4;">© 2026 ShoonyaOrigins. All intellectual property reserved.</div>
+</footer>
+
+<script>
+  // Reveal on scroll
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, 100);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+  reveals.forEach(el => observer.observe(el));
+
+  // Staggered reveals for grids
+  document.querySelectorAll('.problem-grid, .vision-list, .partner-grid').forEach(grid => {
+    const items = grid.querySelectorAll('.reveal');
+    items.forEach((item, i) => {
+      item.style.transitionDelay = `${i * 0.1}s`;
+    });
+  });
+</script>
+</body>
+</html>
