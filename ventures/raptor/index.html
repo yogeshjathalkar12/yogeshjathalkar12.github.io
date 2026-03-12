@@ -3,613 +3,1134 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Raptor | Hunt. Capture. Scale. | ShoonyaOrigins</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<title>Raptor — Hunt. Capture. Scale.</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg-black: #050505;
-    --bg-dark: #080808;
-    --bg-card: rgba(255,255,255,0.04);
-    --neon-purple: #a855f7;
-    --neon-pink: #ec4899;
-    --text-white: #ffffff;
-    --text-dim: #a1a1aa;
-    --text-muted: #52525b;
-    --border: rgba(255,255,255,0.08);
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-
-  body {
-    background: var(--bg-black);
-    color: var(--text-white);
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    overflow-x: hidden;
-    cursor: crosshair;
-  }
-
-  body::before {
-    content: '';
-    position: fixed;
-    width: 800px; height: 800px;
-    top: -200px; left: 50%;
-    transform: translateX(-50%);
-    background: radial-gradient(circle, rgba(168,85,247,0.07) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* NAV */
-  nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    padding: 1.5rem 5%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--border);
-    background: rgba(5,5,5,0.92);
-    backdrop-filter: blur(20px);
-  }
-
-  .brand {
-    font-size: 1.3rem; font-weight: 800; font-style: italic;
-    background: linear-gradient(to right, var(--neon-purple), var(--neon-pink));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    letter-spacing: 0.05em;
-  }
-
-  .nav-right { display: flex; align-items: center; gap: 2rem; }
-
-  .nav-status {
-    display: flex; align-items: center; gap: 0.5rem;
-    font-family: 'Space Mono', monospace;
-    font-size: 0.6rem; color: var(--text-muted);
-    text-transform: uppercase; letter-spacing: 0.1em;
-  }
-
-  .status-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--neon-purple);
-    box-shadow: 0 0 8px var(--neon-purple);
-    animation: pulse 2s ease-in-out infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(0.8); }
-  }
-
-  .back-link {
-    font-family: 'Space Mono', monospace; font-size: 0.65rem;
-    color: var(--text-muted); text-decoration: none;
-    letter-spacing: 0.15em; text-transform: uppercase;
-    transition: color 0.2s ease;
-  }
-  .back-link:hover { color: var(--neon-purple); }
-
-  /* HERO */
-  .hero {
-    min-height: 100vh;
-    display: flex; flex-direction: column; justify-content: center;
-    padding: 8rem 5% 4rem;
-    position: relative; overflow: hidden;
-  }
-
-  .hero-glow {
-    position: absolute;
-    width: 700px; height: 700px;
-    top: 50%; left: 40%;
-    transform: translate(-50%, -50%);
-    background: radial-gradient(circle, rgba(168,85,247,0.1) 0%, transparent 65%);
-    pointer-events: none;
-  }
-
-  .hero-tag {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.65rem; letter-spacing: 0.3em;
-    color: var(--neon-purple); text-transform: uppercase;
-    margin-bottom: 2rem;
-    opacity: 0; animation: fadeUp 0.8s ease forwards 0.3s;
-  }
-
-  .hero-title {
-    font-size: clamp(4.5rem, 13vw, 12rem);
-    font-weight: 800; line-height: 0.85;
-    letter-spacing: -0.03em; text-transform: uppercase;
-  }
-
-  .hero-title .word { display: block; overflow: hidden; }
-
-  .hero-title .word span {
-    display: block;
-    transform: translateY(100%);
-    animation: slideUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
-
-  .hero-title .word:nth-child(1) span { animation-delay: 0.4s; }
-  .hero-title .word:nth-child(2) span { animation-delay: 0.55s; }
-  .hero-title .word:nth-child(3) span { animation-delay: 0.7s; }
-
-  @keyframes slideUp {
-    from { transform: translateY(100%); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-  }
-
-  .gradient-text {
-    background: linear-gradient(to right, var(--neon-purple), var(--neon-pink));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  }
-
-  .hero-sub {
-    margin-top: 3rem; max-width: 580px;
-    font-size: 1.15rem; line-height: 1.7;
-    color: var(--text-dim); font-weight: 300;
-    opacity: 0; animation: fadeUp 0.8s ease forwards 1s;
-  }
-
-  .hero-metrics {
-    display: flex; gap: 4rem; margin-top: 4rem;
-    opacity: 0; animation: fadeUp 0.8s ease forwards 1.2s;
-  }
-
-  .metric-value {
-    font-family: 'Space Mono', monospace;
-    font-size: 2rem; font-weight: 700; line-height: 1;
-  }
-  .metric-value span { background: linear-gradient(to right, var(--neon-purple), var(--neon-pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-  .metric-label {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.58rem; letter-spacing: 0.15em;
-    color: var(--text-muted); text-transform: uppercase; margin-top: 0.3rem;
-  }
-
-  .hero-corner {
-    position: absolute; bottom: 3rem; right: 5%;
-    font-family: 'Space Mono', monospace;
-    font-size: 0.58rem; color: var(--text-muted);
-    letter-spacing: 0.1em; text-transform: uppercase;
-    text-align: right; line-height: 1.8;
-    opacity: 0; animation: fadeUp 0.8s ease forwards 1.5s;
-  }
-
-  /* TICKER */
-  .ticker {
-    border-top: 1px solid rgba(168,85,247,0.2);
-    border-bottom: 1px solid rgba(168,85,247,0.2);
-    padding: 0.8rem 0; overflow: hidden;
-    background: rgba(168,85,247,0.03);
-    position: relative; z-index: 2;
-  }
-
-  .ticker-inner {
-    display: flex; gap: 4rem;
-    animation: ticker 25s linear infinite;
-    white-space: nowrap;
-  }
-
-  .ticker-item {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.65rem; letter-spacing: 0.15em;
-    color: var(--neon-purple); text-transform: uppercase; flex-shrink: 0;
-  }
-  .ticker-sep { color: var(--text-muted); }
-
-  @keyframes ticker {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
-  }
-
-  /* SECTIONS */
-  .section { padding: 7rem 5%; position: relative; z-index: 2; }
-
-  .section-tag {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.6rem; letter-spacing: 0.3em;
-    color: var(--neon-purple); text-transform: uppercase;
-    margin-bottom: 1.5rem;
-    display: flex; align-items: center; gap: 1rem;
-  }
-  .section-tag::before { content: '//'; color: var(--text-muted); }
-
-  .section-title {
-    font-size: clamp(2.5rem, 6vw, 5rem);
-    font-weight: 800; line-height: 0.9;
-    letter-spacing: -0.02em; margin-bottom: 2rem;
-  }
-  .section-title em {
-    font-style: normal;
-    background: linear-gradient(to right, var(--neon-purple), var(--neon-pink));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  }
-
-  .body-text {
-    font-size: 1rem; line-height: 1.8;
-    color: var(--text-dim); font-weight: 300; max-width: 640px;
-  }
-
-  /* HOW */
-  .how-section { background: var(--bg-dark); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-
-  .steps { margin-top: 4rem; display: flex; flex-direction: column; }
-
-  .step {
-    display: grid; grid-template-columns: 120px 1fr; gap: 3rem;
-    padding: 3rem 0; border-bottom: 1px solid var(--border);
-    align-items: start; transition: all 0.3s ease; cursor: default;
-  }
-  .step:hover { background: rgba(168,85,247,0.03); padding-left: 1.5rem; padding-right: 1.5rem; margin: 0 -1.5rem; }
-  .step:last-child { border-bottom: none; }
-
-  .step-num {
-    font-family: 'Space Mono', monospace; font-size: 3rem; font-weight: 700;
-    color: rgba(168,85,247,0.12); line-height: 1; transition: color 0.3s ease;
-  }
-  .step:hover .step-num { color: rgba(168,85,247,0.35); }
-
-  .step-tag {
-    display: inline-block;
-    font-family: 'Space Mono', monospace; font-size: 0.55rem;
-    letter-spacing: 0.15em; color: var(--neon-purple);
-    border: 1px solid rgba(168,85,247,0.3);
-    padding: 0.2rem 0.6rem; margin-bottom: 0.6rem;
-    text-transform: uppercase; border-radius: 2px;
-  }
-
-  .step-content h3 { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.6rem; letter-spacing: -0.01em; }
-  .step-content p { font-size: 0.9rem; line-height: 1.7; color: var(--text-dim); font-weight: 300; max-width: 560px; }
-
-  /* BRAIN */
-  .brain-section {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 6rem;
-    align-items: center; max-width: 1200px; margin: 0 auto;
-  }
-  @media (max-width: 900px) { .brain-section { grid-template-columns: 1fr; gap: 3rem; } }
-
-  .brain-visual {
-    position: relative; height: 420px;
-    display: flex; align-items: center; justify-content: center;
-  }
-
-  .brain-ring {
-    position: absolute; border-radius: 50%;
-    border: 1px solid rgba(168,85,247,0.15);
-    animation: ringPulse 3s ease-in-out infinite;
-  }
-  .brain-ring:nth-child(1) { width: 320px; height: 320px; }
-  .brain-ring:nth-child(2) { width: 230px; height: 230px; animation-delay: 0.6s; border-color: rgba(168,85,247,0.25); }
-  .brain-ring:nth-child(3) { width: 145px; height: 145px; animation-delay: 1.2s; border-color: rgba(168,85,247,0.4); }
-  .brain-ring:nth-child(4) { width: 60px; height: 60px; animation-delay: 1.8s; background: rgba(168,85,247,0.1); border-color: var(--neon-purple); }
-
-  @keyframes ringPulse {
-    0%, 100% { transform: scale(1); opacity: 0.5; }
-    50% { transform: scale(1.06); opacity: 1; }
-  }
-
-  .brain-center {
-    position: absolute; width: 18px; height: 18px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
-    box-shadow: 0 0 30px rgba(168,85,247,0.7), 0 0 60px rgba(168,85,247,0.3);
-  }
-
-  .brain-label {
-    position: absolute; font-family: 'Space Mono', monospace;
-    font-size: 0.55rem; letter-spacing: 0.1em;
-    color: var(--text-muted); text-transform: uppercase;
-  }
-  .brain-label.top { top: 20px; }
-  .brain-label.bottom { bottom: 20px; }
-  .brain-label.left { left: 5px; }
-  .brain-label.right { right: 5px; }
-
-  .purple-line {
-    width: 40px; height: 2px;
-    background: linear-gradient(to right, var(--neon-purple), var(--neon-pink));
-    margin: 1.5rem 0;
-  }
-
-  /* FEATURES */
-  .features-section { background: var(--bg-dark); border-top: 1px solid var(--border); }
-
-  .features-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem; margin-top: 4rem;
-  }
-  @media (max-width: 900px) { .features-grid { grid-template-columns: 1fr; } }
-
-  .feature {
-    padding: 2.5rem;
-    background: var(--bg-card);
-    border: 1px solid var(--border); border-radius: 16px;
-    transition: all 0.3s ease; position: relative; overflow: hidden;
-  }
-  .feature::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-    background: linear-gradient(to right, var(--neon-purple), var(--neon-pink));
-    transform: scaleX(0); transition: transform 0.3s ease; transform-origin: left;
-  }
-  .feature:hover { border-color: rgba(168,85,247,0.3); background: rgba(168,85,247,0.05); transform: translateY(-4px); box-shadow: 0 20px 40px rgba(168,85,247,0.1); }
-  .feature:hover::before { transform: scaleX(1); }
-
-  .feature-icon { font-family: 'Space Mono', monospace; font-size: 0.58rem; letter-spacing: 0.2em; color: var(--neon-purple); margin-bottom: 1.2rem; text-transform: uppercase; }
-  .feature h3 { font-size: 1.1rem; font-weight: 800; margin-bottom: 0.8rem; letter-spacing: -0.01em; }
-  .feature p { font-size: 0.875rem; line-height: 1.7; color: var(--text-dim); font-weight: 300; }
-
-  /* TIMELINE */
-  .compound-section { max-width: 1000px; margin: 0 auto; }
-
-  .timeline { margin-top: 4rem; position: relative; padding-left: 2rem; }
-  .timeline::before {
-    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 1px;
-    background: linear-gradient(to bottom, var(--neon-purple), rgba(168,85,247,0.1));
-  }
-
-  .timeline-item { position: relative; padding: 0 0 3rem 3rem; }
-  .timeline-item::before {
-    content: ''; position: absolute; left: -4px; top: 6px;
-    width: 8px; height: 8px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
-    box-shadow: 0 0 10px rgba(168,85,247,0.6);
-  }
-
-  .timeline-period { font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 0.2em; color: var(--neon-purple); text-transform: uppercase; margin-bottom: 0.4rem; }
-  .timeline-title { font-size: 1.2rem; font-weight: 800; margin-bottom: 0.3rem; }
-  .timeline-desc { font-size: 0.875rem; line-height: 1.6; color: var(--text-dim); font-weight: 300; max-width: 500px; }
-
-  /* WHO */
-  .who-section { background: var(--bg-dark); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-
-  .who-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-top: 4rem; }
-
-  .who-item { padding: 2rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; transition: all 0.3s ease; }
-  .who-item:hover { border-color: rgba(168,85,247,0.3); background: rgba(168,85,247,0.04); transform: translateY(-3px); }
-  .who-item h3 { font-size: 1rem; font-weight: 800; margin-bottom: 0.4rem; }
-  .who-item p { font-size: 0.8rem; color: var(--text-dim); line-height: 1.5; font-weight: 300; }
-
-  /* STATS */
-  .stats-bar {
-    display: flex; justify-content: space-around; padding: 5rem 5%;
-    background: linear-gradient(90deg, #080808, #050505);
-    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
-    position: relative; overflow: hidden;
-  }
-  .stats-bar::before {
-    content: ''; position: absolute; inset: 0;
-    background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(168,85,247,0.04) 0%, transparent 70%);
-  }
-  .stat { text-align: center; position: relative; }
-  .stat h2 {
-    font-size: 3.5rem; font-weight: 800;
-    background: linear-gradient(to right, var(--neon-purple), var(--neon-pink));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    margin-bottom: 0.5rem; line-height: 1;
-  }
-  .stat span { font-family: 'Space Mono', monospace; text-transform: uppercase; letter-spacing: 0.15em; font-size: 0.65rem; color: var(--text-muted); }
-
-  /* CTA */
-  .cta-section { padding: 10rem 5%; text-align: center; position: relative; overflow: hidden; }
-  .cta-section::before {
-    content: 'RAPTOR'; position: absolute;
-    font-size: 18rem; font-weight: 800; font-style: italic;
-    color: rgba(168,85,247,0.025);
-    top: 50%; left: 50%; transform: translate(-50%, -50%);
-    white-space: nowrap; pointer-events: none; letter-spacing: -0.05em;
-  }
-
-  .cta-title { font-size: clamp(2.5rem, 7vw, 6rem); font-weight: 800; line-height: 0.9; letter-spacing: -0.02em; margin-bottom: 2rem; position: relative; }
-  .cta-title em { font-style: normal; display: block; background: linear-gradient(to right, var(--neon-purple), var(--neon-pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-  .cta-sub { font-size: 1rem; color: var(--text-dim); font-weight: 300; max-width: 480px; margin: 0 auto 3rem; line-height: 1.7; position: relative; }
-
-  .cta-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; position: relative; }
-
-  .btn-primary {
-    display: inline-flex; align-items: center; gap: 0.8rem; padding: 1rem 2.5rem;
-    background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
-    color: white; font-family: 'Space Mono', monospace; font-size: 0.7rem;
-    letter-spacing: 0.15em; text-transform: uppercase; text-decoration: none;
-    border-radius: 8px; transition: all 0.3s ease; border: none;
-  }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(168,85,247,0.4); }
-
-  .btn-secondary {
-    display: inline-flex; align-items: center; gap: 0.8rem; padding: 1rem 2.5rem;
-    background: transparent; color: var(--text-dim);
-    font-family: 'Space Mono', monospace; font-size: 0.7rem;
-    letter-spacing: 0.15em; text-transform: uppercase; text-decoration: none;
-    border: 1px solid var(--border); border-radius: 8px; transition: all 0.3s ease;
-  }
-  .btn-secondary:hover { border-color: rgba(168,85,247,0.4); color: white; }
-
-  /* FOOTER */
-  footer { border-top: 1px solid var(--border); padding: 2rem 5%; display: flex; justify-content: space-between; align-items: center; }
-  .footer-left, .footer-right { font-family: 'Space Mono', monospace; font-size: 0.6rem; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; }
-
-  /* ANIMATIONS */
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-
-  .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
-  .reveal.visible { opacity: 1; transform: translateY(0); }
-
-  @media (max-width: 768px) {
-    .hero-metrics { gap: 2rem; flex-wrap: wrap; }
-    .step { grid-template-columns: 60px 1fr; gap: 1.5rem; }
-    .stats-bar { flex-direction: column; gap: 3rem; text-align: center; }
-    footer { flex-direction: column; gap: 1rem; text-align: center; }
-  }
+:root {
+  --black: #030303;
+  --surface: #0a0a0a;
+  --surface2: #0f0f0f;
+  --border: rgba(255,255,255,0.06);
+  --purple: #a855f7;
+  --pink: #ec4899;
+  --grad: linear-gradient(135deg, #a855f7, #ec4899);
+  --white: #f4f4f5;
+  --dim: #71717a;
+  --dim2: #3f3f46;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: 'DM Mono', monospace;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* CUSTOM CURSOR */
+.cursor {
+  position: fixed;
+  width: 8px; height: 8px;
+  background: var(--purple);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: transform 0.1s ease, width 0.3s ease, height 0.3s ease, background 0.3s ease;
+  mix-blend-mode: screen;
+}
+.cursor-ring {
+  position: fixed;
+  width: 32px; height: 32px;
+  border: 1px solid rgba(168,85,247,0.4);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: all 0.15s ease;
+}
+
+/* NOISE */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 998;
+  opacity: 0.5;
+}
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 1.8rem 4rem;
+  display: flex; justify-content: space-between; align-items: center;
+  mix-blend-mode: normal;
+}
+nav::after {
+  content: '';
+  position: absolute; bottom: 0; left: 4rem; right: 4rem;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--border), transparent);
+}
+
+.nav-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.6rem; letter-spacing: 0.1em;
+  background: var(--grad);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+.nav-links { display: flex; gap: 3rem; list-style: none; }
+.nav-links a {
+  font-size: 0.65rem; letter-spacing: 0.2em; color: var(--dim);
+  text-decoration: none; text-transform: uppercase;
+  transition: color 0.3s;
+}
+.nav-links a:hover { color: var(--white); }
+
+.nav-exit {
+  font-size: 0.65rem; letter-spacing: 0.2em; color: var(--dim2);
+  text-decoration: none; text-transform: uppercase;
+  transition: color 0.3s; border: 1px solid var(--dim2);
+  padding: 0.4rem 1rem;
+}
+.nav-exit:hover { color: var(--purple); border-color: var(--purple); }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  padding: 10rem 4rem 6rem;
+  position: relative; overflow: hidden;
+  display: grid;
+  grid-template-rows: 1fr auto;
+}
+
+.hero-orb {
+  position: absolute;
+  width: 900px; height: 900px;
+  top: -200px; right: -300px;
+  background: radial-gradient(circle, rgba(168,85,247,0.08) 0%, rgba(236,72,153,0.04) 40%, transparent 70%);
+  pointer-events: none;
+  animation: orbFloat 8s ease-in-out infinite;
+}
+
+@keyframes orbFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-40px) scale(1.05); }
+}
+
+.hero-eyebrow {
+  font-size: 0.6rem; letter-spacing: 0.35em; color: var(--purple);
+  text-transform: uppercase; margin-bottom: 2.5rem;
+  display: flex; align-items: center; gap: 1rem;
+  opacity: 0; animation: fadeIn 1s ease forwards 0.2s;
+}
+.hero-eyebrow::before {
+  content: '';
+  width: 30px; height: 1px;
+  background: var(--purple);
+}
+
+.hero-headline {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(7rem, 18vw, 18rem);
+  line-height: 0.82;
+  letter-spacing: 0.02em;
+  position: relative;
+}
+
+.hero-headline .line { display: block; overflow: hidden; }
+.hero-headline .line span {
+  display: block;
+  transform: translateY(110%);
+  animation: slideUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.hero-headline .line:nth-child(1) span { animation-delay: 0.3s; }
+.hero-headline .line:nth-child(2) span { animation-delay: 0.45s; color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.2); }
+.hero-headline .line:nth-child(3) span { animation-delay: 0.6s; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+@keyframes slideUp {
+  to { transform: translateY(0); }
+}
+
+.hero-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  padding-top: 5rem;
+  border-top: 1px solid var(--border);
+  margin-top: 4rem;
+  opacity: 0;
+  animation: fadeIn 1s ease forwards 1.1s;
+}
+
+.hero-descriptor {
+  font-family: 'Instrument Serif', serif;
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  line-height: 1.7;
+  color: rgba(244,244,245,0.55);
+  font-style: italic;
+  max-width: 500px;
+}
+
+.hero-descriptor strong { color: var(--white); font-style: normal; font-family: 'DM Mono', monospace; font-weight: 400; }
+
+.hero-tag-list {
+  display: flex; flex-direction: column; gap: 0.8rem;
+  justify-content: flex-end;
+}
+
+.hero-tag-item {
+  display: flex; align-items: center; justify-content: flex-end; gap: 1rem;
+  font-size: 0.6rem; letter-spacing: 0.2em; color: var(--dim2); text-transform: uppercase;
+}
+.hero-tag-item::after { content: ''; width: 20px; height: 1px; background: var(--dim2); }
+
+/* TICKER */
+.ticker-wrap {
+  overflow: hidden;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  padding: 1rem 0;
+  position: relative; z-index: 2;
+}
+.ticker-track {
+  display: flex; gap: 0;
+  animation: scroll 30s linear infinite;
+  white-space: nowrap;
+}
+.ticker-item {
+  display: flex; align-items: center; gap: 0;
+  flex-shrink: 0;
+}
+.ticker-word {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem; letter-spacing: 0.15em;
+  color: var(--dim2); padding: 0 2rem;
+  transition: color 0.3s;
+}
+.ticker-word.accent { color: var(--purple); }
+.ticker-dot {
+  width: 4px; height: 4px; border-radius: 50%;
+  background: var(--dim2); flex-shrink: 0;
+}
+
+@keyframes scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* SECTION BASE */
+.s { padding: 8rem 4rem; position: relative; z-index: 2; }
+.s-dark { background: var(--surface); }
+.s-darker { background: var(--surface2); }
+
+.label {
+  font-size: 0.58rem; letter-spacing: 0.35em; color: var(--purple);
+  text-transform: uppercase; margin-bottom: 1.2rem;
+}
+
+.big-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3.5rem, 8vw, 8rem);
+  line-height: 0.88; letter-spacing: 0.02em;
+}
+.big-title em {
+  font-style: normal;
+  background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+.prose {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.15rem; line-height: 1.75;
+  color: rgba(244,244,245,0.5);
+  font-style: italic; max-width: 560px;
+}
+
+/* ── INTRO STATEMENT ── */
+.statement-section {
+  padding: 8rem 4rem;
+  position: relative; z-index: 2;
+  overflow: hidden;
+}
+
+.statement-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 2fr; gap: 6rem; align-items: start;
+}
+
+.statement-left { padding-top: 0.5rem; }
+
+.statement-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 8rem; line-height: 1;
+  color: rgba(168,85,247,0.08);
+  letter-spacing: 0.05em;
+}
+
+.statement-text {
+  font-family: 'Instrument Serif', serif;
+  font-size: clamp(1.8rem, 3.5vw, 3rem);
+  line-height: 1.3; color: var(--white);
+  font-style: italic;
+}
+
+.statement-text span {
+  background: var(--grad);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  font-style: normal;
+}
+
+/* ── LOOP SECTION ── */
+.loop-section {
+  padding: 8rem 4rem;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+.loop-inner { max-width: 1200px; margin: 0 auto; }
+
+.loop-header {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;
+  align-items: end; margin-bottom: 6rem;
+}
+
+.loop-steps { display: flex; flex-direction: column; }
+
+.loop-step {
+  display: grid; grid-template-columns: 5rem 1fr auto;
+  gap: 2rem; align-items: start;
+  padding: 2.5rem 0;
+  border-bottom: 1px solid var(--border);
+  transition: all 0.4s ease;
+  cursor: default;
+  position: relative;
+}
+
+.loop-step::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: var(--grad);
+  transform: scaleY(0); transform-origin: top;
+  transition: transform 0.4s ease;
+}
+
+.loop-step:hover::before { transform: scaleY(1); }
+.loop-step:hover { padding-left: 1.5rem; background: rgba(168,85,247,0.03); }
+.loop-step:last-child { border-bottom: none; }
+
+.loop-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.5rem; color: rgba(168,85,247,0.15);
+  line-height: 1; transition: color 0.4s ease;
+}
+.loop-step:hover .loop-num { color: rgba(168,85,247,0.4); }
+
+.loop-content h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.8rem; letter-spacing: 0.04em;
+  color: var(--white); margin-bottom: 0.5rem;
+  transition: color 0.3s;
+}
+.loop-step:hover .loop-content h3 { color: var(--white); }
+
+.loop-content p {
+  font-size: 0.8rem; line-height: 1.8;
+  color: var(--dim); font-weight: 300; max-width: 480px;
+}
+
+.loop-phase {
+  font-size: 0.55rem; letter-spacing: 0.2em;
+  color: var(--purple); text-transform: uppercase;
+  border: 1px solid rgba(168,85,247,0.25);
+  padding: 0.25rem 0.7rem; white-space: nowrap;
+  align-self: flex-start; margin-top: 0.3rem;
+}
+
+/* ── BRAIN SECTION ── */
+.brain-section {
+  padding: 8rem 4rem;
+  position: relative; overflow: hidden;
+}
+
+.brain-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8rem; align-items: center;
+}
+
+@media (max-width: 900px) { .brain-inner { grid-template-columns: 1fr; gap: 4rem; } }
+
+.brain-text {}
+
+.brain-statement {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.05rem; line-height: 1.9;
+  color: rgba(244,244,245,0.5); font-style: italic;
+  margin-top: 2rem; max-width: 500px;
+}
+
+.brain-callout {
+  margin-top: 2.5rem; padding: 1.5rem 2rem;
+  border-left: 2px solid var(--purple);
+  background: rgba(168,85,247,0.04);
+}
+
+.brain-callout p {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1rem; line-height: 1.7;
+  color: var(--purple); font-style: italic;
+}
+
+.orbit-container {
+  position: relative; width: 380px; height: 380px;
+  margin: 0 auto;
+}
+
+.orbit {
+  position: absolute; top: 50%; left: 50%;
+  border-radius: 50%;
+  border: 1px solid;
+  transform: translate(-50%, -50%);
+  animation: spin linear infinite;
+}
+
+.orbit-1 { width: 340px; height: 340px; border-color: rgba(168,85,247,0.08); animation-duration: 30s; }
+.orbit-2 { width: 250px; height: 250px; border-color: rgba(168,85,247,0.12); animation-duration: 20s; animation-direction: reverse; }
+.orbit-3 { width: 160px; height: 160px; border-color: rgba(168,85,247,0.2); animation-duration: 14s; }
+.orbit-4 { width: 80px; height: 80px; border-color: rgba(168,85,247,0.4); animation-duration: 8s; animation-direction: reverse; }
+
+.orbit-dot {
+  position: absolute; top: -4px; left: 50%;
+  transform: translateX(-50%);
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--purple);
+  box-shadow: 0 0 12px var(--purple);
+}
+
+.orbit-3 .orbit-dot { background: var(--pink); box-shadow: 0 0 12px var(--pink); }
+
+@keyframes spin { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+.orbit-core {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--grad);
+  box-shadow: 0 0 40px rgba(168,85,247,0.6), 0 0 80px rgba(168,85,247,0.2);
+  animation: corePulse 3s ease-in-out infinite;
+}
+
+@keyframes corePulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 40px rgba(168,85,247,0.6), 0 0 80px rgba(168,85,247,0.2); }
+  50% { transform: translate(-50%, -50%) scale(1.3); box-shadow: 0 0 60px rgba(168,85,247,0.8), 0 0 120px rgba(168,85,247,0.3); }
+}
+
+.orbit-labels { position: absolute; inset: 0; }
+.orbit-label {
+  position: absolute; font-size: 0.55rem; letter-spacing: 0.15em;
+  color: var(--dim2); text-transform: uppercase;
+}
+.orbit-label.t { top: 0; left: 50%; transform: translateX(-50%); }
+.orbit-label.b { bottom: 0; left: 50%; transform: translateX(-50%); }
+.orbit-label.l { left: 0; top: 50%; transform: translateY(-50%); }
+.orbit-label.r { right: 0; top: 50%; transform: translateY(-50%); }
+
+/* ── CAPABILITIES ── */
+.cap-section {
+  padding: 8rem 4rem;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+.cap-inner { max-width: 1200px; margin: 0 auto; }
+
+.cap-header {
+  display: flex; justify-content: space-between;
+  align-items: flex-end; margin-bottom: 5rem;
+}
+
+.cap-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 1px solid var(--border);
+}
+
+@media (max-width: 900px) { .cap-grid { grid-template-columns: 1fr; } }
+
+.cap-item {
+  padding: 3rem 2.5rem;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  position: relative; overflow: hidden;
+  transition: background 0.4s ease;
+}
+
+.cap-item:nth-child(3n) { border-right: none; }
+.cap-item:nth-last-child(-n+3) { border-bottom: none; }
+.cap-item:hover { background: rgba(168,85,247,0.04); }
+
+.cap-item::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--grad);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.4s ease;
+}
+.cap-item:hover::after { transform: scaleX(1); }
+
+.cap-index {
+  font-size: 0.55rem; letter-spacing: 0.2em;
+  color: rgba(168,85,247,0.5); margin-bottom: 1.5rem; text-transform: uppercase;
+}
+
+.cap-item h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.5rem; letter-spacing: 0.05em;
+  color: var(--white); margin-bottom: 0.8rem;
+}
+
+.cap-item p {
+  font-size: 0.78rem; line-height: 1.8;
+  color: var(--dim); font-weight: 300;
+}
+
+/* ── COMPOUND ── */
+.compound-section { padding: 8rem 4rem; }
+
+.compound-inner { max-width: 1000px; margin: 0 auto; }
+
+.timeline { margin-top: 5rem; position: relative; }
+
+.timeline::before {
+  content: '';
+  position: absolute; left: 80px; top: 0; bottom: 0; width: 1px;
+  background: linear-gradient(to bottom, var(--purple), transparent);
+}
+
+.tl-item {
+  display: grid; grid-template-columns: 80px 1fr;
+  gap: 3rem; padding-bottom: 4rem;
+  position: relative;
+}
+
+.tl-item::before {
+  content: '';
+  position: absolute; left: 76px; top: 7px;
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--grad);
+  box-shadow: 0 0 12px rgba(168,85,247,0.5);
+}
+
+.tl-period {
+  font-size: 0.58rem; letter-spacing: 0.2em;
+  color: var(--purple); text-transform: uppercase;
+  padding-top: 0.4rem; text-align: right;
+  padding-right: 1.5rem;
+}
+
+.tl-content h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.6rem; letter-spacing: 0.04em;
+  color: var(--white); margin-bottom: 0.4rem;
+}
+
+.tl-content p {
+  font-size: 0.8rem; line-height: 1.7;
+  color: var(--dim); max-width: 500px;
+}
+
+/* ── WHO ── */
+.who-section {
+  padding: 8rem 4rem;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+.who-inner { max-width: 1200px; margin: 0 auto; }
+
+.who-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem; margin-top: 5rem;
+}
+
+@media (max-width: 900px) { .who-grid { grid-template-columns: 1fr; } }
+
+.who-card {
+  padding: 2.5rem;
+  border: 1px solid var(--border);
+  background: var(--black);
+  transition: all 0.4s ease;
+  position: relative; overflow: hidden;
+}
+
+.who-card::before {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+  background: var(--grad);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.4s ease;
+}
+
+.who-card:hover { border-color: rgba(168,85,247,0.25); transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 40px rgba(168,85,247,0.06); }
+.who-card:hover::before { transform: scaleX(1); }
+
+.who-card h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.4rem; letter-spacing: 0.05em;
+  color: var(--white); margin-bottom: 0.8rem;
+}
+
+.who-card p { font-size: 0.78rem; line-height: 1.7; color: var(--dim); }
+
+/* ── CTA ── */
+.cta-section {
+  padding: 10rem 4rem;
+  position: relative; overflow: hidden;
+  text-align: center;
+}
+
+.cta-glow {
+  position: absolute; width: 800px; height: 800px;
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(168,85,247,0.08) 0%, rgba(236,72,153,0.04) 40%, transparent 70%);
+  pointer-events: none;
+  animation: orbFloat 6s ease-in-out infinite;
+}
+
+.cta-overline {
+  font-size: 0.6rem; letter-spacing: 0.3em;
+  color: var(--dim2); text-transform: uppercase; margin-bottom: 2rem;
+}
+
+.cta-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(4rem, 10vw, 10rem);
+  line-height: 0.85; letter-spacing: 0.02em;
+  margin-bottom: 1rem; position: relative;
+}
+
+.cta-title .grad {
+  background: var(--grad);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+.cta-title .outline {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255,255,255,0.15);
+}
+
+.cta-sub {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.2rem; font-style: italic;
+  color: rgba(244,244,245,0.4);
+  max-width: 500px; margin: 0 auto 4rem; line-height: 1.7;
+  position: relative;
+}
+
+.cta-buttons { display: flex; gap: 1.2rem; justify-content: center; position: relative; }
+
+.btn-main {
+  padding: 1.1rem 3rem;
+  background: var(--grad);
+  color: white; font-family: 'DM Mono', monospace;
+  font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+  text-decoration: none; border: none;
+  transition: all 0.3s ease; position: relative; overflow: hidden;
+}
+.btn-main::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: white; opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.btn-main:hover { transform: translateY(-2px); box-shadow: 0 16px 40px rgba(168,85,247,0.4); }
+
+.btn-ghost {
+  padding: 1.1rem 3rem;
+  background: transparent;
+  color: var(--dim); font-family: 'DM Mono', monospace;
+  font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+  text-decoration: none;
+  border: 1px solid var(--dim2);
+  transition: all 0.3s ease;
+}
+.btn-ghost:hover { border-color: rgba(168,85,247,0.5); color: var(--white); }
+
+/* FOOTER */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 2.5rem 4rem;
+  display: flex; justify-content: space-between; align-items: center;
+  position: relative; z-index: 2;
+}
+
+.footer-brand {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1rem; letter-spacing: 0.1em;
+  background: var(--grad);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+.footer-copy {
+  font-size: 0.58rem; letter-spacing: 0.15em;
+  color: var(--dim2); text-transform: uppercase;
+}
+
+/* REVEAL */
+.reveal {
+  opacity: 0; transform: translateY(28px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.reveal.in { opacity: 1; transform: translateY(0); }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+@media (max-width: 768px) {
+  nav { padding: 1.5rem 1.5rem; }
+  .nav-links { display: none; }
+  .hero { padding: 8rem 1.5rem 4rem; }
+  .hero-bottom { grid-template-columns: 1fr; }
+  .s, .loop-section, .brain-section, .cap-section, .compound-section, .who-section, .cta-section { padding: 5rem 1.5rem; }
+  .statement-inner { grid-template-columns: 1fr; gap: 2rem; }
+  .loop-step { grid-template-columns: 3rem 1fr; gap: 1.5rem; }
+  .loop-step .loop-phase { display: none; }
+  .cap-grid { grid-template-columns: 1fr; }
+  .cap-item:nth-child(3n) { border-right: 1px solid var(--border); }
+  .cap-item:nth-last-child(-n+3) { border-bottom: 1px solid var(--border); }
+  .cap-item:last-child { border-bottom: none; }
+  .who-grid { grid-template-columns: 1fr; }
+  footer { flex-direction: column; gap: 1rem; text-align: center; }
+}
 </style>
 </head>
 <body>
 
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
 <nav>
-  <div class="brand">RAPTOR</div>
-  <div class="nav-right">
-    <div class="nav-status"><div class="status-dot"></div>System Active</div>
-    <a href="../../index.html" class="back-link">Exit ///</a>
-  </div>
+  <div class="nav-logo">Raptor</div>
+  <ul class="nav-links">
+    <li><a href="#loop">The Loop</a></li>
+    <li><a href="#brain">The Brain</a></li>
+    <li><a href="#capabilities">Capabilities</a></li>
+    <li><a href="#compound">Compound</a></li>
+  </ul>
+  <a href="../../index.html" class="nav-exit">Exit ///</a>
 </nav>
 
+<!-- HERO -->
 <div class="hero">
-  <div class="hero-glow"></div>
-  <p class="hero-tag">// AI Sales Intelligence · ShoonyaOrigins</p>
-  <h1 class="hero-title">
-    <div class="word"><span>Hunt.</span></div>
-    <div class="word"><span>Capture.</span></div>
-    <div class="word"><span class="gradient-text">Scale.</span></div>
-  </h1>
-  <p class="hero-sub">The AI-driven growth engine that learns your business, finds your clients, crafts the perfect pitch — and gets smarter with every single deal.</p>
-  <div class="hero-metrics">
-    <div class="metric"><div class="metric-value">24<span>/7</span></div><div class="metric-label">Operation Time</div></div>
-    <div class="metric"><div class="metric-value">100<span>+</span></div><div class="metric-label">Client Parameters</div></div>
-    <div class="metric"><div class="metric-value">0<span>.02s</span></div><div class="metric-label">Response Latency</div></div>
-    <div class="metric"><div class="metric-value">∞</div><div class="metric-label">Learns Over Time</div></div>
-  </div>
-  <div class="hero-corner">Raptor · v1.0<br>Pune, India<br>ShoonyaOrigins</div>
-</div>
+  <div class="hero-orb"></div>
 
-<div class="ticker">
-  <div class="ticker-inner">
-    <span class="ticker-item">Hunt <span class="ticker-sep">///</span></span>
-    <span class="ticker-item">Identify Prospects <span class="ticker-sep">///</span></span>
-    <span class="ticker-item">Capture <span class="ticker-sep">///</span></span>
-    <span class="ticker-item">Craft the Perfect Pitch <span class="ticker-sep">///</span></span>
-    <span class="ticker-item">Scale <span class="ticker-sep">///</span></span>
-    <span class="ticker-item">Learn. Retune. Improve. <span class="ticker-sep">///</span></span>
-    <span class="ticker-item">Your Organisation's Sales Brain <span class="ticker-sep">///</span></span>
-    <span class="ticker-item">Hunt <span class="ticker-sep">///</span></span>
-    <span class="ticker-item">Identify Prospects <span class="ticker-sep">///</span></span>
-    <span class="ticker-item">Capture <span class="ticker-sep">///</span></span>
-    <span class="ticker-item">Craft the Perfect Pitch <span class="ticker-sep">///</span></span>
-    <span class="ticker-item">Scale <span class="ticker-sep">///</span></span>
-    <span class="ticker-item">Learn. Retune. Improve. <span class="ticker-sep">///</span></span>
-    <span class="ticker-item">Your Organisation's Sales Brain <span class="ticker-sep">///</span></span>
+  <div>
+    <p class="hero-eyebrow">ShoonyaOrigins · AI Sales Intelligence · v1.0</p>
+
+    <h1 class="hero-headline">
+      <div class="line"><span>Hunt.</span></div>
+      <div class="line"><span>Capture.</span></div>
+      <div class="line"><span>Scale.</span></div>
+    </h1>
+  </div>
+
+  <div class="hero-bottom">
+    <p class="hero-descriptor">
+      Not a sales tool.<br>
+      <strong>A self-improving brain</strong> that learns your business, hunts your clients, crafts the perfect pitch — and gets smarter with every single deal it closes.
+    </p>
+    <div class="hero-tag-list">
+      <div class="hero-tag-item">Autonomous Prospecting</div>
+      <div class="hero-tag-item">100+ Parameter Scoring</div>
+      <div class="hero-tag-item">Live Call Intelligence</div>
+      <div class="hero-tag-item">Self-Retuning Engine</div>
+      <div class="hero-tag-item">Hybrid LLM + RNN Architecture</div>
+    </div>
   </div>
 </div>
 
-<div class="how-section section" id="how">
-  <p class="section-tag reveal">How It Works</p>
-  <h2 class="section-title reveal">The Complete<br><em>Loop</em></h2>
-  <p class="body-text reveal">Most sales tools are specialists. Raptor is a single brain that owns the entire journey — from knowing nothing about your business to closing deals on your behalf — and compounds its intelligence with every interaction.</p>
-  <div class="steps">
-    <div class="step reveal"><div class="step-num">01</div><div class="step-content"><div class="step-tag">Identity</div><h3>Learn Who You Are</h3><p>Feed Raptor data about your company — your product, your values, your ideal client, your competitive edge. The AI neural network builds a deep model of your organisation. This becomes the foundation everything else runs on.</p></div></div>
-    <div class="step reveal"><div class="step-num">02</div><div class="step-content"><div class="step-tag">Intelligence</div><h3>Hunt the Market</h3><p>Raptor searches the internet autonomously — LinkedIn, news, job boards, company databases, social signals — finding your ideal clients wherever they exist. Simultaneously it gathers competitive intelligence and identifies potential partners without you lifting a finger.</p></div></div>
-    <div class="step reveal"><div class="step-num">03</div><div class="step-content"><div class="step-tag">Classification</div><h3>Classify Every Prospect</h3><p>Every prospect is analysed across 100+ parameters — company size, growth signals, technology stack, buying intent, decision maker profiles, budget indicators. Raptor categorises and ranks them by conversion probability so you always know exactly where to focus.</p></div></div>
-    <div class="step reveal"><div class="step-num">04</div><div class="step-content"><div class="step-tag">Precision</div><h3>Craft the Perfect Pitch</h3><p>For each prospect, Raptor generates a personalised pitch and strategy — the right message, the right channel, the right timing. Not a template. A genuinely tailored approach built from everything it knows about that specific person and organisation.</p></div></div>
-    <div class="step reveal"><div class="step-num">05</div><div class="step-content"><div class="step-tag">Execution</div><h3>Guide Every Conversation</h3><p>During live calls, Raptor provides real-time guidance. It automates follow-up messages. It reads sentiment from email replies and voice tone. It tells you when to push, when to wait, when to close — before you even ask.</p></div></div>
-    <div class="step reveal"><div class="step-num">06</div><div class="step-content"><div class="step-tag">Evolution</div><h3>Learn. Retune. Repeat.</h3><p>After every interaction — every call, every reply, every deal won or lost — Raptor analyses what happened, identifies what worked, and retrains itself. The brain gets smarter with every single data point. Permanently. Automatically.</p></div></div>
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-track">
+    <div class="ticker-item"><span class="ticker-word accent">Hunt</span><span class="ticker-dot"></span></div>
+    <div class="ticker-item"><span class="ticker-word">Identify Every Prospect</span><span class="ticker-dot"></span></div>
+    <div class="ticker-item"><span class="ticker-word accent">Capture</span><span class="ticker-dot"></span></div>
+    <div class="ticker-item"><span class="ticker-word">Craft the Perfect Pitch</span><span class="ticker-dot"></span></div>
+    <div class="ticker-item"><span class="ticker-word accent">Scale</span><span class="ticker-dot"></span></div>
+    <div class="ticker-item"><span class="ticker-word">Learn · Retune · Improve</span><span class="ticker-dot"></span></div>
+    <div class="ticker-item"><span class="ticker-word accent">Your Sales Brain</span><span class="ticker-dot"></span></div>
+    <div class="ticker-item"><span class="ticker-word">Competitive Intelligence</span><span class="ticker-dot"></span></div>
+    <div class="ticker-item"><span class="ticker-word accent">Hunt</span><span class="ticker-dot"></span></div>
+    <div class="ticker-item"><span class="ticker-word">Identify Every Prospect</span><span class="ticker-dot"></span></div>
+    <div class="ticker-item"><span class="ticker-word accent">Capture</span><span class="ticker-dot"></span></div>
+    <div class="ticker-item"><span class="ticker-word">Craft the Perfect Pitch</span><span class="ticker-dot"></span></div>
+    <div class="ticker-item"><span class="ticker-word accent">Scale</span><span class="ticker-dot"></span></div>
+    <div class="ticker-item"><span class="ticker-word">Learn · Retune · Improve</span><span class="ticker-dot"></span></div>
+    <div class="ticker-item"><span class="ticker-word accent">Your Sales Brain</span><span class="ticker-dot"></span></div>
+    <div class="ticker-item"><span class="ticker-word">Competitive Intelligence</span><span class="ticker-dot"></span></div>
   </div>
 </div>
 
-<div class="section">
-  <div class="brain-section">
+<!-- STATEMENT -->
+<div class="statement-section reveal">
+  <div class="statement-inner">
+    <div class="statement-left">
+      <div class="label">The Difference</div>
+      <div class="statement-num">01</div>
+    </div>
     <div>
-      <p class="section-tag reveal">The Moat</p>
-      <h2 class="section-title reveal">Your<br><em>Sales Brain</em></h2>
-      <div class="purple-line reveal"></div>
-      <p class="body-text reveal">After 12 months of using Raptor, your organisation has something no competitor can buy or copy — a proprietary AI sales brain trained entirely on your specific clients, your specific wins, your specific market.</p>
-      <p class="body-text reveal" style="margin-top:1.2rem;">That brain belongs to you. It compounds every day. And it's irreplaceable — because it was built from your data, your conversations, your victories.</p>
-      <p class="body-text reveal" style="margin-top:1.2rem; color:var(--neon-purple); font-style:italic;">Switching away from Raptor means losing that brain. That's not a product. That's a dependency.</p>
-    </div>
-    <div class="brain-visual reveal">
-      <div class="brain-ring"></div><div class="brain-ring"></div>
-      <div class="brain-ring"></div><div class="brain-ring"></div>
-      <div class="brain-center"></div>
-      <div class="brain-label top">Prospect Intelligence</div>
-      <div class="brain-label bottom">Deal Memory</div>
-      <div class="brain-label left">Market Data</div>
-      <div class="brain-label right">Your DNA</div>
+      <p class="statement-text">
+        Every sales tool in the market is a <span>specialist</span>. One finds leads. Another sends emails. Another tracks calls. None of them talk to each other. None of them learn.
+        <br><br>
+        Raptor is one brain that <span>owns the entire loop</span> — and gets smarter every time it closes a deal.
+      </p>
     </div>
   </div>
 </div>
 
-<div class="features-section section">
-  <p class="section-tag reveal">Capabilities</p>
-  <h2 class="section-title reveal">Every Tool.<br><em>One Brain.</em></h2>
-  <p class="body-text reveal">Every other tool is a specialist. Raptor replaces all of them with a single unified intelligence that sees everything, learns everything and compounds everything.</p>
-  <div class="features-grid">
-    <div class="feature reveal"><div class="feature-icon">01 · Prospecting</div><h3>Autonomous Lead Discovery</h3><p>Raptor finds your ideal clients across the internet — LinkedIn, news, databases, social signals — without any manual input. It never sleeps.</p></div>
-    <div class="feature reveal"><div class="feature-icon">02 · Intelligence</div><h3>Competitive Monitoring</h3><p>Automatically tracks competitors and potential partners. You always know what's moving in your market before your competition does.</p></div>
-    <div class="feature reveal"><div class="feature-icon">03 · Scoring</div><h3>100+ Parameter Analysis</h3><p>Every prospect scored and ranked across over 100 variables. No guesswork. Pure data-driven prioritisation of where your time goes.</p></div>
-    <div class="feature reveal"><div class="feature-icon">04 · Personalisation</div><h3>AI-Crafted Pitches</h3><p>Not templates. Genuinely personalised pitches and strategies for each prospect — built from deep research on their specific situation.</p></div>
-    <div class="feature reveal"><div class="feature-icon">05 · Real-Time</div><h3>Live Call Guidance</h3><p>During calls, Raptor listens and guides. Sentiment analysis. Objection handling suggestions. Closing signals. All in real time.</p></div>
-    <div class="feature reveal"><div class="feature-icon">06 · Automation</div><h3>Follow-Up Automation</h3><p>Every follow-up message crafted and sent automatically — at the right time, in the right tone, with the right content. Zero manual effort.</p></div>
-    <div class="feature reveal"><div class="feature-icon">07 · Learning</div><h3>Self-Retuning Engine</h3><p>After every interaction Raptor retrains itself. What worked gets reinforced. What didn't gets discarded. The system improves permanently.</p></div>
-    <div class="feature reveal"><div class="feature-icon">08 · Memory</div><h3>Organisational Sales Memory</h3><p>Every deal, every conversation, every win and loss — stored, analysed and used to make every future interaction smarter than the last.</p></div>
-    <div class="feature reveal"><div class="feature-icon">09 · Funnels</div><h3>Dynamic Marketing Funnels</h3><p>Marketing pathways that adapt in real time. If a prospect hesitates, the system changes the approach instantly to maximise conversion.</p></div>
+<!-- THE LOOP -->
+<div class="loop-section" id="loop">
+  <div class="loop-inner">
+    <div class="loop-header">
+      <div>
+        <div class="label reveal">The Complete Loop</div>
+        <h2 class="big-title reveal">Six Steps.<br><em>One Brain.</em></h2>
+      </div>
+      <p class="prose reveal">From knowing nothing about your business — to closing deals on your behalf. The loop never stops. The brain never sleeps.</p>
+    </div>
+
+    <div class="loop-steps">
+      <div class="loop-step reveal">
+        <div class="loop-num">01</div>
+        <div class="loop-content">
+          <h3>Learn Who You Are</h3>
+          <p>Feed Raptor your company DNA — product, values, ideal client, competitive edge. The hybrid LLM + RNN architecture builds a deep identity model of your organisation. Everything else runs on this foundation.</p>
+        </div>
+        <div class="loop-phase">Identity</div>
+      </div>
+      <div class="loop-step reveal">
+        <div class="loop-num">02</div>
+        <div class="loop-content">
+          <h3>Hunt the Market</h3>
+          <p>Raptor scans the internet autonomously — LinkedIn, news feeds, job boards, company databases, social signals — finding your ideal clients wherever they exist. Simultaneously mapping your competitors and identifying potential partners. Automatically. Always.</p>
+        </div>
+        <div class="loop-phase">Intelligence</div>
+      </div>
+      <div class="loop-step reveal">
+        <div class="loop-num">03</div>
+        <div class="loop-content">
+          <h3>Classify Every Prospect</h3>
+          <p>Each prospect is scored across 100+ parameters — company growth signals, buying intent, decision-maker profiles, technology stack, budget indicators. Ranked by conversion probability. You always know exactly where to focus.</p>
+        </div>
+        <div class="loop-phase">Classification</div>
+      </div>
+      <div class="loop-step reveal">
+        <div class="loop-num">04</div>
+        <div class="loop-content">
+          <h3>Craft the Perfect Pitch</h3>
+          <p>Not a template. A genuinely personalised pitch for each prospect — the right message, right channel, right timing — built from everything Raptor knows about that specific person, their business and their moment.</p>
+        </div>
+        <div class="loop-phase">Precision</div>
+      </div>
+      <div class="loop-step reveal">
+        <div class="loop-num">05</div>
+        <div class="loop-content">
+          <h3>Guide Every Conversation</h3>
+          <p>Live call intelligence. Real-time guidance during conversations. Sentiment analysis from email replies and voice tone. Automated follow-ups at the right moment. Raptor tells you when to push, when to wait, when to close.</p>
+        </div>
+        <div class="loop-phase">Execution</div>
+      </div>
+      <div class="loop-step reveal">
+        <div class="loop-num">06</div>
+        <div class="loop-content">
+          <h3>Learn. Retune. Repeat.</h3>
+          <p>After every interaction — every call, every reply, every win and loss — Raptor analyses what happened, reinforces what worked, discards what didn't. The brain retrains itself permanently. Every deal makes it sharper.</p>
+        </div>
+        <div class="loop-phase">Evolution</div>
+      </div>
+    </div>
   </div>
 </div>
 
-<div class="section">
-  <div class="compound-section">
-    <p class="section-tag reveal">The Compound Effect</p>
-    <h2 class="section-title reveal">Gets Smarter<br><em>Every Day</em></h2>
-    <p class="body-text reveal">Unlike every other sales tool that stays static, Raptor compounds. The longer you use it — the more irreplaceable it becomes.</p>
+<!-- THE BRAIN -->
+<div class="brain-section" id="brain">
+  <div class="brain-inner">
+    <div class="brain-text">
+      <div class="label reveal">The Moat</div>
+      <h2 class="big-title reveal">Your<br><em>Sales</em><br>Brain.</h2>
+      <p class="brain-statement reveal">
+        After 12 months of using Raptor, your organisation owns something no competitor can buy, replicate or reverse-engineer — a proprietary AI sales brain trained entirely on your clients, your wins, your market.
+      </p>
+      <div class="brain-callout reveal">
+        <p>Switching away from Raptor means losing that brain. That is not a product feature. That is a strategic dependency.</p>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <div class="orbit-container">
+        <div class="orbit orbit-1"><div class="orbit-dot"></div></div>
+        <div class="orbit orbit-2"><div class="orbit-dot"></div></div>
+        <div class="orbit orbit-3"><div class="orbit-dot"></div></div>
+        <div class="orbit orbit-4"><div class="orbit-dot"></div></div>
+        <div class="orbit-core"></div>
+        <div class="orbit-labels">
+          <div class="orbit-label t">Prospect Data</div>
+          <div class="orbit-label b">Deal Memory</div>
+          <div class="orbit-label l">Market Intel</div>
+          <div class="orbit-label r">Your DNA</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CAPABILITIES -->
+<div class="cap-section" id="capabilities">
+  <div class="cap-inner">
+    <div class="cap-header">
+      <div>
+        <div class="label reveal">Capabilities</div>
+        <h2 class="big-title reveal">Every Tool.<br><em>One Brain.</em></h2>
+      </div>
+      <p class="prose reveal">Where competitors offer a toolkit, Raptor offers unified intelligence. One system that sees everything, learns from everything, and compounds everything.</p>
+    </div>
+
+    <div class="cap-grid">
+      <div class="cap-item reveal">
+        <div class="cap-index">01 · Prospecting</div>
+        <h3>Autonomous Lead Discovery</h3>
+        <p>Finds your ideal clients across the internet without any manual input. LinkedIn, news, databases, social signals. It never sleeps, never stops, never misses.</p>
+      </div>
+      <div class="cap-item reveal">
+        <div class="cap-index">02 · Intelligence</div>
+        <h3>Competitive Monitoring</h3>
+        <p>Automatically tracks competitors and maps potential partners. You always know what's moving in your market before your competition even notices.</p>
+      </div>
+      <div class="cap-item reveal">
+        <div class="cap-index">03 · Scoring</div>
+        <h3>100+ Parameter Analysis</h3>
+        <p>Every prospect scored and ranked across over 100 variables. Pure data-driven prioritisation of where your time and energy should go.</p>
+      </div>
+      <div class="cap-item reveal">
+        <div class="cap-index">04 · Personalisation</div>
+        <h3>AI-Crafted Pitches</h3>
+        <p>Not templates. Genuinely personalised strategies for each prospect built from deep research on their specific situation, pain points and timing.</p>
+      </div>
+      <div class="cap-item reveal">
+        <div class="cap-index">05 · Real-Time</div>
+        <h3>Live Call Guidance</h3>
+        <p>Raptor listens during calls. Sentiment analysis, objection handling, closing signals. All surfaced in real time so you always know your next move.</p>
+      </div>
+      <div class="cap-item reveal">
+        <div class="cap-index">06 · Automation</div>
+        <h3>Follow-Up Automation</h3>
+        <p>Every follow-up crafted and sent automatically — right time, right tone, right content. The system handles the sequence. You focus on the close.</p>
+      </div>
+      <div class="cap-item reveal">
+        <div class="cap-index">07 · Learning</div>
+        <h3>Self-Retuning Engine</h3>
+        <p>After every interaction Raptor retrains itself. What worked gets reinforced. What failed gets discarded. The system permanently improves.</p>
+      </div>
+      <div class="cap-item reveal">
+        <div class="cap-index">08 · Memory</div>
+        <h3>Organisational Sales Memory</h3>
+        <p>Every deal, every conversation, every outcome — stored, analysed, used to make every future interaction smarter than the last.</p>
+      </div>
+      <div class="cap-item reveal">
+        <div class="cap-index">09 · Funnels</div>
+        <h3>Dynamic Marketing Funnels</h3>
+        <p>Pathways that adapt in real time. If a prospect hesitates, the system changes the approach instantly — before you even realise it's necessary.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COMPOUND -->
+<div class="compound-section" id="compound">
+  <div class="compound-inner">
+    <div class="label reveal">The Compound Effect</div>
+    <h2 class="big-title reveal">Gets Sharper<br><em>Every Day.</em></h2>
+    <p class="prose reveal" style="margin-top:1.5rem;">Every other sales tool stays static. Raptor compounds. The longer you use it — the more irreplaceable it becomes.</p>
+
     <div class="timeline">
-      <div class="timeline-item reveal"><div class="timeline-period">Day 1</div><div class="timeline-title">Raptor knows your company</div><div class="timeline-desc">Identity model built. Market search begins. First prospect list generated.</div></div>
-      <div class="timeline-item reveal"><div class="timeline-period">Week 1</div><div class="timeline-title">Raptor knows your market</div><div class="timeline-desc">Hundreds of prospects classified. Competitive intelligence gathered. First pitches crafted and sent.</div></div>
-      <div class="timeline-item reveal"><div class="timeline-period">Month 1</div><div class="timeline-title">Raptor knows your best prospects</div><div class="timeline-desc">Pattern recognition kicks in. High-converting prospect profiles identified. Strategy refined from real interaction data.</div></div>
-      <div class="timeline-item reveal"><div class="timeline-period">Month 3</div><div class="timeline-title">Raptor knows what pitch works for whom</div><div class="timeline-desc">Personalisation reaches a new level. The brain has seen enough wins and losses to predict conversion probability with precision.</div></div>
-      <div class="timeline-item reveal"><div class="timeline-period">Month 6</div><div class="timeline-title">Raptor knows which calls convert and why</div><div class="timeline-desc">Voice and sentiment patterns from hundreds of calls now inform real-time guidance. Closing rates compound.</div></div>
-      <div class="timeline-item reveal"><div class="timeline-period">Month 12</div><div class="timeline-title">Raptor is your most valuable sales asset</div><div class="timeline-desc">A proprietary AI brain trained entirely on your organisation. Irreplaceable. Impossible to replicate. Yours forever.</div></div>
+      <div class="tl-item reveal">
+        <div class="tl-period">Day 1</div>
+        <div class="tl-content">
+          <h3>Raptor Knows Your Company</h3>
+          <p>Identity model built. Market search initiated. First prospect list generated.</p>
+        </div>
+      </div>
+      <div class="tl-item reveal">
+        <div class="tl-period">Week 1</div>
+        <div class="tl-content">
+          <h3>Raptor Knows Your Market</h3>
+          <p>Hundreds of prospects classified. Competitive intelligence mapped. First personalised pitches sent.</p>
+        </div>
+      </div>
+      <div class="tl-item reveal">
+        <div class="tl-period">Month 1</div>
+        <div class="tl-content">
+          <h3>Raptor Knows Your Best Prospects</h3>
+          <p>Pattern recognition activates. High-converting profiles identified. Strategy refined from live interaction data.</p>
+        </div>
+      </div>
+      <div class="tl-item reveal">
+        <div class="tl-period">Month 3</div>
+        <div class="tl-content">
+          <h3>Raptor Knows What Pitch Works for Whom</h3>
+          <p>Personalisation reaches surgical precision. Conversion probability predicted with confidence.</p>
+        </div>
+      </div>
+      <div class="tl-item reveal">
+        <div class="tl-period">Month 6</div>
+        <div class="tl-content">
+          <h3>Raptor Knows Which Calls Convert and Why</h3>
+          <p>Voice and sentiment patterns from hundreds of calls inform real-time guidance. Closing rates compound.</p>
+        </div>
+      </div>
+      <div class="tl-item reveal">
+        <div class="tl-period">Month 12</div>
+        <div class="tl-content">
+          <h3>Raptor Is Your Most Valuable Sales Asset</h3>
+          <p>A proprietary AI brain trained on your organisation. Irreplaceable. Impossible to replicate. Yours permanently.</p>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-<div class="who-section section">
-  <p class="section-tag reveal">Who It's For</p>
-  <h2 class="section-title reveal">Built For<br><em>Serious Builders</em></h2>
-  <p class="body-text reveal">Any B2B organisation with an active sales motion and the ambition to dominate their market.</p>
-  <div class="who-grid">
-    <div class="who-item reveal"><h3>B2B Startups</h3><p>Scaling fast without a large sales team. Raptor multiplies your reach immediately.</p></div>
-    <div class="who-item reveal"><h3>Mid-Size Enterprises</h3><p>Frustrated by 5 disconnected tools. Raptor unifies everything into one brain.</p></div>
-    <div class="who-item reveal"><h3>Consultancies</h3><p>Complex, relationship-driven sales cycles. Raptor remembers everything so you don't have to.</p></div>
-    <div class="who-item reveal"><h3>SaaS Companies</h3><p>High volume outreach with personalisation at scale. Raptor was built for exactly this.</p></div>
-    <div class="who-item reveal"><h3>Real Estate</h3><p>HNI client acquisition with precision targeting. Raptor finds who's ready before they know it themselves.</p></div>
-    <div class="who-item reveal"><h3>Any Sales Team</h3><p>If you sell B2B and want to sell more — Raptor is your unfair advantage.</p></div>
+<!-- WHO -->
+<div class="who-section">
+  <div class="who-inner">
+    <div class="label reveal">Built For</div>
+    <h2 class="big-title reveal">Serious<br><em>Builders.</em></h2>
+    <p class="prose reveal" style="margin-top:1.5rem;">Any B2B organisation with an active sales motion and the ambition to dominate their market.</p>
+
+    <div class="who-grid">
+      <div class="who-card reveal">
+        <h3>B2B Startups</h3>
+        <p>Scaling fast without a large sales team. Raptor gives you the intelligence of a 20-person sales org from day one.</p>
+      </div>
+      <div class="who-card reveal">
+        <h3>Mid-Size Enterprises</h3>
+        <p>Running 5 disconnected tools with gaps between them. Raptor replaces the entire stack with one unified brain.</p>
+      </div>
+      <div class="who-card reveal">
+        <h3>Consultancies</h3>
+        <p>Complex, relationship-driven sales cycles. Raptor maps every stakeholder, remembers every conversation, never drops a thread.</p>
+      </div>
+      <div class="who-card reveal">
+        <h3>SaaS Companies</h3>
+        <p>High-volume outreach that still needs to feel personal. Raptor delivers precision personalisation at any scale.</p>
+      </div>
+      <div class="who-card reveal">
+        <h3>Real Estate</h3>
+        <p>HNI client acquisition with timing precision. Raptor identifies who is ready to move before they know it themselves.</p>
+      </div>
+      <div class="who-card reveal">
+        <h3>Any Sales Team</h3>
+        <p>If you sell B2B and want to sell more — Raptor is the unfair advantage your competitors don't have. Yet.</p>
+      </div>
+    </div>
   </div>
 </div>
 
-<div class="stats-bar">
-  <div class="stat reveal"><h2>24/7</h2><span>Operation Time</span></div>
-  <div class="stat reveal"><h2>0.02s</h2><span>Response Latency</span></div>
-  <div class="stat reveal"><h2>100%</h2><span>Automation</span></div>
-  <div class="stat reveal"><h2>∞</h2><span>Learns Over Time</span></div>
-</div>
-
+<!-- CTA -->
 <div class="cta-section">
-  <h2 class="cta-title reveal">Your competitors<br><em>don't have this yet.</em></h2>
-  <p class="cta-sub reveal">Every day without Raptor is a day your competitors could be building a smarter brain than yours. The compounding starts on day one.</p>
+  <div class="cta-glow"></div>
+  <p class="cta-overline reveal">The window is open</p>
+  <h2 class="cta-title reveal">
+    <span class="outline">Your</span><br>
+    <span class="grad">Competitors</span><br>
+    <span class="outline">Don't Have This.</span>
+  </h2>
+  <p class="cta-sub reveal">Every day without Raptor is a day your competitors could be building a smarter brain than yours. The compounding starts on day one. Not day two.</p>
   <div class="cta-buttons reveal">
-    <a href="mailto:contact@shoonyaorigins.com" class="btn-primary">Request Early Access →</a>
-    <a href="../../index.html" class="btn-secondary">Back to ShoonyaOrigins</a>
+    <a href="mailto:contact@shoonyaorigins.com" class="btn-main">Request Early Access</a>
+    <a href="../../index.html" class="btn-ghost">Back to ShoonyaOrigins</a>
   </div>
 </div>
 
+<!-- FOOTER -->
 <footer>
-  <div class="footer-left">System Active. © 2026 Raptor · ShoonyaOrigins</div>
-  <div class="footer-right">Pune, India · shoonyaorigins.com</div>
+  <div class="footer-brand">Raptor · ShoonyaOrigins</div>
+  <div class="footer-copy">System Active · Pune, India · © 2026</div>
 </footer>
 
 <script>
-  const reveals = document.querySelectorAll('.reveal');
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        setTimeout(() => entry.target.classList.add('visible'), 80);
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
-  reveals.forEach(el => observer.observe(el));
+// Custom cursor
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
 
-  document.querySelectorAll('.features-grid, .who-grid, .stats-bar').forEach(grid => {
-    grid.querySelectorAll('.reveal').forEach((item, i) => {
-      item.style.transitionDelay = `${i * 0.07}s`;
-    });
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx + 'px';
+  cursor.style.top = my + 'px';
+});
+
+function animateRing() {
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) *.12;
+  ring.style.left = rx + 'px';
+  ring.style.top = ry + 'px';
+  requestAnimationFrame(animateRing);
+}
+animateRing();
+
+document.querySelectorAll('a, button').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    cursor.style.width = '16px'; cursor.style.height = '16px';
+    cursor.style.background = 'var(--pink)';
+    ring.style.width = '50px'; ring.style.height = '50px';
   });
+  el.addEventListener('mouseleave', () => {
+    cursor.style.width = '8px'; cursor.style.height = '8px';
+    cursor.style.background = 'var(--purple)';
+    ring.style.width = '32px'; ring.style.height = '32px';
+  });
+});
+
+// Reveal on scroll
+const reveals = document.querySelectorAll('.reveal');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('in'), 60);
+      obs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -50px 0px' });
+
+reveals.forEach((el, i) => {
+  el.style.transitionDelay = '0s';
+  obs.observe(el);
+});
+
+// Stagger children in grids
+document.querySelectorAll('.cap-grid, .who-grid, .loop-steps').forEach(grid => {
+  grid.querySelectorAll('.reveal').forEach((item, i) => {
+    item.dataset.delay = i * 0.08;
+  });
+});
+
+const staggerObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const delay = parseFloat(e.target.dataset.delay || 0);
+      setTimeout(() => e.target.classList.add('in'), delay * 1000 + 60);
+      staggerObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.05 });
+
+document.querySelectorAll('[data-delay]').forEach(el => staggerObs.observe(el));
 </script>
 </body>
 </html>
