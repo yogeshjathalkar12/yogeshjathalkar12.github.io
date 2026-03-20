@@ -341,6 +341,156 @@
             .cable-svg { display: none; }
             .site-header { display: none; } /* Hide fixed header on mobile for space */
         }
+
+    .construct-launch {
+    position: relative;
+    width: 100%;
+    padding: 6rem 4rem 6rem 4rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    background: var(--bg-color);
+    border-bottom: 4px solid var(--safety-yellow);
+    z-index: 2;
+}
+
+.cl-grid-bg {
+    position: absolute; inset: 0;
+    background-image: var(--bg-pattern);
+    background-size: var(--bg-size);
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.cl-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem; letter-spacing: 0.3em;
+    color: var(--text-light); text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: 1rem;
+    position: relative; z-index: 1;
+}
+.cl-eyebrow::before, .cl-eyebrow::after {
+    content: ''; width: 40px; height: 2px;
+    background: var(--safety-yellow);
+}
+
+.cl-title {
+    font-size: clamp(3rem, 8vw, 7rem);
+    font-weight: 800; line-height: 1.0;
+    text-transform: uppercase; letter-spacing: 2px;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--concrete-grey) 30%, var(--safety-yellow) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    position: relative; z-index: 1;
+}
+body.dark-mode .cl-title {
+    background: linear-gradient(135deg, #e2e8f0 30%, var(--safety-yellow) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+.cl-sub {
+    font-size: 1.1rem; color: var(--text-light);
+    max-width: 560px; line-height: 1.7; margin-bottom: 3rem;
+    position: relative; z-index: 1;
+}
+.cl-sub strong { color: var(--text-dark); font-weight: 700; }
+
+/* Countdown */
+.cl-countdown {
+    display: flex; align-items: center; gap: 0;
+    margin-bottom: 3rem;
+    position: relative; z-index: 1;
+}
+.cl-block {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 1.8rem 2.2rem;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-left: 4px solid var(--safety-yellow);
+    box-shadow: var(--shadow);
+    min-width: 100px;
+    transition: box-shadow 0.3s ease;
+}
+.cl-block:hover {
+    box-shadow: 0 8px 32px var(--card-glow);
+}
+.cl-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 700; line-height: 1;
+    color: var(--safety-yellow);
+}
+.cl-num.flip { animation: clFlip 0.3s ease; }
+@keyframes clFlip {
+    0%   { transform: translateY(0);   opacity: 1; }
+    49%  { transform: translateY(-8px); opacity: 0; }
+    51%  { transform: translateY(8px);  opacity: 0; }
+    100% { transform: translateY(0);   opacity: 1; }
+}
+.cl-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.55rem; letter-spacing: 0.2em;
+    color: var(--text-light); text-transform: uppercase; margin-top: 0.4rem;
+}
+.cl-sep {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 2.5rem; font-weight: 700;
+    color: var(--safety-yellow); opacity: 0.3;
+    padding: 0 0.4rem; align-self: flex-start; margin-top: 1rem;
+    animation: clSepPulse 1s ease-in-out infinite;
+}
+@keyframes clSepPulse {
+    0%, 100% { opacity: 0.3; }
+    50%       { opacity: 0.8; }
+}
+
+/* Free Tier Badge */
+.cl-free-tier {
+    display: flex; align-items: center; gap: 2rem;
+    padding: 1.2rem 2.5rem;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-left: 4px solid var(--safety-yellow);
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+    position: relative; z-index: 1;
+}
+.cl-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.4rem; font-weight: 700;
+    color: var(--safety-yellow); white-space: nowrap;
+    text-transform: uppercase; letter-spacing: 2px;
+}
+.cl-tier-headline {
+    font-size: 0.75rem; letter-spacing: 0.15em;
+    color: var(--text-dark); text-transform: uppercase;
+    font-weight: 700; margin-bottom: 0.25rem;
+}
+.cl-tier-sub {
+    font-size: 0.65rem; letter-spacing: 0.1em;
+    color: var(--text-light); text-transform: uppercase;
+}
+
+/* Target date */
+.cl-target {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem; letter-spacing: 0.25em;
+    color: var(--text-light); text-transform: uppercase;
+    display: flex; align-items: center; gap: 1rem;
+    position: relative; z-index: 1;
+}
+.cl-target-line { width: 30px; height: 2px; background: var(--safety-yellow); }
+.cl-target span { color: var(--safety-yellow); }
+
+@media (max-width: 768px) {
+    .construct-launch { padding: 4rem 1.5rem; }
+    .cl-countdown { flex-wrap: nowrap; }
+    .cl-block { padding: 1.2rem 1rem; min-width: 70px; }
+    .cl-sep { font-size: 1.8rem; }
+    .cl-free-tier { flex-direction: column; gap: 1rem; text-align: center; }
+    
     </style>
 </head>
 <body>
@@ -361,7 +511,6 @@
     <div class="sys-monitor">
         <div class="sys-header">
             <span>CONSTRUCT.OS</span>
-            <span class="sys-status">● ONLINE</span>
         </div>
         
         <ul class="sys-list">
@@ -391,7 +540,55 @@
     <div id="hero-top" class="hero">
         <h1>The Central Nervous System<br>of Construction</h1>
         <p class="subtitle">We don't just build. We engineer the automated ecosystem that manages Safety, Logistics, and Quality with military-grade precision.</p>
+    <br>
+    <section class="construct-launch">
+
+    <p class="cl-sub">
+     Free for 15 days. No setup fees. No credit card.
+    </p>
+
+    <div class="cl-countdown">
+        <div class="cl-block">
+            <span class="cl-num" id="cl-days">00</span>
+            <span class="cl-label">Days</span>
+        </div>
+        <div class="cl-sep">:</div>
+        <div class="cl-block">
+            <span class="cl-num" id="cl-hours">00</span>
+            <span class="cl-label">Hours</span>
+        </div>
+        <div class="cl-sep">:</div>
+        <div class="cl-block">
+            <span class="cl-num" id="cl-minutes">00</span>
+            <span class="cl-label">Min</span>
+        </div>
+        <div class="cl-sep">:</div>
+        <div class="cl-block">
+            <span class="cl-num" id="cl-seconds">00</span>
+            <span class="cl-label">Sec</span>
+        </div>
     </div>
+
+    <div class="cl-free-tier">
+        <div class="cl-badge">15 Days Free</div>
+        <div class="cl-divider"></div>
+        <div>
+            <div class="cl-tier-headline">Full Access. No Credit Card.</div>
+            <div class="cl-tier-sub">Any business · All modules · Cancel anytime</div>
+        </div>
+    </div>
+
+    <div class="cl-target">
+        <div class="cl-target-line"></div>
+        Live on <span>27 March 2026 · 14:00 IST</span>
+        <div class="cl-target-line"></div>
+    </div>
+</section>
+    
+
+    </div>
+
+    
 
     <div class="map-container">
         <svg class="cable-svg" xmlns="http://www.w3.org/2000/svg">
@@ -850,6 +1047,30 @@
                 location.reload();
             }
         });
+
+    // Construct Launch Countdown
+(function() {
+    const target = new Date('2026-03-27T14:00:00+05:30').getTime();
+    function pad(n) { return String(n).padStart(2, '0'); }
+    function flip(el, val) {
+        if (el.textContent !== val) {
+            el.classList.remove('flip');
+            void el.offsetWidth;
+            el.classList.add('flip');
+            el.textContent = val;
+        }
+    }
+    function tick() {
+        const diff = target - Date.now();
+        if (diff <= 0) return;
+        flip(document.getElementById('cl-days'),    pad(Math.floor(diff / 86400000)));
+        flip(document.getElementById('cl-hours'),   pad(Math.floor((diff % 86400000) / 3600000)));
+        flip(document.getElementById('cl-minutes'), pad(Math.floor((diff % 3600000) / 60000)));
+        flip(document.getElementById('cl-seconds'), pad(Math.floor((diff % 60000) / 1000)));
+    }
+    tick();
+    setInterval(tick, 1000);
+})();
     </script>
 </body>
 </html>
