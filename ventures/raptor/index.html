@@ -849,6 +849,15 @@ footer {
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
+@keyframes greenPulse {
+  0%, 100% { opacity: 1; text-shadow: 0 0 5px rgba(34, 197, 94, 0.5); }
+  50% { opacity: 0.7; text-shadow: 0 0 15px rgba(34, 197, 94, 0.8); }
+}
+
+.lc-target-text span {
+  animation: greenPulse 2s ease-in-out infinite;
+}
+
 @media (max-width: 768px) {
   nav { padding: 1.5rem 1.5rem; }
   .nav-links { display: none; }
@@ -920,47 +929,35 @@ footer {
   <div class="lc-bracket tr"></div>
   <div class="lc-bracket bl"></div>
   <div class="lc-bracket br"></div>
-  </p>
 
-  <div class="lc-countdown">
-    <div class="lc-block">
-      <span class="lc-num" id="lc-days">00</span>
-      <span class="lc-label">Days</span>
-    </div>
-    <div class="lc-sep">:</div>
-    <div class="lc-block">
-      <span class="lc-num" id="lc-hours">00</span>
-      <span class="lc-label">Hours</span>
-    </div>
-    <div class="lc-sep">:</div>
-    <div class="lc-block">
-      <span class="lc-num" id="lc-minutes">00</span>
-      <span class="lc-label">Min</span>
-    </div>
-    <div class="lc-sep">:</div>
-    <div class="lc-block">
-      <span class="lc-num" id="lc-seconds">00</span>
-      <span class="lc-label">Sec</span>
-    </div>
-  </div>
-
-  <div class="lc-free-tier">
-    <div class="lc-badge">15 Days Free</div>
-    <div class="lc-divider"></div>
-    <div>
-      <div class="lc-tier-headline">Full Access. No Credit Card.</div>
-      <div class="lc-tier-sub">Any business · All features · Cancel anytime</div>
-    </div>
-    <div class="lc-arrow">→</div>
-  </div>
-
-  <div class="lc-target">
+  <div class="lc-target" style="margin-top: 0; margin-bottom: 2rem;">
     <div class="lc-target-line"></div>
-    <div class="lc-target-text">Live on <span>25 March 2026 · 14:00 IST</span></div>
+    <div class="lc-target-text" style="color: var(--white); font-weight: bold;">
+      SYSTEM <span style="color: #22c55e;">ONLINE</span> // STATUS: HUNTING
+    </div>
     <div class="lc-target-line"></div>
   </div>
-</section>
 
+  <div style="margin-bottom: 3rem; opacity: 0; animation: fadeIn 1s ease forwards 0.5s;">
+    <a href="https://github.com/yogeshjathalkar12/raptor/releases/download/v1.0.0/Raptor.Setup.0.1.0.exe" 
+       class="btn-main" 
+       style="padding: 1.5rem 4rem; font-size: 1rem; box-shadow: 0 0 30px rgba(168,85,247,0.3);">
+       Download Raptor v1.0.0
+    </a>
+    <p style="color: var(--dim2); font-size: 0.55rem; letter-spacing: 0.3em; margin-top: 1.5rem; text-transform: uppercase;">
+      Windows x64 · Stable Release · 113MB
+    </p>
+  </div>
+
+  <div class="lc-free-tier" style="border-color: rgba(34, 197, 94, 0.2); background: rgba(34, 197, 94, 0.02);">
+    <div class="lc-badge" style="background: linear-gradient(135deg, #22c55e, #10b981); -webkit-text-fill-color: transparent;">DOMINATE</div>
+    <div class="lc-divider" style="background: rgba(34, 197, 94, 0.2);"></div>
+    <div style="text-align: left;">
+      <div class="lc-tier-headline" style="color: #22c55e;">The wait is over.</div>
+      <div class="lc-tier-sub">Download now to out-hunt and out-scale your competition.</div>
+    </div>
+  </div>
+  </section>
   <div>
     
     <h1 class="hero-headline">
@@ -1361,29 +1358,6 @@ const staggerObs = new IntersectionObserver(entries => {
 }, { threshold: 0.05 });
 
 document.querySelectorAll('[data-delay]').forEach(el => staggerObs.observe(el));
-
-(function() {
-  const target = new Date('2026-03-24T14:00:00+05:30').getTime();
-  function pad(n) { return String(n).padStart(2, '0'); }
-  function flip(el, val) {
-    if (el.textContent !== val) {
-      el.classList.remove('flip');
-      void el.offsetWidth;
-      el.classList.add('flip');
-      el.textContent = val;
-    }
-  }
-  function tick() {
-    const diff = target - Date.now();
-    if (diff <= 0) return;
-    flip(document.getElementById('lc-days'),    pad(Math.floor(diff / 86400000)));
-    flip(document.getElementById('lc-hours'),   pad(Math.floor((diff % 86400000) / 3600000)));
-    flip(document.getElementById('lc-minutes'), pad(Math.floor((diff % 3600000) / 60000)));
-    flip(document.getElementById('lc-seconds'), pad(Math.floor((diff % 60000) / 1000)));
-  }
-  tick();
-  setInterval(tick, 1000);
-})();
 
 </script>
 </body>
