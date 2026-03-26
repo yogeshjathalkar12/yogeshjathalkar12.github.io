@@ -7,14 +7,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=IBM+Plex+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --black: #000000;
-    --white: #ffffff;
-    --red: #ff2200;
-    --dim: #333333;
-    --mid: #666666;
-    --faint: #111111;
-    --border: #1a1a1a;
-    --green: #00ff41;
+    --black: #030303;
+    --white: #f4f4f5;
+    --purple: #a855f7;
+    --pink: #ec4899;
+    --grad: linear-gradient(135deg, #a855f7, #ec4899);
+    --dim: #3f3f46;
+    --mid: #71717a;
+    --faint: #0a0a0a;
+    --border: rgba(255,255,255,0.06);
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -31,20 +32,14 @@
     cursor: crosshair;
   }
 
-  /* SCANLINES */
-  body::before {
+  /* NOISE OVERLAY - Matches Home Site */
+  body::after {
     content: '';
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(255,255,255,0.015) 2px,
-      rgba(255,255,255,0.015) 4px
-    );
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
     pointer-events: none;
     z-index: 9999;
+    opacity: 0.5;
   }
 
   /* NAV */
@@ -57,7 +52,7 @@
     align-items: center;
     padding: 20px 40px;
     border-bottom: 1px solid var(--border);
-    background: rgba(0,0,0,0.95);
+    background: rgba(3,3,3,0.95);
     backdrop-filter: blur(10px);
   }
 
@@ -65,7 +60,9 @@
     font-family: 'Bebas Neue', sans-serif;
     font-size: 22px;
     letter-spacing: 4px;
-    color: var(--white);
+    background: var(--grad);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     text-decoration: none;
   }
 
@@ -97,8 +94,8 @@
   }
 
   .nav-exit:hover {
-    color: var(--white);
-    border-color: var(--white);
+    color: var(--purple);
+    border-color: var(--purple);
   }
 
   /* HERO */
@@ -117,7 +114,7 @@
     transform: translateY(-50%) rotate(90deg);
     font-family: 'Bebas Neue', sans-serif;
     font-size: 180px;
-    color: rgba(255,255,255,0.02);
+    color: rgba(168,85,247,0.03);
     letter-spacing: 20px;
     pointer-events: none;
     white-space: nowrap;
@@ -132,9 +129,35 @@
   }
 
   .system-tag span {
-    color: var(--green);
+    color: var(--purple);
     animation: blink 1.4s infinite;
   }
+
+  /* CUSTOM CURSOR STYLES */
+body { cursor: none; } /* Hide the default cursor */
+
+.cursor {
+  position: fixed;
+  width: 8px; height: 8px;
+  background: var(--purple);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: transform 0.1s ease, width 0.3s ease, height 0.3s ease, background 0.3s ease;
+  mix-blend-mode: screen;
+}
+
+.cursor-ring {
+  position: fixed;
+  width: 32px; height: 32px;
+  border: 1px solid rgba(168,85,247,0.4);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: all 0.15s ease;
+}
 
   @keyframes blink {
     0%, 100% { opacity: 1; }
@@ -151,7 +174,9 @@
 
   .hero h1 em {
     font-style: normal;
-    color: var(--red);
+    background: var(--grad);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 
   .hero-sub {
@@ -166,7 +191,7 @@
 
   /* FOUNDING BANNER */
   .founding-banner {
-    background: var(--red);
+    background: var(--grad);
     color: var(--white);
     padding: 14px 40px;
     font-size: 11px;
@@ -197,7 +222,7 @@
   .section-label {
     font-size: 10px;
     letter-spacing: 4px;
-    color: var(--mid);
+    color: var(--purple);
     text-transform: uppercase;
     margin-bottom: 48px;
     display: flex;
@@ -230,11 +255,11 @@
     transition: background 0.3s;
   }
 
-  .plan:hover { background: #050505; }
+  .plan:hover { background: #080808; }
 
   .plan.featured {
-    background: #060606;
-    outline: 1px solid var(--red);
+    background: #0a0a0a;
+    outline: 1px solid var(--purple);
     outline-offset: -1px;
   }
 
@@ -242,13 +267,13 @@
     font-size: 9px;
     letter-spacing: 3px;
     text-transform: uppercase;
-    color: var(--red);
+    color: var(--purple);
     margin-bottom: 20px;
     display: block;
   }
 
   .plan.featured .plan-badge {
-    background: var(--red);
+    background: var(--grad);
     color: var(--white);
     display: inline-block;
     padding: 3px 10px;
@@ -284,7 +309,11 @@
     color: var(--white);
   }
 
-  .plan.featured .price-amount { color: var(--red); }
+  .plan.featured .price-amount {
+    background: var(--grad);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 
   .price-period {
     font-size: 11px;
@@ -295,7 +324,7 @@
 
   .price-annual {
     font-size: 10px;
-    color: var(--green);
+    color: var(--purple);
     margin-top: 6px;
     letter-spacing: 1px;
   }
@@ -328,7 +357,7 @@
   .plan-features li strong { color: var(--white); }
 
   .plan-features li.locked {
-    opacity: 0.3;
+    opacity: 0.15;
     text-decoration: line-through;
   }
 
@@ -350,20 +379,19 @@
   }
 
   .plan-cta:hover {
-    border-color: var(--white);
+    border-color: var(--purple);
     color: var(--white);
-    background: rgba(255,255,255,0.03);
+    background: rgba(168,85,247,0.05);
   }
 
   .plan.featured .plan-cta {
-    background: var(--red);
-    border-color: var(--red);
+    background: var(--grad);
+    border-color: transparent;
     color: var(--white);
   }
 
   .plan.featured .plan-cta:hover {
-    background: #cc1a00;
-    border-color: #cc1a00;
+    opacity: 0.9;
   }
 
   /* ADD-ONS */
@@ -381,12 +409,12 @@
     transition: background 0.2s;
   }
 
-  .addon:hover { background: #050505; }
+  .addon:hover { background: #080808; }
 
   .addon-label {
     font-size: 9px;
     letter-spacing: 3px;
-    color: var(--red);
+    color: var(--purple);
     text-transform: uppercase;
     margin-bottom: 10px;
   }
@@ -443,16 +471,16 @@
     vertical-align: middle;
   }
 
-  .annual-table tr:hover td { background: #050505; }
+  .annual-table tr:hover td { background: #080808; }
 
   .annual-table .plan-col { color: var(--white); letter-spacing: 1px; }
   .annual-table .monthly-col { color: var(--mid); }
-  .annual-table .annual-col { color: var(--green); }
-  .annual-table .saving-col { color: var(--red); }
+  .annual-table .annual-col { color: var(--purple); }
+  .annual-table .saving-col { background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; }
 
   /* FOUNDING */
   .founding-section {
-    background: #060606;
+    background: #050505;
   }
 
   .founding-grid {
@@ -472,7 +500,9 @@
 
   .founding-left h2 em {
     font-style: normal;
-    color: var(--red);
+    background: var(--grad);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 
   .founding-left p {
@@ -500,7 +530,7 @@
 
   .founding-benefits li::before {
     content: '//';
-    color: var(--red);
+    color: var(--purple);
     flex-shrink: 0;
   }
 
@@ -521,7 +551,7 @@
   .slots-number {
     font-family: 'Bebas Neue', sans-serif;
     font-size: 96px;
-    color: var(--red);
+    color: var(--purple);
     line-height: 1;
     letter-spacing: 4px;
   }
@@ -548,7 +578,7 @@
     position: absolute;
     left: 0; top: 0; bottom: 0;
     width: 35%;
-    background: var(--red);
+    background: var(--grad);
   }
 
   .slots-taken {
@@ -584,7 +614,7 @@
 
   .founding-price-note {
     font-size: 10px;
-    color: var(--green);
+    color: var(--purple);
     letter-spacing: 2px;
     margin-top: 8px;
   }
@@ -593,7 +623,7 @@
     display: block;
     width: 100%;
     padding: 18px;
-    background: var(--red);
+    background: var(--grad);
     border: none;
     color: var(--white);
     font-family: 'IBM Plex Mono', monospace;
@@ -601,13 +631,13 @@
     letter-spacing: 4px;
     text-transform: uppercase;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: opacity 0.2s;
     text-align: center;
     text-decoration: none;
     margin-bottom: 12px;
   }
 
-  .founding-cta:hover { background: #cc1a00; }
+  .founding-cta:hover { opacity: 0.9; }
 
   .founding-cta-note {
     font-size: 10px;
@@ -635,7 +665,7 @@
   }
 
   .roi-outputs {
-    background: #060606;
+    background: #080808;
     padding: 40px;
   }
 
@@ -674,7 +704,7 @@
   }
 
   .roi-field input:focus, .roi-field select:focus {
-    border-color: var(--white);
+    border-color: var(--purple);
   }
 
   .roi-field select option { background: #111; }
@@ -702,8 +732,8 @@
     line-height: 1;
   }
 
-  .roi-metric-value.positive { color: var(--green); }
-  .roi-metric-value.highlight { color: var(--red); }
+  .roi-metric-value.positive { background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .roi-metric-value.highlight { color: var(--purple); text-shadow: 0 0 10px rgba(168,85,247,0.3); }
 
   .roi-metric-sub {
     font-size: 10px;
@@ -730,7 +760,7 @@
   }
 
   .comparison-grid th:first-child { text-align: left; }
-  .comparison-grid th.raptor-col { color: var(--red); }
+  .comparison-grid th.raptor-col { background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
   .comparison-grid td {
     padding: 14px 20px;
@@ -746,11 +776,11 @@
     letter-spacing: 1px;
   }
 
-  .comparison-grid tr:hover td { background: #050505; }
+  .comparison-grid tr:hover td { background: #080808; }
 
-  .check { color: var(--green); font-size: 14px; }
-  .cross { color: var(--dim); font-size: 14px; }
-  .partial { color: #ff9900; font-size: 11px; letter-spacing: 1px; }
+  .check { color: var(--purple); font-size: 14px; }
+  .cross { color: var(--dim); font-size: 14px; opacity: 0.3; }
+  .partial { color: var(--purple); font-size: 11px; letter-spacing: 1px; opacity: 0.6; }
 
   /* FOOTER */
   footer {
@@ -761,13 +791,16 @@
     font-size: 10px;
     color: var(--mid);
     letter-spacing: 2px;
+    border-top: 1px solid var(--border);
   }
 
   .footer-logo {
     font-family: 'Bebas Neue', sans-serif;
     font-size: 18px;
     letter-spacing: 4px;
-    color: var(--white);
+    background: var(--grad);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 
   /* ANIMATIONS */
@@ -790,7 +823,7 @@
   .cursor::after {
     content: '_';
     animation: blink 1s infinite;
-    color: var(--red);
+    color: var(--purple);
   }
 
   @media (max-width: 900px) {
@@ -812,8 +845,9 @@
 </style>
 </head>
 <body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
 
-<!-- NAV -->
 <nav>
   <a href="#" class="nav-logo">RAPTOR</a>
   <ul class="nav-links">
@@ -826,14 +860,12 @@
   <a href="https://shoonyaorigins.com/ventures/raptor/" class="nav-exit">Exit ///</a>
 </nav>
 
-<!-- FOUNDING BANNER -->
 <div class="founding-banner">
   <strong>FOUNDING MEMBER ACCESS OPEN</strong>
   <span class="founding-count">7 / 20 SLOTS TAKEN</span>
   <strong>50% OFF FOREVER — LOCKS IN TODAY'S PRICE PERMANENTLY</strong>
 </div>
 
-<!-- HERO -->
 <div class="hero">
   <div class="system-tag"><span>■</span> PRICING MODULE // STATUS: ACTIVE</div>
   <h1>INVEST IN<br>THE <em>BRAIN.</em></h1>
@@ -843,13 +875,11 @@
   </p>
 </div>
 
-<!-- PLANS -->
 <section id="plans">
   <div class="section-label">01 // Deployment Tiers</div>
 
   <div class="pricing-grid">
 
-    <!-- STARTER -->
     <div class="plan fade-in">
       <span class="plan-badge">// TIER 01</span>
       <div class="plan-name">STARTER</div>
@@ -872,7 +902,6 @@
       <a href="mailto:contact@shoonyaorigins.com?subject=Raptor Starter Plan" class="plan-cta">Deploy Starter →</a>
     </div>
 
-    <!-- GROWTH -->
     <div class="plan featured fade-in">
       <span class="plan-badge">// MOST DEPLOYED</span>
       <div class="plan-name">GROWTH</div>
@@ -895,7 +924,6 @@
       <a href="mailto:contact@shoonyaorigins.com?subject=Raptor Growth Plan" class="plan-cta">Deploy Growth →</a>
     </div>
 
-    <!-- SCALE -->
     <div class="plan fade-in">
       <span class="plan-badge">// TIER 03</span>
       <div class="plan-name">SCALE</div>
@@ -918,7 +946,6 @@
       <a href="mailto:contact@shoonyaorigins.com?subject=Raptor Scale Plan" class="plan-cta">Deploy Scale →</a>
     </div>
 
-    <!-- ENTERPRISE -->
     <div class="plan fade-in">
       <span class="plan-badge">// TIER 04</span>
       <div class="plan-name">ENTERPRISE</div>
@@ -943,7 +970,6 @@
 
   </div>
 
-  <!-- ANNUAL TABLE -->
   <div class="section-label" style="margin-top: 60px;">Annual Billing — Lock In and Save</div>
   <table class="annual-table">
     <thead>
@@ -981,7 +1007,6 @@
   </table>
 </section>
 
-<!-- ADD-ONS -->
 <section id="addons">
   <div class="section-label">02 // Expansion Modules</div>
   <div class="addons-grid">
@@ -1012,12 +1037,11 @@
   </div>
 </section>
 
-<!-- FOUNDING MEMBER -->
 <section id="founding" class="founding-section">
   <div class="section-label">03 // Founding Member Protocol</div>
   <div class="founding-grid">
     <div class="founding-left">
-      <h2>THE FIRST<br><em>20</em> CHANGE<br>EVERYTHING.</h2>
+      <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 56px; letter-spacing: 3px; line-height: 0.95; margin-bottom: 24px;">THE FIRST<br><em style="font-style: normal; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">20</em> CHANGE<br>EVERYTHING.</h2>
       <p>Raptor is a <strong>self-retuning brain</strong>. Every deal closed by every client makes it sharper. The first 20 clients don't just get a product — they become the training data that makes Raptor irreplaceable.</p>
       <p>In exchange, they get <strong>50% off their chosen plan forever.</strong> Not a trial. Not a promo. Permanently locked pricing that compounds in their favour as Raptor scales.</p>
       <ul class="founding-benefits">
@@ -1037,20 +1061,19 @@
       <div class="slots-bar"></div>
       <div class="slots-taken">
         <span>7 of 20 taken</span>
-        <span style="color: var(--red);">35% claimed</span>
+        <span style="color: var(--purple);">35% claimed</span>
       </div>
       <div class="founding-price-display">
         <div class="founding-price-old">₹12,999/mo</div>
         <div class="founding-price-new">₹6,499</div>
         <div class="founding-price-note">// GROWTH PLAN · FOUNDING PRICE · FOREVER</div>
       </div>
-      <a href="mailto:contact@shoonyaorigins.com?subject=Founding Member Application — Raptor" class="founding-cta">Claim Founding Slot →</a>
+      <a href="mailto:yogeshjathalkar@gmail.com?subject=Founding Member Application — Raptor" class="founding-cta">Claim Founding Slot →</a>
       <div class="founding-cta-note">Via direct email · Response within 24hrs</div>
     </div>
   </div>
 </section>
 
-<!-- ROI CALCULATOR -->
 <section id="roi" class="roi-section">
   <div class="section-label">04 // ROI Calculator</div>
   <div class="roi-grid">
@@ -1104,7 +1127,6 @@
   </div>
 </section>
 
-<!-- COMPARISON -->
 <section id="compare">
   <div class="section-label">05 // Stack Comparison</div>
   <table class="comparison-grid">
@@ -1193,7 +1215,7 @@
       </tr>
       <tr>
         <td>Monthly Cost (3 users, INR)</td>
-        <td style="color: var(--red); font-family: 'Bebas Neue'; font-size: 20px; letter-spacing: 2px;">₹12,999</td>
+        <td style="background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family: 'Bebas Neue'; font-size: 20px; letter-spacing: 2px;">₹12,999</td>
         <td style="color: var(--mid);">₹12,000</td>
         <td style="color: var(--mid);">₹36,000</td>
         <td style="color: var(--mid);">₹24,000</td>
@@ -1203,27 +1225,61 @@
   </table>
 </section>
 
-<!-- CTA -->
 <section style="text-align: center; padding: 100px 40px; background: #030303;">
   <div class="system-tag" style="justify-content: center; margin-bottom: 32px;"><span>■</span> WINDOW IS OPEN</div>
-  <h2 style="font-family: 'Bebas Neue'; font-size: clamp(48px, 8vw, 100px); letter-spacing: 4px; line-height: 0.95; margin-bottom: 32px;">YOUR COMPETITORS<br>DON'T HAVE <span style="color: var(--red);">THIS.</span><br>YET.</h2>
+  <h2 style="font-family: 'Bebas Neue'; font-size: clamp(48px, 8vw, 100px); letter-spacing: 4px; line-height: 0.95; margin-bottom: 32px;">YOUR COMPETITORS<br>DON'T HAVE <span style="background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">THIS.</span><br>YET.</h2>
   <p style="color: var(--mid); max-width: 480px; margin: 0 auto 48px; font-size: 12px; line-height: 1.9;">
     Every day without Raptor is a day your competitors could be building a smarter brain than yours. <strong style="color: var(--white);">The compounding starts on day one. Not day two.</strong>
   </p>
   <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
-    <a href="mailto:contact@shoonyaorigins.com?subject=Founding Member Application — Raptor" style="padding: 16px 40px; background: var(--red); color: var(--white); text-decoration: none; font-family: 'IBM Plex Mono'; font-size: 12px; letter-spacing: 4px; text-transform: uppercase; transition: background 0.2s;" onmouseover="this.style.background='#cc1a00'" onmouseout="this.style.background='#ff2200'">Claim Founding Slot →</a>
-    <a href="https://shoonyaorigins.com/ventures/raptor/" style="padding: 16px 40px; background: transparent; color: var(--mid); text-decoration: none; font-family: 'IBM Plex Mono'; font-size: 12px; letter-spacing: 4px; text-transform: uppercase; border: 1px solid var(--dim); transition: all 0.2s;" onmouseover="this.style.color='#fff';this.style.borderColor='#fff'" onmouseout="this.style.color='#666';this.style.borderColor='#333'">Back to Raptor ///</a>
+    <a href="mailto:contact@shoonyaorigins.com?subject=Founding Member Application — Raptor" style="padding: 16px 40px; background: var(--grad); color: var(--white); text-decoration: none; font-family: 'IBM Plex Mono'; font-size: 12px; letter-spacing: 4px; text-transform: uppercase; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">Claim Founding Slot →</a>
+    <a href="https://shoonyaorigins.com/ventures/raptor/" style="padding: 16px 40px; background: transparent; color: var(--mid); text-decoration: none; font-family: 'IBM Plex Mono'; font-size: 12px; letter-spacing: 4px; text-transform: uppercase; border: 1px solid var(--dim); transition: all 0.2s;" onmouseover="this.style.color='#f4f4f5';this.style.borderColor='#f4f4f5'" onmouseout="this.style.color='#71717a';this.style.borderColor='#3f3f46'">Back to Raptor ///</a>
   </div>
 </section>
 
-<!-- FOOTER -->
 <footer>
   <span class="footer-logo">RAPTOR</span>
   <span>ShoonyaOrigins · AI Sales Intelligence · Pune, India · © 2026</span>
-  <span>SYSTEM ACTIVE</span>
+  <span style="color: var(--purple);">SYSTEM ACTIVE</span>
 </footer>
 
 <script>
+
+  const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; 
+  my = e.clientY;
+  cursor.style.left = mx + 'px';
+  cursor.style.top = my + 'px';
+});
+
+// The smooth trailing animation
+function animateRing() {
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px';
+  ring.style.top = ry + 'px';
+  requestAnimationFrame(animateRing);
+}
+animateRing();
+
+// Expansion effect on interactive elements
+document.querySelectorAll('a, button, input, select, .plan').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    cursor.style.width = '16px'; cursor.style.height = '16px';
+    cursor.style.background = 'var(--pink)';
+    ring.style.width = '50px'; ring.style.height = '50px';
+  });
+  el.addEventListener('mouseleave', () => {
+    cursor.style.width = '8px'; cursor.style.height = '8px';
+    cursor.style.background = 'var(--purple)';
+    ring.style.width = '32px'; ring.style.height = '32px';
+  });
+});
+
   function formatINR(n) {
     if (n >= 10000000) return '₹' + (n/10000000).toFixed(1) + 'Cr';
     if (n >= 100000) return '₹' + (n/100000).toFixed(1) + 'L';
