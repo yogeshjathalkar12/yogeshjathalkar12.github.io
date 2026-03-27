@@ -1,0 +1,2218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raptor — Free Sales Arsenal</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --bg2: #111111;
+    --bg3: #181818;
+    --border: #2a2a2a;
+    --border-active: #6c3bff;
+    --purple: #6c3bff;
+    --pink: #ff3b8b;
+    --green: #00ff88;
+    --text: #e8e8e8;
+    --text-dim: #666;
+    --text-mid: #999;
+    --mono: 'DM Mono', monospace;
+    --display: 'Bebas Neue', sans-serif;
+    --body: 'Space Grotesk', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* SCAN LINE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,10,10,0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+  }
+
+  .nav-brand {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .nav-brand span { color: var(--purple); }
+
+  .nav-status {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--green);
+    letter-spacing: 0.1em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .nav-status::before {
+    content: '■';
+    animation: blink 1.2s infinite;
+  }
+
+  .nav-back {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    transition: color 0.2s;
+  }
+  .nav-back:hover { color: var(--text); }
+
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* HERO */
+  .hero {
+    padding: 100px 40px 60px;
+    max-width: 1100px;
+    margin: 0 auto;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--purple);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  .hero h1 {
+    font-family: var(--display);
+    font-size: clamp(56px, 9vw, 110px);
+    line-height: 0.9;
+    letter-spacing: 0.02em;
+    margin-bottom: 32px;
+  }
+
+  .hero h1 em {
+    font-style: normal;
+    background: linear-gradient(135deg, var(--purple), var(--pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--text-mid);
+    max-width: 600px;
+    line-height: 1.8;
+    margin-bottom: 40px;
+  }
+
+  .hero-meta {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .hero-meta-item {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .hero-meta-item span {
+    color: var(--green);
+    display: block;
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 0;
+    margin-bottom: 2px;
+  }
+
+  /* TOOL GRID INDEX */
+  .tool-index {
+    padding: 60px 40px;
+    max-width: 1100px;
+    margin: 0 auto;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+
+  .tool-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+  }
+
+  .tool-card {
+    background: var(--bg);
+    padding: 28px 24px;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-decoration: none;
+    display: block;
+  }
+
+  .tool-card:hover { background: var(--bg3); }
+
+  .tool-card.live .tool-card-status { color: var(--green); }
+  .tool-card.beta .tool-card-status { color: var(--pink); }
+  .tool-card.soon .tool-card-status { color: var(--text-dim); opacity: 0.5; pointer-events: none; }
+  .tool-card.soon { opacity: 0.5; cursor: default; }
+
+  .tool-card-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    margin-bottom: 12px;
+  }
+
+  .tool-card-title {
+    font-family: var(--display);
+    font-size: 22px;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+    line-height: 1.1;
+  }
+
+  .tool-card-desc {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-mid);
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .tool-card-status {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  /* TOOLS SECTIONS */
+  .tools-section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  .tool-block {
+    padding: 80px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tool-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    margin-bottom: 48px;
+    align-items: start;
+  }
+
+  .tool-header-left {}
+
+  .tool-num-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--purple);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .tool-title {
+    font-family: var(--display);
+    font-size: clamp(36px, 5vw, 60px);
+    line-height: 0.95;
+    letter-spacing: 0.03em;
+    margin-bottom: 20px;
+  }
+
+  .tool-title em {
+    font-style: normal;
+    background: linear-gradient(135deg, var(--purple), var(--pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .tool-desc {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-mid);
+    line-height: 1.8;
+  }
+
+  .tool-header-right {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.8;
+    padding-top: 40px;
+  }
+
+  .tool-header-right strong {
+    color: var(--text);
+    display: block;
+    margin-bottom: 8px;
+    font-size: 12px;
+  }
+
+  /* CALCULATOR UI */
+  .calc-shell {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .calc-topbar {
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.12em;
+  }
+
+  .calc-topbar-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--purple);
+    animation: blink 2s infinite;
+  }
+
+  .calc-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .calc-inputs {
+    padding: 32px;
+    border-right: 1px solid var(--border);
+  }
+
+  .calc-outputs {
+    padding: 32px;
+  }
+
+  .field-group {
+    margin-bottom: 24px;
+  }
+
+  .field-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .field-hint {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    margin-top: 4px;
+    opacity: 0.6;
+  }
+
+  input[type="number"],
+  input[type="text"],
+  select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 14px;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  input[type="number"]::-webkit-inner-spin-button { display: none; }
+
+  input:focus, select:focus {
+    border-color: var(--purple);
+  }
+
+  select {
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+  }
+
+  .range-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  input[type="range"] {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 2px;
+    background: var(--border);
+    outline: none;
+    padding: 0;
+    border: none;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    background: var(--purple);
+    cursor: pointer;
+    border-radius: 0;
+  }
+
+  .range-val {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--text);
+    min-width: 48px;
+    text-align: right;
+  }
+
+  .calc-btn {
+    width: 100%;
+    background: var(--purple);
+    color: #fff;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 14px;
+    border: none;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.2s, opacity 0.2s;
+  }
+
+  .calc-btn:hover { background: #7d4fff; }
+  .calc-btn:active { opacity: 0.8; }
+
+  .calc-btn.secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    margin-top: 8px;
+  }
+  .calc-btn.secondary:hover { border-color: var(--text-mid); color: var(--text); background: transparent; }
+
+  /* OUTPUT PANELS */
+  .output-panel {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .output-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .output-value {
+    font-family: var(--display);
+    font-size: 36px;
+    letter-spacing: 0.02em;
+    color: var(--green);
+    line-height: 1;
+  }
+
+  .output-value.purple { color: var(--purple); }
+  .output-value.pink { color: var(--pink); }
+  .output-value.white { color: var(--text); }
+
+  .output-sub {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  .output-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .output-diagnosis {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--purple);
+    padding: 16px 20px;
+    margin-bottom: 12px;
+  }
+
+  .output-diagnosis.warn { border-left-color: var(--pink); }
+  .output-diagnosis.good { border-left-color: var(--green); }
+
+  .diagnosis-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .diagnosis-text {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  .output-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    color: var(--text-dim);
+    font-family: var(--mono);
+    font-size: 11px;
+    text-align: center;
+    gap: 12px;
+    letter-spacing: 0.1em;
+  }
+
+  .output-placeholder::before {
+    content: '◈';
+    font-size: 28px;
+    color: var(--border);
+  }
+
+  /* SCORE BAR */
+  .score-bar-wrap {
+    margin: 16px 0;
+  }
+
+  .score-bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+
+  .score-bar-track {
+    height: 4px;
+    background: var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .score-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--purple), var(--pink));
+    transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+    width: 0%;
+  }
+
+  /* TABS */
+  .tool-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0;
+  }
+
+  .tool-tab {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 12px 20px;
+    cursor: pointer;
+    color: var(--text-dim);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.2s;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+  }
+
+  .tool-tab.active {
+    color: var(--purple);
+    border-bottom-color: var(--purple);
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ICP BUILDER SPECIFIC */
+  .icpq-step { display: none; }
+  .icpq-step.active { display: block; }
+
+  .icpq-progress {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 24px;
+  }
+
+  .icpq-dot {
+    flex: 1;
+    height: 2px;
+    background: var(--border);
+    transition: background 0.3s;
+  }
+
+  .icpq-dot.done { background: var(--purple); }
+  .icpq-dot.active { background: var(--pink); }
+
+  .icpq-question {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    margin-bottom: 20px;
+    line-height: 1.8;
+  }
+
+  .icpq-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .icpq-option {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 12px 16px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-mid);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+  }
+
+  .icpq-option:hover,
+  .icpq-option.selected {
+    border-color: var(--purple);
+    color: var(--text);
+    background: rgba(108,59,255,0.08);
+  }
+
+  /* CHURN SPECIFIC */
+  .signal-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .signal-row:last-child { border-bottom: none; }
+
+  .signal-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-mid);
+    flex: 1;
+  }
+
+  .signal-toggle {
+    display: flex;
+    gap: 4px;
+  }
+
+  .sig-btn {
+    font-family: var(--mono);
+    font-size: 9px;
+    padding: 5px 10px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text-dim);
+    cursor: pointer;
+    letter-spacing: 0.1em;
+    transition: all 0.15s;
+  }
+
+  .sig-btn.active-yes { border-color: var(--green); color: var(--green); background: rgba(0,255,136,0.06); }
+  .sig-btn.active-no { border-color: var(--pink); color: var(--pink); background: rgba(255,59,139,0.06); }
+
+  /* COMMISSION BUILDER */
+  .tier-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 8px;
+    margin-bottom: 8px;
+    align-items: center;
+  }
+
+  .tier-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+  }
+
+  .remove-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--pink);
+    font-family: var(--mono);
+    font-size: 12px;
+    width: 30px; height: 30px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+
+  .remove-btn:hover { background: rgba(255,59,139,0.1); }
+
+  /* TIMING TOOL */
+  .timing-matrix {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1px;
+    background: var(--border);
+    margin-bottom: 16px;
+  }
+
+  .timing-cell {
+    background: var(--bg2);
+    padding: 10px 8px;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    line-height: 1.4;
+  }
+
+  .timing-cell.header {
+    background: var(--bg3);
+    color: var(--text-mid);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+  }
+
+  .timing-cell.hot {
+    background: rgba(108,59,255,0.15);
+    color: var(--purple);
+    border: 1px solid rgba(108,59,255,0.3);
+  }
+
+  .timing-cell.warm {
+    background: rgba(255,59,139,0.08);
+    color: var(--pink);
+  }
+
+  /* PIPELINE HEALTH */
+  .health-ring-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .health-ring {
+    position: relative;
+    width: 120px; height: 120px;
+  }
+
+  .health-ring svg {
+    transform: rotate(-90deg);
+  }
+
+  .health-ring-text {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+
+  .health-ring-score {
+    font-family: var(--display);
+    font-size: 36px;
+    line-height: 1;
+    color: var(--green);
+  }
+
+  .health-ring-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+  }
+
+  /* TAM SPECIFIC */
+  .tam-funnel {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .tam-tier {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .tam-tier-bar {
+    height: 36px;
+    background: linear-gradient(90deg, var(--purple), var(--pink));
+    opacity: 0.8;
+    transition: width 0.6s;
+    min-width: 20px;
+  }
+
+  .tam-tier-info {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-mid);
+    white-space: nowrap;
+  }
+
+  .tam-tier-info strong { color: var(--text); }
+
+  /* SEQUENCE TOOL */
+  .seq-timeline {
+    position: relative;
+    padding-left: 20px;
+  }
+
+  .seq-timeline::before {
+    content: '';
+    position: absolute;
+    left: 4px; top: 8px; bottom: 8px;
+    width: 1px;
+    background: var(--border);
+  }
+
+  .seq-step {
+    position: relative;
+    margin-bottom: 16px;
+    padding: 14px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+  }
+
+  .seq-step::before {
+    content: '';
+    position: absolute;
+    left: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px; height: 8px;
+    background: var(--purple);
+    border-radius: 50%;
+  }
+
+  .seq-day {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--purple);
+    letter-spacing: 0.15em;
+    margin-bottom: 4px;
+  }
+
+  .seq-action {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .seq-why {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+
+  /* HIRING ROI */
+  .roi-compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .roi-side {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 16px;
+  }
+
+  .roi-side-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .roi-line {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-mid);
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .roi-line:last-child { border-bottom: none; }
+  .roi-line strong { color: var(--text); }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 40px;
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-brand {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    line-height: 1.8;
+  }
+
+  .footer-cta {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 12px 24px;
+    background: var(--purple);
+    color: #fff;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+
+  .footer-cta:hover { background: #7d4fff; }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    nav { padding: 0 20px; }
+    .hero { padding: 60px 20px 40px; }
+    .tool-grid { grid-template-columns: 1fr; }
+    .calc-body { grid-template-columns: 1fr; }
+    .calc-inputs { border-right: none; border-bottom: 1px solid var(--border); }
+    .tool-header { grid-template-columns: 1fr; gap: 20px; }
+    .tools-section { padding: 0 20px; }
+    .output-grid-2 { grid-template-columns: 1fr; }
+    .timing-matrix { grid-template-columns: repeat(3,1fr); }
+    footer { flex-direction: column; gap: 24px; text-align: center; }
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .tool-block { animation: fadeUp 0.5s ease both; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand"><span>RAPTOR</span> · FREE ARSENAL</div>
+  <div class="nav-status">SYSTEM ACTIVE // 9 TOOLS LOADED</div>
+  <a href="https://shoonyaorigins.com/ventures/raptor/" class="nav-back">← BACK TO RAPTOR</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">// FREE TOOLS · NO SIGNUP · NO BULLSHIT</div>
+  <h1>THE SALES<br><em>ARSENAL.</em></h1>
+  <p class="hero-sub">Nine tools that sales teams pay thousands for. Built by Raptor. Yours for free. Every calculation runs locally — no data leaves your browser.</p>
+  <div class="hero-meta">
+    <div class="hero-meta-item"><span>9</span>Tools</div>
+    <div class="hero-meta-item"><span>0</span>Sign-ups</div>
+    <div class="hero-meta-item"><span>0₹</span>Cost</div>
+    <div class="hero-meta-item"><span>∞</span>Uses</div>
+  </div>
+</div>
+
+<!-- TOOL INDEX -->
+<div class="tool-index">
+  <div class="section-tag">// TOOL INDEX</div>
+  <div class="tool-grid">
+    <a href="#tool-01" class="tool-card live">
+      <div class="tool-card-num">01 ///</div>
+      <div class="tool-card-title">TAM/SAM/SOM<br>CALCULATOR</div>
+      <div class="tool-card-desc">Size your market. Know your real opportunity.</div>
+      <div class="tool-card-status">● LIVE</div>
+    </a>
+    <a href="#tool-02" class="tool-card live">
+      <div class="tool-card-num">02 ///</div>
+      <div class="tool-card-title">SALES VELOCITY<br>CALCULATOR</div>
+      <div class="tool-card-desc">Find your biggest revenue lever in 60 seconds.</div>
+      <div class="tool-card-status">● LIVE</div>
+    </a>
+    <a href="#tool-03" class="tool-card live">
+      <div class="tool-card-num">03 ///</div>
+      <div class="tool-card-title">ICP PROFILE<br>BUILDER</div>
+      <div class="tool-card-desc">Generate your ideal client profile document.</div>
+      <div class="tool-card-status">● LIVE</div>
+    </a>
+    <a href="#tool-04" class="tool-card live">
+      <div class="tool-card-num">04 ///</div>
+      <div class="tool-card-title">PIPELINE HEALTH<br>SCORE</div>
+      <div class="tool-card-desc">Diagnose your pipeline before it breaks.</div>
+      <div class="tool-card-status">● LIVE</div>
+    </a>
+    <a href="#tool-05" class="tool-card live">
+      <div class="tool-card-num">05 ///</div>
+      <div class="tool-card-title">COMMISSION<br>BUILDER</div>
+      <div class="tool-card-desc">Design your sales comp plan with projections.</div>
+      <div class="tool-card-status">● LIVE</div>
+    </a>
+    <a href="#tool-06" class="tool-card live">
+      <div class="tool-card-num">06 ///</div>
+      <div class="tool-card-title">OUTREACH TIMING<br>OPTIMIZER</div>
+      <div class="tool-card-desc">Know exactly when and how to reach your prospect.</div>
+      <div class="tool-card-status">● LIVE</div>
+    </a>
+    <a href="#tool-07" class="tool-card live">
+      <div class="tool-card-num">07 ///</div>
+      <div class="tool-card-title">CHURN RISK<br>DIAGNOSTIC</div>
+      <div class="tool-card-desc">Score your accounts before they walk out.</div>
+      <div class="tool-card-status">● LIVE</div>
+    </a>
+    <a href="#tool-08" class="tool-card live">
+      <div class="tool-card-num">08 ///</div>
+      <div class="tool-card-title">SALES HIRING<br>ROI CALCULATOR</div>
+      <div class="tool-card-desc">SDR or AE? Know the numbers before you decide.</div>
+      <div class="tool-card-status">● LIVE</div>
+    </a>
+    <a href="#tool-09" class="tool-card live">
+      <div class="tool-card-num">09 ///</div>
+      <div class="tool-card-title">SEQUENCE<br>PLANNER</div>
+      <div class="tool-card-desc">Build your outreach sequence, not just the email.</div>
+      <div class="tool-card-status">● LIVE</div>
+    </a>
+  </div>
+</div>
+
+<!-- ======= TOOLS ======= -->
+<div class="tools-section">
+
+  <!-- TOOL 01: TAM/SAM/SOM -->
+  <div class="tool-block" id="tool-01">
+    <div class="tool-header">
+      <div class="tool-header-left">
+        <div class="tool-num-label">01 // MARKET SIZING</div>
+        <div class="tool-title">TAM / SAM / <em>SOM</em></div>
+        <p class="tool-desc">Most founders size their market wrong and either undersell to investors or overpromise to themselves. This calculator forces you to be precise — total market, serviceable segment, realistic capture.</p>
+      </div>
+      <div class="tool-header-right">
+        <strong>What you get</strong>
+        TAM — Total Addressable Market<br>
+        SAM — Serviceable Addressable Market<br>
+        SOM — Serviceable Obtainable Market<br>
+        3-year realistic revenue projection<br>
+        Investor-ready market narrative
+      </div>
+    </div>
+    <div class="calc-shell">
+      <div class="calc-topbar">
+        <div class="calc-topbar-dot"></div>
+        RAPTOR · MARKET SIZING ENGINE · v1.0
+      </div>
+      <div class="calc-body">
+        <div class="calc-inputs">
+          <div class="field-group">
+            <label class="field-label">Total Companies in Target Market</label>
+            <input type="number" id="tam-total" placeholder="e.g. 50000" oninput="calcTAM()">
+            <div class="field-hint">All companies that could theoretically buy your product</div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Average Contract Value (₹ / year)</label>
+            <input type="number" id="tam-acv" placeholder="e.g. 120000" oninput="calcTAM()">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Geographic / Segment Filter (%)</label>
+            <div class="range-wrapper">
+              <input type="range" id="tam-geo" min="1" max="100" value="30" oninput="document.getElementById('tam-geo-val').textContent=this.value+'%';calcTAM()">
+              <span class="range-val" id="tam-geo-val">30%</span>
+            </div>
+            <div class="field-hint">% of total market you can actually reach (geography, language, segment)</div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Win Rate Against Competition (%)</label>
+            <div class="range-wrapper">
+              <input type="range" id="tam-win" min="1" max="80" value="15" oninput="document.getElementById('tam-win-val').textContent=this.value+'%';calcTAM()">
+              <span class="range-val" id="tam-win-val">15%</span>
+            </div>
+            <div class="field-hint">Realistic close rate in your serviceable market</div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Market Penetration Target (3 years, %)</label>
+            <div class="range-wrapper">
+              <input type="range" id="tam-pen" min="1" max="30" value="5" oninput="document.getElementById('tam-pen-val').textContent=this.value+'%';calcTAM()">
+              <span class="range-val" id="tam-pen-val">5%</span>
+            </div>
+          </div>
+          <button class="calc-btn" onclick="calcTAM()">▶ CALCULATE MARKET SIZE</button>
+        </div>
+        <div class="calc-outputs" id="tam-output">
+          <div class="output-placeholder">Enter your numbers to size your market</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOOL 02: SALES VELOCITY -->
+  <div class="tool-block" id="tool-02">
+    <div class="tool-header">
+      <div class="tool-header-left">
+        <div class="tool-num-label">02 // REVENUE ENGINE</div>
+        <div class="tool-title">SALES <em>VELOCITY</em></div>
+        <p class="tool-desc">Sales velocity = (Opportunities × Win Rate × ACV) ÷ Sales Cycle. One formula. Four levers. This tool tells you which lever moves your revenue the most so you stop optimising the wrong thing.</p>
+      </div>
+      <div class="tool-header-right">
+        <strong>What you get</strong>
+        Current monthly revenue velocity<br>
+        Impact of improving each variable 10%<br>
+        Your #1 highest-leverage action<br>
+        Annual revenue projection
+      </div>
+    </div>
+    <div class="calc-shell">
+      <div class="calc-topbar">
+        <div class="calc-topbar-dot"></div>
+        RAPTOR · VELOCITY ENGINE · v1.0
+      </div>
+      <div class="calc-body">
+        <div class="calc-inputs">
+          <div class="field-group">
+            <label class="field-label">Active Opportunities in Pipeline</label>
+            <input type="number" id="sv-opps" placeholder="e.g. 40" oninput="calcVelocity()">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Average Deal Size (₹)</label>
+            <input type="number" id="sv-acv" placeholder="e.g. 150000" oninput="calcVelocity()">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Win Rate (%)</label>
+            <div class="range-wrapper">
+              <input type="range" id="sv-wr" min="1" max="90" value="20" oninput="document.getElementById('sv-wr-val').textContent=this.value+'%';calcVelocity()">
+              <span class="range-val" id="sv-wr-val">20%</span>
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Average Sales Cycle (days)</label>
+            <input type="number" id="sv-cycle" placeholder="e.g. 45" oninput="calcVelocity()">
+          </div>
+          <button class="calc-btn" onclick="calcVelocity()">▶ CALCULATE VELOCITY</button>
+        </div>
+        <div class="calc-outputs" id="sv-output">
+          <div class="output-placeholder">Enter your pipeline data to find your biggest lever</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOOL 03: ICP BUILDER -->
+  <div class="tool-block" id="tool-03">
+    <div class="tool-header">
+      <div class="tool-header-left">
+        <div class="tool-num-label">03 // TARGETING INTELLIGENCE</div>
+        <div class="tool-title">ICP <em>BUILDER</em></div>
+        <p class="tool-desc">An Ideal Client Profile is the single most important document in your sales org. Most teams don't have one. Answer 8 questions and walk away with a formatted ICP you can actually use.</p>
+      </div>
+      <div class="tool-header-right">
+        <strong>What you get</strong>
+        Formatted ICP document<br>
+        Firmographic profile<br>
+        Buying signal checklist<br>
+        Disqualification criteria<br>
+        Copy-paste ready
+      </div>
+    </div>
+    <div class="calc-shell">
+      <div class="calc-topbar">
+        <div class="calc-topbar-dot"></div>
+        RAPTOR · ICP INTELLIGENCE · v1.0
+      </div>
+      <div class="calc-body">
+        <div class="calc-inputs">
+          <div class="icpq-progress" id="icp-progress"></div>
+          <div id="icp-steps">
+            <!-- Steps rendered by JS -->
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px;">
+            <button class="calc-btn secondary" id="icp-back-btn" onclick="icpBack()" style="display:none;">← BACK</button>
+            <button class="calc-btn" id="icp-next-btn" onclick="icpNext()">NEXT →</button>
+          </div>
+        </div>
+        <div class="calc-outputs" id="icp-output">
+          <div class="output-placeholder">Complete the questionnaire to generate your ICP</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOOL 04: PIPELINE HEALTH -->
+  <div class="tool-block" id="tool-04">
+    <div class="tool-header">
+      <div class="tool-header-left">
+        <div class="tool-num-label">04 // PIPELINE INTELLIGENCE</div>
+        <div class="tool-title">PIPELINE <em>HEALTH</em></div>
+        <p class="tool-desc">Most pipelines look healthy until they collapse. This diagnostic scores your pipeline across five dimensions and tells you exactly where the rot is — before it costs you the quarter.</p>
+      </div>
+      <div class="tool-header-right">
+        <strong>What you get</strong>
+        Overall pipeline health score /100<br>
+        5-dimension breakdown<br>
+        Specific failure risks flagged<br>
+        Recommended interventions
+      </div>
+    </div>
+    <div class="calc-shell">
+      <div class="calc-topbar">
+        <div class="calc-topbar-dot"></div>
+        RAPTOR · PIPELINE DIAGNOSTIC · v1.0
+      </div>
+      <div class="calc-body">
+        <div class="calc-inputs">
+          <div class="field-group">
+            <label class="field-label">Monthly Revenue Target (₹)</label>
+            <input type="number" id="ph-target" placeholder="e.g. 500000" oninput="calcPipeline()">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Total Pipeline Value (₹)</label>
+            <input type="number" id="ph-pipeline" placeholder="e.g. 1500000" oninput="calcPipeline()">
+            <div class="field-hint">Industry benchmark: 3-4x monthly target minimum</div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Deals Stale {'>'} 30 Days (%)</label>
+            <div class="range-wrapper">
+              <input type="range" id="ph-stale" min="0" max="100" value="30" oninput="document.getElementById('ph-stale-val').textContent=this.value+'%';calcPipeline()">
+              <span class="range-val" id="ph-stale-val">30%</span>
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Deals at Late Stage {'>'} 60% (%)</label>
+            <div class="range-wrapper">
+              <input type="range" id="ph-late" min="0" max="100" value="25" oninput="document.getElementById('ph-late-val').textContent=this.value+'%';calcPipeline()">
+              <span class="range-val" id="ph-late-val">25%</span>
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Average Deal Age vs Avg Cycle (%)</label>
+            <div class="range-wrapper">
+              <input type="range" id="ph-age" min="10" max="200" value="70" oninput="document.getElementById('ph-age-val').textContent=this.value+'%';calcPipeline()">
+              <span class="range-val" id="ph-age-val">70%</span>
+            </div>
+            <div class="field-hint">100% = deals are exactly as old as your avg sales cycle</div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Single Account {'>'} 30% of Pipeline?</label>
+            <select id="ph-conc" onchange="calcPipeline()">
+              <option value="0">No — distributed risk</option>
+              <option value="1">Yes — concentrated risk</option>
+            </select>
+          </div>
+          <button class="calc-btn" onclick="calcPipeline()">▶ DIAGNOSE PIPELINE</button>
+        </div>
+        <div class="calc-outputs" id="ph-output">
+          <div class="output-placeholder">Enter pipeline data to run diagnostic</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOOL 05: COMMISSION BUILDER -->
+  <div class="tool-block" id="tool-05">
+    <div class="tool-header">
+      <div class="tool-header-left">
+        <div class="tool-num-label">05 // INCENTIVE DESIGN</div>
+        <div class="tool-title">COMMISSION <em>BUILDER</em></div>
+        <p class="tool-desc">Bad comp plans kill sales teams. Every sales manager builds this in Excel from scratch. This tool designs your commission tiers, calculates OTE at different attainment levels, and flags structural problems before you lock it in.</p>
+      </div>
+      <div class="tool-header-right">
+        <strong>What you get</strong>
+        Full commission schedule<br>
+        OTE at 50%, 75%, 100%, 125% quota<br>
+        Accelerator impact analysis<br>
+        Cost-to-company projection
+      </div>
+    </div>
+    <div class="calc-shell">
+      <div class="calc-topbar">
+        <div class="calc-topbar-dot"></div>
+        RAPTOR · COMMISSION ARCHITECT · v1.0
+      </div>
+      <div class="calc-body">
+        <div class="calc-inputs">
+          <div class="field-group">
+            <label class="field-label">Annual Base Salary (₹)</label>
+            <input type="number" id="cm-base" placeholder="e.g. 600000" oninput="calcCommission()">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Annual Quota (₹)</label>
+            <input type="number" id="cm-quota" placeholder="e.g. 3000000" oninput="calcCommission()">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Target Commission % at 100% Quota</label>
+            <div class="range-wrapper">
+              <input type="range" id="cm-pct" min="2" max="25" value="8" oninput="document.getElementById('cm-pct-val').textContent=this.value+'%';calcCommission()">
+              <span class="range-val" id="cm-pct-val">8%</span>
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Accelerator Above 100% Quota</label>
+            <select id="cm-accel" onchange="calcCommission()">
+              <option value="1.5">1.5x (Standard)</option>
+              <option value="2">2x (Aggressive)</option>
+              <option value="2.5">2.5x (High-performance)</option>
+              <option value="1.25">1.25x (Conservative)</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Draw Period (months, 0 = none)</label>
+            <input type="number" id="cm-draw" placeholder="e.g. 3" min="0" max="12" value="0" oninput="calcCommission()">
+            <div class="field-hint">Guaranteed minimum commission during ramp</div>
+          </div>
+          <button class="calc-btn" onclick="calcCommission()">▶ BUILD COMMISSION PLAN</button>
+        </div>
+        <div class="calc-outputs" id="cm-output">
+          <div class="output-placeholder">Enter compensation parameters to build your plan</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOOL 06: OUTREACH TIMING -->
+  <div class="tool-block" id="tool-06">
+    <div class="tool-header">
+      <div class="tool-header-left">
+        <div class="tool-num-label">06 // OUTREACH INTELLIGENCE</div>
+        <div class="tool-title">TIMING <em>OPTIMIZER</em></div>
+        <p class="tool-desc">Most outreach fails not because of what you say but when you say it. This tool maps the optimal days, times, and channels based on your prospect's seniority, industry, and deal size — baked from real B2B research.</p>
+      </div>
+      <div class="tool-header-right">
+        <strong>What you get</strong>
+        Best days and times to reach out<br>
+        Primary and fallback channels<br>
+        Optimal follow-up gap<br>
+        Industry-specific caveats
+      </div>
+    </div>
+    <div class="calc-shell">
+      <div class="calc-topbar">
+        <div class="calc-topbar-dot"></div>
+        RAPTOR · TIMING INTELLIGENCE · v1.0
+      </div>
+      <div class="calc-body">
+        <div class="calc-inputs">
+          <div class="field-group">
+            <label class="field-label">Prospect Seniority</label>
+            <select id="ot-seniority" onchange="calcTiming()">
+              <option value="">Select seniority</option>
+              <option value="c-suite">C-Suite (CEO, CTO, CFO)</option>
+              <option value="vp">VP / Director</option>
+              <option value="manager">Manager / Team Lead</option>
+              <option value="ic">Individual Contributor</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Target Industry</label>
+            <select id="ot-industry" onchange="calcTiming()">
+              <option value="">Select industry</option>
+              <option value="tech">Technology / SaaS</option>
+              <option value="finance">Finance / Banking / NBFC</option>
+              <option value="realestate">Real Estate / Construction</option>
+              <option value="manufacturing">Manufacturing / Industrial</option>
+              <option value="health">Healthcare / Pharma</option>
+              <option value="retail">Retail / D2C / FMCG</option>
+              <option value="consulting">Consulting / Professional Services</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Average Deal Size</label>
+            <select id="ot-deal" onchange="calcTiming()">
+              <option value="">Select deal size</option>
+              <option value="smb">Under ₹1L (SMB)</option>
+              <option value="mid">₹1L – ₹10L (Mid-market)</option>
+              <option value="enterprise">Above ₹10L (Enterprise)</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Sales Motion</label>
+            <select id="ot-motion" onchange="calcTiming()">
+              <option value="">Select motion</option>
+              <option value="inbound">Inbound (they reached out first)</option>
+              <option value="outbound">Outbound (cold)</option>
+              <option value="warm">Warm (referral / event)</option>
+            </select>
+          </div>
+          <button class="calc-btn" onclick="calcTiming()">▶ OPTIMISE TIMING</button>
+        </div>
+        <div class="calc-outputs" id="ot-output">
+          <div class="output-placeholder">Select your prospect profile to get timing recommendations</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOOL 07: CHURN RISK -->
+  <div class="tool-block" id="tool-07">
+    <div class="tool-header">
+      <div class="tool-header-left">
+        <div class="tool-num-label">07 // RETENTION INTELLIGENCE</div>
+        <div class="tool-title">CHURN RISK <em>DIAGNOSTIC</em></div>
+        <p class="tool-desc">Churn is never sudden. There are always signals — engagement drops, champion changes, support tickets, competitor mentions. Score your account across 10 signals and know your intervention window.</p>
+      </div>
+      <div class="tool-header-right">
+        <strong>What you get</strong>
+        Churn probability score<br>
+        Risk category (Low / Medium / High / Critical)<br>
+        Top 3 risk factors identified<br>
+        Recommended immediate actions
+      </div>
+    </div>
+    <div class="calc-shell">
+      <div class="calc-topbar">
+        <div class="calc-topbar-dot"></div>
+        RAPTOR · CHURN DIAGNOSTIC · v1.0
+      </div>
+      <div class="calc-body">
+        <div class="calc-inputs" style="padding:24px 32px;">
+          <p class="field-label" style="margin-bottom:16px;">For each signal, mark YES or NO for your account</p>
+          <div id="churn-signals"></div>
+          <button class="calc-btn" style="margin-top:16px;" onclick="calcChurn()">▶ SCORE CHURN RISK</button>
+        </div>
+        <div class="calc-outputs" id="churn-output">
+          <div class="output-placeholder">Score signals to calculate churn probability</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOOL 08: SALES HIRING ROI -->
+  <div class="tool-block" id="tool-08">
+    <div class="tool-header">
+      <div class="tool-header-left">
+        <div class="tool-num-label">08 // HIRING INTELLIGENCE</div>
+        <div class="tool-title">SALES HIRING <em>ROI</em></div>
+        <p class="tool-desc">Hiring a sales rep costs 3-4x their salary when you factor in ramp, management, tools. This calculator tells you exactly when your new hire pays off and what return to expect in year one versus year two.</p>
+      </div>
+      <div class="tool-header-right">
+        <strong>What you get</strong>
+        Total cost of hire (year 1 and 2)<br>
+        Break-even month<br>
+        Expected ROI at 12 and 24 months<br>
+        SDR vs AE comparison
+      </div>
+    </div>
+    <div class="calc-shell">
+      <div class="calc-topbar">
+        <div class="calc-topbar-dot"></div>
+        RAPTOR · HIRING ROI CALCULATOR · v1.0
+      </div>
+      <div class="calc-body">
+        <div class="calc-inputs">
+          <div class="field-group">
+            <label class="field-label">Role Type</label>
+            <select id="hr-role" onchange="calcHiring()">
+              <option value="sdr">SDR / BDR (Outbound)</option>
+              <option value="ae">AE (Closing)</option>
+              <option value="csm">CSM (Customer Success)</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Annual Base Salary (₹)</label>
+            <input type="number" id="hr-base" placeholder="e.g. 600000" oninput="calcHiring()">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Annual Quota (₹)</label>
+            <input type="number" id="hr-quota" placeholder="e.g. 3000000" oninput="calcHiring()">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Ramp Period (months)</label>
+            <select id="hr-ramp" onchange="calcHiring()">
+              <option value="2">2 months (SDR / simple product)</option>
+              <option value="3" selected>3 months (Mid-complexity)</option>
+              <option value="6">6 months (Enterprise AE)</option>
+              <option value="9">9 months (Complex / technical)</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Expected Quota Attainment (%)</label>
+            <div class="range-wrapper">
+              <input type="range" id="hr-attain" min="20" max="120" value="70" oninput="document.getElementById('hr-attain-val').textContent=this.value+'%';calcHiring()">
+              <span class="range-val" id="hr-attain-val">70%</span>
+            </div>
+            <div class="field-hint">Industry average is 55-70% for year 1</div>
+          </div>
+          <button class="calc-btn" onclick="calcHiring()">▶ CALCULATE HIRING ROI</button>
+        </div>
+        <div class="calc-outputs" id="hr-output">
+          <div class="output-placeholder">Enter hiring parameters to calculate ROI</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOOL 09: SEQUENCE PLANNER -->
+  <div class="tool-block" id="tool-09">
+    <div class="tool-header">
+      <div class="tool-header-left">
+        <div class="tool-num-label">09 // OUTREACH ARCHITECTURE</div>
+        <div class="tool-title">SEQUENCE <em>PLANNER</em></div>
+        <p class="tool-desc">Most people obsess over writing the perfect cold email and ignore the sequence architecture entirely. The sequence is the strategy. This tool builds your full multi-touch outreach plan based on your deal profile.</p>
+      </div>
+      <div class="tool-header-right">
+        <strong>What you get</strong>
+        Full touch sequence with timing<br>
+        Channel allocation per touch<br>
+        Message angle for each touchpoint<br>
+        Breakup email recommendation
+      </div>
+    </div>
+    <div class="calc-shell">
+      <div class="calc-topbar">
+        <div class="calc-topbar-dot"></div>
+        RAPTOR · SEQUENCE ARCHITECT · v1.0
+      </div>
+      <div class="calc-body">
+        <div class="calc-inputs">
+          <div class="field-group">
+            <label class="field-label">Deal Complexity</label>
+            <select id="sq-complexity" onchange="calcSequence()">
+              <option value="">Select complexity</option>
+              <option value="simple">Simple (single decision-maker, short cycle)</option>
+              <option value="medium">Medium (2-3 stakeholders, 30-60 day cycle)</option>
+              <option value="complex">Complex (committee, 60-180 day cycle)</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Primary Channel</label>
+            <select id="sq-channel" onchange="calcSequence()">
+              <option value="">Select primary channel</option>
+              <option value="email">Email first</option>
+              <option value="linkedin">LinkedIn first</option>
+              <option value="phone">Phone first</option>
+              <option value="whatsapp">WhatsApp first (Indian B2B)</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Prospect Warmth</label>
+            <select id="sq-warmth" onchange="calcSequence()">
+              <option value="">Select warmth</option>
+              <option value="cold">Cold — no prior contact</option>
+              <option value="warm">Warm — met at event / referral</option>
+              <option value="inbound">Inbound — they contacted you</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Product / Service Type</label>
+            <select id="sq-product" onchange="calcSequence()">
+              <option value="">Select type</option>
+              <option value="saas">SaaS / Software</option>
+              <option value="services">Professional Services</option>
+              <option value="hardware">Hardware / Physical product</option>
+              <option value="consulting">Consulting / Advisory</option>
+            </select>
+          </div>
+          <button class="calc-btn" onclick="calcSequence()">▶ BUILD SEQUENCE</button>
+        </div>
+        <div class="calc-outputs" id="sq-output">
+          <div class="output-placeholder">Configure your deal profile to generate sequence</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /tools-section -->
+
+<!-- FOOTER -->
+<div style="border-top: 1px solid #2a2a2a; margin-top: 80px;">
+  <footer>
+    <div class="footer-brand">
+      RAPTOR · FREE SALES ARSENAL<br>
+      ShoonyaOrigins · Pune, India · © 2026<br>
+      <span style="color:#444">All calculations run locally. Zero data collection.</span>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:12px;">
+      <a href="https://shoonyaorigins.com/ventures/raptor/" class="footer-cta">→ GET THE FULL BRAIN</a>
+      <span style="font-family:var(--mono);font-size:10px;color:var(--text-dim);">These tools are a preview of what Raptor automates.</span>
+    </div>
+  </footer>
+</div>
+
+<script>
+// ===================== UTILITIES =====================
+function fmt(n) {
+  if (n >= 10000000) return '₹' + (n/10000000).toFixed(1) + 'Cr';
+  if (n >= 100000) return '₹' + (n/100000).toFixed(1) + 'L';
+  if (n >= 1000) return '₹' + (n/1000).toFixed(1) + 'K';
+  return '₹' + Math.round(n).toLocaleString('en-IN');
+}
+function num(id) { return parseFloat(document.getElementById(id).value) || 0; }
+function val(id) { return document.getElementById(id).value; }
+function setOutput(id, html) { document.getElementById(id).innerHTML = html; }
+
+function scoreBar(label, pct, colorClass='') {
+  return `<div class="score-bar-wrap">
+    <div class="score-bar-label"><span>${label}</span><span>${Math.round(pct)}%</span></div>
+    <div class="score-bar-track"><div class="score-bar-fill" style="width:${pct}%"></div></div>
+  </div>`;
+}
+
+function panel(label, value, sub='', colorClass='white') {
+  return `<div class="output-panel">
+    <div class="output-label">${label}</div>
+    <div class="output-value ${colorClass}">${value}</div>
+    ${sub ? `<div class="output-sub">${sub}</div>` : ''}
+  </div>`;
+}
+
+function diagnosis(label, text, type='') {
+  return `<div class="output-diagnosis ${type}">
+    <div class="diagnosis-label">${label}</div>
+    <div class="diagnosis-text">${text}</div>
+  </div>`;
+}
+
+// ===================== TOOL 01: TAM =====================
+function calcTAM() {
+  const total = num('tam-total');
+  const acv = num('tam-acv');
+  const geo = num('tam-geo') / 100;
+  const win = num('tam-win') / 100;
+  const pen = num('tam-pen') / 100;
+  if (!total || !acv) return;
+
+  const tam = total * acv;
+  const sam = tam * geo;
+  const som = sam * win;
+  const yr3 = sam * pen * acv;
+  const companies3 = Math.round(total * geo * pen);
+
+  const maxW = Math.max(tam, 1);
+  const tamPct = 100;
+  const samPct = (sam / maxW) * 100;
+  const somPct = (som / maxW) * 100;
+
+  setOutput('tam-output', `
+    <div class="tam-funnel">
+      <div class="tam-tier">
+        <div class="tam-tier-bar" style="width:${tamPct}%;opacity:0.4;"></div>
+        <div class="tam-tier-info"><strong>TAM</strong> ${fmt(tam)}</div>
+      </div>
+      <div class="tam-tier">
+        <div class="tam-tier-bar" style="width:${samPct}%;opacity:0.65;"></div>
+        <div class="tam-tier-info"><strong>SAM</strong> ${fmt(sam)}</div>
+      </div>
+      <div class="tam-tier">
+        <div class="tam-tier-bar" style="width:${Math.max(somPct,2)}%;"></div>
+        <div class="tam-tier-info"><strong>SOM</strong> ${fmt(som)}</div>
+      </div>
+    </div>
+    ${panel('3-YEAR REVENUE TARGET', fmt(yr3), `${companies3.toLocaleString()} companies captured`, 'purple')}
+    <div class="output-grid-2">
+      ${panel('TAM', fmt(tam), 'Total universe', 'white')}
+      ${panel('SAM', fmt(sam), 'Your reachable slice', 'white')}
+    </div>
+    ${diagnosis('NARRATIVE', `Your serviceable market is ${(geo*100).toFixed(0)}% of the total universe. At your projected win rate, capturing ${(pen*100).toFixed(0)}% of SAM by year 3 puts you at <strong>${fmt(yr3)}</strong> ARR — approximately ${companies3.toLocaleString()} clients.`, 'good')}
+  `);
+}
+
+// ===================== TOOL 02: VELOCITY =====================
+function calcVelocity() {
+  const opps = num('sv-opps');
+  const acv = num('sv-acv');
+  const wr = num('sv-wr') / 100;
+  const cycle = num('sv-cycle');
+  if (!opps || !acv || !cycle) return;
+
+  const velocity = (opps * acv * wr) / cycle * 30;
+  const annual = velocity * 12;
+
+  // Impact of 10% improvement on each lever
+  const impactOpps = ((opps*1.1 * acv * wr) / cycle * 30) - velocity;
+  const impactACV = ((opps * acv*1.1 * wr) / cycle * 30) - velocity;
+  const impactWR = ((opps * acv * wr*1.1) / cycle * 30) - velocity;
+  const impactCycle = ((opps * acv * wr) / (cycle*0.9) * 30) - velocity;
+
+  const levers = [
+    {name: 'More Opportunities', impact: impactOpps, action: 'Increase prospecting volume'},
+    {name: 'Higher ACV', impact: impactACV, action: 'Move upmarket or bundle'},
+    {name: 'Better Win Rate', impact: impactWR, action: 'Improve qualification and closing'},
+    {name: 'Shorter Sales Cycle', impact: impactCycle, action: 'Reduce friction in process'},
+  ];
+  levers.sort((a,b) => b.impact - a.impact);
+
+  const maxImpact = levers[0].impact;
+
+  setOutput('sv-output', `
+    ${panel('MONTHLY REVENUE VELOCITY', fmt(velocity), `${fmt(annual)} annualised`, 'green')}
+    <div class="output-label" style="margin:16px 0 8px;font-family:var(--mono);font-size:10px;letter-spacing:.15em;color:var(--text-dim);">IMPACT OF 10% IMPROVEMENT PER LEVER</div>
+    ${levers.map((l,i) => scoreBar(
+      `${i===0?'★ ':''}${l.name} (+${fmt(l.impact)}/mo)`,
+      (l.impact / maxImpact) * 100
+    )).join('')}
+    ${diagnosis('BIGGEST LEVER', `Improving <strong>${levers[0].name}</strong> by 10% adds <strong>${fmt(levers[0].impact)}/month</strong> (${fmt(levers[0].impact*12)}/yr). Action: ${levers[0].action}.`, 'good')}
+  `);
+}
+
+// ===================== TOOL 03: ICP BUILDER =====================
+const icpQuestions = [
+  {
+    q: 'What company size is your ideal client?',
+    field: 'size',
+    options: ['1-10 employees', '11-50 employees', '51-200 employees', '201-1000 employees', '1000+ employees']
+  },
+  {
+    q: 'What is their primary industry?',
+    field: 'industry',
+    options: ['Technology / SaaS', 'Real Estate / Construction', 'Manufacturing', 'Finance / NBFC', 'Healthcare / Pharma', 'Retail / D2C', 'Consulting / Services']
+  },
+  {
+    q: 'Who is the primary buyer / decision-maker?',
+    field: 'buyer',
+    options: ['Founder / CEO', 'VP Sales / CRO', 'Head of Marketing', 'Operations Head', 'CTO / Technical Lead', 'Finance / CFO']
+  },
+  {
+    q: 'What is their typical annual revenue?',
+    field: 'revenue',
+    options: ['Under ₹1Cr', '₹1Cr – ₹10Cr', '₹10Cr – ₹100Cr', '₹100Cr – ₹500Cr', 'Above ₹500Cr']
+  },
+  {
+    q: 'What is their primary pain point?',
+    field: 'pain',
+    options: ['Not enough leads', 'Low conversion / win rate', 'Sales team inefficiency', 'No visibility into pipeline', 'Losing to competitors', 'High customer churn']
+  },
+  {
+    q: 'What is the typical deal size?',
+    field: 'deal',
+    options: ['Under ₹50K', '₹50K – ₹2L', '₹2L – ₹10L', '₹10L – ₹50L', 'Above ₹50L']
+  },
+  {
+    q: 'What triggers a buying decision?',
+    field: 'trigger',
+    options: ['New funding / budget', 'Leadership change', 'Growth target miss', 'Competitor threat', 'Expansion / new market', 'Product launch']
+  },
+  {
+    q: 'What would disqualify a prospect immediately?',
+    field: 'dq',
+    options: ['No dedicated sales function', 'Under ₹50L annual revenue', 'B2C only business', 'No growth ambition', 'Sole proprietor / freelancer']
+  }
+];
+
+let icpStep = 0;
+let icpAnswers = {};
+
+function icpRender() {
+  const prog = document.getElementById('icp-progress');
+  const steps = document.getElementById('icp-steps');
+  prog.innerHTML = icpQuestions.map((q,i) =>
+    `<div class="icpq-dot ${i < icpStep ? 'done' : i === icpStep ? 'active' : ''}"></div>`
+  ).join('');
+
+  if (icpStep >= icpQuestions.length) {
+    icpGenerateOutput();
+    return;
+  }
+
+  const q = icpQuestions[icpStep];
+  steps.innerHTML = `
+    <div class="icpq-question">${String(icpStep+1).padStart(2,'0')} / ${icpQuestions.length} &nbsp;·&nbsp; ${q.q}</div>
+    <div class="icpq-options">
+      ${q.options.map(o => `<button class="icpq-option ${icpAnswers[q.field]===o?'selected':''}" onclick="icpSelect('${q.field}','${o}',this)">${o}</button>`).join('')}
+    </div>
+  `;
+
+  document.getElementById('icp-back-btn').style.display = icpStep > 0 ? 'block' : 'none';
+  document.getElementById('icp-next-btn').textContent = icpStep === icpQuestions.length - 1 ? 'GENERATE ICP →' : 'NEXT →';
+}
+
+function icpSelect(field, val, el) {
+  icpAnswers[field] = val;
+  el.closest('.icpq-options').querySelectorAll('.icpq-option').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function icpNext() {
+  const q = icpQuestions[icpStep];
+  if (!icpAnswers[q.field]) { return; }
+  icpStep++;
+  icpRender();
+}
+
+function icpBack() {
+  if (icpStep > 0) { icpStep--; icpRender(); }
+}
+
+function icpGenerateOutput() {
+  const a = icpAnswers;
+  document.getElementById('icp-steps').innerHTML = `
+    <div style="font-family:var(--mono);font-size:11px;color:var(--green);letter-spacing:.1em;margin-bottom:8px;">✓ ICP GENERATED</div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);">Your ICP document is ready on the right panel.</div>
+    <button class="calc-btn secondary" style="margin-top:16px;" onclick="icpStep=0;icpAnswers={};icpRender();setOutput('icp-output','<div class=output-placeholder>Complete the questionnaire to generate your ICP</div>')">↺ START OVER</button>
+  `;
+  document.getElementById('icp-back-btn').style.display = 'none';
+  document.getElementById('icp-next-btn').style.display = 'none';
+
+  setOutput('icp-output', `
+    <div class="output-label" style="font-family:var(--mono);font-size:9px;color:var(--purple);letter-spacing:.2em;margin-bottom:16px;">// IDEAL CLIENT PROFILE · GENERATED</div>
+
+    ${diagnosis('FIRMOGRAPHIC PROFILE', `
+      <strong>Company Size:</strong> ${a.size}<br>
+      <strong>Industry:</strong> ${a.industry}<br>
+      <strong>Annual Revenue:</strong> ${a.revenue}<br>
+      <strong>Geography:</strong> India (B2B)
+    `, 'good')}
+
+    ${diagnosis('DECISION-MAKER PROFILE', `
+      <strong>Primary Buyer:</strong> ${a.buyer}<br>
+      <strong>Typical Deal Size:</strong> ${a.deal}<br>
+      <strong>Sales Cycle:</strong> Medium-to-long (relationship driven)
+    `)}
+
+    ${diagnosis('BUYING TRIGGERS', `
+      <strong>Primary Trigger:</strong> ${a.trigger}<br>
+      <strong>Core Pain:</strong> ${a.pain}<br>
+      Watch for: funding announcements, leadership hires, expansion news
+    `)}
+
+    ${diagnosis('DISQUALIFICATION CRITERIA', `
+      Auto-disqualify if: ${a.dq}<br>
+      Do not waste cycles on prospects that don't match all three firmographic criteria.
+    `, 'warn')}
+
+    <div style="margin-top:12px;font-family:var(--mono);font-size:9px;color:var(--text-dim);letter-spacing:.1em;">GENERATED BY RAPTOR · SHOONYAORIGINS · ${new Date().toLocaleDateString('en-IN')}</div>
+  `);
+}
+
+icpRender();
+
+// ===================== TOOL 04: PIPELINE HEALTH =====================
+function calcPipeline() {
+  const target = num('ph-target');
+  const pipeline = num('ph-pipeline');
+  const stale = num('ph-stale');
+  const late = num('ph-late');
+  const age = num('ph-age');
+  const conc = parseInt(val('ph-conc'));
+  if (!target || !pipeline) return;
+
+  const coverage = pipeline / target;
+  const coverageScore = Math.min(coverage / 4, 1) * 100;
+  const staleScore = Math.max(0, 100 - stale * 1.5);
+  const lateScore = late < 20 ? 60 : late > 40 ? 100 : 60 + ((late-20)/20)*40;
+  const ageScore = age < 80 ? 100 : age < 120 ? Math.max(0, 100 - (age-80)) : 20;
+  const concScore = conc === 1 ? 40 : 100;
+
+  const overall = Math.round((coverageScore*0.3 + staleScore*0.25 + lateScore*0.15 + ageScore*0.2 + concScore*0.1));
+  const grade = overall >= 80 ? 'HEALTHY' : overall >= 60 ? 'AT RISK' : overall >= 40 ? 'CRITICAL' : 'BROKEN';
+  const gradeColor = overall >= 80 ? 'good' : overall >= 60 ? '' : 'warn';
+
+  const circumference = 2 * Math.PI * 45;
+  const dash = circumference * (overall / 100);
+  const ringColor = overall >= 80 ? '#00ff88' : overall >= 60 ? '#6c3bff' : '#ff3b8b';
+
+  setOutput('ph-output', `
+    <div class="health-ring-wrap">
+      <div class="health-ring">
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="45" fill="none" stroke="#2a2a2a" stroke-width="8"/>
+          <circle cx="60" cy="60" r="45" fill="none" stroke="${ringColor}" stroke-width="8"
+            stroke-dasharray="${dash} ${circumference}" stroke-linecap="square"
+            style="transition:stroke-dasharray 0.8s"/>
+        </svg>
+        <div class="health-ring-text">
+          <div class="health-ring-score" style="color:${ringColor}">${overall}</div>
+          <div class="health-ring-label">/100</div>
+        </div>
+      </div>
+    </div>
+    ${diagnosis('PIPELINE STATUS', `<strong>${grade}</strong> · Coverage ratio: <strong>${coverage.toFixed(1)}x</strong> (target: 3-4x minimum)`, gradeColor)}
+    ${scoreBar('Coverage Ratio', coverageScore)}
+    ${scoreBar('Deal Freshness', staleScore)}
+    ${scoreBar('Stage Distribution', lateScore)}
+    ${scoreBar('Deal Age Health', ageScore)}
+    ${scoreBar('Concentration Risk', concScore)}
+    ${overall < 60 ? diagnosis('IMMEDIATE ACTION', coverage < 3 ? 'Pipeline is underfunded. You need ' + fmt((target*3.5)-pipeline) + ' more in top-of-funnel immediately.' : stale > 40 ? 'Over 40% of deals are stale. Run a pipeline scrub this week — kill or accelerate.' : 'Concentration risk is critical. One deal falling means missing target.', 'warn') : ''}
+  `);
+}
+
+// ===================== TOOL 05: COMMISSION =====================
+function calcCommission() {
+  const base = num('cm-base');
+  const quota = num('cm-quota');
+  const pct = num('cm-pct') / 100;
+  const accel = parseFloat(val('cm-accel'));
+  const draw = num('cm-draw');
+  if (!base || !quota) return;
+
+  const targetComm = quota * pct;
+  const ote = base + targetComm;
+  const monthlyBase = base / 12;
+  const monthlyQuota = quota / 12;
+
+  function commAtAttainment(att) {
+    const rev = quota * att;
+    if (att <= 1) return rev * pct;
+    return quota * pct + (rev - quota) * pct * accel;
+  }
+
+  const levels = [0.5, 0.75, 1.0, 1.25, 1.5];
+
+  setOutput('cm-output', `
+    <div class="output-grid-2">
+      ${panel('OTE AT 100%', fmt(ote), `Base + Commission`, 'green')}
+      ${panel('TARGET COMMISSION', fmt(targetComm), `${(pct*100).toFixed(0)}% of quota`, 'purple')}
+    </div>
+    <div class="output-label" style="font-family:var(--mono);font-size:10px;letter-spacing:.15em;color:var(--text-dim);margin:4px 0 12px;">EARNINGS AT DIFFERENT ATTAINMENT LEVELS</div>
+    ${levels.map(att => {
+      const comm = commAtAttainment(att);
+      const total = base + comm;
+      const isTarget = att === 1.0;
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;margin-bottom:4px;background:${isTarget?'rgba(108,59,255,0.1)':'var(--bg)'};border:1px solid ${isTarget?'var(--purple)':'var(--border)'}">
+        <span style="font-family:var(--mono);font-size:10px;color:${isTarget?'var(--purple)':'var(--text-dim)'}">${(att*100).toFixed(0)}% QUOTA ${isTarget?'· TARGET':''}</span>
+        <span style="font-family:var(--mono);font-size:12px;color:var(--text)">${fmt(total)}/yr &nbsp;<span style="color:var(--text-dim);font-size:10px">(${fmt(comm)} comm)</span></span>
+      </div>`;
+    }).join('')}
+    ${draw > 0 ? diagnosis('DRAW PERIOD', `${draw}-month draw guarantees ${fmt(monthlyBase * 0.5)}/month minimum commission during ramp. Total draw liability: ${fmt(monthlyBase * 0.5 * draw)}.`) : ''}
+    ${diagnosis('COST TO COMPANY', `Year 1 total cost including employer contributions (~15%): <strong>${fmt(ote * 1.15)}</strong>. At 70% attainment: <strong>${fmt((base + commAtAttainment(0.7)) * 1.15)}</strong>.`)}
+  `);
+}
+
+// ===================== TOOL 06: TIMING =====================
+function calcTiming() {
+  const seniority = val('ot-seniority');
+  const industry = val('ot-industry');
+  const deal = val('ot-deal');
+  const motion = val('ot-motion');
+  if (!seniority || !industry || !deal || !motion) return;
+
+  const timingData = {
+    'c-suite': { bestDays: 'Tue, Wed', bestTime: '7:30–9:00 AM', channel: 'Email → LinkedIn', gap: '5–7 days', note: 'C-suite reads email before 9 AM. Keep subject under 6 words. Never call without prior email.' },
+    'vp': { bestDays: 'Tue, Thu', bestTime: '8:00–10:00 AM', channel: 'LinkedIn → Email', gap: '3–5 days', note: 'VPs respond well to LinkedIn messages. Reference a shared connection or their recent post.' },
+    'manager': { bestDays: 'Mon, Wed, Thu', bestTime: '10:00 AM–12:00 PM', channel: 'Email → Phone', gap: '2–4 days', note: 'Managers are reachable mid-morning. Phone follow-up after email works well for this tier.' },
+    'ic': { bestDays: 'Wed, Thu', bestTime: '12:00–2:00 PM', channel: 'Email → WhatsApp', gap: '2–3 days', note: 'ICs check email over lunch. WhatsApp follow-up is effective in the Indian market.' }
+  };
+
+  const industryNotes = {
+    tech: 'Tech buyers are inbox-heavy. Avoid Monday (planning week). Keep it brief — they scan.',
+    finance: 'Finance is conservative. Formal email with clear subject lines. Avoid month-end (quarter-close crunch).',
+    realestate: 'Real estate works on WhatsApp heavily in India. Site visits dominate Friday-Saturday.',
+    manufacturing: 'Manufacturing buyers prefer phone calls. Best reached early morning before factory floor activity.',
+    health: 'Healthcare buyers are time-starved. Short, relevant emails. Avoid Mon/Fri.',
+    retail: 'Avoid festive seasons (they\'re swamped). Q1 and Q3 are highest receptivity windows.',
+    consulting: 'Consulting buyers are senior and skeptical. Referral or mutual connection dramatically increases response.'
+  };
+
+  const dealNotes = {
+    smb: 'SMB: Expect 1-2 decision makers. Move fast — they decide in days, not months. High urgency works.',
+    mid: 'Mid-market: Budget exists but needs approval. Map 2-3 stakeholders. Multi-touch over 4-6 weeks.',
+    enterprise: 'Enterprise: Buying committee of 5-8. Expect 60-180 days. Build multiple relationships simultaneously.'
+  };
+
+  const motionMods = {
+    inbound: 'They reached out — respond within 1 hour. Speed to lead is the single biggest conversion factor.',
+    warm: 'Referral / event: Reference the connection immediately. First touch should feel like a conversation, not a pitch.',
+    outbound: 'Cold outbound: Lead with their pain, not your product. The first message earns the second message.'
+  };
+
+  const t = timingData[seniority];
+
+  setOutput('ot-output', `
+    <div class="output-grid-2">
+      ${panel('BEST DAYS', t.bestDays, 'Primary outreach window', 'purple')}
+      ${panel('BEST TIME', t.bestTime, 'Local IST', 'white')}
+    </div>
+    ${diagnosis('CHANNEL SEQUENCE', `<strong>Primary:</strong> ${t.channel}<br><strong>Follow-up gap:</strong> ${t.gap}<br><strong>Note:</strong> ${t.note}`, 'good')}
+    ${diagnosis('INDUSTRY CONTEXT', industryNotes[industry])}
+    ${diagnosis('DEAL SIZE PLAYBOOK', dealNotes[deal])}
+    ${diagnosis('MOTION MODIFIER', motionMods[motion])}
+  `);
+}
+
+// ===================== TOOL 07: CHURN =====================
+const churnSignals = [
+  { label: 'Login / usage has dropped significantly in last 30 days', weight: 15, risk: true },
+  { label: 'Champion / main contact has left or changed role', weight: 18, risk: true },
+  { label: 'Support tickets have increased (3+ in last 60 days)', weight: 10, risk: true },
+  { label: 'They missed or rescheduled the last QBR / check-in', weight: 8, risk: true },
+  { label: 'They have not expanded or added seats in 12+ months', weight: 7, risk: true },
+  { label: 'They mentioned a competitor by name in any conversation', weight: 14, risk: true },
+  { label: 'Invoice payment was delayed last cycle', weight: 9, risk: true },
+  { label: 'NPS score dropped below 7 or not completed', weight: 8, risk: true },
+  { label: 'They have achieved their primary stated goal with your product', weight: 6, risk: false },
+  { label: 'Executive sponsor is actively engaged (attends reviews)', weight: 5, risk: false },
+];
+
+let churnState = {};
+
+function renderChurnSignals() {
+  document.getElementById('churn-signals').innerHTML = churnSignals.map((s, i) => `
+    <div class="signal-row">
+      <div class="signal-label">${s.label}</div>
+      <div class="signal-toggle">
+        <button class="sig-btn ${churnState[i]==='yes'?'active-yes':''}" onclick="setChurn(${i},'yes',this)">YES</button>
+        <button class="sig-btn ${churnState[i]==='no'?'active-no':''}" onclick="setChurn(${i},'no',this)">NO</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function setChurn(i, v, el) {
+  churnState[i] = v;
+  renderChurnSignals();
+}
+
+function calcChurn() {
+  let riskScore = 0;
+  let maxRisk = 0;
+  const flagged = [];
+
+  churnSignals.forEach((s, i) => {
+    if (s.risk) {
+      maxRisk += s.weight;
+      if (churnState[i] === 'yes') { riskScore += s.weight; flagged.push(s.label); }
+    } else {
+      if (churnState[i] === 'yes') riskScore = Math.max(0, riskScore - s.weight);
+    }
+  });
+
+  const prob = Math.min(Math.round((riskScore / maxRisk) * 100), 95);
+  const category = prob >= 70 ? 'CRITICAL' : prob >= 45 ? 'HIGH' : prob >= 25 ? 'MEDIUM' : 'LOW';
+  const catColor = prob >= 70 ? 'warn' : prob >= 45 ? 'warn' : prob >= 25 ? '' : 'good';
+
+  const actions = {
+    CRITICAL: 'Schedule executive-to-executive call within 48 hours. Do not send an email. Call. Bring your CEO if needed.',
+    HIGH: 'Request an urgent account review. Identify a new internal champion immediately. Bring a concrete renewal incentive.',
+    MEDIUM: 'Run a proactive check-in. Deliver a usage review showing ROI. Identify expansion opportunity to re-anchor value.',
+    LOW: 'Account is stable. Maintain regular cadence and identify expansion opportunities.'
+  };
+
+  setOutput('churn-output', `
+    ${panel('CHURN PROBABILITY', prob + '%', category + ' RISK', prob >= 45 ? 'pink' : prob >= 25 ? 'purple' : 'green')}
+    ${scoreBar('Risk Score', prob)}
+    ${flagged.length > 0 ? diagnosis('TOP RISK SIGNALS', flagged.slice(0,3).map(f=>`· ${f}`).join('<br>'), catColor) : ''}
+    ${diagnosis('RECOMMENDED ACTION', actions[category], catColor)}
+  `);
+}
+
+renderChurnSignals();
+
+// ===================== TOOL 08: HIRING ROI =====================
+function calcHiring() {
+  const role = val('hr-role');
+  const base = num('hr-base');
+  const quota = num('hr-quota');
+  const ramp = parseInt(val('hr-ramp'));
+  const attain = num('hr-attain') / 100;
+  if (!base || !quota) return;
+
+  const roleComm = { sdr: 0.05, ae: 0.08, csm: 0.04 };
+  const commRate = roleComm[role] || 0.07;
+  const targetComm = quota * commRate;
+  const ote = base + targetComm;
+  const tools = role === 'ae' ? 120000 : 60000;
+  const recruiting = base * 0.2;
+  const overhead = ote * 0.15;
+
+  const rampRevenue = (quota * attain * (ramp / 12)) * 0.4;
+  const fullYearRevenue = quota * attain * ((12 - ramp) / 12);
+  const yr1Revenue = rampRevenue + fullYearRevenue;
+  const yr2Revenue = quota * Math.min(attain + 0.1, 1.0);
+
+  const yr1Cost = ote + tools + recruiting + overhead;
+  const yr2Cost = ote + tools + overhead;
+
+  const yr1ROI = ((yr1Revenue - yr1Cost) / yr1Cost) * 100;
+  const yr2ROI = ((yr2Revenue - yr2Cost) / yr2Cost) * 100;
+
+  const breakevenMonth = Math.ceil(yr1Cost / (yr1Revenue / 12));
+
+  setOutput('hr-output', `
+    <div class="output-grid-2">
+      ${panel('BREAK-EVEN', 'Month ' + Math.min(breakevenMonth,24), 'From start date', 'purple')}
+      ${panel('YR 1 ROI', (yr1ROI>0?'+':'')+yr1ROI.toFixed(0)+'%', 'Net return year 1', yr1ROI>0?'green':'pink')}
+    </div>
+    <div class="roi-compare">
+      <div class="roi-side">
+        <div class="roi-side-label">YEAR 1</div>
+        <div class="roi-line"><span>OTE</span><strong>${fmt(ote)}</strong></div>
+        <div class="roi-line"><span>Tools</span><strong>${fmt(tools)}</strong></div>
+        <div class="roi-line"><span>Recruiting</span><strong>${fmt(recruiting)}</strong></div>
+        <div class="roi-line"><span>Overhead</span><strong>${fmt(overhead)}</strong></div>
+        <div class="roi-line" style="border-top:1px solid var(--border);margin-top:4px;padding-top:8px;"><span>Total Cost</span><strong style="color:var(--pink)">${fmt(yr1Cost)}</strong></div>
+        <div class="roi-line"><span>Revenue Gen</span><strong style="color:var(--green)">${fmt(yr1Revenue)}</strong></div>
+      </div>
+      <div class="roi-side">
+        <div class="roi-side-label">YEAR 2</div>
+        <div class="roi-line"><span>OTE</span><strong>${fmt(ote)}</strong></div>
+        <div class="roi-line"><span>Tools</span><strong>${fmt(tools)}</strong></div>
+        <div class="roi-line"><span>Overhead</span><strong>${fmt(overhead)}</strong></div>
+        <div class="roi-line" style="border-top:1px solid var(--border);margin-top:4px;padding-top:8px;"><span>Total Cost</span><strong style="color:var(--pink)">${fmt(yr2Cost)}</strong></div>
+        <div class="roi-line"><span>Revenue Gen</span><strong style="color:var(--green)">${fmt(yr2Revenue)}</strong></div>
+        <div class="roi-line"><span>ROI</span><strong style="color:var(--green)">+${yr2ROI.toFixed(0)}%</strong></div>
+      </div>
+    </div>
+    ${yr1ROI < 0 ? diagnosis('NOTE', `Year 1 is typically negative due to ramp and recruiting costs. This is normal. The investment pays off in month ${Math.min(breakevenMonth,24)}. Year 2 ROI improves to <strong>+${yr2ROI.toFixed(0)}%</strong>.`) : diagnosis('STRONG HIRE', `This hire is ROI-positive in year 1. Ensure quota is realistic and ramp support is in place.`, 'good')}
+  `);
+}
+
+// ===================== TOOL 09: SEQUENCE PLANNER =====================
+function calcSequence() {
+  const complexity = val('sq-complexity');
+  const channel = val('sq-channel');
+  const warmth = val('sq-warmth');
+  const product = val('sq-product');
+  if (!complexity || !channel || !warmth || !product) return;
+
+  const sequences = {
+    simple: {
+      cold: [
+        { day: 'Day 1', action: 'First touch — ' + channel, angle: 'Lead with their specific pain. One sentence problem, one sentence outcome.', why: 'Establish relevance immediately.' },
+        { day: 'Day 3', action: 'Follow-up email', angle: 'Add social proof — similar company, specific result.', why: '80% of deals require 5+ touches. Most people stop at 1.' },
+        { day: 'Day 7', action: 'LinkedIn connect + note', angle: 'Reference your email. Keep note under 300 characters.', why: 'Multi-channel increases response rate by 30-40%.' },
+        { day: 'Day 10', action: 'Value email — free resource', angle: 'Send something genuinely useful. No ask.', why: 'Reciprocity. They owe you a read.' },
+        { day: 'Day 14', action: 'Breakup email', angle: '"Last email from me — closing your file unless you want to chat."', why: 'Breakup emails get 3-5x higher response than standard follow-ups.' },
+      ],
+      warm: [
+        { day: 'Same day', action: 'First touch — ' + channel, angle: 'Reference the connection or event directly. Ask for a 15-min call.', why: 'Warm leads go cold fast. Move within 24 hours.' },
+        { day: 'Day 3', action: 'Follow-up', angle: 'Share a relevant case study or insight based on their situation.', why: 'Demonstrate you listened.' },
+        { day: 'Day 7', action: 'Soft ask', angle: 'Ask a simple yes/no question to restart conversation.', why: 'Lowers friction for a response.' },
+      ],
+      inbound: [
+        { day: 'Within 1 hour', action: 'Immediate response', angle: 'Thank them for reaching out. Confirm you understand their need. Propose a specific time.', why: 'Speed to lead is the #1 conversion factor. 5-minute response = 21x higher conversion than 30-minute.' },
+        { day: 'Day 1', action: 'Send calendar link', angle: 'Remove all friction. Give them your Calendly or specific 3 slots.', why: 'Every extra step loses 30% of leads.' },
+        { day: 'Day 3 (if no booking)', action: 'Follow-up', angle: 'Simple: "Still interested? Here are 2 more slots."', why: 'Inbound leads that don\'t book immediately are still warm.' },
+      ]
+    },
+    medium: {
+      cold: [
+        { day: 'Day 1', action: 'Research + first touch — ' + channel, angle: 'Hyper-personalised opener — reference something specific about their business.', why: 'Medium deals need trust. Generic openers destroy it.' },
+        { day: 'Day 4', action: 'LinkedIn comment on their post', angle: 'Add a genuinely thoughtful comment on their recent content. No pitch.', why: 'Warms the relationship before the next email.' },
+        { day: 'Day 6', action: 'Follow-up email', angle: 'Connect your product to their specific business context. Short case study.', why: 'Demonstrates relevance at their scale.' },
+        { day: 'Day 10', action: 'Phone call', angle: 'Reference your emails. Ask one qualifying question.', why: 'Voice breaks through email fatigue.' },
+        { day: 'Day 15', action: 'LinkedIn DM', angle: 'Send relevant industry insight. No ask.', why: 'Multi-channel cadence sustains visibility.' },
+        { day: 'Day 21', action: 'Final email', angle: 'Breakup with open door. "Reaching out in 90 days if timing changes."', why: 'Preserves relationship for future cycle.' },
+      ],
+      warm: [
+        { day: 'Day 1', action: 'First touch — ' + channel, angle: 'Reference connection. Ask for intro call — "30 mins to explore fit."', why: 'Warm = high intent. Move directly to qualification.' },
+        { day: 'Day 3', action: 'Send pre-read material', angle: 'Case study or one-pager relevant to their industry.', why: 'Lets them prepare — increases meeting quality.' },
+        { day: 'Day 7', action: 'Follow-up + meeting prep', angle: '"Quick question before our call" — send 2 discovery questions.', why: 'Sets agenda, signals professionalism.' },
+        { day: 'Day 14 (if no meeting)', action: 'Re-engage', angle: 'New angle — share a trigger event or news relevant to them.', why: 'Context changes can restart stalled conversations.' },
+      ],
+      inbound: [
+        { day: 'Within 1 hour', action: 'Response + qualification', angle: 'Acknowledge, ask 2 qualifying questions, propose a discovery call.', why: 'Qualify fast — medium deals need right stakeholders from day 1.' },
+        { day: 'Day 1', action: 'Discovery call', angle: 'Understand their full situation. Map stakeholders. Confirm budget and timeline.', why: 'Medium deals die from incomplete discovery.' },
+        { day: 'Day 3', action: 'Send summary + proposal outline', angle: 'Written summary of what you heard + next steps.', why: 'Written recaps build trust and surface misalignments early.' },
+        { day: 'Day 7', action: 'Follow-up on proposal', angle: 'Ask for feedback. Introduce to second stakeholder.', why: 'Expand your footprint while momentum is high.' },
+      ]
+    },
+    complex: {
+      cold: [
+        { day: 'Week 1', action: 'Map the buying committee', angle: 'Identify 3-5 stakeholders before first contact. Research each.', why: 'Enterprise deals die from single-threading. Know everyone before you start.' },
+        { day: 'Week 1', action: 'First touch to economic buyer — ' + channel, angle: 'Executive-level message. Business outcome focus. No product features.', why: 'Economic buyers set the budget and kill the deal. Start there.' },
+        { day: 'Week 2', action: 'LinkedIn engagement across stakeholders', angle: 'Comment on posts from 2-3 committee members. No pitch.', why: 'Build familiarity before outreach.' },
+        { day: 'Week 2', action: 'Outreach to technical evaluator', angle: 'Separate message, technical framing, offer a sandbox or demo.', why: 'Technical buyers need different content than economic buyers.' },
+        { day: 'Week 3', action: 'Send thought leadership content', angle: 'Industry report, benchmark data, or insight that helps their decision-making.', why: 'Complex buyers evaluate vendors on quality of thinking.' },
+        { day: 'Week 4', action: 'Request executive briefing or workshop', angle: 'Offer to run a value assessment or architecture review. No sales pressure.', why: 'Getting them to invest time is a commitment signal.' },
+        { day: 'Week 6', action: 'Multi-stakeholder meeting', angle: 'Bring your senior leadership. Present business case.', why: 'Mirror the buying committee with your selling team.' },
+        { day: 'Week 8+', action: 'Continuous: champion enablement', angle: 'Arm your internal champion with everything they need to sell internally.', why: 'Your champion sells for you when you\'re not in the room.' },
+      ]
+    }
+  };
+
+  const seqKey = complexity === 'complex' ? 'cold' : warmth;
+  const steps = (sequences[complexity] && sequences[complexity][seqKey]) || sequences['medium']['cold'];
+
+  setOutput('sq-output', `
+    <div class="output-label" style="font-family:var(--mono);font-size:9px;color:var(--purple);letter-spacing:.2em;margin-bottom:16px;">${complexity.toUpperCase()} · ${warmth.toUpperCase()} · ${product.toUpperCase()}</div>
+    <div class="seq-timeline">
+      ${steps.map(s => `
+        <div class="seq-step">
+          <div class="seq-day">${s.day}</div>
+          <div class="seq-action">${s.action}</div>
+          <div class="seq-why" style="margin-top:4px;color:var(--text-mid)">${s.angle}</div>
+          <div class="seq-why" style="margin-top:4px;opacity:0.6">↳ ${s.why}</div>
+        </div>
+      `).join('')}
+    </div>
+    ${diagnosis('SEQUENCE LOGIC', `${steps.length} touches across ${complexity === 'complex' ? '8+ weeks' : complexity === 'medium' ? '3 weeks' : '2 weeks'}. Primary channel: <strong>${channel}</strong>. Adjust timing based on prospect responses — a reply at any stage resets the sequence.`, 'good')}
+  `);
+}
+</script>
+</body>
+</html>
