@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aura — Free Health Intelligence Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+    --primary: #059669;
+    --primary-light: #34d399;
+    --primary-dark: #064e3b;
+    --accent: #f97316;
+    --bg-main: #f0fdf4;
+    --glass-bg: rgba(255,255,255,0.65);
+    --glass-border: rgba(5,150,105,0.2);
+    --glass-hover: rgba(255,255,255,0.85);
+    --text-main: #022c22;
+    --text-muted: #374151;
+    --blob-1: rgba(52,211,153,0.4);
+    --blob-2: rgba(249,115,22,0.15);
+    --transition-speed: 0.4s;
+}
+[data-theme="dark"] {
+    --bg-main: #020617;
+    --glass-bg: rgba(15,23,42,0.6);
+    --glass-border: rgba(52,211,153,0.15);
+    --glass-hover: rgba(30,41,59,0.8);
+    --text-main: #ecfdf5;
+    --text-muted: #94a3b8;
+    --primary-dark: #6ee7b7;
+    --blob-1: rgba(5,150,105,0.25);
+    --blob-2: rgba(249,115,22,0.1);
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Plus Jakarta Sans',sans-serif;}
+body{background-color:var(--bg-main);color:var(--text-main);overflow-x:hidden;min-height:100vh;transition:background-color var(--transition-speed),color var(--transition-speed);}
+
+.ambient-flow{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;background:radial-gradient(at 0% 0%,var(--blob-1) 0px,transparent 50%),radial-gradient(at 100% 0%,var(--blob-2) 0px,transparent 50%),radial-gradient(at 100% 100%,var(--blob-1) 0px,transparent 50%),radial-gradient(at 0% 50%,var(--blob-2) 0px,transparent 50%);filter:blur(80px);animation:breathe 10s ease-in-out infinite alternate;transition:background 1s ease;}
+@keyframes breathe{0%{transform:scale(1);}100%{transform:scale(1.1);}}
+
+nav{display:flex;justify-content:space-between;align-items:center;padding:15px 8%;background:var(--glass-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--glass-border);position:sticky;top:0;z-index:1000;transition:background var(--transition-speed),border-color var(--transition-speed);}
+.logo{font-size:1.6rem;font-weight:800;letter-spacing:-1px;color:var(--text-main);text-decoration:none;transition:color var(--transition-speed);}
+.logo span{color:var(--primary);}
+.nav-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
+.brand-sub{font-size:0.85rem;font-weight:700;color:var(--text-muted);opacity:0.8;letter-spacing:0.5px;}
+.theme-toggle{cursor:pointer;background:transparent;border:1px solid var(--glass-border);padding:4px 12px;border-radius:20px;display:flex;align-items:center;gap:6px;font-size:0.75rem;font-weight:600;color:var(--text-muted);transition:0.3s;}
+.theme-toggle:hover{background:var(--glass-hover);color:var(--primary);border-color:var(--primary);}
+
+.hero{text-align:center;padding:80px 5% 60px;}
+.hero h1{font-size:clamp(2.5rem,5vw,4.5rem);font-weight:800;line-height:1.1;margin-bottom:1.5rem;color:var(--text-main);transition:color var(--transition-speed);}
+.hero h1 span{color:var(--primary);}
+.hero p{font-size:1.2rem;color:var(--text-muted);max-width:650px;margin:0 auto;transition:color var(--transition-speed);}
+
+.hero-stats{display:flex;justify-content:center;gap:40px;margin-top:40px;flex-wrap:wrap;}
+.h-stat{text-align:center;}
+.h-stat-val{font-size:2rem;font-weight:800;color:var(--primary);}
+.h-stat-label{font-size:0.8rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;}
+
+.grid-container{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;padding:0 8% 60px;max-width:1400px;margin:0 auto;}
+
+.card{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:24px;padding:30px;text-decoration:none;transition:all 0.3s cubic-bezier(0.25,0.8,0.25,1);display:flex;flex-direction:column;justify-content:space-between;min-height:260px;position:relative;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.05);}
+.card:hover{transform:translateY(-8px);background:var(--glass-hover);border-color:var(--primary);box-shadow:0 15px 30px rgba(5,150,105,0.15);}
+.card h3{font-size:1.4rem;color:var(--text-main);margin-bottom:10px;font-weight:700;transition:color var(--transition-speed);}
+.card p{font-size:0.95rem;color:var(--text-muted);line-height:1.5;transition:color var(--transition-speed);}
+.card-num{position:absolute;bottom:-15px;right:15px;font-size:5rem;font-weight:900;color:var(--primary);opacity:0.08;pointer-events:none;}
+.badge{display:inline-block;padding:4px 12px;border-radius:50px;font-size:0.7rem;font-weight:700;text-transform:uppercase;margin-bottom:12px;}
+.badge-beta{background:rgba(249,115,22,0.1);color:var(--accent);border:1px solid rgba(249,115,22,0.3);}
+.badge-live{background:rgba(5,150,105,0.1);color:var(--primary);border:1px solid rgba(5,150,105,0.3);}
+.link-text{margin-top:20px;font-size:0.9rem;font-weight:600;color:var(--primary);display:flex;align-items:center;gap:6px;transition:gap 0.2s;}
+.card:hover .link-text{gap:10px;}
+
+/* TOOL SECTIONS */
+.tool-section{padding:60px 8%;max-width:1400px;margin:0 auto;}
+.tool-section-header{margin-bottom:40px;}
+.tool-section-header h2{font-size:clamp(1.8rem,3vw,3rem);font-weight:800;color:var(--text-main);margin-bottom:10px;}
+.tool-section-header h2 span{color:var(--primary);}
+.tool-section-header p{font-size:1rem;color:var(--text-muted);max-width:600px;}
+
+.tool-card{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:24px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.05);margin-bottom:40px;}
+.tool-card-header{padding:28px 32px 20px;border-bottom:1px solid var(--glass-border);}
+.tool-card-header h3{font-size:1.5rem;font-weight:800;color:var(--text-main);margin-bottom:6px;}
+.tool-card-header p{font-size:0.9rem;color:var(--text-muted);}
+.tool-card-body{display:grid;grid-template-columns:1fr 1fr;min-height:400px;}
+.tool-inputs{padding:32px;border-right:1px solid var(--glass-border);}
+.tool-outputs{padding:32px;}
+
+@media(max-width:768px){
+  .tool-card-body{grid-template-columns:1fr;}
+  .tool-inputs{border-right:none;border-bottom:1px solid var(--glass-border);}
+  .hero h1{font-size:2.5rem;}
+  nav{padding:15px 5%;}
+  .grid-container,.tool-section{padding-left:5%;padding-right:5%;}
+}
+
+/* FORM ELEMENTS */
+.form-group{margin-bottom:18px;}
+.form-group label{display:block;margin-bottom:8px;font-weight:600;font-size:0.85rem;color:var(--text-muted);}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:11px 14px;border-radius:10px;border:1px solid var(--glass-border);background:rgba(255,255,255,0.5);color:var(--text-main);font-family:inherit;font-size:0.9rem;transition:0.3s;outline:none;}
+[data-theme="dark"] .form-group input,[data-theme="dark"] .form-group select,[data-theme="dark"] .form-group textarea{background:rgba(0,0,0,0.2);}
+.form-group input:focus,.form-group select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(5,150,105,0.1);}
+.form-group input[type="range"]{padding:0;border:none;background:transparent;box-shadow:none;-webkit-appearance:none;height:6px;background:var(--glass-border);border-radius:3px;}
+.form-group input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;background:var(--primary);border-radius:50%;cursor:pointer;box-shadow:0 2px 6px rgba(5,150,105,0.3);}
+.range-row{display:flex;align-items:center;gap:12px;}
+.range-val{font-weight:700;color:var(--primary);min-width:50px;font-size:0.95rem;}
+
+.calc-btn{background:var(--primary);color:white;border:none;padding:13px 24px;border-radius:50px;font-weight:700;cursor:pointer;width:100%;transition:0.3s;font-size:0.95rem;margin-top:8px;}
+.calc-btn:hover{background:var(--primary-light);transform:translateY(-2px);box-shadow:0 10px 20px rgba(5,150,105,0.2);}
+.calc-btn.secondary{background:transparent;border:1px solid var(--glass-border);color:var(--text-muted);margin-top:8px;}
+.calc-btn.secondary:hover{background:var(--glass-hover);color:var(--primary);border-color:var(--primary);}
+
+/* OUTPUT COMPONENTS */
+.out-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;color:var(--text-muted);text-align:center;gap:12px;}
+.out-placeholder .icon{font-size:3rem;opacity:0.3;}
+.out-placeholder p{font-size:0.9rem;}
+
+.result-card{background:rgba(5,150,105,0.06);border:1px solid rgba(5,150,105,0.2);border-radius:16px;padding:20px;margin-bottom:16px;}
+.result-card.accent{background:rgba(249,115,22,0.06);border-color:rgba(249,115,22,0.2);}
+.result-card.warn{background:rgba(239,68,68,0.06);border-color:rgba(239,68,68,0.2);}
+.result-label{font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:6px;}
+.result-value{font-size:2.2rem;font-weight:800;color:var(--primary);line-height:1;}
+.result-value.accent{color:var(--accent);}
+.result-value.warn{color:#ef4444;}
+.result-sub{font-size:0.82rem;color:var(--text-muted);margin-top:5px;}
+
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.result-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;}
+.result-grid .result-card,.result-grid-3 .result-card{margin-bottom:0;}
+.result-grid .result-value,.result-grid-3 .result-value{font-size:1.6rem;}
+
+.progress-bar{height:8px;background:var(--glass-border);border-radius:4px;overflow:hidden;margin:6px 0 4px;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--primary-light));border-radius:4px;transition:width 0.8s cubic-bezier(0.4,0,0.2,1);}
+.progress-fill.accent{background:linear-gradient(90deg,var(--accent),#fb923c);}
+.progress-fill.warn{background:linear-gradient(90deg,#ef4444,#f87171);}
+
+.bar-label{display:flex;justify-content:space-between;font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;}
+
+.insight-box{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:12px;padding:16px;margin-bottom:12px;}
+.insight-box.green{border-left:3px solid var(--primary);}
+.insight-box.orange{border-left:3px solid var(--accent);}
+.insight-box.red{border-left:3px solid #ef4444;}
+.insight-title{font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-muted);margin-bottom:5px;}
+.insight-text{font-size:0.88rem;color:var(--text-main);line-height:1.6;}
+
+/* FOOD CALCULATOR SPECIFIC */
+.food-search-wrap{position:relative;margin-bottom:16px;}
+.food-search{width:100%;padding:11px 14px 11px 40px;border-radius:10px;border:1px solid var(--glass-border);background:rgba(255,255,255,0.5);color:var(--text-main);font-family:inherit;font-size:0.9rem;transition:0.3s;outline:none;}
+[data-theme="dark"] .food-search{background:rgba(0,0,0,0.2);}
+.food-search:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(5,150,105,0.1);}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:1rem;}
+.food-dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:12px;max-height:240px;overflow-y:auto;z-index:100;box-shadow:0 10px 30px rgba(0,0,0,0.1);display:none;backdrop-filter:blur(16px);}
+.food-dropdown.open{display:block;}
+.food-option{padding:10px 16px;cursor:pointer;font-size:0.88rem;color:var(--text-main);display:flex;justify-content:space-between;align-items:center;transition:background 0.15s;}
+.food-option:hover{background:rgba(5,150,105,0.08);}
+.food-option-cal{font-size:0.78rem;color:var(--text-muted);}
+.food-option-cat{font-size:0.7rem;color:var(--primary);font-weight:600;}
+
+.food-log{margin-bottom:16px;}
+.food-log-header{font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-muted);margin-bottom:10px;}
+.food-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(5,150,105,0.04);border:1px solid rgba(5,150,105,0.1);border-radius:10px;margin-bottom:8px;}
+.food-item-name{flex:1;font-size:0.88rem;font-weight:600;color:var(--text-main);}
+.food-item-qty{display:flex;align-items:center;gap:6px;}
+.food-item-qty input{width:55px;padding:5px 8px;border-radius:6px;border:1px solid var(--glass-border);background:rgba(255,255,255,0.5);color:var(--text-main);font-family:inherit;font-size:0.82rem;text-align:center;outline:none;}
+[data-theme="dark"] .food-item-qty input{background:rgba(0,0,0,0.2);}
+.food-item-unit{font-size:0.75rem;color:var(--text-muted);}
+.food-item-cal{font-size:0.85rem;font-weight:700;color:var(--primary);min-width:55px;text-align:right;}
+.food-item-remove{background:none;border:none;color:#ef4444;cursor:pointer;font-size:1rem;padding:2px 4px;border-radius:4px;transition:background 0.2s;}
+.food-item-remove:hover{background:rgba(239,68,68,0.1);}
+
+.meal-tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.meal-tab{padding:6px 16px;border-radius:20px;border:1px solid var(--glass-border);background:transparent;font-size:0.8rem;font-weight:600;color:var(--text-muted);cursor:pointer;transition:0.2s;}
+.meal-tab.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+
+.suggestion-chip{display:inline-block;padding:6px 14px;border-radius:20px;background:rgba(5,150,105,0.08);border:1px solid rgba(5,150,105,0.2);color:var(--primary);font-size:0.8rem;font-weight:600;cursor:pointer;margin:4px;transition:all 0.2s;}
+.suggestion-chip:hover{background:var(--primary);color:#fff;}
+
+/* WORKOUT SPECIFIC */
+.workout-phase{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:16px;padding:20px;margin-bottom:16px;}
+.workout-phase-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.workout-phase-title{font-size:1rem;font-weight:700;color:var(--text-main);}
+.workout-phase-badge{font-size:0.72rem;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(5,150,105,0.1);color:var(--primary);}
+.workout-phase-badge.accent{background:rgba(249,115,22,0.1);color:var(--accent);}
+
+.exercise-item{display:flex;align-items:flex-start;gap:14px;padding:12px 0;border-bottom:1px solid var(--glass-border);}
+.exercise-item:last-child{border-bottom:none;padding-bottom:0;}
+.ex-icon{width:40px;height:40px;border-radius:10px;background:rgba(5,150,105,0.1);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+.ex-icon.accent{background:rgba(249,115,22,0.1);}
+.ex-info{flex:1;}
+.ex-name{font-size:0.92rem;font-weight:700;color:var(--text-main);margin-bottom:3px;}
+.ex-detail{font-size:0.8rem;color:var(--text-muted);line-height:1.5;}
+.ex-detail strong{color:var(--primary);}
+.ex-why{font-size:0.76rem;color:var(--text-muted);font-style:italic;margin-top:3px;}
+.ex-tag{display:inline-block;padding:2px 8px;border-radius:8px;font-size:0.7rem;font-weight:700;background:rgba(5,150,105,0.08);color:var(--primary);margin-right:4px;margin-top:4px;}
+.ex-tag.accent{background:rgba(249,115,22,0.08);color:var(--accent);}
+
+.hr-zone{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--glass-border);}
+.hr-zone:last-child{border-bottom:none;}
+.hr-zone-color{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+.hr-zone-info{flex:1;}
+.hr-zone-name{font-size:0.85rem;font-weight:700;color:var(--text-main);}
+.hr-zone-range{font-size:0.78rem;color:var(--text-muted);}
+.hr-zone-benefit{font-size:0.75rem;color:var(--text-muted);font-style:italic;}
+.hr-zone-active{font-size:0.78rem;font-weight:700;color:var(--primary);}
+
+.week-plan{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:16px;}
+.day-cell{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:10px;padding:8px 4px;text-align:center;}
+.day-cell.active{background:rgba(5,150,105,0.1);border-color:var(--primary);}
+.day-cell.rest{opacity:0.5;}
+.day-name{font-size:0.65rem;font-weight:700;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;}
+.day-type{font-size:0.68rem;font-weight:600;color:var(--primary);}
+.day-type.rest{color:var(--text-muted);}
+.day-type.accent{color:var(--accent);}
+
+/* SMALL TOOLS */
+.small-tool-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:24px;padding:0 8% 80px;max-width:1400px;margin:0 auto;}
+.small-tool{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:24px;padding:28px;box-shadow:0 4px 20px rgba(0,0,0,0.05);}
+.small-tool h3{font-size:1.15rem;font-weight:800;color:var(--text-main);margin-bottom:6px;}
+.small-tool .tool-desc{font-size:0.85rem;color:var(--text-muted);margin-bottom:20px;line-height:1.5;}
+.small-tool-out{margin-top:16px;}
+
+.divider{border:none;border-top:1px solid var(--glass-border);margin:20px 0;}
+
+footer{text-align:center;padding:60px 8%;border-top:1px solid var(--glass-border);background:rgba(255,255,255,0.02);}
+.social-links{display:flex;justify-content:center;gap:30px;margin-bottom:30px;}
+.social-link{text-decoration:none;color:var(--text-muted);font-weight:600;font-size:0.9rem;transition:color 0.3s;text-transform:uppercase;letter-spacing:1px;}
+.social-link:hover{color:var(--primary);}
+.copyright{color:var(--text-muted);font-size:0.85rem;opacity:0.7;}
+
+.section-label{font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--primary);margin-bottom:8px;}
+.section-divider{height:1px;background:var(--glass-border);margin:60px 8%;}
+</style>
+</head>
+<body data-theme="light">
+<div class="ambient-flow"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="https://shoonyaorigins.com/ventures/aura/" class="logo">Aura<span>.</span></a>
+  <div class="nav-right">
+    <span class="brand-sub">Free Health Tools · ShoonyaOrigins</span>
+    <button class="theme-toggle" onclick="toggleTheme()">
+      <span id="theme-icon">🌙</span>
+      <span id="theme-label">Dark</span>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="section-label">Free · No Signup · Runs Locally</div>
+  <h1>Your Personal<br><span>Health Intelligence</span></h1>
+  <p>Ten tools that fitness apps, nutritionists, and health coaches charge for. Built by Aura. Free forever. All calculations run in your browser — zero data shared.</p>
+  <div class="hero-stats">
+    <div class="h-stat"><div class="h-stat-val">10</div><div class="h-stat-label">Tools</div></div>
+    <div class="h-stat"><div class="h-stat-val">60+</div><div class="h-stat-label">Indian Foods</div></div>
+    <div class="h-stat"><div class="h-stat-val">₹0</div><div class="h-stat-label">Cost</div></div>
+    <div class="h-stat"><div class="h-stat-val">0</div><div class="h-stat-label">Signups</div></div>
+  </div>
+</div>
+
+<!-- TOOL INDEX CARDS -->
+<div class="grid-container">
+  <a href="#tool-calorie" class="card">
+    <div><span class="badge badge-live">Featured</span><h3>Indian Calorie Calculator</h3><p>60+ Indian foods. Track roti, dal, sabzi, biryani. Know your real daily intake vs your goal.</p></div>
+    <div class="link-text">Open Tool →</div>
+    <div class="card-num">04</div>
+  </a>
+  <a href="#tool-workout" class="card">
+    <div><span class="badge badge-live">Featured</span><h3>Personalised Workout Guide</h3><p>Heart rate zones, weekly plan, exercise-by-exercise breakdown based on your age and goal.</p></div>
+    <div class="link-text">Open Tool →</div>
+    <div class="card-num">10</div>
+  </a>
+  <a href="#tool-bmi" class="card">
+    <div><span class="badge badge-live">Live</span><h3>BMI & Body Composition</h3><p>Beyond basic BMI. Body fat %, lean mass, metabolic age, health classification.</p></div>
+    <div class="link-text">Open Tool →</div>
+    <div class="card-num">01</div>
+  </a>
+  <a href="#tool-rhr" class="card">
+    <div><span class="badge badge-live">Live</span><h3>Heart Rate Health Score</h3><p>What your resting heart rate says about your cardiovascular fitness and risk.</p></div>
+    <div class="link-text">Open Tool →</div>
+    <div class="card-num">02</div>
+  </a>
+  <a href="#tool-aqi" class="card">
+    <div><span class="badge badge-live">Live</span><h3>AQI Health Impact</h3><p>Your city's air quality translated into real health risk and daily exposure dose.</p></div>
+    <div class="link-text">Open Tool →</div>
+    <div class="card-num">03</div>
+  </a>
+  <a href="#tool-sleep" class="card">
+    <div><span class="badge badge-live">Live</span><h3>Sleep Quality Scorer</h3><p>Score your sleep habits. Find what's hurting your recovery and long-term health.</p></div>
+    <div class="link-text">Open Tool →</div>
+    <div class="card-num">05</div>
+  </a>
+  <a href="#tool-neonatal" class="card">
+    <div><span class="badge badge-beta">Beta</span><h3>Neonatal Vitals Reference</h3><p>Normal heart rate, breathing, SpO2 ranges for your baby's exact age and weight.</p></div>
+    <div class="link-text">Open Tool →</div>
+    <div class="card-num">06</div>
+  </a>
+  <a href="#tool-fall" class="card">
+    <div><span class="badge badge-live">Live</span><h3>Elderly Fall Risk Assessment</h3><p>8-signal risk score for elderly family members. Know when to act before a fall happens.</p></div>
+    <div class="link-text">Open Tool →</div>
+    <div class="card-num">07</div>
+  </a>
+  <a href="#tool-hydration" class="card">
+    <div><span class="badge badge-live">Live</span><h3>Hydration Calculator</h3><p>Your real daily water target based on weight, activity, and Indian climate.</p></div>
+    <div class="link-text">Open Tool →</div>
+    <div class="card-num">08</div>
+  </a>
+  <a href="#tool-stress" class="card">
+    <div><span class="badge badge-live">Live</span><h3>Stress & Burnout Index</h3><p>10 signals. Burnout probability score and recovery protocol personalised to you.</p></div>
+    <div class="link-text">Open Tool →</div>
+    <div class="card-num">09</div>
+  </a>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- ===== TOOL 04: INDIAN CALORIE CALCULATOR ===== -->
+<div class="tool-section" id="tool-calorie">
+  <div class="tool-section-header">
+    <div class="section-label">Tool 04 · Nutrition Intelligence</div>
+    <h2>Indian <span>Calorie Calculator</span></h2>
+    <p>Track your actual meals — roti, dal, sabzi, chai, biryani, everything. Get your real daily intake vs your personalised calorie goal with macro breakdown.</p>
+  </div>
+  <div class="tool-card">
+    <div class="tool-card-header">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+        <div><h3>🍛 Daily Meal Tracker</h3><p>Add foods meal by meal. 60+ Indian foods included. See your intake vs target in real time.</p></div>
+        <button class="calc-btn" style="width:auto;padding:10px 20px;" onclick="clearAllMeals()">↺ Clear All</button>
+      </div>
+    </div>
+    <div class="tool-card-body" style="grid-template-columns:1.1fr 0.9fr;">
+
+      <!-- INPUTS -->
+      <div class="tool-inputs" style="overflow-y:auto;">
+
+        <!-- PROFILE -->
+        <div style="background:rgba(5,150,105,0.04);border:1px solid rgba(5,150,105,0.12);border-radius:14px;padding:18px;margin-bottom:20px;">
+          <div class="section-label" style="margin-bottom:12px;">Your Profile</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label>Age</label>
+              <input type="number" id="cal-age" placeholder="e.g. 28" min="10" max="90" oninput="recalcGoal()">
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label>Gender</label>
+              <select id="cal-gender" onchange="recalcGoal()">
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label>Weight (kg)</label>
+              <input type="number" id="cal-weight" placeholder="e.g. 70" oninput="recalcGoal()">
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label>Height (cm)</label>
+              <input type="number" id="cal-height" placeholder="e.g. 170" oninput="recalcGoal()">
+            </div>
+          </div>
+          <div class="form-group" style="margin-top:12px;margin-bottom:0;">
+            <label>Activity Level</label>
+            <select id="cal-activity" onchange="recalcGoal()">
+              <option value="1.2">Sedentary (desk job, no exercise)</option>
+              <option value="1.375">Light (1-3 days/week exercise)</option>
+              <option value="1.55" selected>Moderate (3-5 days/week)</option>
+              <option value="1.725">Active (6-7 days/week)</option>
+              <option value="1.9">Very Active (athlete / physical job)</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-top:12px;margin-bottom:0;">
+            <label>Goal</label>
+            <select id="cal-goal" onchange="recalcGoal()">
+              <option value="-500">Lose Weight (−500 kcal deficit)</option>
+              <option value="0" selected>Maintain Weight</option>
+              <option value="300">Lean Muscle Gain (+300 kcal)</option>
+              <option value="500">Bulk / Mass Gain (+500 kcal)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- MEAL TABS -->
+        <div class="meal-tabs">
+          <button class="meal-tab active" onclick="setMeal('breakfast',this)">🌅 Breakfast</button>
+          <button class="meal-tab" onclick="setMeal('lunch',this)">☀️ Lunch</button>
+          <button class="meal-tab" onclick="setMeal('snacks',this)">🍵 Snacks</button>
+          <button class="meal-tab" onclick="setMeal('dinner',this)">🌙 Dinner</button>
+        </div>
+
+        <!-- FOOD SEARCH -->
+        <div class="food-search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="food-search" id="food-search" placeholder="Search: roti, dal, paneer, chai..." oninput="searchFood()" onfocus="searchFood()" autocomplete="off">
+          <div class="food-dropdown" id="food-dropdown"></div>
+        </div>
+
+        <!-- QUICK ADD CHIPS -->
+        <div style="margin-bottom:16px;">
+          <div class="section-label" style="margin-bottom:8px;">Quick Add</div>
+          <div id="quick-chips"></div>
+        </div>
+
+        <!-- FOOD LOG -->
+        <div class="food-log">
+          <div class="food-log-header">Added Foods — <span id="meal-label">Breakfast</span></div>
+          <div id="food-list">
+            <div style="font-size:0.85rem;color:var(--text-muted);padding:12px 0;">No foods added yet. Search above or use quick add.</div>
+          </div>
+        </div>
+
+        <button class="calc-btn" onclick="calculateCalories()">📊 Calculate Day's Nutrition</button>
+      </div>
+
+      <!-- OUTPUTS -->
+      <div class="tool-outputs" id="cal-output">
+        <div class="out-placeholder">
+          <div class="icon">🥗</div>
+          <p>Add your profile and meals to see your nutrition breakdown</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- ===== TOOL 10: WORKOUT GUIDE ===== -->
+<div class="tool-section" id="tool-workout">
+  <div class="tool-section-header">
+    <div class="section-label">Tool 10 · Fitness Intelligence</div>
+    <h2>Personalised <span>Workout Guide</span></h2>
+    <p>Your age, fitness level, and goal — translated into exact heart rate zones, a 7-day weekly plan, exercise-by-exercise breakdowns, and progressions.</p>
+  </div>
+  <div class="tool-card">
+    <div class="tool-card-header">
+      <h3>💪 Your Training Blueprint</h3>
+      <p>Built on exercise science. Every recommendation tied to your specific numbers.</p>
+    </div>
+    <div class="tool-card-body">
+      <div class="tool-inputs">
+        <div class="form-group">
+          <label>Age</label>
+          <input type="number" id="wo-age" placeholder="e.g. 28" min="14" max="75">
+        </div>
+        <div class="form-group">
+          <label>Gender</label>
+          <select id="wo-gender">
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Resting Heart Rate (bpm)</label>
+          <input type="number" id="wo-rhr" placeholder="e.g. 72" min="40" max="110">
+          <div style="font-size:0.78rem;color:var(--text-muted);margin-top:4px;">Measure after waking, before getting up</div>
+        </div>
+        <div class="form-group">
+          <label>Current Fitness Level</label>
+          <select id="wo-fitness">
+            <option value="beginner">Beginner (No regular exercise)</option>
+            <option value="intermediate">Intermediate (Exercise 1-3x/week)</option>
+            <option value="advanced">Advanced (Exercise 4+ times/week)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Primary Goal</label>
+          <select id="wo-goal">
+            <option value="weightloss">Weight Loss / Fat Burn</option>
+            <option value="muscle">Muscle Building / Strength</option>
+            <option value="endurance">Endurance / Stamina</option>
+            <option value="general">General Fitness / Health</option>
+            <option value="flexibility">Flexibility / Mobility</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Available Days per Week</label>
+          <select id="wo-days">
+            <option value="3">3 days/week</option>
+            <option value="4">4 days/week</option>
+            <option value="5">5 days/week</option>
+            <option value="6">6 days/week</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Session Duration</label>
+          <select id="wo-duration">
+            <option value="30">30 minutes</option>
+            <option value="45">45 minutes</option>
+            <option value="60">60 minutes</option>
+            <option value="90">90 minutes</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Equipment Available</label>
+          <select id="wo-equipment">
+            <option value="none">None (Bodyweight only)</option>
+            <option value="minimal">Minimal (Dumbbells / Resistance bands)</option>
+            <option value="gym">Full Gym Access</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Any Limitations / Injuries</label>
+          <select id="wo-limit">
+            <option value="none">None</option>
+            <option value="knee">Knee / Lower body issues</option>
+            <option value="back">Lower back pain</option>
+            <option value="shoulder">Shoulder / Upper body issues</option>
+          </select>
+        </div>
+        <button class="calc-btn" onclick="generateWorkout()">🏋️ Generate My Training Plan</button>
+      </div>
+      <div class="tool-outputs" id="wo-output">
+        <div class="out-placeholder">
+          <div class="icon">🏃</div>
+          <p>Fill in your profile to generate your personalised training blueprint</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- ===== SMALL TOOLS (01, 02, 03, 05, 06, 07, 08, 09) ===== -->
+<div style="padding:0 8%;max-width:1400px;margin:0 auto;">
+  <div class="section-label" style="margin-bottom:8px;">More Free Tools</div>
+  <h2 style="font-size:clamp(1.8rem,3vw,2.5rem);font-weight:800;color:var(--text-main);margin-bottom:40px;">Eight More <span style="color:var(--primary)">Health Diagnostics</span></h2>
+</div>
+
+<div class="small-tool-grid">
+
+  <!-- T01: BMI -->
+  <div class="small-tool" id="tool-bmi">
+    <div class="section-label">Tool 01 · Body Composition</div>
+    <h3>BMI & Body Composition</h3>
+    <p class="tool-desc">Goes beyond BMI — estimates body fat %, lean mass, metabolic age, and gives your real health classification for Indian body standards.</p>
+    <div class="form-group"><label>Weight (kg)</label><input type="number" id="bmi-w" placeholder="70" oninput="calcBMI()"></div>
+    <div class="form-group"><label>Height (cm)</label><input type="number" id="bmi-h" placeholder="170" oninput="calcBMI()"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="form-group"><label>Age</label><input type="number" id="bmi-age" placeholder="28" oninput="calcBMI()"></div>
+      <div class="form-group"><label>Gender</label><select id="bmi-gender" onchange="calcBMI()"><option value="male">Male</option><option value="female">Female</option></select></div>
+    </div>
+    <div class="small-tool-out" id="bmi-out"></div>
+  </div>
+
+  <!-- T02: HEART RATE -->
+  <div class="small-tool" id="tool-rhr">
+    <div class="section-label">Tool 02 · Cardiovascular Health</div>
+    <h3>Resting Heart Rate Score</h3>
+    <p class="tool-desc">Your resting heart rate is one of the best indicators of cardiovascular fitness. Input yours and understand what it means for your heart health.</p>
+    <div class="form-group"><label>Resting Heart Rate (bpm)</label><input type="number" id="rhr-val" placeholder="e.g. 72" oninput="calcRHR()"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="form-group"><label>Age</label><input type="number" id="rhr-age" placeholder="28" oninput="calcRHR()"></div>
+      <div class="form-group"><label>Gender</label><select id="rhr-gender" onchange="calcRHR()"><option value="male">Male</option><option value="female">Female</option></select></div>
+    </div>
+    <div class="form-group"><label>Exercise Frequency</label>
+      <select id="rhr-exercise" onchange="calcRHR()">
+        <option value="none">Rarely / Never</option>
+        <option value="light">1-2x/week</option>
+        <option value="moderate">3-4x/week</option>
+        <option value="heavy">5+ times/week</option>
+      </select>
+    </div>
+    <div class="small-tool-out" id="rhr-out"></div>
+  </div>
+
+  <!-- T03: AQI -->
+  <div class="small-tool" id="tool-aqi">
+    <div class="section-label">Tool 03 · Environmental Intel</div>
+    <h3>AQI Health Impact Calculator</h3>
+    <p class="tool-desc">Your city's AQI translated into actual health risk — cigarette equivalents, annual lung dose, and recommended protective actions.</p>
+    <div class="form-group"><label>Current AQI</label><input type="number" id="aqi-val" placeholder="e.g. 150" oninput="calcAQI()"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="form-group"><label>Daily Outdoor Hours</label><input type="number" id="aqi-hours" placeholder="e.g. 4" oninput="calcAQI()"></div>
+      <div class="form-group"><label>Age Group</label>
+        <select id="aqi-age" onchange="calcAQI()">
+          <option value="child">Child (&lt;12)</option>
+          <option value="adult" selected>Adult (12-60)</option>
+          <option value="elderly">Elderly (60+)</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group"><label>Pre-existing Condition</label>
+      <select id="aqi-condition" onchange="calcAQI()">
+        <option value="none">None</option>
+        <option value="asthma">Asthma / Respiratory</option>
+        <option value="cardiac">Cardiac / Heart condition</option>
+        <option value="diabetes">Diabetes</option>
+      </select>
+    </div>
+    <div class="small-tool-out" id="aqi-out"></div>
+  </div>
+
+  <!-- T05: SLEEP -->
+  <div class="small-tool" id="tool-sleep">
+    <div class="section-label">Tool 05 · Recovery Intelligence</div>
+    <h3>Sleep Quality Scorer</h3>
+    <p class="tool-desc">Score your sleep habits across 6 dimensions. Know what's hurting your recovery, cognitive function, and long-term health.</p>
+    <div class="form-group"><label>Average Sleep Hours</label>
+      <div class="range-row">
+        <input type="range" id="sl-hours" min="3" max="12" value="7" step="0.5" oninput="document.getElementById('sl-hv').textContent=this.value+'h';calcSleep()">
+        <span class="range-val" id="sl-hv">7h</span>
+      </div>
+    </div>
+    <div class="form-group"><label>Sleep Consistency (same bedtime?)</label>
+      <select id="sl-consist" onchange="calcSleep()"><option value="4">Always (±30 min)</option><option value="3" selected>Mostly (±1 hr)</option><option value="2">Sometimes</option><option value="1">Rarely — varies 2+ hrs</option></select>
+    </div>
+    <div class="form-group"><label>Night Wakeups</label>
+      <select id="sl-wake" onchange="calcSleep()"><option value="4">None</option><option value="3" selected>1-2 times</option><option value="2">3-4 times</option><option value="1">5+ times</option></select>
+    </div>
+    <div class="form-group"><label>Screen time before bed</label>
+      <select id="sl-screen" onchange="calcSleep()"><option value="4">None (1hr+ before bed)</option><option value="3">30-60 min before</option><option value="2" selected>Right until bed</option><option value="1">In bed on phone</option></select>
+    </div>
+    <div class="form-group"><label>How refreshed do you feel on waking?</label>
+      <select id="sl-refresh" onchange="calcSleep()"><option value="4">Very refreshed</option><option value="3">Mostly okay</option><option value="2" selected>Groggy / takes time</option><option value="1">Exhausted / unrefreshed</option></select>
+    </div>
+    <button class="calc-btn" onclick="calcSleep()">Score My Sleep</button>
+    <div class="small-tool-out" id="sl-out"></div>
+  </div>
+
+  <!-- T06: NEONATAL -->
+  <div class="small-tool" id="tool-neonatal">
+    <div class="section-label">Tool 06 · Neonatal Care</div>
+    <h3>Neonatal Vitals Reference</h3>
+    <p class="tool-desc">Normal vital sign ranges for your baby's exact age. Know what's normal before you worry — and when to call the doctor immediately.</p>
+    <div class="form-group"><label>Baby's Age</label>
+      <select id="neo-age" onchange="calcNeonatal()">
+        <option value="">-- Select age --</option>
+        <option value="premature">Premature (&lt;37 weeks at birth)</option>
+        <option value="newborn">Newborn (0-1 month)</option>
+        <option value="infant1">Infant (1-3 months)</option>
+        <option value="infant2">Infant (3-6 months)</option>
+        <option value="infant3">Infant (6-12 months)</option>
+        <option value="toddler">Toddler (1-3 years)</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Birth Weight (grams, optional)</label>
+      <input type="number" id="neo-weight" placeholder="e.g. 3200" oninput="calcNeonatal()">
+    </div>
+    <div class="small-tool-out" id="neo-out"></div>
+  </div>
+
+  <!-- T07: FALL RISK -->
+  <div class="small-tool" id="tool-fall">
+    <div class="section-label">Tool 07 · Elderly Care</div>
+    <h3>Elderly Fall Risk Assessment</h3>
+    <p class="tool-desc">8-signal questionnaire for elderly family members. Identifies fall risk before an incident happens — and what to do about it.</p>
+    <div id="fall-signals" style="margin-bottom:16px;"></div>
+    <button class="calc-btn" onclick="calcFall()">Assess Fall Risk</button>
+    <div class="small-tool-out" id="fall-out"></div>
+  </div>
+
+  <!-- T08: HYDRATION -->
+  <div class="small-tool" id="tool-hydration">
+    <div class="section-label">Tool 08 · Hydration Intelligence</div>
+    <h3>Hydration Calculator</h3>
+    <p class="tool-desc">Your real daily water target based on weight, Indian climate, activity, and diet. Not the generic "8 glasses" advice.</p>
+    <div class="form-group"><label>Body Weight (kg)</label><input type="number" id="hy-weight" placeholder="e.g. 70" oninput="calcHydration()"></div>
+    <div class="form-group"><label>Activity Level</label>
+      <select id="hy-activity" onchange="calcHydration()">
+        <option value="1">Sedentary</option><option value="1.3" selected>Moderate</option><option value="1.6">Active</option><option value="2">Very Active / Athlete</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Ambient Temperature</label>
+      <select id="hy-temp" onchange="calcHydration()">
+        <option value="1">Cool (&lt;25°C)</option><option value="1.15" selected>Warm (25-35°C)</option><option value="1.3">Hot (35-42°C)</option><option value="1.5">Extreme heat (42°C+)</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Diet Type</label>
+      <select id="hy-diet" onchange="calcHydration()">
+        <option value="0.9">High fruit/veg (lots of water in food)</option><option value="1" selected>Mixed Indian diet</option><option value="1.1">High protein / meat heavy</option><option value="1.2">High salt / processed food</option>
+      </select>
+    </div>
+    <div class="small-tool-out" id="hy-out"></div>
+  </div>
+
+  <!-- T09: STRESS -->
+  <div class="small-tool" id="tool-stress">
+    <div class="section-label">Tool 09 · Mental Health</div>
+    <h3>Stress & Burnout Index</h3>
+    <p class="tool-desc">10 signals. Your burnout probability score, physical health risks from chronic stress, and a recovery protocol personalised to your situation.</p>
+    <div id="stress-signals" style="margin-bottom:16px;"></div>
+    <button class="calc-btn" onclick="calcStress()">Calculate Burnout Index</button>
+    <div class="small-tool-out" id="stress-out"></div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="social-links">
+    <a href="https://shoonyaorigins.com/ventures/aura/" class="social-link">← Back to Aura</a>
+    <a href="https://shoonyaorigins.com/" class="social-link">ShoonyaOrigins</a>
+    <a href="mailto:contact@shoonyaorigins.com" class="social-link">Contact</a>
+  </div>
+  <p class="copyright">© 2026 Shoonya Origins · Aura Health Intelligence · All calculations run locally · Zero data shared</p>
+</footer>
+
+<script>
+// ===================== THEME =====================
+function toggleTheme(){
+  const body=document.body;
+  const isDark=body.getAttribute('data-theme')==='dark';
+  body.setAttribute('data-theme',isDark?'light':'dark');
+  document.getElementById('theme-icon').textContent=isDark?'🌙':'☀️';
+  document.getElementById('theme-label').textContent=isDark?'Dark':'Light';
+}
+
+// ===================== FOOD DATABASE =====================
+const FOODS = [
+  // GRAINS & BREADS
+  {name:'Roti (Wheat Chapati)',cal:70,p:2.5,c:15,f:0.4,unit:'per roti (30g)',category:'Grains'},
+  {name:'Paratha (Plain)',cal:160,p:3,c:22,f:7,unit:'per paratha',category:'Grains'},
+  {name:'Paratha (Aloo stuffed)',cal:200,p:4,c:28,f:8,unit:'per paratha',category:'Grains'},
+  {name:'Paratha (Paneer stuffed)',cal:230,p:8,c:24,f:11,unit:'per paratha',category:'Grains'},
+  {name:'Puri',cal:110,p:2,c:13,f:5,unit:'per puri',category:'Grains'},
+  {name:'Naan',cal:170,p:5,c:33,f:2,unit:'per naan',category:'Grains'},
+  {name:'Tandoori Roti',cal:90,p:3,c:18,f:1,unit:'per roti',category:'Grains'},
+  {name:'Rice (cooked)',cal:130,p:2.7,c:28,f:0.3,unit:'per 100g (½ katori)',category:'Grains'},
+  {name:'Biryani (Chicken)',cal:290,p:18,c:38,f:7,unit:'per 200g serving',category:'Grains'},
+  {name:'Biryani (Veg)',cal:220,p:6,c:42,f:4,unit:'per 200g serving',category:'Grains'},
+  {name:'Khichdi',cal:180,p:7,c:32,f:3,unit:'per 200g serving',category:'Grains'},
+  {name:'Upma',cal:170,p:4,c:30,f:4,unit:'per 200g serving',category:'Grains'},
+  {name:'Poha',cal:165,p:3.5,c:33,f:2.5,unit:'per 200g serving',category:'Grains'},
+  {name:'Idli',cal:40,p:2,c:8,f:0.2,unit:'per idli',category:'Grains'},
+  {name:'Dosa (Plain)',cal:135,p:3.5,c:25,f:2.5,unit:'per dosa',category:'Grains'},
+  {name:'Dosa (Masala)',cal:205,p:5,c:30,f:7,unit:'per dosa',category:'Grains'},
+  {name:'Uttapam',cal:180,p:5,c:32,f:3.5,unit:'per uttapam',category:'Grains'},
+  // DALS & LEGUMES
+  {name:'Dal Tadka',cal:150,p:9,c:22,f:3,unit:'per 200ml (1 katori)',category:'Dal & Legumes'},
+  {name:'Dal Makhani',cal:230,p:10,c:24,f:10,unit:'per 200ml',category:'Dal & Legumes'},
+  {name:'Chana Masala',cal:200,p:10,c:30,f:5,unit:'per 200g',category:'Dal & Legumes'},
+  {name:'Rajma',cal:180,p:10,c:28,f:2,unit:'per 200g',category:'Dal & Legumes'},
+  {name:'Sambar',cal:90,p:4,c:14,f:2,unit:'per 200ml',category:'Dal & Legumes'},
+  {name:'Moong Dal (cooked)',cal:105,p:7,c:19,f:0.5,unit:'per 200ml',category:'Dal & Legumes'},
+  // VEGETABLES
+  {name:'Aloo Sabzi',cal:130,p:2.5,c:20,f:4.5,unit:'per 150g serving',category:'Vegetables'},
+  {name:'Palak Paneer',cal:200,p:10,c:10,f:14,unit:'per 200g serving',category:'Vegetables'},
+  {name:'Paneer Butter Masala',cal:280,p:12,c:12,f:20,unit:'per 200g',category:'Vegetables'},
+  {name:'Bhindi (Okra) Sabzi',cal:90,p:2.5,c:9,f:4.5,unit:'per 150g',category:'Vegetables'},
+  {name:'Baingan Bharta',cal:110,p:2.5,c:10,f:6,unit:'per 150g',category:'Vegetables'},
+  {name:'Mixed Veg Sabzi',cal:100,p:2.5,c:12,f:4,unit:'per 150g',category:'Vegetables'},
+  {name:'Methi Sabzi',cal:80,p:3,c:9,f:3.5,unit:'per 150g',category:'Vegetables'},
+  {name:'Matar Paneer',cal:210,p:10,c:14,f:13,unit:'per 200g',category:'Vegetables'},
+  // NON-VEG
+  {name:'Chicken Curry',cal:250,p:25,c:8,f:13,unit:'per 200g serving',category:'Non-Veg'},
+  {name:'Butter Chicken',cal:290,p:24,c:12,f:16,unit:'per 200g',category:'Non-Veg'},
+  {name:'Mutton Curry',cal:310,p:26,c:6,f:19,unit:'per 200g',category:'Non-Veg'},
+  {name:'Fish Curry',cal:220,p:24,c:8,f:10,unit:'per 200g',category:'Non-Veg'},
+  {name:'Egg Bhurji',cal:180,p:12,c:4,f:13,unit:'per 2 eggs',category:'Non-Veg'},
+  {name:'Boiled Egg',cal:78,p:6,c:0.6,f:5,unit:'per egg',category:'Non-Veg'},
+  {name:'Omelette (2 egg)',cal:185,p:12,c:2,f:14,unit:'per omelette',category:'Non-Veg'},
+  // SNACKS & STREET FOOD
+  {name:'Samosa',cal:260,p:4,c:30,f:14,unit:'per samosa',category:'Snacks'},
+  {name:'Pakora (Mixed)',cal:200,p:5,c:22,f:10,unit:'per 100g (4-5 pieces)',category:'Snacks'},
+  {name:'Vada Pav',cal:290,p:7,c:42,f:10,unit:'per vada pav',category:'Snacks'},
+  {name:'Pav Bhaji',cal:350,p:8,c:52,f:12,unit:'per plate (2 pav)',category:'Snacks'},
+  {name:'Bhel Puri',cal:180,p:4,c:34,f:4,unit:'per 150g serving',category:'Snacks'},
+  {name:'Chaat (Dahi Puri)',cal:220,p:6,c:38,f:5,unit:'per plate',category:'Snacks'},
+  {name:'Biscuits (Marie)',cal:70,p:1,c:12,f:2,unit:'per 2 biscuits',category:'Snacks'},
+  // DAIRY
+  {name:'Paneer',cal:265,p:18,c:3,f:20,unit:'per 100g',category:'Dairy'},
+  {name:'Dahi / Curd',cal:60,p:3.5,c:4.5,f:3,unit:'per 150g (1 katori)',category:'Dairy'},
+  {name:'Lassi (Sweet)',cal:180,p:5,c:30,f:4,unit:'per 250ml glass',category:'Dairy'},
+  {name:'Buttermilk (Chaas)',cal:40,p:2,c:5,f:1,unit:'per 250ml glass',category:'Dairy'},
+  {name:'Milk (Full fat)',cal:150,p:8,c:11,f:8,unit:'per 250ml glass',category:'Dairy'},
+  {name:'Milk (Toned)',cal:110,p:7,c:11,f:3,unit:'per 250ml glass',category:'Dairy'},
+  // DRINKS
+  {name:'Chai (with milk+sugar)',cal:65,p:1.5,c:10,f:2,unit:'per 150ml cup',category:'Drinks'},
+  {name:'Chai (no sugar)',cal:30,p:1.5,c:4,f:1,unit:'per 150ml cup',category:'Drinks'},
+  {name:'Coffee (with milk)',cal:55,p:2,c:7,f:2,unit:'per 150ml cup',category:'Drinks'},
+  {name:'Nimbu Pani (sweet)',cal:60,p:0.2,c:15,f:0,unit:'per 250ml glass',category:'Drinks'},
+  {name:'Coconut Water',cal:45,p:1.7,c:9,f:0.5,unit:'per 250ml',category:'Drinks'},
+  // FRUITS
+  {name:'Mango (Alphonso)',cal:99,p:0.8,c:25,f:0.4,unit:'per 150g (½ mango)',category:'Fruits'},
+  {name:'Banana',cal:105,p:1.3,c:27,f:0.4,unit:'per medium banana',category:'Fruits'},
+  {name:'Apple',cal:80,p:0.4,c:21,f:0.2,unit:'per medium apple',category:'Fruits'},
+  {name:'Papaya',cal:55,p:0.6,c:14,f:0.1,unit:'per 150g serving',category:'Fruits'},
+  {name:'Guava',cal:68,p:2.6,c:14,f:1,unit:'per medium guava',category:'Fruits'},
+  // SWEETS
+  {name:'Gulab Jamun',cal:175,p:2.5,c:28,f:6,unit:'per 2 pieces',category:'Sweets'},
+  {name:'Kheer (Rice)',cal:185,p:4,c:32,f:5,unit:'per 150g serving',category:'Sweets'},
+  {name:'Halwa (Sooji)',cal:280,p:4,c:40,f:12,unit:'per 150g serving',category:'Sweets'},
+  {name:'Ladoo (Besan)',cal:180,p:4,c:22,f:9,unit:'per ladoo',category:'Sweets'},
+];
+
+let currentMeal = 'breakfast';
+let mealLogs = {breakfast:[],lunch:[],snacks:[],dinner:[]};
+let calorieGoal = 0;
+
+const quickFoods = {
+  breakfast:['Roti (Wheat Chapati)','Paratha (Plain)','Chai (with milk+sugar)','Boiled Egg','Poha','Upma','Dosa (Plain)','Idli'],
+  lunch:['Rice (cooked)','Dal Tadka','Aloo Sabzi','Rajma','Chicken Curry','Palak Paneer','Roti (Wheat Chapati)','Dahi / Curd'],
+  snacks:['Chai (with milk+sugar)','Samosa','Biscuits (Marie)','Banana','Apple','Bhel Puri','Pakora (Mixed)'],
+  dinner:['Roti (Wheat Chapati)','Dal Makhani','Paneer Butter Masala','Rice (cooked)','Butter Chicken','Mixed Veg Sabzi','Khichdi']
+};
+
+function setMeal(meal,btn){
+  currentMeal=meal;
+  document.querySelectorAll('.meal-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('meal-label').textContent=btn.textContent.trim().split(' ').slice(1).join(' ');
+  renderFoodList();
+  renderQuickChips();
+}
+
+function renderQuickChips(){
+  const chips=quickFoods[currentMeal]||[];
+  document.getElementById('quick-chips').innerHTML=chips.map(name=>`<span class="suggestion-chip" onclick="quickAdd('${name}')">${name.split('(')[0].trim()}</span>`).join('');
+}
+
+function quickAdd(name){
+  const food=FOODS.find(f=>f.name===name);
+  if(!food)return;
+  addFood(food);
+}
+
+function searchFood(){
+  const q=document.getElementById('food-search').value.toLowerCase().trim();
+  const dd=document.getElementById('food-dropdown');
+  if(q.length<1){dd.classList.remove('open');return;}
+  const results=FOODS.filter(f=>f.name.toLowerCase().includes(q)||f.category.toLowerCase().includes(q)).slice(0,12);
+  if(!results.length){dd.innerHTML='<div class="food-option" style="color:var(--text-muted);">No foods found</div>';dd.classList.add('open');return;}
+  dd.innerHTML=results.map(f=>`<div class="food-option" onclick="addFood(${JSON.stringify(f).replace(/"/g,'&quot;')})">
+    <div><span style="font-weight:600">${f.name}</span><span class="food-option-cat"> · ${f.category}</span></div>
+    <span class="food-option-cal">${f.cal} kcal ${f.unit}</span>
+  </div>`).join('');
+  dd.classList.add('open');
+}
+
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.food-search-wrap'))document.getElementById('food-dropdown').classList.remove('open');
+});
+
+function addFood(food){
+  mealLogs[currentMeal].push({...food,qty:1});
+  document.getElementById('food-search').value='';
+  document.getElementById('food-dropdown').classList.remove('open');
+  renderFoodList();
+  if(calorieGoal>0)calculateCalories();
+}
+
+function removeFood(meal,idx){
+  mealLogs[meal].splice(idx,1);
+  renderFoodList();
+  if(calorieGoal>0)calculateCalories();
+}
+
+function updateQty(meal,idx,val){
+  mealLogs[meal][idx].qty=parseFloat(val)||1;
+  if(calorieGoal>0)calculateCalories();
+}
+
+function renderFoodList(){
+  const items=mealLogs[currentMeal];
+  const el=document.getElementById('food-list');
+  if(!items.length){el.innerHTML='<div style="font-size:0.85rem;color:var(--text-muted);padding:12px 0;">No foods added yet.</div>';return;}
+  el.innerHTML=items.map((item,i)=>`
+    <div class="food-item">
+      <div class="food-item-name">${item.name}</div>
+      <div class="food-item-qty">
+        <input type="number" value="${item.qty}" min="0.25" step="0.25" onchange="updateQty('${currentMeal}',${i},this.value)" style="width:55px;">
+        <span class="food-item-unit">×</span>
+      </div>
+      <div class="food-item-cal">${Math.round(item.cal*item.qty)} kcal</div>
+      <button class="food-item-remove" onclick="removeFood('${currentMeal}',${i})">✕</button>
+    </div>
+  `).join('');
+}
+
+function clearAllMeals(){
+  mealLogs={breakfast:[],lunch:[],snacks:[],dinner:[]};
+  renderFoodList();
+  document.getElementById('cal-output').innerHTML='<div class="out-placeholder"><div class="icon">🥗</div><p>Add your profile and meals to see your nutrition breakdown</p></div>';
+}
+
+function recalcGoal(){
+  const age=parseFloat(document.getElementById('cal-age').value)||0;
+  const w=parseFloat(document.getElementById('cal-weight').value)||0;
+  const h=parseFloat(document.getElementById('cal-height').value)||0;
+  const gender=document.getElementById('cal-gender').value;
+  const activity=parseFloat(document.getElementById('cal-activity').value)||1.55;
+  const goal=parseInt(document.getElementById('cal-goal').value)||0;
+  if(!age||!w||!h)return;
+  let bmr=gender==='male'?(10*w)+(6.25*h)-(5*age)+5:(10*w)+(6.25*h)-(5*age)-161;
+  calorieGoal=Math.round(bmr*activity)+goal;
+}
+
+function calculateCalories(){
+  recalcGoal();
+  const allFoods=Object.values(mealLogs).flat();
+  if(!allFoods.length){alert('Please add at least one food item.');return;}
+
+  let totalCal=0,totalP=0,totalC=0,totalF=0;
+  const mealCals={breakfast:0,lunch:0,snacks:0,dinner:0};
+  Object.entries(mealLogs).forEach(([meal,items])=>{
+    items.forEach(item=>{
+      totalCal+=item.cal*item.qty;
+      totalP+=item.p*item.qty;
+      totalC+=item.c*item.qty;
+      totalF+=item.f*item.qty;
+      mealCals[meal]+=item.cal*item.qty;
+    });
+  });
+  totalCal=Math.round(totalCal);totalP=Math.round(totalP);totalC=Math.round(totalC);totalF=Math.round(totalF);
+  const calPct=calorieGoal>0?Math.round((totalCal/calorieGoal)*100):0;
+  const diff=calorieGoal>0?totalCal-calorieGoal:0;
+  const status=diff>200?'Over':'deficit';
+  const calColor=Math.abs(diff)<150?'':'';
+
+  // Macro targets (based on goal)
+  const goalType=document.getElementById('cal-goal')?.value||'0';
+  const proteinTarget=Math.round((document.getElementById('cal-weight').value||70)*(goalType==='500'?2:1.6));
+  const carbTarget=Math.round((calorieGoal*0.5)/4);
+  const fatTarget=Math.round((calorieGoal*0.25)/9);
+
+  // Suggestions
+  const suggestions=[];
+  if(totalP<proteinTarget-20)suggestions.push({text:`Add ${proteinTarget-totalP}g more protein. Try: Egg (6g), Dal (9g/katori), Paneer (18g/100g), Chicken (25g/200g).`,type:'orange'});
+  if(totalCal<calorieGoal-300)suggestions.push({text:`You're ${Math.abs(diff)} kcal below target. Add: 2 Roti (140 kcal), or 1 katori Dal + Rice (280 kcal).`,type:'orange'});
+  if(totalCal>calorieGoal+300)suggestions.push({text:`${diff} kcal over target. Swap: 1 Paratha → 2 Roti (saves 90 kcal). Skip 1 Samosa (saves 260 kcal).`,type:'orange'});
+  if(totalF>fatTarget+10)suggestions.push({text:`Fat intake is high. Consider dry sabzi over gravy-based, or reduce oil in tadka.`,type:'orange'});
+  if(totalP>=proteinTarget-5)suggestions.push({text:`Protein target met. Well done — this supports muscle recovery and keeps you fuller longer.`,type:'green'});
+
+  document.getElementById('cal-output').innerHTML=`
+    ${calorieGoal>0?`
+    <div class="result-card" style="margin-bottom:12px;">
+      <div class="result-label">Daily Calorie Goal</div>
+      <div class="result-value" style="font-size:1.8rem;">${calorieGoal} <span style="font-size:1rem;font-weight:600;color:var(--text-muted);">kcal</span></div>
+      <div class="result-sub">Based on your profile and goal</div>
+    </div>`:''}
+    <div class="result-grid">
+      <div class="result-card ${diff>300?'warn':diff>0?'accent':''}">
+        <div class="result-label">Today's Intake</div>
+        <div class="result-value ${diff>300?'warn':diff>0?'accent':''}" style="font-size:1.8rem;">${totalCal}</div>
+        <div class="result-sub">kcal consumed</div>
+      </div>
+      ${calorieGoal>0?`<div class="result-card ${diff>200?'warn':''}">
+        <div class="result-label">${diff>0?'Surplus':'Remaining'}</div>
+        <div class="result-value ${diff>200?'warn':'accent'}" style="font-size:1.8rem;">${Math.abs(diff)}</div>
+        <div class="result-sub">kcal ${diff>0?'over target':'left in budget'}</div>
+      </div>`:''}
+    </div>
+    ${calorieGoal>0?`<div style="margin-bottom:16px;">
+      <div class="bar-label"><span>Calorie Progress</span><span>${calPct}%</span></div>
+      <div class="progress-bar"><div class="progress-fill ${calPct>110?'warn':calPct>100?'accent':''}" style="width:${Math.min(calPct,100)}%"></div></div>
+    </div>`:''}
+    <div class="result-grid-3">
+      <div class="result-card"><div class="result-label">Protein</div><div class="result-value" style="font-size:1.4rem;">${totalP}g</div><div class="result-sub">Target: ${proteinTarget}g</div></div>
+      <div class="result-card"><div class="result-label">Carbs</div><div class="result-value" style="font-size:1.4rem;">${totalC}g</div><div class="result-sub">Target: ${carbTarget}g</div></div>
+      <div class="result-card"><div class="result-label">Fats</div><div class="result-value" style="font-size:1.4rem;">${totalF}g</div><div class="result-sub">Target: ${fatTarget}g</div></div>
+    </div>
+    <div style="margin-bottom:16px;">
+      ${['breakfast','lunch','snacks','dinner'].map(m=>`
+        <div class="bar-label"><span style="text-transform:capitalize">${m}</span><span>${Math.round(mealCals[m])} kcal</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${calorieGoal?Math.min((mealCals[m]/calorieGoal)*100*3,100):50}%"></div></div>
+      `).join('')}
+    </div>
+    ${suggestions.map(s=>`<div class="insight-box ${s.type}"><div class="insight-title">${s.type==='green'?'✓ On Track':'💡 Suggestion'}</div><div class="insight-text">${s.text}</div></div>`).join('')}
+  `;
+}
+
+renderQuickChips();
+renderFoodList();
+
+// ===================== TOOL 10: WORKOUT =====================
+const exerciseDB = {
+  weightloss:{
+    beginner:{
+      none:[
+        {name:'Brisk Walking / Jogging Intervals',sets:'20-30 min',reps:'Continuous',icon:'🚶',tag:'Cardio',why:'Burns 200-300 kcal. Low impact, sustainable for beginners. Builds aerobic base.'},
+        {name:'Bodyweight Squats',sets:'3 sets',reps:'12-15 reps',icon:'🦵',tag:'Legs',why:'Largest muscle group = maximum calorie burn. Improves metabolism long-term.'},
+        {name:'Push-ups (knee modified if needed)',sets:'3 sets',reps:'8-12 reps',icon:'💪',tag:'Upper Body',why:'Compound movement activating chest, shoulders, triceps. Burns more than isolation.'},
+        {name:'Mountain Climbers',sets:'3 sets',reps:'20 reps (10 each)',icon:'🏔️',tag:'Core + Cardio',why:'Elevates heart rate into fat-burning zone while building core strength.'},
+        {name:'Superman Hold',sets:'3 sets',reps:'12 reps, 2s hold',icon:'🦸',tag:'Back',why:'Strengthens lower back — critical for injury prevention as you increase intensity.'},
+        {name:'High Knees',sets:'3 sets',reps:'30 seconds',icon:'🏃',tag:'Cardio',why:'High intensity, zero equipment. Burns 8-10 kcal/min — equivalent to running.'},
+      ],
+      minimal:[
+        {name:'Dumbbell Walking Lunges',sets:'3 sets',reps:'12 each leg',icon:'🦵',tag:'Legs',why:'Heavier legs = more calories burned. Lunges activate glutes and quads simultaneously.'},
+        {name:'Dumbbell Goblet Squat',sets:'4 sets',reps:'12-15 reps',icon:'🏋️',tag:'Full Body',why:'Combines squat movement with core stability. High metabolic demand.'},
+        {name:'Resistance Band Rows',sets:'3 sets',reps:'15 reps',icon:'💪',tag:'Back',why:'Builds the back — the largest upper body muscle group. Increases resting metabolism.'},
+        {name:'Burpees',sets:'3 sets',reps:'8-10 reps',icon:'💥',tag:'Full Body',why:'Burns 10-15 kcal/minute. Single most effective bodyweight fat-burning exercise.'},
+        {name:'Dumbbell Romanian Deadlift',sets:'3 sets',reps:'12 reps',icon:'🏋️',tag:'Posterior Chain',why:'Hamstrings and glutes are the largest muscle group. Maximum fat burning potential.'},
+        {name:'Plank Hold',sets:'3 sets',reps:'30-45 seconds',icon:'🧘',tag:'Core',why:'Builds the foundation for all other movements. Prevents injury as intensity increases.'},
+      ],
+      gym:[
+        {name:'Treadmill Intervals (1 min run / 1 min walk)',sets:'20 min',reps:'10 intervals',icon:'🏃',tag:'Cardio',why:'HIIT protocol burns 25-30% more fat than steady-state cardio in the same time.'},
+        {name:'Leg Press',sets:'3 sets',reps:'15-20 reps',icon:'🦵',tag:'Legs',why:'Safer than squats for beginners. Engages the largest muscles for maximum calorie burn.'},
+        {name:'Lat Pulldown',sets:'3 sets',reps:'12-15 reps',icon:'💪',tag:'Back',why:'Builds the width of the back. Back muscles are the largest upper body calorie burners.'},
+        {name:'Chest Press Machine',sets:'3 sets',reps:'12-15 reps',icon:'🏋️',tag:'Chest',why:'Compound movement. Machines allow safe form for beginners while building strength.'},
+        {name:'Cable Row',sets:'3 sets',reps:'12-15 reps',icon:'💪',tag:'Back',why:'Builds mid-back thickness. Essential for posture and balanced muscle development.'},
+        {name:'Stationary Bike (moderate)',sets:'15 min',reps:'Continuous',icon:'🚲',tag:'Cardio',why:'Low impact. Excellent for beginners — burns 150-200 kcal in 15 min at moderate intensity.'},
+      ]
+    },
+    intermediate:{
+      none:[
+        {name:'Jump Squats',sets:'4 sets',reps:'15 reps',icon:'💥',tag:'Explosive + Legs',why:'Plyometric movement elevates heart rate to 80-90% MHR. Maximum fat burning zone.'},
+        {name:'Pike Push-ups',sets:'3 sets',reps:'10-12 reps',icon:'💪',tag:'Shoulders',why:'Shoulder-dominant compound. Builds upper body definition while burning significant calories.'},
+        {name:'Bulgarian Split Squat',sets:'3 sets',reps:'10 each leg',icon:'🦵',tag:'Legs',why:'Unilateral movement corrects imbalances. Higher calorie burn than standard squats.'},
+        {name:'Commando Plank',sets:'3 sets',reps:'8 each side',icon:'🧘',tag:'Core + Arms',why:'Dynamic core exercise. Combines plank stability with arm strength in one movement.'},
+        {name:'Explosive Push-ups',sets:'3 sets',reps:'8-10 reps',icon:'💪',tag:'Upper Body',why:'Plyometric push-up pattern recruits fast-twitch fibres — critical for fat metabolism.'},
+        {name:'Bicycle Crunches',sets:'3 sets',reps:'20 reps',icon:'🚲',tag:'Core',why:'Most effective core exercise in EMG studies. Activates all four layers of abdominal wall.'},
+      ],
+      gym:[
+        {name:'Barbell Back Squat',sets:'4 sets',reps:'8-12 reps',icon:'🏋️',tag:'Primary',why:'King of all exercises. Triggers maximum anabolic response and calorie afterburn (EPOC).'},
+        {name:'Romanian Deadlift',sets:'3 sets',reps:'10-12 reps',icon:'💪',tag:'Posterior Chain',why:'Posterior chain development. Hamstrings and glutes burn the most calories during training.'},
+        {name:'Weighted HIIT Circuit (20 min)',sets:'4 rounds',reps:'40s on / 20s off',icon:'🔥',tag:'Cardio + Strength',why:'Combines strength and cardio. Elevates metabolism for 24-48 hours post-workout.'},
+        {name:'Incline Dumbbell Press',sets:'3 sets',reps:'10-12 reps',icon:'🏋️',tag:'Chest',why:'Upper chest development. Compound pressing movement maintains elevated heart rate.'},
+        {name:'Pull-ups / Assisted Pull-ups',sets:'3 sets',reps:'6-10 reps',icon:'💪',tag:'Back',why:'Best upper body pulling exercise. Lat activation provides significant metabolic demand.'},
+        {name:'Battle Ropes (30s intervals)',sets:'5 rounds',reps:'30s on / 30s off',icon:'🔥',tag:'Conditioning',why:'Burns 10-12 kcal/min. Simultaneous upper body strength and cardiovascular conditioning.'},
+      ]
+    },
+    advanced:{
+      gym:[
+        {name:'Barbell Deadlift',sets:'4 sets',reps:'5-8 reps',icon:'🏋️',tag:'Primary Compound',why:'Maximum total muscle recruitment. Creates highest post-workout calorie burn of any exercise.'},
+        {name:'Barbell Squat',sets:'4 sets',reps:'6-8 reps',icon:'🦵',tag:'Primary Compound',why:'Heavy loading maximises EPOC — the "afterburn" effect that burns fat for 24-48 hours.'},
+        {name:'AMRAP Circuit (20 min)',sets:'Max rounds',reps:'As many rounds as possible',icon:'🔥',tag:'Metabolic Conditioning',why:'Advanced metabolic conditioning. Maximises work density — most calories per time unit.'},
+        {name:'Weighted Pull-ups',sets:'4 sets',reps:'6-8 reps',icon:'💪',tag:'Back',why:'Adding load to bodyweight movements creates the strongest strength-endurance adaptation.'},
+        {name:'Barbell Hip Thrust',sets:'4 sets',reps:'10-12 reps',icon:'🦵',tag:'Glutes',why:'Glute activation is critical for metabolic rate — largest single muscle in the body.'},
+        {name:'Sprint Intervals (400m)',sets:'6-8 rounds',reps:'85-90% effort',icon:'🏃',tag:'Sprint',why:'Sprint intervals produce 9x more fat loss than steady-state cardio per unit time.'},
+      ]
+    }
+  },
+  muscle:{
+    beginner:{
+      none:[
+        {name:'Push-ups (Progressions)',sets:'4 sets',reps:'Max reps',icon:'💪',tag:'Chest + Triceps',why:'Foundation of all pressing movements. Progressive difficulty: knee → standard → diamond.'},
+        {name:'Bodyweight Squats',sets:'4 sets',reps:'15-20 reps',icon:'🦵',tag:'Quads + Glutes',why:'No equipment needed. High rep building muscle endurance before loading.'},
+        {name:'Inverted Rows (under table)',sets:'3 sets',reps:'10-12 reps',icon:'💪',tag:'Back + Biceps',why:'Best home substitute for rows. Critically important — most beginners neglect pulling.'},
+        {name:'Pike Push-ups',sets:'3 sets',reps:'10 reps',icon:'💪',tag:'Shoulders',why:'Shoulder pressing pattern without equipment. Builds the front and lateral deltoid.'},
+        {name:'Glute Bridge',sets:'4 sets',reps:'15-20 reps',icon:'🦵',tag:'Glutes + Hamstrings',why:'Activates the largest muscle group. Most neglected by beginners. Critical for strength base.'},
+        {name:'Dead Hang / Negative Pull-ups',sets:'3 sets',reps:'5-8 negatives (5s down)',icon:'💪',tag:'Back',why:'Best way to build pull-up strength without being able to do them yet.'},
+      ],
+      gym:[
+        {name:'Barbell / Dumbbell Bench Press',sets:'4 sets',reps:'8-12 reps',icon:'🏋️',tag:'Chest',why:'Primary horizontal pressing. 80% of the chest workout. Learn perfect form first.'},
+        {name:'Barbell Squat (light)',sets:'4 sets',reps:'8-12 reps',icon:'🦵',tag:'Legs',why:'Most important lift to learn. Builds entire lower body. Triggers maximum anabolic response.'},
+        {name:'Lat Pulldown',sets:'3 sets',reps:'10-12 reps',icon:'💪',tag:'Back + Biceps',why:'Best machine to learn proper pulling mechanics before progressing to pull-ups.'},
+        {name:'Seated Dumbbell Press',sets:'3 sets',reps:'10-12 reps',icon:'🏋️',tag:'Shoulders',why:'Primary shoulder development movement. Controlled range of motion for beginners.'},
+        {name:'Barbell / Dumbbell Romanian Deadlift',sets:'3 sets',reps:'10-12 reps',icon:'🏋️',tag:'Hamstrings + Glutes',why:'Hip hinge pattern is foundational. Builds posterior chain — the most undertrained area.'},
+        {name:'Cable Bicep Curl + Tricep Pushdown',sets:'3 sets each',reps:'12-15 reps',icon:'💪',tag:'Arms',why:'Isolation exercises as finishers. Cables maintain constant tension throughout range.'},
+      ]
+    },
+    intermediate:{
+      gym:[
+        {name:'Barbell Bench Press (Progressively heavier)',sets:'4 sets',reps:'5-8 reps',icon:'🏋️',tag:'Primary Chest',why:'Strength gains require progressive overload. Increase weight every 1-2 weeks.'},
+        {name:'Barbell Back Squat',sets:'4 sets',reps:'6-8 reps',icon:'🦵',tag:'Primary Legs',why:'Heavy squats produce the greatest testosterone and growth hormone response.'},
+        {name:'Weighted Pull-ups / Chin-ups',sets:'4 sets',reps:'6-10 reps',icon:'💪',tag:'Primary Back',why:'Add weight belt once bodyweight becomes easy. Best lat builder available.'},
+        {name:'Overhead Press (Barbell)',sets:'3 sets',reps:'6-8 reps',icon:'🏋️',tag:'Primary Shoulders',why:'The shoulder press with the greatest strength carryover. Builds 3D shoulder development.'},
+        {name:'Barbell Deadlift',sets:'3 sets',reps:'5-6 reps',icon:'🏋️',tag:'Full Posterior',why:'At intermediate level, deadlifts should be heavy and few. Max strength stimulus.'},
+        {name:'Dips (weighted)',sets:'3 sets',reps:'8-10 reps',icon:'💪',tag:'Chest + Triceps',why:'Best pressing movement for lower chest and tricep mass. Add weight belt to progress.'},
+      ]
+    }
+  },
+  endurance:{
+    beginner:{
+      none:[
+        {name:'Walk-to-Run Intervals',sets:'30 min',reps:'2 min walk / 1 min run',icon:'🏃',tag:'Base Cardio',why:'Couch to 5K methodology. Builds aerobic capacity without overloading joints.'},
+        {name:'Jumping Jacks',sets:'3 sets',reps:'50 reps',icon:'⭐',tag:'Cardio',why:'Full body cardio. Elevates heart rate quickly. Good warm-up before longer endurance work.'},
+        {name:'Step-ups',sets:'3 sets',reps:'15 each leg',icon:'🪜',tag:'Legs + Cardio',why:'Builds leg endurance while elevating heart rate. Low impact for joint-sensitive individuals.'},
+        {name:'Plank Variations',sets:'4 sets',reps:'30-60 seconds',icon:'🧘',tag:'Core Endurance',why:'Endurance training demands a strong core. Core fatigue causes form breakdown in long sessions.'},
+        {name:'Swimming / Cycling',sets:'20-30 min',reps:'Continuous',icon:'🏊',tag:'Low Impact Cardio',why:'Excellent aerobic base builders. Lower injury risk than running for beginners.'},
+      ],
+      gym:[
+        {name:'Treadmill (Steady Pace)',sets:'20-30 min',reps:'Conversational pace',icon:'🏃',tag:'Aerobic Base',why:'Zone 2 cardio. Builds mitochondrial density — the foundation of all endurance performance.'},
+        {name:'Rowing Machine',sets:'15-20 min',reps:'Moderate pace',icon:'🚣',tag:'Full Body Cardio',why:'Engages 86% of muscles. Better calorie burn and cardiovascular demand than cycling.'},
+        {name:'Stairmaster / Incline Walking',sets:'15-20 min',reps:'Continuous',icon:'🪜',tag:'Cardio + Legs',why:'High-intensity low-impact. Builds glutes and legs while developing aerobic capacity.'},
+        {name:'Core Circuit (Plank, Side Plank, V-sit)',sets:'3 rounds',reps:'30s each',icon:'🧘',tag:'Core Endurance',why:'Endurance athletes need core endurance more than core strength. Trains time under tension.'},
+      ]
+    }
+  },
+  general:{
+    beginner:{
+      none:[
+        {name:'Brisk Walking (30 min)',sets:'Daily',reps:'3-4 km target',icon:'🚶',tag:'Cardio',why:'Foundational health habit. 30 min/day walking reduces all-cause mortality by 35%.'},
+        {name:'Bodyweight Squat + Push-up Superset',sets:'3 sets',reps:'10-15 each',icon:'💪',tag:'Full Body',why:'Two movements that train the entire body. Maximum efficiency for time-limited individuals.'},
+        {name:'Yoga Sun Salutation (Surya Namaskar)',sets:'5-10 rounds',reps:'Each side',icon:'🧘',tag:'Mobility + Strength',why:'12-pose sequence that simultaneously builds strength, flexibility, and mindfulness.'},
+        {name:'Dead Bug',sets:'3 sets',reps:'8 each side',icon:'🧘',tag:'Core',why:'Best core stability exercise for general health. Protects the lower back during daily activities.'},
+        {name:'Resistance Band Full Body Circuit',sets:'2-3 rounds',reps:'12-15 each',icon:'💪',tag:'Full Body',why:'Complete stimulus across all muscle groups in 20 minutes. Ideal for general fitness.'},
+      ],
+      gym:[
+        {name:'Full Body Circuit (5 exercises)',sets:'3 rounds',reps:'12-15 each',icon:'🏋️',tag:'Full Body',why:'General fitness responds best to full body training 3x/week rather than body-part splits.'},
+        {name:'Light Cardio (20 min)',sets:'Post-strength',reps:'Moderate pace',icon:'🏃',tag:'Cardio',why:'General health guidelines recommend 150 min/week moderate cardio. Build toward this.'},
+        {name:'Foam Rolling + Stretching',sets:'End of session',reps:'60s per muscle',icon:'🧘',tag:'Recovery',why:'Recovery is where the adaptation happens. Often the most neglected part of general fitness.'},
+      ]
+    }
+  },
+  flexibility:{
+    beginner:{
+      none:[
+        {name:'Yoga — Yin or Hatha Flow',sets:'30-45 min',reps:'Hold 30-90s per pose',icon:'🧘',tag:'Flexibility + Mindfulness',why:'Yin yoga targets connective tissue, not just muscles. Creates lasting flexibility changes.'},
+        {name:'Hip Flexor Lunge Stretch',sets:'3 sets',reps:'60s each side',icon:'🦵',tag:'Hip Flexibility',why:'Most desk workers have chronically tight hip flexors. This is the #1 mobility issue in India.'},
+        {name:'Thoracic Spine Rotations',sets:'2 sets',reps:'10 each side',icon:'🔄',tag:'Spine Mobility',why:'Upper back mobility is critical for posture correction. Reverses the "desk hunch" pattern.'},
+        {name:'Hamstring Passive Stretch',sets:'3 sets',reps:'60s each side',icon:'🦵',tag:'Hamstrings',why:'Tight hamstrings cause lower back pain in 80% of cases. Priority for all desk workers.'},
+        {name:'Shoulder Mobility Circles + Cross-body stretch',sets:'2 sets',reps:'10 reps + 30s hold',icon:'💪',tag:'Shoulder',why:'Restores shoulder range of motion lost to forward posture and prolonged sitting.'},
+        {name:'Cat-Cow + Child\'s Pose',sets:'3 sets',reps:'10 reps + 60s hold',icon:'🧘',tag:'Spine',why:'Fundamental spinal decompression. The spine needs movement in all planes daily.'},
+      ]
+    }
+  }
+};
+
+function generateWorkout(){
+  const age=parseInt(document.getElementById('wo-age').value)||0;
+  const gender=document.getElementById('wo-gender').value;
+  const rhr=parseInt(document.getElementById('wo-rhr').value)||70;
+  const fitness=document.getElementById('wo-fitness').value;
+  const goal=document.getElementById('wo-goal').value;
+  const days=parseInt(document.getElementById('wo-days').value)||3;
+  const duration=parseInt(document.getElementById('wo-duration').value)||45;
+  const equipment=document.getElementById('wo-equipment').value;
+  const limit=document.getElementById('wo-limit').value;
+  if(!age){alert('Please enter your age.');return;}
+
+  // Heart rate zones (Karvonen method)
+  const mhr=220-age;
+  const hrr=mhr-rhr;
+  const z1=[Math.round(rhr+hrr*0.5),Math.round(rhr+hrr*0.6)];
+  const z2=[Math.round(rhr+hrr*0.6),Math.round(rhr+hrr*0.7)];
+  const z3=[Math.round(rhr+hrr*0.7),Math.round(rhr+hrr*0.8)];
+  const z4=[Math.round(rhr+hrr*0.8),Math.round(rhr+hrr*0.9)];
+  const z5=[Math.round(rhr+hrr*0.9),mhr];
+
+  const targetZone=goal==='weightloss'?`Zone 2-3 (${z2[0]}-${z3[1]} bpm)`:goal==='endurance'?`Zone 3-4 (${z3[0]}-${z4[1]} bpm)`:goal==='muscle'?`Zone 1-2 (${z1[0]}-${z2[1]} bpm)`:`Zone 2-3 (${z2[0]}-${z3[1]} bpm)`;
+
+  // Get exercises
+  const level=fitness==='advanced'?'advanced':fitness==='intermediate'?'intermediate':'beginner';
+  const eqKey=equipment==='none'?'none':equipment==='minimal'?'minimal':'gym';
+  let exercises=[];
+  try{
+    exercises=(exerciseDB[goal]?.[level]?.[eqKey])||
+              (exerciseDB[goal]?.['beginner']?.[eqKey])||
+              (exerciseDB[goal]?.['beginner']?.['none'])||
+              (exerciseDB['general']?.['beginner']?.['none'])||[];
+  }catch(e){exercises=exerciseDB['general']['beginner']['none'];}
+
+  // Filter for limitations
+  if(limit==='knee')exercises=exercises.filter(e=>!['Squat','Lunge','Jump','Run','Step'].some(k=>e.name.includes(k)));
+  if(limit==='back')exercises=exercises.filter(e=>!['Deadlift','Squat (heavy)'].some(k=>e.name.includes(k)));
+  if(limit==='shoulder')exercises=exercises.filter(e=>!['Press','Push-up','Overhead'].some(k=>e.name.includes(k)));
+
+  // Weekly plan
+  const goalDayNames={weightloss:{workout:'Fat Burn',rest:'Rest/Walk'},muscle:{workout:'Strength',rest:'Rest'},endurance:{workout:'Cardio',rest:'Rest'},general:{workout:'Training',rest:'Rest'},flexibility:{workout:'Flex/Yoga',rest:'Rest'}};
+  const dnames=goalDayNames[goal]||goalDayNames.general;
+  const weekDays=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  let plan=[];
+  if(days==3){plan=['workout','rest','workout','rest','workout','rest','rest'];}
+  else if(days==4){plan=['workout','workout','rest','workout','workout','rest','rest'];}
+  else if(days==5){plan=['workout','workout','rest','workout','workout','workout','rest'];}
+  else{plan=['workout','workout','workout','rest','workout','workout','workout'];}
+
+  // Calories burned estimate
+  const metValue=goal==='weightloss'?7:goal==='endurance'?8:5;
+  const weight=70;
+  const calBurn=Math.round((metValue*weight*duration)/60);
+
+  document.getElementById('wo-output').innerHTML=`
+    <div style="overflow-y:auto;max-height:none;">
+      <div class="result-card" style="margin-bottom:16px;">
+        <div class="result-label">Your Training Profile</div>
+        <div style="font-size:0.9rem;color:var(--text-main);line-height:1.8;margin-top:6px;">
+          <strong>Max Heart Rate:</strong> ${mhr} bpm<br>
+          <strong>Target Zone:</strong> ${targetZone}<br>
+          <strong>Est. Calories/Session:</strong> ~${calBurn} kcal<br>
+          <strong>Level:</strong> ${fitness.charAt(0).toUpperCase()+fitness.slice(1)} · ${days} days/week · ${duration} min
+        </div>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <div class="bar-label" style="font-weight:700;margin-bottom:10px;">❤️ Your Heart Rate Zones</div>
+        ${[
+          {name:'Zone 1 — Recovery',range:`${z1[0]}-${z1[1]} bpm`,benefit:'Active recovery, warm-up',color:'#6ee7b7',active:goal==='flexibility'},
+          {name:'Zone 2 — Fat Burn',range:`${z2[0]}-${z2[1]} bpm`,benefit:'Primary fat oxidation zone',color:'#34d399',active:goal==='weightloss'||goal==='general'},
+          {name:'Zone 3 — Aerobic',range:`${z3[0]}-${z3[1]} bpm`,benefit:'Cardiovascular improvement',color:'#059669',active:goal==='endurance'},
+          {name:'Zone 4 — Threshold',range:`${z4[0]}-${z4[1]} bpm`,benefit:'Lactate threshold training',color:'#f97316',active:goal==='muscle'},
+          {name:'Zone 5 — Maximum',range:`${z5[0]}-${z5[1]} bpm`,benefit:'Peak performance / sprints',color:'#ef4444',active:false},
+        ].map(z=>`<div class="hr-zone">
+          <div class="hr-zone-color" style="background:${z.color}"></div>
+          <div class="hr-zone-info">
+            <div class="hr-zone-name">${z.name}</div>
+            <div class="hr-zone-range">${z.range} · ${z.benefit}</div>
+          </div>
+          ${z.active?`<div class="hr-zone-active">YOUR TARGET</div>`:''}
+        </div>`).join('')}
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <div class="bar-label" style="font-weight:700;margin-bottom:10px;">📅 Your Weekly Plan</div>
+        <div class="week-plan">
+          ${weekDays.map((d,i)=>`<div class="day-cell ${plan[i]==='workout'?'active':'rest'}">
+            <div class="day-name">${d}</div>
+            <div class="day-type ${plan[i]==='rest'?'rest':goal==='weightloss'?'accent':''}">${plan[i]==='workout'?dnames.workout:dnames.rest}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+
+      <div class="workout-phase">
+        <div class="workout-phase-header">
+          <div class="workout-phase-title">🔥 Warm-Up (5-8 min)</div>
+          <div class="workout-phase-badge">Always First</div>
+        </div>
+        ${[
+          {name:'Joint Circles (neck, shoulders, hips, knees, ankles)',sets:'',reps:'30s each joint',icon:'🔄',tag:'Mobility',why:'Lubricates joints and increases synovial fluid. Reduces injury risk by 40%.'},
+          {name:'Light Cardio (jumping jacks / spot jogging)',sets:'',reps:'3-5 minutes',icon:'🏃',tag:'Cardio',why:'Raises core temperature and heart rate gradually. Prepares the cardiovascular system.'},
+          {name:'Dynamic Stretches (leg swings, arm circles)',sets:'',reps:'10 each',icon:'🤸',tag:'Dynamic Stretch',why:'Activates the muscles about to be used. Static stretching before exercise reduces power output.'},
+        ].map(e=>`<div class="exercise-item">
+          <div class="ex-icon">${e.icon}</div>
+          <div class="ex-info">
+            <div class="ex-name">${e.name}</div>
+            <div class="ex-detail">${e.reps}</div>
+            <div class="ex-why">${e.why}</div>
+            <span class="ex-tag">${e.tag}</span>
+          </div>
+        </div>`).join('')}
+      </div>
+
+      <div class="workout-phase">
+        <div class="workout-phase-header">
+          <div class="workout-phase-title">💪 Main Training Block (${duration-13} min)</div>
+          <div class="workout-phase-badge accent">${goal.charAt(0).toUpperCase()+goal.slice(1)} Focus</div>
+        </div>
+        ${exercises.map(e=>`<div class="exercise-item">
+          <div class="ex-icon ${e.tag.toLowerCase().includes('cardio')?'accent':''}">${e.icon}</div>
+          <div class="ex-info">
+            <div class="ex-name">${e.name}</div>
+            <div class="ex-detail"><strong>${e.sets}</strong> · ${e.reps}</div>
+            <div class="ex-why">${e.why}</div>
+            <span class="ex-tag">${e.tag}</span>
+          </div>
+        </div>`).join('')}
+      </div>
+
+      <div class="workout-phase">
+        <div class="workout-phase-header">
+          <div class="workout-phase-title">🧘 Cool-Down (5 min)</div>
+          <div class="workout-phase-badge">Never Skip</div>
+        </div>
+        ${[
+          {name:'Slow Walk / Gentle Cardio',reps:'2-3 minutes',icon:'🚶',why:'Prevents blood pooling in legs. Gradually lowers heart rate to resting levels.'},
+          {name:'Static Stretch — Hold Major Muscles Worked',reps:'30-45s each',icon:'🧘',why:'Post-exercise is the only time static stretching is beneficial. Improves long-term flexibility.'},
+          {name:'Diaphragmatic Breathing',reps:'2 minutes, 4s inhale / 4s exhale',icon:'🫁',why:'Activates parasympathetic nervous system. Accelerates recovery and reduces cortisol.'},
+        ].map(e=>`<div class="exercise-item">
+          <div class="ex-icon">${e.icon}</div>
+          <div class="ex-info">
+            <div class="ex-name">${e.name}</div>
+            <div class="ex-detail">${e.reps}</div>
+            <div class="ex-why">${e.why}</div>
+          </div>
+        </div>`).join('')}
+      </div>
+
+      <div class="insight-box green">
+        <div class="insight-title">📈 Progression Protocol</div>
+        <div class="insight-text">
+          <strong>Week 1-2:</strong> Focus on form. Use lighter weights. Learn the movement.<br>
+          <strong>Week 3-4:</strong> Add 1 rep per set or 2.5-5kg per exercise when form is perfect.<br>
+          <strong>Month 2:</strong> Increase intensity by 10%. Add a fourth set to main lifts.<br>
+          <strong>Month 3:</strong> Reassess your goal and adjust the programme. Deload every 4th week (reduce volume 40%).
+        </div>
+      </div>
+
+      <div class="insight-box orange">
+        <div class="insight-title">⚠️ Important Safety Notes</div>
+        <div class="insight-text">
+          ${limit!=='none'?`<strong>Limitation noted (${limit}):</strong> Exercises have been modified. Consult a physiotherapist if pain persists.<br>`:''}
+          Rest at least 48 hours between training the same muscle group.<br>
+          Stop immediately if you feel chest pain, severe dizziness, or sharp joint pain.<br>
+          Aura's Bio-Ergonomics module tracks real-time fatigue and injury risk automatically.
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ===================== SMALL TOOLS =====================
+
+// BMI
+function calcBMI(){
+  const w=parseFloat(document.getElementById('bmi-w').value)||0;
+  const h=parseFloat(document.getElementById('bmi-h').value)||0;
+  const age=parseInt(document.getElementById('bmi-age').value)||30;
+  const gender=document.getElementById('bmi-gender').value;
+  if(!w||!h)return;
+  const bmi=w/((h/100)**2);
+  // Indian BMI thresholds (lower than Western)
+  const cat=bmi<18.5?'Underweight':bmi<23?'Normal (Indian Standard)':bmi<27.5?'Overweight':bmi<32.5?'Obese Class I':'Obese Class II+';
+  const catColor=bmi<18.5?'warn':bmi<23?'':bmi<27.5?'accent':'warn';
+  // Body fat estimate (Deurenberg formula)
+  const bf=(1.20*bmi)+(0.23*age)-(10.8*(gender==='male'?1:0))-5.4;
+  const leanMass=Math.round(w*(1-bf/100));
+  const metAge=Math.round(age+(bmi-22)*1.5);
+  const ideal=[18.5*(h/100)**2,23*(h/100)**2];
+  document.getElementById('bmi-out').innerHTML=`
+    <div class="result-grid">
+      <div class="result-card ${catColor}"><div class="result-label">BMI</div><div class="result-value ${catColor}" style="font-size:1.8rem;">${bmi.toFixed(1)}</div><div class="result-sub">${cat}</div></div>
+      <div class="result-card"><div class="result-label">Body Fat %</div><div class="result-value" style="font-size:1.8rem;">${bf.toFixed(1)}%</div><div class="result-sub">Est. Deurenberg</div></div>
+    </div>
+    <div class="result-grid">
+      <div class="result-card"><div class="result-label">Lean Mass</div><div class="result-value" style="font-size:1.5rem;">${leanMass}kg</div></div>
+      <div class="result-card"><div class="result-label">Metabolic Age</div><div class="result-value" style="font-size:1.5rem;">${metAge}yr</div></div>
+    </div>
+    <div class="insight-box ${bmi>=23?'orange':'green'}"><div class="insight-title">Healthy Weight Range for You</div><div class="insight-text">${Math.round(ideal[0])}kg – ${Math.round(ideal[1])}kg (Indian BMI 18.5–23). ${bmi>=23?'Aiming for this range reduces diabetes and cardiac risk significantly for South Asian populations.':'You are within healthy range. Focus on building lean muscle mass and maintaining.'}</div></div>
+  `;
+}
+
+// RHR
+function calcRHR(){
+  const rhr=parseInt(document.getElementById('rhr-val').value)||0;
+  const age=parseInt(document.getElementById('rhr-age').value)||30;
+  const gender=document.getElementById('rhr-gender').value;
+  const ex=document.getElementById('rhr-exercise').value;
+  if(!rhr)return;
+  const mhr=220-age;
+  const fitnessScore=rhr<50?'Athlete':rhr<60?'Excellent':rhr<70?'Good':rhr<80?'Average':rhr<90?'Below Average':'Poor — Consult Doctor';
+  const risk=rhr>80?'Elevated cardiac risk. RHR above 80 is associated with 2-3x higher risk of heart disease.':rhr>70?'Moderate. Research shows RHR 70-80 carries modest increased cardiovascular risk.':'Low risk. RHR below 70 is associated with better cardiovascular outcomes.';
+  const riskColor=rhr>80?'red':rhr>70?'orange':'green';
+  document.getElementById('rhr-out').innerHTML=`
+    <div class="result-card ${rhr>80?'warn':rhr<60?'':'' }"><div class="result-label">Cardiovascular Fitness</div><div class="result-value" style="font-size:1.5rem;${rhr>80?'color:#ef4444':rhr<60?'color:var(--primary)':''}">${fitnessScore}</div><div class="result-sub">RHR: ${rhr} bpm · MHR: ${mhr} bpm</div></div>
+    <div class="insight-box ${riskColor}"><div class="insight-title">Health Implication</div><div class="insight-text">${risk}<br><br>${rhr>75?'Priority action: 30 min brisk walking daily reduces RHR by 5-10 bpm within 4-6 weeks.':'Keep training consistently to maintain this excellent baseline.'}</div></div>
+  `;
+}
+
+// AQI
+function calcAQI(){
+  const aqi=parseInt(document.getElementById('aqi-val').value)||0;
+  const hours=parseFloat(document.getElementById('aqi-hours').value)||4;
+  const ageGroup=document.getElementById('aqi-age').value;
+  const cond=document.getElementById('aqi-condition').value;
+  if(!aqi)return;
+  const cat=aqi<=50?'Good':aqi<=100?'Satisfactory':aqi<=200?'Moderate':aqi<=300?'Poor':aqi<=400?'Very Poor':'Severe / Hazardous';
+  const catColor=aqi<=100?'green':aqi<=200?'orange':'red';
+  const vulnMult=ageGroup!=='adult'?1.5:cond!=='none'?1.8:1;
+  const cigEquiv=Math.round((aqi/22)*vulnMult*(hours/24)*10)/10;
+  const annualDose=Math.round(aqi*hours*365/1000);
+  const rec=aqi<=50?'Air quality is good. Safe for all activities outdoors.':aqi<=100?'Generally safe. Sensitive individuals may experience minor discomfort.':aqi<=200?'Wear N95 mask for outdoor exposure >1 hour. Avoid exercise outdoors.':aqi<=300?'Avoid outdoor exercise. Use air purifier indoors. N95 mandatory outside.':'Stay indoors. Use air purifier on maximum. Seal windows. Seek medical advice if symptomatic.';
+  document.getElementById('aqi-out').innerHTML=`
+    <div class="result-grid">
+      <div class="result-card ${catColor==='red'?'warn':catColor==='orange'?'accent':''}"><div class="result-label">Air Quality</div><div class="result-value" style="font-size:1.5rem;${catColor==='red'?'color:#ef4444':catColor==='orange'?'color:var(--accent)':''}">${cat}</div><div class="result-sub">AQI: ${aqi}</div></div>
+      <div class="result-card ${catColor==='red'?'warn':'accent'}"><div class="result-label">Daily Cigarette Equiv.</div><div class="result-value accent" style="font-size:1.8rem;">${cigEquiv}</div><div class="result-sub">Cigarettes/day exposure</div></div>
+    </div>
+    <div class="insight-box ${catColor}"><div class="insight-title">Your Action Plan</div><div class="insight-text">${rec}</div></div>
+  `;
+}
+
+// SLEEP
+function calcSleep(){
+  const hours=parseFloat(document.getElementById('sl-hours').value)||7;
+  const consist=parseInt(document.getElementById('sl-consist').value)||3;
+  const wake=parseInt(document.getElementById('sl-wake').value)||3;
+  const screen=parseInt(document.getElementById('sl-screen').value)||2;
+  const refresh=parseInt(document.getElementById('sl-refresh').value)||2;
+  const scoreRaw=(consist+wake+screen+refresh)/16;
+  const hourScore=hours>=7&&hours<=9?1:hours>=6&&hours<7?0.7:hours>9?0.8:0.4;
+  const total=Math.round((scoreRaw*0.7+hourScore*0.3)*100);
+  const cat=total>=80?'Excellent':total>=65?'Good':total>=50?'Fair':'Poor — Health Risk';
+  const catColor=total>=80?'green':total>=65?'green':total>=50?'orange':'red';
+  const issues=[];
+  if(hours<7)issues.push('Sleep duration below 7h is linked to 2x higher risk of obesity, diabetes, and cardiac disease.');
+  if(screen<=2)issues.push('Blue light before bed suppresses melatonin by 90 min. Switch to night mode or stop screens 1h before bed.');
+  if(consist<=2)issues.push('Inconsistent sleep timing disrupts circadian rhythm more than sleep duration. Fix your wake time first.');
+  if(refresh<=2)issues.push('Poor sleep quality may indicate sleep apnea or high stress cortisol. Aura\'s elderly care module monitors sleep apnea non-invasively.');
+  document.getElementById('sl-out').innerHTML=`
+    <div class="result-card ${catColor==='red'?'warn':catColor==='orange'?'accent':''}"><div class="result-label">Sleep Quality Score</div><div class="result-value" style="${catColor==='red'?'color:#ef4444':catColor==='orange'?'color:var(--accent)':''}">${total}/100</div><div class="result-sub">${cat}</div></div>
+    ${issues.map(i=>`<div class="insight-box orange"><div class="insight-title">⚠️ Issue Found</div><div class="insight-text">${i}</div></div>`).join('')}
+    ${!issues.length?`<div class="insight-box green"><div class="insight-title">✓ Great Sleep</div><div class="insight-text">Your sleep habits are excellent. Keep the consistent schedule and protect the sleep quality.</div></div>`:''}
+  `;
+}
+
+// NEONATAL
+function calcNeonatal(){
+  const age=document.getElementById('neo-age').value;
+  if(!age)return;
+  const ranges={
+    premature:{hr:'120-170',rr:'40-70',spo2:'88-95',temp:'36.5-37.5',note:'Premature infants need closer monitoring. Contact NICU team for any reading outside these ranges.'},
+    newborn:{hr:'100-160',rr:'30-60',spo2:'95-100',temp:'36.5-37.5',note:'Newborn vitals are highly variable. Crying can raise HR to 180. Measure at rest.'},
+    infant1:{hr:'100-150',rr:'30-60',spo2:'96-100',temp:'36.5-37.5',note:'At 1-3 months, heart rate starts to slow as cardiac efficiency improves.'},
+    infant2:{hr:'90-150',rr:'25-45',spo2:'96-100',temp:'36.5-37.5',note:'Breathing rate slows significantly from newborn period. This is normal and healthy.'},
+    infant3:{hr:'80-140',rr:'25-40',spo2:'96-100',temp:'36.5-37.5',note:'By 6 months, vitals begin to approach toddler ranges. More variation is normal.'},
+    toddler:{hr:'70-110',rr:'20-30',spo2:'97-100',temp:'36.5-37.5',note:'Toddler vitals are much closer to adult ranges. Activity level strongly influences HR.'},
+  };
+  const r=ranges[age];
+  document.getElementById('neo-out').innerHTML=`
+    <div class="result-grid-3">
+      <div class="result-card"><div class="result-label">Heart Rate</div><div class="result-value" style="font-size:1.2rem;">${r.hr}</div><div class="result-sub">bpm (normal)</div></div>
+      <div class="result-card"><div class="result-label">Breathing Rate</div><div class="result-value" style="font-size:1.2rem;">${r.rr}</div><div class="result-sub">breaths/min</div></div>
+      <div class="result-card"><div class="result-label">SpO2</div><div class="result-value" style="font-size:1.2rem;">${r.spo2}</div><div class="result-sub">% (pulse ox)</div></div>
+    </div>
+    <div class="result-card"><div class="result-label">Temperature (Normal)</div><div class="result-value" style="font-size:1.5rem;">${r.temp}°C</div><div class="result-sub">Axillary (underarm)</div></div>
+    <div class="insight-box orange"><div class="insight-title">⚠️ Seek Immediate Help If</div><div class="insight-text">HR &lt;80 or &gt;200 sustained · SpO2 &lt;90 · Temperature &gt;38°C or &lt;36°C · Breathing laboured, grunting, or nasal flaring · Blue/grey colour around lips</div></div>
+    <div class="insight-box green"><div class="insight-title">ℹ️ Note</div><div class="insight-text">${r.note}</div></div>
+  `;
+}
+
+// FALL RISK
+const fallSignals=[
+  {label:'Has fallen at least once in the last 12 months',weight:20},
+  {label:'Uses a walking aid (cane, walker) or has unsteady gait',weight:18},
+  {label:'Takes 4 or more medications daily',weight:12},
+  {label:'Has vision problems not fully corrected',weight:10},
+  {label:'Has dizziness or low blood pressure on standing',weight:12},
+  {label:'Home has loose rugs, poor lighting, or no grab bars in bathroom',weight:10},
+  {label:'Has Parkinson\'s, stroke history, or significant arthritis',weight:15},
+  {label:'Muscle weakness in legs — difficulty rising from chair unaided',weight:13},
+];
+let fallState={};
+function renderFallSignals(){
+  document.getElementById('fall-signals').innerHTML=fallSignals.map((s,i)=>`
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--glass-border);">
+      <div style="flex:1;font-size:0.85rem;color:var(--text-main);">${s.label}</div>
+      <div style="display:flex;gap:4px;flex-shrink:0;">
+        <button style="padding:4px 10px;border-radius:6px;border:1px solid var(--glass-border);background:${fallState[i]==='yes'?'var(--primary)':'transparent'};color:${fallState[i]==='yes'?'#fff':'var(--text-muted)'};font-size:0.75rem;font-weight:700;cursor:pointer;" onclick="fallState[${i}]='yes';renderFallSignals()">Yes</button>
+        <button style="padding:4px 10px;border-radius:6px;border:1px solid var(--glass-border);background:${fallState[i]==='no'?'#ef4444':'transparent'};color:${fallState[i]==='no'?'#fff':'var(--text-muted)'};font-size:0.75rem;font-weight:700;cursor:pointer;" onclick="fallState[${i}]='no';renderFallSignals()">No</button>
+      </div>
+    </div>
+  `).join('');
+}
+function calcFall(){
+  let score=0;
+  fallSignals.forEach((s,i)=>{if(fallState[i]==='yes')score+=s.weight;});
+  const pct=Math.min(Math.round(score/1.1),95);
+  const cat=pct>=60?'HIGH RISK':pct>=35?'MODERATE RISK':'LOW RISK';
+  const catColor=pct>=60?'warn':pct>=35?'accent':'';
+  const actions=pct>=60?'Immediate GP referral for falls assessment. Install grab bars in bathroom and shower NOW. Remove all loose rugs. Consider physiotherapy balance training.':pct>=35?'Discuss with doctor at next visit. Start balance and leg strength exercises. Assess home hazards.':'Continue monitoring. Gentle exercise (walking, yoga) maintains balance and reduces future risk.';
+  document.getElementById('fall-out').innerHTML=`
+    <div class="result-card ${catColor}"><div class="result-label">Fall Risk Score</div><div class="result-value ${pct>=60?'warn':pct>=35?'accent':''}">${pct}%</div><div class="result-sub">${cat}</div></div>
+    <div class="insight-box ${pct>=60?'red':pct>=35?'orange':'green'}"><div class="insight-title">Recommended Action</div><div class="insight-text">${actions}</div></div>
+  `;
+}
+renderFallSignals();
+
+// HYDRATION
+function calcHydration(){
+  const w=parseFloat(document.getElementById('hy-weight').value)||0;
+  const activity=parseFloat(document.getElementById('hy-activity').value)||1.3;
+  const temp=parseFloat(document.getElementById('hy-temp').value)||1.15;
+  const diet=parseFloat(document.getElementById('hy-diet').value)||1;
+  if(!w)return;
+  const base=w*0.033;
+  const target=Math.round(base*activity*temp*diet*10)/10;
+  const glasses=Math.round(target/0.25);
+  document.getElementById('hy-out').innerHTML=`
+    <div class="result-grid">
+      <div class="result-card"><div class="result-label">Daily Water Target</div><div class="result-value">${target}L</div><div class="result-sub">${glasses} glasses (250ml)</div></div>
+      <div class="result-card"><div class="result-label">Hourly (waking hrs)</div><div class="result-value" style="font-size:1.5rem;">${Math.round(target/16*10)/10}L</div><div class="result-sub">Over 16 waking hours</div></div>
+    </div>
+    <div class="insight-box green"><div class="insight-title">💧 Hydration Protocol</div><div class="insight-text">Start with 500ml on waking (before chai/coffee). 250ml before each meal. Remaining spread across the day. Urine should be pale yellow — darker means drink more.</div></div>
+  `;
+}
+
+// STRESS
+const stressSignals=[
+  {label:'Difficulty sleeping or waking up feeling unrefreshed',weight:12},
+  {label:'Feeling overwhelmed or unable to switch off from work',weight:14},
+  {label:'Increased irritability or short temper recently',weight:10},
+  {label:'Physical symptoms: headaches, jaw clenching, muscle tension',weight:11},
+  {label:'Reduced motivation or enjoyment in activities you used to like',weight:13},
+  {label:'Difficulty concentrating or making decisions',weight:12},
+  {label:'Working more than 10 hours/day regularly, skipping breaks',weight:10},
+  {label:'Relying on caffeine, alcohol, or food to cope with stress',weight:11},
+  {label:'Social withdrawal or feeling disconnected from others',weight:9},
+  {label:'Feeling like your effort doesn\'t match your output / progress',weight:8},
+];
+let stressState={};
+function renderStressSignals(){
+  document.getElementById('stress-signals').innerHTML=stressSignals.map((s,i)=>`
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid var(--glass-border);">
+      <div style="flex:1;font-size:0.82rem;color:var(--text-main);line-height:1.4;">${s.label}</div>
+      <div style="display:flex;gap:4px;flex-shrink:0;">
+        <button style="padding:3px 9px;border-radius:6px;border:1px solid var(--glass-border);background:${stressState[i]==='yes'?'var(--accent)':'transparent'};color:${stressState[i]==='yes'?'#fff':'var(--text-muted)'};font-size:0.72rem;font-weight:700;cursor:pointer;" onclick="stressState[${i}]='yes';renderStressSignals()">Yes</button>
+        <button style="padding:3px 9px;border-radius:6px;border:1px solid var(--glass-border);background:${stressState[i]==='no'?'var(--primary)':'transparent'};color:${stressState[i]==='no'?'#fff':'var(--text-muted)'};font-size:0.72rem;font-weight:700;cursor:pointer;" onclick="stressState[${i}]='no';renderStressSignals()">No</button>
+      </div>
+    </div>
+  `).join('');
+}
+function calcStress(){
+  let score=0;
+  stressSignals.forEach((s,i)=>{if(stressState[i]==='yes')score+=s.weight;});
+  const max=stressSignals.reduce((a,s)=>a+s.weight,0);
+  const pct=Math.round((score/max)*100);
+  const cat=pct>=70?'Severe Burnout Risk':pct>=50?'High Stress':pct>=30?'Moderate Stress':'Low / Managed';
+  const catColor=pct>=70?'red':pct>=50?'orange':'green';
+  const protocol=pct>=70?'You are showing signs of burnout. This is a medical condition — speak to a doctor or mental health professional. Immediate steps: mandatory 1-week rest, no work after 7pm, daily 20-min walk, confide in someone you trust.':pct>=50?'Stress is significantly elevated. Priority protocol: protect 8h sleep (non-negotiable), 20-min outdoor walk daily, one full rest day per week, reduce caffeine after 2pm.':'Stress is manageable. Maintain: regular exercise, sleep consistency, and social connection. Aura tracks your stress biomarkers via EVM technology.';
+  document.getElementById('stress-out').innerHTML=`
+    <div class="result-card ${catColor==='red'?'warn':catColor==='orange'?'accent':''}"><div class="result-label">Burnout Index</div><div class="result-value ${catColor==='red'?'warn':catColor==='orange'?'accent':''}">${pct}%</div><div class="result-sub">${cat}</div></div>
+    <div class="insight-box ${catColor}"><div class="insight-title">Recovery Protocol</div><div class="insight-text">${protocol}</div></div>
+  `;
+}
+renderStressSignals();
+</script>
+</body>
+</html>
