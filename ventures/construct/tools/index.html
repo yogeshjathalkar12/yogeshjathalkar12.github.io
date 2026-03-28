@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Construct.OS — Site Intelligence Toolkit</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* =========================================
+           1. CORE VARIABLES & THEME (INDUSTRIAL)
+           ========================================= */
+        :root {
+            --bg-color: #f0f4f8;
+            --bg-pattern: 
+                linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+            --bg-size: 40px 40px;
+            --safety-yellow: #fbbf24;
+            --concrete-grey: #334155;
+            --text-dark: #0f172a;
+            --text-light: #64748b;
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            --panel-bg: #ffffff;
+            --panel-text: #334155;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+        }
+
+        body.dark-mode {
+            --bg-color: #0b1120; 
+            --bg-pattern: 
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            --safety-yellow: #fbbf24; 
+            --concrete-grey: #e2e8f0; 
+            --text-dark: #f8fafc;
+            --text-light: #94a3b8; 
+            --glass-bg: rgba(15, 23, 42, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --panel-bg: #0f172a;
+            --panel-text: #94a3b8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        
+        body { 
+            background-color: var(--bg-color); 
+            background-image: var(--bg-pattern);
+            background-size: var(--bg-size);
+            color: var(--text-dark); 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden; 
+            transition: background 0.8s ease;
+        }
+
+        /* =========================================
+           2. NAVIGATION & SIDEBAR (SHELL)
+           ========================================= */
+        .site-header {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100px;
+            background-color: var(--bg-color);
+            border-bottom: 4px solid var(--safety-yellow);
+            z-index: 85; transition: background 0.8s ease;
+        }
+
+        .brand { 
+            position: fixed; top: 2.2rem; left: 22%; z-index: 100;
+            font-size: 1.3rem; font-weight: 800; color: var(--concrete-grey); 
+            text-transform: uppercase; letter-spacing: 3px; 
+        }
+        .brand span { color: var(--safety-yellow); }
+
+        .back-link { 
+            position: fixed; top: 2.5rem; right: 90px; z-index: 100;
+            text-decoration: none; color: var(--text-light); 
+            font-weight: 700; font-size: 0.75rem; letter-spacing: 1px;
+            transition: 0.3s; text-transform: uppercase;
+        }
+        .back-link:hover { color: var(--safety-yellow); }
+
+        /* LAMP SWITCH (NIGHT MODE) */
+        .lamp-container {
+            position: fixed; top: 0; right: 2rem; z-index: 1000; 
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .wire { width: 2px; height: 50px; background: #475569; }
+        .bulb { width: 30px; height: 30px; background: #cbd5e1; border-radius: 50%; border: 2px solid #475569; cursor: pointer; transition: 0.3s; }
+        .pull-string { width: 1px; height: 40px; background: #94a3b8; cursor: pointer; transition: height 0.2s; }
+        .lamp-container:active .pull-string { height: 60px; }
+        body.dark-mode .bulb { background: var(--safety-yellow); box-shadow: 0 0 20px var(--safety-yellow); }
+
+        /* SYSTEM MONITOR SIDEBAR */
+        .sys-monitor {
+            position: fixed; top: 0; left: 0; width: 20%; height: 100vh;
+            background: var(--panel-bg); border-right: 1px solid var(--glass-border);
+            padding: 2rem; display: flex; flex-direction: column; z-index: 90;
+            box-shadow: 5px 0 30px rgba(0,0,0,0.05); transition: background 0.5s ease;
+        }
+
+        .sys-header {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: bold;
+            color: var(--text-light); border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 1rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between;
+            margin-top: 1.5rem;
+        }
+        .sys-status { color: var(--accent-green); animation: blink 2s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        .sys-list { list-style: none; flex-grow: 1; overflow-y: auto; }
+        .sys-item {
+            padding: 0.6rem 0.8rem; margin-bottom: 0.3rem; border-radius: 4px;
+            cursor: pointer; transition: 0.2s; font-size: 0.75rem;
+            color: var(--panel-text); font-family: 'JetBrains Mono', monospace;
+            text-decoration: none; display: block; border: 1px solid transparent;
+        }
+        .sys-item:hover { background: rgba(0,0,0,0.05); color: var(--safety-yellow); }
+        body.dark-mode .sys-item:hover { background: rgba(255,255,255,0.05); }
+
+        .sys-details {
+            margin-top: auto; background: rgba(0,0,0,0.03);
+            border-radius: 8px; padding: 1.2rem; border: 1px solid var(--glass-border);
+        }
+        .detail-label { font-family: 'JetBrains Mono'; font-size: 0.6rem; color: var(--text-light); display: block; margin-bottom: 5px; text-transform: uppercase; }
+        .detail-value { font-size: 0.8rem; font-weight: 800; color: var(--concrete-grey); margin-bottom: 0.8rem; font-family: 'JetBrains Mono'; }
+
+        /* =========================================
+           3. MAIN LAYOUT
+           ========================================= */
+        .main-content { margin-left: 20%; padding-top: 120px; max-width: 1400px; }
+
+        .hero { padding: 4rem 10% 6rem; text-align: left; }
+        .hero-sys { font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--safety-yellow); letter-spacing: 2px; margin-bottom: 1rem; text-transform: uppercase; }
+        h1 { font-size: clamp(2.5rem, 5vw, 4.5rem); line-height: 1; font-weight: 800; color: var(--text-dark); margin-bottom: 1.5rem; text-transform: uppercase; }
+        h1 em { font-style: normal; color: var(--safety-yellow); }
+        .hero-sub { font-size: 1.1rem; color: var(--text-light); max-width: 700px; line-height: 1.6; margin-bottom: 3rem; }
+
+        .hero-stats { display: flex; gap: 2rem; flex-wrap: wrap; }
+        .hero-stat {
+            background: var(--glass-bg); padding: 1.5rem 2rem; border-radius: 8px;
+            border-left: 4px solid var(--safety-yellow); box-shadow: var(--shadow); min-width: 160px;
+        }
+        .hero-stat-val { display: block; font-size: 1.8rem; font-weight: 800; color: var(--concrete-grey); margin-bottom: 0.2rem; }
+        .hero-stat-label { font-size: 0.7rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* =========================================
+           4. MODULE STYLING
+           ========================================= */
+        .tool-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem; padding: 0 10% 4rem;
+        }
+        .tool-card {
+            background: var(--glass-bg); padding: 2rem; border-radius: 12px;
+            border-left: 6px solid var(--concrete-grey); box-shadow: var(--shadow);
+            text-decoration: none; transition: 0.3s;
+        }
+        .tool-card:hover { transform: translateY(-5px); border-left-color: var(--safety-yellow); }
+        .tc-id { font-family: 'JetBrains Mono'; font-size: 0.65rem; color: var(--text-light); margin-bottom: 1rem; display: block; }
+        .tc-title { font-size: 1.1rem; font-weight: 800; color: var(--text-dark); margin-bottom: 0.5rem; text-transform: uppercase; }
+        .tc-desc { font-size: 0.85rem; color: var(--text-light); line-height: 1.5; margin-bottom: 1rem; }
+        .tc-status { font-family: 'JetBrains Mono'; font-size: 0.65rem; color: var(--accent-green); font-weight: bold; }
+
+        .tool-block { padding: 6rem 10%; border-top: 1px solid var(--glass-border); }
+        .tool-header { display: grid; grid-template-columns: 1.5fr 1fr; gap: 4rem; margin-bottom: 3rem; }
+        .th-title { font-size: 2.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 1rem; text-transform: uppercase; }
+        .th-desc { color: var(--text-light); line-height: 1.6; }
+        .th-specs { 
+            background: rgba(0,0,0,0.03); padding: 1.5rem; border-radius: 8px; font-family: 'JetBrains Mono';
+            font-size: 0.75rem; color: var(--text-light); line-height: 2;
+        }
+        body.dark-mode .th-specs { background: rgba(255,255,255,0.03); }
+
+        /* THE CALCULATOR SHELL */
+        .calc-shell {
+            background: var(--panel-bg); border-radius: 12px; overflow: hidden;
+            box-shadow: var(--shadow); border: 1px solid var(--glass-border);
+        }
+        .calc-topbar {
+            background: var(--concrete-grey); color: white; padding: 1rem 1.5rem;
+            display: flex; justify-content: space-between; font-family: 'JetBrains Mono'; font-size: 0.7rem;
+        }
+        .calc-body { display: grid; grid-template-columns: 1fr 1fr; min-height: 400px; }
+        .calc-inputs { padding: 2.5rem; border-right: 1px solid var(--glass-border); }
+        .calc-outputs { padding: 2.5rem; background: rgba(0,0,0,0.01); }
+
+        /* FORM CONTROLS */
+        .field-group { margin-bottom: 1.5rem; }
+        .field-label { font-size: 0.7rem; font-weight: 800; color: var(--text-light); text-transform: uppercase; margin-bottom: 0.5rem; display: block; }
+        input, select {
+            width: 100%; padding: 0.8rem; border-radius: 6px; border: 1px solid #ddd;
+            font-family: inherit; font-size: 0.9rem; outline: none; transition: 0.2s;
+            background: var(--bg-color); color: var(--text-dark);
+        }
+        input:focus { border-color: var(--safety-yellow); }
+        
+        .calc-btn {
+            width: 100%; background: var(--safety-yellow); color: var(--concrete-grey);
+            border: none; padding: 1.1rem; font-weight: 800; text-transform: uppercase;
+            border-radius: 6px; cursor: pointer; transition: 0.3s; margin-top: 1rem;
+        }
+        .calc-btn:hover { background: #eab308; transform: translateY(-2px); }
+
+        /* OUTPUT COMPONENTS */
+        .out-panel {
+            background: var(--glass-bg); padding: 1.5rem; border-radius: 8px;
+            border-left: 6px solid var(--safety-yellow); margin-bottom: 1.2rem;
+            box-shadow: var(--shadow);
+        }
+        .out-label { font-size: 0.65rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; margin-bottom: 0.5rem; letter-spacing: 1px; }
+        .out-val { font-size: 2.2rem; font-weight: 800; color: var(--concrete-grey); font-family: 'JetBrains Mono', monospace; }
+        .out-panel.green { border-left-color: var(--accent-green); }
+        .out-panel.red { border-left-color: var(--accent-red); }
+        .out-panel.cyan { border-left-color: #06b6d4; }
+
+        .risk-badge {
+            display: inline-block; padding: 0.4rem 1rem; border-radius: 4px; font-family: 'JetBrains Mono';
+            font-size: 0.7rem; font-weight: bold; margin-bottom: 1rem; text-transform: uppercase;
+        }
+        .risk-badge.high { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); }
+        .risk-badge.medium { background: rgba(251, 191, 36, 0.1); color: var(--safety-yellow); }
+        .risk-badge.low { background: rgba(16, 185, 129, 0.1); color: var(--accent-green); }
+
+        /* SLIDERS */
+        .range-row { display: flex; align-items: center; gap: 15px; }
+        input[type="range"] { -webkit-appearance: none; height: 4px; background: #ddd; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: var(--safety-yellow); border-radius: 50%; cursor: pointer; }
+
+        /* DATA TABLES */
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.85rem; }
+        .data-table th { text-align: left; padding: 1rem; color: var(--text-light); border-bottom: 2px solid var(--glass-border); font-family: 'JetBrains Mono'; font-size: 0.7rem; }
+        .data-table td { padding: 1rem; border-bottom: 1px solid var(--glass-border); color: var(--text-dark); }
+
+        /* SIG ROW (FOR GREEN MODULE) */
+        .sig-row { display: flex; align-items: center; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid var(--glass-border); }
+        .sig-label { font-size: 0.85rem; color: var(--text-dark); flex: 1; }
+        .sig-btns { display: flex; gap: 8px; }
+        .sig-btn { padding: 0.4rem 0.8rem; border-radius: 4px; border: 1px solid #ddd; background: white; cursor: pointer; font-family: 'JetBrains Mono'; font-size: 0.7rem; }
+        .sig-btn.yes { border-color: var(--accent-green); color: var(--accent-green); }
+        .sig-btn.no { border-color: var(--accent-red); color: var(--accent-red); }
+
+        @media (max-width: 1000px) {
+            .sys-monitor { display: none; }
+            .main-content { margin-left: 0; }
+            .calc-body { grid-template-columns: 1fr; }
+            .calc-inputs { border-right: none; border-bottom: 1px solid var(--glass-border); }
+            .tool-header { grid-template-columns: 1fr; gap: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="site-header"></header>
+<div class="brand">Construct<span>.OS</span></div>
+<a href="https://shoonyaorigins.com/ventures/construct/" class="back-link">← Terminal Exit</a>
+
+<div class="lamp-container" onclick="document.body.classList.toggle('dark-mode')">
+    <div class="wire"></div>
+    <div class="bulb"></div>
+    <div class="pull-string"></div>
+</div>
+
+<aside class="sys-monitor">
+    <div class="sys-header">
+        <span>SYSTEM_READY</span>
+        <span class="sys-status">● ACTIVE</span>
+    </div>
+    <nav class="sys-list">
+        <a href="#t01" class="sys-item">01_BUDGET_RISK</a>
+        <a href="#t02" class="sys-item">02_SAFETY_COST</a>
+        <a href="#t03" class="sys-item">03_MATERIAL_WASTE</a>
+        <a href="#t04" class="sys-item">04_FATIGUE_INDEX</a>
+        <a href="#t05" class="sys-item">05_PROJECT_ROI</a>
+        <a href="#t06" class="sys-item">06_DELAY_CASCADE</a>
+        <a href="#t07" class="sys-item">07_VEND_SCORER</a>
+        <a href="#t08" class="sys-item">08_EQUIP_UTIL</a>
+        <a href="#t09" class="sys-item">09_GREEN_COMPLY</a>
+        <a href="#t10" class="sys-item">10_SQUAD_SIZING</a>
+    </nav>
+    <div class="sys-details">
+        <span class="detail-label">Data Node</span>
+        <div class="detail-value">Local_Secure</div>
+        <span class="detail-label">Module Count</span>
+        <div class="detail-value">10/10 Loaded</div>
+    </div>
+</aside>
+
+<main class="main-content">
+    
+    <section class="hero">
+        <div class="hero-sys">// SITE INTELLIGENCE SUITE V1.0</div>
+        <h1>Diagnostic <em>Toolkit</em></h1>
+        <p class="hero-sub">Ten tactical diagnostic tools built to automate complex project management audits. Calculated locally, no signups, zero cost. Protect your margins through data visibility.</p>
+        
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <span class="hero-stat-val">10</span>
+                <span class="hero-stat-label">Active Modules</span>
+            </div>
+            <div class="hero-stat">
+                <span class="hero-stat-val">₹0</span>
+                <span class="hero-stat-label">Access Cost</span>
+            </div>
+            <div class="hero-stat">
+                <span class="hero-stat-val">Local</span>
+                <span class="hero-stat-label">Data Privacy</span>
+            </div>
+        </div>
+    </section>
+
+    <div class="tool-grid">
+        <a href="#t01" class="tool-card">
+            <span class="tc-id">CNSTRCT-T01</span>
+            <div class="tc-title">Budget Overrun</div>
+            <p class="tc-desc">Risk probability and expected cost bleed metrics.</p>
+            <div class="tc-status">● ONLINE</div>
+        </a>
+        <a href="#t02" class="tool-card">
+            <span class="tc-id">CNSTRCT-T02</span>
+            <div class="tc-title">Safety Incident</div>
+            <p class="tc-desc">Full financial breakdown of site accidents.</p>
+            <div class="tc-status">● ONLINE</div>
+        </a>
+        <a href="#t03" class="tool-card">
+            <span class="tc-id">CNSTRCT-T03</span>
+            <div class="tc-title">Material Waste</div>
+            <p class="tc-desc">Efficiency benchmarks vs industry actuals.</p>
+            <div class="tc-status">● ONLINE</div>
+        </a>
+        <a href="#t04" class="tool-card">
+            <span class="tc-id">CNSTRCT-T04</span>
+            <div class="tc-title">Fatigue Index</div>
+            <p class="tc-desc">Heat index impact on trade productivity.</p>
+            <div class="tc-status">● ONLINE</div>
+        </a>
+        <a href="#t05" class="tool-card">
+            <span class="tc-id">CNSTRCT-T05</span>
+            <div class="tc-title">Project ROI</div>
+            <p class="tc-desc">Break-even and margin sensitivity analysis.</p>
+            <div class="tc-status">● ONLINE</div>
+        </a>
+    </div>
+
+    <div class="tool-block" id="t01">
+        <div class="tool-header">
+            <div>
+                <div class="hero-sys">ORACLE MODULE // FINANCIAL</div>
+                <div class="th-title">Budget<br>Overrun Risk</div>
+                <p class="th-desc">Indian construction projects overrun by 20-40% on average. Input your project parameters to identify your specific exposure.</p>
+            </div>
+            <div class="th-specs">
+                <strong>// OUTPUT TELEMETRY</strong><br>
+                > Overrun probability (%)<br>
+                > Expected cost bleed (₹)<br>
+                > Top 3 risk factors ranked<br>
+                > Mitigation action plan
+            </div>
+        </div>
+        <div class="calc-shell">
+            <div class="calc-topbar"><span>ORACLE ENGINE ACTIVE</span><span>ID: T01</span></div>
+            <div class="calc-body">
+                <div class="calc-inputs">
+                    <div class="field-group">
+                        <label class="field-label">Project Type</label>
+                        <select id="or-type" onchange="calcOverrun()">
+                            <option value="">-- SELECT TYPE --</option>
+                            <option value="residential">Residential</option>
+                            <option value="commercial">Commercial</option>
+                            <option value="industrial">Industrial</option>
+                            <option value="infrastructure">Infrastructure</option>
+                        </select>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Total Project Budget (₹)</label>
+                        <input type="number" id="or-budget" placeholder="e.g. 50000000" oninput="calcOverrun()">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Project Duration (months)</label>
+                        <input type="number" id="or-duration" placeholder="e.g. 24" oninput="calcOverrun()">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Number of Contractors: <span id="or-cv">5</span></label>
+                        <input type="range" id="or-contractors" min="1" max="30" value="5" oninput="document.getElementById('or-cv').textContent=this.value;calcOverrun()">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Design Finalized?</label>
+                        <select id="or-design" onchange="calcOverrun()">
+                            <option value="yes">Yes — Locked</option>
+                            <option value="partial">Partial</option>
+                            <option value="no">No — In Progress</option>
+                        </select>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Soil Investigation Done?</label>
+                        <select id="or-soil" onchange="calcOverrun()">
+                            <option value="yes">Yes</option>
+                            <option value="partial">Partial</option>
+                            <option value="no">No</option>
+                        </select>
+                    </div>
+                    <button class="calc-btn" onclick="calcOverrun()">Run Risk Analysis</button>
+                </div>
+                <div class="calc-outputs" id="or-out">
+                    <div style="text-align:center; padding-top:100px; color:var(--text-light); font-size:0.8rem; font-family:'JetBrains Mono'">[ STANDBY: DATA_ENTRY_REQUIRED ]</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tool-block" id="t02">
+        <div class="tool-header">
+            <div>
+                <div class="hero-sys">SENTINEL MODULE // SAFETY</div>
+                <div class="th-title">Safety<br>Incident Cost</div>
+                <p class="th-desc">Safety incidents cost 4-10x more than just the compensation. This engine tracks the "iceberg" of indirect costs.</p>
+            </div>
+            <div class="th-specs">
+                <strong>// OUTPUT TELEMETRY</strong><br>
+                > Direct vs Indirect breakdown<br>
+                > Site shutdown impact<br>
+                > Regulatory legal exposure<br>
+                > Insurance impact
+            </div>
+        </div>
+        <div class="calc-shell">
+            <div class="calc-topbar"><span>SENTINEL ENGINE ACTIVE</span><span>ID: T02</span></div>
+            <div class="calc-body">
+                <div class="calc-inputs">
+                    <div class="field-group">
+                        <label class="field-label">Incident Severity</label>
+                        <select id="si-severity" onchange="calcSafety()">
+                            <option value="">-- SELECT SEVERITY --</option>
+                            <option value="minor">Minor (First Aid)</option>
+                            <option value="moderate">Moderate (LTI > 1 day)</option>
+                            <option value="serious">Serious (Disability)</option>
+                            <option value="fatal">Fatal</option>
+                        </select>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Daily Burn Rate (₹)</label>
+                        <input type="number" id="si-burn" placeholder="e.g. 200000" oninput="calcSafety()">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Site Shutdown (days)</label>
+                        <input type="number" id="si-shutdown" placeholder="e.g. 3" oninput="calcSafety()">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Workforce Size</label>
+                        <input type="number" id="si-workers" placeholder="e.g. 150" oninput="calcSafety()">
+                    </div>
+                    <button class="calc-btn" onclick="calcSafety()">Calculate True Cost</button>
+                </div>
+                <div class="calc-outputs" id="si-out">
+                    <div style="text-align:center; padding-top:100px; color:var(--text-light); font-size:0.8rem; font-family:'JetBrains Mono'">[ AWAITING_INCIDENT_PARAMS ]</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tool-block" id="t03">
+        <div class="tool-header">
+            <div>
+                <div class="hero-sys">ECO MODULE // EFFICIENCY</div>
+                <div class="th-title">Material Waste<br>Estimator</div>
+                <p class="th-desc">Compare your consumption actuals vs global benchmarks to reveal recoverable capital from scrap and shrinkage.</p>
+            </div>
+            <div class="th-specs">
+                <strong>// OUTPUT TELEMETRY</strong><br>
+                > Recoverable capital (₹)<br>
+                > Benchmark variance (%)<br>
+                > Material-wise breakdown<br>
+                > Eco recovery score
+            </div>
+        </div>
+        <div class="calc-shell">
+            <div class="calc-topbar"><span>ECO ENGINE ACTIVE</span><span>ID: T03</span></div>
+            <div class="calc-body">
+                <div class="calc-inputs">
+                    <div class="field-group">
+                        <label class="field-label">Concrete Quantity (m³)</label>
+                        <input type="number" id="mw-conc-qty" oninput="calcWaste()">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Concrete Cost (₹/m³)</label>
+                        <input type="number" id="mw-conc-cost" oninput="calcWaste()">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Your Concrete Waste: <span id="mw-cw">8%</span></label>
+                        <input type="range" id="mw-conc-waste" min="1" max="30" value="8" oninput="document.getElementById('mw-cw').textContent=this.value+'%';calcWaste()">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Steel Quantity (MT)</label>
+                        <input type="number" id="mw-steel-qty" oninput="calcWaste()">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Steel Cost (₹/MT)</label>
+                        <input type="number" id="mw-steel-cost" oninput="calcWaste()">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Your Steel Waste: <span id="mw-sw">6%</span></label>
+                        <input type="range" id="mw-steel-waste" min="1" max="20" value="6" oninput="document.getElementById('mw-sw').textContent=this.value+'%';calcWaste()">
+                    </div>
+                    <button class="calc-btn" onclick="calcWaste()">Audit Material Waste</button>
+                </div>
+                <div class="calc-outputs" id="mw-out"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tool-block" id="t04">
+        <div class="tool-header">
+            <div>
+                <div class="hero-sys">BIO MODULE // ERGONOMIC</div>
+                <div class="th-title">Workforce<br>Fatigue Index</div>
+                <p class="th-desc">Temperature and humidity aren't just weather—they are productivity killers. Calculate the output bleed.</p>
+            </div>
+            <div class="th-specs">
+                <strong>// OUTPUT TELEMETRY</strong><br>
+                > Productivity retained (%)<br>
+                > Daily output loss (₹)<br>
+                > Safe work window (hrs)<br>
+                > Medical risk rating
+            </div>
+        </div>
+        <div class="calc-shell">
+            <div class="calc-topbar"><span>BIO ENGINE ACTIVE</span><span>ID: T04</span></div>
+            <div class="calc-body">
+                <div class="calc-inputs">
+                    <div class="field-group">
+                        <label class="field-label">Temperature: <span id="fa-tv">35°C</span></label>
+                        <input type="range" id="fa-temp" min="20" max="50" value="35" oninput="document.getElementById('fa-tv').textContent=this.value+'°C';calcFatigue()">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Humidity: <span id="fa-hv">60%</span></label>
+                        <input type="range" id="fa-humid" min="20" max="100" value="60" oninput="document.getElementById('fa-hv').textContent=this.value+'%';calcFatigue()">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Workforce Size</label>
+                        <input type="number" id="fa-workers" oninput="calcFatigue()">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Average Daily Wage (₹)</label>
+                        <input type="number" id="fa-wage" oninput="calcFatigue()">
+                    </div>
+                    <button class="calc-btn" onclick="calcFatigue()">Analyze Fatigue Load</button>
+                </div>
+                <div class="calc-outputs" id="fa-out"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tool-block" id="t05">
+        <div class="tool-header">
+            <div>
+                <div class="hero-sys">ORACLE MODULE // DEVELOPER</div>
+                <div class="th-title">Project<br>ROI Calculator</div>
+                <p class="th-desc">Know your real gross development margin. Audit the sensitivity of your profits to construction delays.</p>
+            </div>
+            <div class="th-specs">
+                <strong>// OUTPUT TELEMETRY</strong><br>
+                > Break-even per sqft<br>
+                > Delayed scenario ROI<br>
+                > Overrun impact on margin<br>
+                > Financing cost audit
+            </div>
+        </div>
+        <div class="calc-shell">
+            <div class="calc-topbar"><span>ORACLE ROI ENGINE ACTIVE</span><span>ID: T05</span></div>
+            <div class="calc-body">
+                <div class="calc-inputs">
+                    <div class="field-group">
+                        <label class="field-label">Land Cost (₹)</label>
+                        <input type="number" id="roi-land" oninput="calcROI()">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Construction Cost (₹)</label>
+                        <input type="number" id="roi-constr" oninput="calcROI()">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Target Sale Price (₹/sqft)</label>
+                        <input type="number" id="roi-price" oninput="calcROI()">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Area (sqft)</label>
+                        <input type="number" id="roi-area" oninput="calcROI()">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Duration (mo)</label>
+                        <input type="number" id="roi-duration" oninput="calcROI()">
+                    </div>
+                    <button class="calc-btn" onclick="calcROI()">Run Financial Audit</button>
+                </div>
+                <div class="calc-outputs" id="roi-out"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tool-block" id="t06">
+        <div class="tool-header">
+            <div>
+                <div class="hero-sys">ORACLE MODULE // OPERATIONS</div>
+                <div class="th-title">Delay Cascade<br>Estimator</div>
+                <p class="th-desc">A 10-day delay in structure isn't 10 days. It's a cascade. Calculate the downstream financial damage.</p>
+            </div>
+            <div class="th-specs">
+                <strong>// OUTPUT TELEMETRY</strong><br>
+                > Total cascade days<br>
+                > Finance cost addition<br>
+                > Penalty clause exposure<br>
+                > Recovery playbook
+            </div>
+        </div>
+        <div class="calc-shell">
+            <div class="calc-topbar"><span>CASCADE ENGINE ACTIVE</span><span>ID: T06</span></div>
+            <div class="calc-body">
+                <div class="calc-inputs">
+                    <div class="field-group">
+                        <label class="field-label">Initial Delay (days)</label>
+                        <input type="number" id="dc-days" oninput="calcCascade()">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Daily Site Burn (₹)</label>
+                        <input type="number" id="dc-burn" oninput="calcCascade()">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Phase at Delay</label>
+                        <select id="dc-phase" onchange="calcCascade()">
+                            <option value="foundation">Foundation</option>
+                            <option value="structure">Structure</option>
+                            <option value="mep">MEP</option>
+                            <option value="finishing">Finishing</option>
+                        </select>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Penalty Clause (₹/day)</label>
+                        <input type="number" id="dc-penalty" oninput="calcCascade()">
+                    </div>
+                    <button class="calc-btn" onclick="calcCascade()">Simulate Cascade</button>
+                </div>
+                <div class="calc-outputs" id="dc-out"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tool-block" id="t07">
+        <div class="tool-header">
+            <div>
+                <div class="hero-sys">LOGISTICS MODULE // VENDOR</div>
+                <div class="th-title">Contractor<br>Performance Scorer</div>
+                <p class="th-desc">Remove gut-feel from renewals. Score contractors across 5 critical dimensions with weighted analytics.</p>
+            </div>
+            <div class="th-specs">
+                <strong>// OUTPUT TELEMETRY</strong><br>
+                > Performance score /100<br>
+                > Rework exposure (₹)<br>
+                > Renewal recommendation<br>
+                > Risk flag summary
+            </div>
+        </div>
+        <div class="calc-shell">
+            <div class="calc-topbar"><span>VENDOR SCORING ENGINE</span><span>ID: T07</span></div>
+            <div class="calc-body">
+                <div class="calc-inputs">
+                    <div class="field-group">
+                        <label class="field-label">On-Time Rate: <span id="cs-ov">70%</span></label>
+                        <input type="range" id="cs-ontime" min="0" max="100" value="70" oninput="document.getElementById('cs-ov').textContent=this.value+'%';calcContractor()">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Defect Rate: <span id="cs-dv">10%</span></label>
+                        <input type="range" id="cs-defect" min="0" max="40" value="10" oninput="document.getElementById('cs-dv').textContent=this.value+'%';calcContractor()">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Disputes</label>
+                        <select id="cs-disputes" onchange="calcContractor()">
+                            <option value="0">None</option>
+                            <option value="1">1-2 Minor</option>
+                            <option value="2">Frequent</option>
+                        </select>
+                    </div>
+                    <button class="calc-btn" onclick="calcContractor()">Grade Contractor</button>
+                </div>
+                <div class="calc-outputs" id="cs-out"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tool-block" id="t08">
+        <div class="tool-header">
+            <div>
+                <div class="hero-sys">LOGISTICS MODULE // ASSET</div>
+                <div class="th-title">Equipment<br>Utilisation Audit</div>
+                <p class="th-desc">Idle machines are cash burn events. Calculate the rent vs own break-even for your heavy assets.</p>
+            </div>
+            <div class="th-specs">
+                <strong>// OUTPUT TELEMETRY</strong><br>
+                > Daily idle cost (₹)<br>
+                > Rent vs Own break-even<br>
+                > Monthly utility loss<br>
+                > Deployment target
+            </div>
+        </div>
+        <div class="calc-shell">
+            <div class="calc-topbar"><span>ASSET AUDIT ENGINE</span><span>ID: T08</span></div>
+            <div class="calc-body">
+                <div class="calc-inputs">
+                    <div class="field-group">
+                        <label class="field-label">Equipment Type</label>
+                        <select id="eq-type" onchange="calcEquipment()">
+                            <option value="excavator">Excavator</option>
+                            <option value="crane">Tower Crane</option>
+                            <option value="concrete">Batching Plant</option>
+                        </select>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Daily Rent (₹)</label>
+                        <input type="number" id="eq-rent" oninput="calcEquipment()">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Current Util: <span id="eq-uv">55%</span></label>
+                        <input type="range" id="eq-util" min="10" max="100" value="55" oninput="document.getElementById('eq-uv').textContent=this.value+'%';calcEquipment()">
+                    </div>
+                    <button class="calc-btn" onclick="calcEquipment()">Audit Utilisation</button>
+                </div>
+                <div class="calc-outputs" id="eq-out"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tool-block" id="t09">
+        <div class="tool-header">
+            <div>
+                <div class="hero-sys">ECO MODULE // COMPLIANCE</div>
+                <div class="th-title">Green<br>Compliance Checker</div>
+                <p class="th-desc">Score your project across IGBC/GRIHA dimensions. Identify the gaps to official certification.</p>
+            </div>
+            <div class="th-specs">
+                <strong>// OUTPUT TELEMETRY</strong><br>
+                > Estimated IGBC score<br>
+                > Certification band<br>
+                > Priority action gaps<br>
+                > Compliance cost estimate
+            </div>
+        </div>
+        <div class="calc-shell">
+            <div class="calc-topbar"><span>COMPLIANCE ENGINE ACTIVE</span><span>ID: T09</span></div>
+            <div class="calc-body">
+                <div class="calc-inputs">
+                    <div id="gc-signals" style="margin-bottom: 2rem;"></div>
+                    <button class="calc-btn" onclick="calcGreen()">Generate Compliance Report</button>
+                </div>
+                <div class="calc-outputs" id="gc-out"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tool-block" id="t10">
+        <div class="tool-header">
+            <div>
+                <div class="hero-sys">BIO MODULE // PLANNING</div>
+                <div class="th-title">Workforce<br>Sizing Tool</div>
+                <p class="th-desc">Audit your labor requirements. Calculate trade-wise headcount and monthly wage burn projections.</p>
+            </div>
+            <div class="th-specs">
+                <strong>// OUTPUT TELEMETRY</strong><br>
+                > Peak workforce count<br>
+                > Monthly wage burn (₹)<br>
+                > Trade-wise breakdown<br>
+                > Staffing curve audit
+            </div>
+        </div>
+        <div class="calc-shell">
+            <div class="calc-topbar"><span>SQUAD SIZING ENGINE</span><span>ID: T10</span></div>
+            <div class="calc-body">
+                <div class="calc-inputs">
+                    <div class="field-group">
+                        <label class="field-label">Built-up Area (sqft)</label>
+                        <input type="number" id="wf-area" oninput="calcWorkforce()">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Duration (mo)</label>
+                        <input type="number" id="wf-duration" oninput="calcWorkforce()">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Project Type</label>
+                        <select id="wf-type" onchange="calcWorkforce()">
+                            <option value="residential">Residential</option>
+                            <option value="commercial">Commercial</option>
+                            <option value="industrial">Industrial</option>
+                        </select>
+                    </div>
+                    <button class="calc-btn" onclick="calcWorkforce()">Size Workforce</button>
+                </div>
+                <div class="calc-outputs" id="wf-out"></div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<footer>
+    <div class="hero-sys">CONSTRUCT.OS // MISSION CONTROL // PUNE // 2026</div>
+    <p>Strategic Diagnostics for Indian Construction • Powered by Shoonya Origins</p>
+</footer>
+
+<script>
+// =========================================
+// CORE UTILITIES (Original Functions Preserved)
+// =========================================
+function fmt(n) {
+    if(n>=10000000) return '₹'+(n/10000000).toFixed(2)+'Cr';
+    if(n>=100000)   return '₹'+(n/100000).toFixed(1)+'L';
+    if(n>=1000)     return '₹'+(n/1000).toFixed(1)+'K';
+    return '₹'+Math.round(n).toLocaleString('en-IN');
+}
+function num(id){ return parseFloat(document.getElementById(id).value)||0; }
+function val(id){ return document.getElementById(id).value; }
+function set(id,html){ document.getElementById(id).innerHTML=html; }
+
+// Mission Control Output Components
+function panel(label,value,sub='',cls=''){
+    return `<div class="out-panel ${cls}">
+        <div class="out-label">${label}</div>
+        <div class="out-val">${value}</div>
+        ${sub?`<div style="font-size:0.7rem; color:var(--text-light); margin-top:5px; font-weight:700;">${sub}</div>`:''}
+    </div>`;
+}
+function panelG(label,value,sub=''){ return panel(label,value,sub,'green'); }
+function panelR(label,value,sub=''){ return panel(label,value,sub,'red'); }
+function diag(label,text,cls=''){
+    return `<div style="padding:1.2rem; background:rgba(0,0,0,0.03); border-radius:8px; margin-top:1rem; border-left:4px solid ${cls==='red'?'var(--accent-red)':'var(--accent-green)'}">
+        <div class="out-label">${label}</div>
+        <div style="font-size:0.85rem; line-height:1.6; color:var(--text-dark)">${text}</div>
+    </div>`;
+}
+function bar(label,pct,cls=''){
+    return `<div style="margin:10px 0;">
+        <div style="display:flex; justify-content:space-between; font-size:0.7rem; font-weight:800; color:var(--text-light); margin-bottom:5px;">
+            <span>${label}</span><span>${Math.round(pct)}%</span>
+        </div>
+        <div style="height:6px; background:#ddd; border-radius:3px; overflow:hidden;">
+            <div style="width:${pct}%; height:100%; background:${cls==='red'?'var(--accent-red)':'var(--accent-green)'}"></div>
+        </div>
+    </div>`;
+}
+
+// =========================================
+// 10 MODULE CALCULATION LOGIC
+// =========================================
+
+// T01: BUDGET OVERRUN
+function calcOverrun(){
+    const type=val('or-type'), budget=num('or-budget'), duration=num('or-duration');
+    const contractors=num('or-contractors'), design=val('or-design'), soil=val('or-soil');
+    if(!type||!budget||!duration) return;
+    const baseRisk = {residential:0.22,commercial:0.28,industrial:0.20,infrastructure:0.35}[type]||0.25;
+    let riskMult = 1;
+    if(design==='no') riskMult+=0.35;
+    if(soil==='no') riskMult+=0.25;
+    const overrunPct = Math.min(baseRisk * riskMult, 0.85);
+    const expectedBleed = budget * overrunPct;
+    const level = overrunPct > 0.4 ? 'HIGH' : overrunPct > 0.25 ? 'MEDIUM' : 'LOW';
+    set('or-out', `
+        <div class="risk-badge ${level.toLowerCase()}">${level} OVERRUN RISK</div>
+        ${panelR('OVERRUN PROBABILITY', (overrunPct*100).toFixed(0)+'%', 'Based on project profile')}
+        ${panelR('EXPECTED BLEED', fmt(expectedBleed))}
+        ${diag('MITIGATION', 'Lock design phases before structure completion. Design change mid-construction is your #1 risk.', 'red')}
+    `);
+}
+
+// T02: SAFETY INCIDENT
+function calcSafety(){
+    const severity=val('si-severity'), burn=num('si-burn'), shutdown=num('si-shutdown'), workers=num('si-workers');
+    if(!severity||!burn) return;
+    const base = {minor:25000, moderate:200000, serious:1000000, fatal:2000000}[severity];
+    const total = (base + (burn * (shutdown||1))) * 4.5;
+    set('si-out', `
+        ${panelR('TRUE INCIDENT COST', fmt(total), 'Direct + Indirect Multiplier')}
+        ${diag('REGULATORY RISK', 'Fatal incidents under Indian BOCW Act can shut site for 30-90 days.', 'red')}
+    `);
+}
+
+// T03: MATERIAL WASTE
+function calcWaste(){
+    const cQty=num('mw-conc-qty'), cCost=num('mw-conc-cost'), cWaste=num('mw-conc-waste');
+    const sQty=num('mw-steel-qty'), sCost=num('mw-steel-cost'), sWaste=num('mw-steel-waste');
+    if(!cQty && !sQty) return;
+    const recoverable = ((cQty*cCost)*(cWaste-3)/100) + ((sQty*sCost)*(sWaste-2)/100);
+    set('mw-out', `
+        ${panelG('RECOVERABLE CAPITAL', fmt(recoverable), 'Savings achievable vs industry benchmark')}
+        ${bar('Concrete Efficiency', 100-cWaste, 'green')}
+        ${bar('Steel Efficiency', 100-sWaste, 'green')}
+    `);
+}
+
+// T04: FATIGUE
+function calcFatigue(){
+    const temp=num('fa-temp'), humid=num('fa-humid'), workers=num('fa-workers'), wage=num('fa-wage');
+    if(!workers||!wage) return;
+    const lossPct = Math.max(0, (temp-28)*2.5 + (humid-60)*0.2);
+    const dailyLoss = workers * wage * (lossPct/100);
+    set('fa-out', `
+        ${panelR('DAILY OUTPUT LOSS', fmt(dailyLoss), 'Productivity bleed due to environment')}
+        ${panel('EFFECTIVE OUTPUT', (100-lossPct).toFixed(0)+'%', 'Of theoretical max')}
+    `);
+}
+
+// T05: ROI
+function calcROI(){
+    const land=num('roi-land'), constr=num('roi-constr'), price=num('roi-price'), area=num('roi-area'), dur=num('roi-duration');
+    if(!land||!constr||!price) return;
+    const revenue = price * area;
+    const allIn = land + constr + (land*0.12*(dur/12));
+    const margin = ((revenue - allIn)/revenue)*100;
+    set('roi-out', `
+        ${panelG('GROSS MARGIN', margin.toFixed(1)+'%', 'All-in project health')}
+        ${panel('BREAK-EVEN COST', fmt(allIn/area)+'/sqft')}
+    `);
+}
+
+// T06: DELAY CASCADE
+function calcCascade(){
+    const days=num('dc-days'), burn=num('dc-burn'), phase=val('dc-phase');
+    if(!days||!burn) return;
+    const mult = {foundation:3, structure:2.2, mep:1.5, finishing:1.2}[phase];
+    const cascadeDays = Math.round(days * mult);
+    set('dc-out', `
+        ${panelR('CASCADE IMPACT', cascadeDays + ' DAYS', 'Estimated downstream timeline drift')}
+        ${panelR('CASCADE COST', fmt(cascadeDays * burn))}
+    `);
+}
+
+// T07: CONTRACTOR
+function calcContractor(){
+    const ot=num('cs-ontime'), def=num('cs-defect');
+    const score = Math.round((ot*0.6) + (100-def*2.5)*0.4);
+    set('cs-out', `
+        <div class="risk-badge ${score>75?'low':score>50?'medium':'high'}">SCORE: ${score}/100</div>
+        ${panel(score>75?'RENEW':'RE-NEGOTIATE', score>75?'RECOMMENDED':'FLAGGED', '', score>75?'green':'red')}
+    `);
+}
+
+// T08: EQUIPMENT
+function calcEquipment(){
+    const rent=num('eq-rent'), util=num('eq-util');
+    if(!rent) return;
+    const monthlyLoss = rent * 26 * (1 - util/100);
+    set('eq-out', `
+        ${panelR('MONTHLY IDLE LOSS', fmt(monthlyLoss), 'Cash burn on current utilization')}
+        ${bar('Utilization Level', util, util>75?'green':'red')}
+    `);
+}
+
+// T09: GREEN COMPLIANCE
+const greenDims = [
+    {label:'Rainwater Harvesting', pts:15},
+    {label:'Waste Sorting On-Site', pts:12},
+    {label:'Low-VOC Materials', pts:10},
+    {label:'Dust Suppression System', pts:10}
+];
+let gcState = {};
+function renderGreenSignals(){
+    document.getElementById('gc-signals').innerHTML = greenDims.map((d,i)=>`
+        <div class="sig-row">
+            <span class="sig-label">${d.label} (+${d.pts} pts)</span>
+            <div class="sig-btns">
+                <button class="sig-btn ${gcState[i]==='y'?'yes':''}" onclick="setGC(${i},'y')">YES</button>
+                <button class="sig-btn ${gcState[i]==='n'?'no':''}" onclick="setGC(${i},'n')">NO</button>
+            </div>
+        </div>
+    `).join('');
+}
+function setGC(i,v){ gcState[i]=v; renderGreenSignals(); }
+function calcGreen(){
+    let s=0; greenDims.forEach((d,i)=> { if(gcState[i]==='y') s+=d.pts; });
+    set('gc-out', `
+        ${panel('IGBC ESTIMATE', s + '/100', 'Current eligibility points')}
+        ${diag('ACTION', s < 50 ? 'Immediate intervention required for Silver certification.' : 'Eligible for pre-certification audit.', s<50?'red':'green')}
+    `);
+}
+renderGreenSignals();
+
+// T10: WORKFORCE
+function calcWorkforce(){
+    const area=num('wf-area'), type=val('wf-type');
+    if(!area) return;
+    const density = {residential:2.2, commercial:2.8, industrial:1.8}[type]||2;
+    const peak = Math.round((area/1000) * density);
+    set('wf-out', `
+        ${panelG('PEAK WORKFORCE', peak + ' CREW', 'Maximum concurrent labor requirement')}
+        ${diag('BURN PROJECTED', 'Ensure labor colony planning accounts for peak capacity by phase 2.', 'green')}
+    `);
+}
+</script>
+</body>
+</html>
