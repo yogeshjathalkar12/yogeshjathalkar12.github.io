@@ -99,6 +99,14 @@
             transition: background var(--transition-speed), border-color var(--transition-speed);
         }
 
+        .action-bar {
+           display: flex;
+           justify-content: center;
+           gap: 15px;
+           margin-bottom: 40px;
+           padding: 0 5%;
+          }
+
         .logo {
             font-size: 1.6rem;
             font-weight: 800;
@@ -383,10 +391,11 @@
         <p>A unified health ecosystem powered by Sensor Fusion and EVM technology.</p>
     </header>
 
-    <button href = "https://shoonyaorigins.com/ventures/aura/tools/">
-                <span id="toolsbutton">Free Tools </span> 
-            </button>
-
+    <div class="action-bar" data-aos="fade-up" data-aos-delay="200">
+    <a href="https://shoonyaorigins.com/ventures/aura/tools/" class="btn-secondary">
+        <span>Free Tools 🛠️</span>
+    </a>
+   </div>
     <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">
                 <span id="themeIcon">🌙</span> <span>Mode</span>
             </button>
