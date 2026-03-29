@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Basis — Environment & Resource Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=Space+Mono&display=swap');
+
+:root {
+    /* --- SHARED OCEANIC PRODUCT PALETTE --- */
+    --bg: #F0F7F9;             /* Soft Arctic Mist */
+    --surface: rgba(224, 242, 254, 0.3); /* Translucent Sea Foam */
+    --border: rgba(8, 145, 178, 0.12);    /* Subtle Teal border */
+    --accent: #0891B2;         /* Deep Mediterranean Teal */
+    --accent2: #0F172A;        /* Midnight Anchor Blue */
+    --accent3: #334155;        /* Slate Depth */
+    --text: #1E293B;           /* Professional Navy Grey */
+    --muted: #64748B;          /* Cool Slate Muted */
+    --card: rgba(255, 255, 255, 0.6); /* High-Clarity Frosted Glass */
+    
+    /* Functional Colors */
+    --warning: #B45309;        /* Warm Amber */
+    --danger: #9F1239;         /* Deep Crimson */
+    --safe: #059669;           /* Emerald Lagoon */
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.6;
+}
+
+/* AMBIENT AQUATIC GRADIENTS */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(circle at 15% 15%, rgba(8, 145, 178, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(15, 23, 42, 0.05) 0%, transparent 40%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* SYNCED PRODUCT GRID */
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(8, 145, 178, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(8, 145, 178, 0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.container { max-width: 1100px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+/* HEADER */
+header {
+    border-bottom: 1px solid var(--border);
+    padding: 24px 0;
+    position: sticky;
+    top: 0;
+    background: rgba(240, 247, 249, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    z-index: 100;
+}
+
+.header-inner { display: flex; align-items: center; justify-content: space-between; }
+
+.logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    color: var(--accent2);
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+.logo span { color: var(--accent); }
+
+.page-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.page-nav { display: flex; gap: 12px; }
+.page-nav a {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 4px;
+}
+.page-nav a.active, .page-nav a:hover {
+    color: #fff;
+    background: var(--accent2);
+    border-color: var(--accent2);
+}
+
+/* HERO */
+.hero { padding: 100px 0 80px; text-align: center; }
+.hero-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    font-weight: 700;
+}
+.hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(42px, 8vw, 84px);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    color: var(--accent2);
+}
+.hero-sub {
+    font-size: 18px;
+    color: var(--accent3);
+    max-width: 600px;
+    margin: 0 auto 40px;
+    line-height: 1.8;
+}
+.tool-count {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    display: inline-block;
+    padding-top: 24px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+.tool-count strong { color: var(--accent); }
+
+/* TOOL GRID */
+.tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 32px; margin-bottom: 100px; }
+
+/* TOOL CARD - UNIFIED GLASSMorphism */
+.tool-card {
+    background: var(--card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    padding: 32px;
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-shadow: 0 10px 40px rgba(15, 23, 42, 0.03);
+}
+.tool-card:hover {
+    transform: translateY(-12px);
+    background: rgba(255, 255, 255, 0.85);
+    border-color: var(--accent);
+    box-shadow: 0 30px 60px rgba(8, 145, 178, 0.12);
+}
+.tool-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--accent); transform: scaleX(0); transform-origin: left;
+    transition: transform 0.4s ease;
+}
+.tool-card:hover::before { transform: scaleX(1); }
+
+.tool-num { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--accent); font-weight: 700; margin-bottom: 16px; display: block; opacity: 0.6; }
+.tool-title { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 700; margin-bottom: 12px; color: var(--accent2); }
+.tool-desc { font-size: 14px; color: var(--accent3); opacity: 0.8; line-height: 1.6; margin-bottom: 24px; }
+
+/* FORM ELEMENTS */
+.tool-form { display: flex; flex-direction: column; gap: 14px; }
+.field-row { display: flex; flex-direction: column; gap: 6px; }
+.field-label { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 10px; font-weight: 800; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; }
+
+input[type="number"], input[type="range"], select {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    padding: 12px 16px;
+    width: 100%;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    outline: none;
+}
+input[type="number"]:focus, select:focus { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 4px rgba(8, 145, 178, 0.1); }
+input[type="range"] { accent-color: var(--accent); height: 4px; background: rgba(8, 145, 178, 0.1); padding: 0; }
+
+.btn {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent2);
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 8px;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+}
+.btn:hover { background: var(--accent); transform: scale(1.03); }
+
+/* BUTTON VARIANTS SYNCED TO THEME */
+.btn-orange { background: var(--warning); }
+.btn-blue { background: var(--accent); }
+
+/* RESULT BOX */
+.result {
+    display: none; margin-top: 24px; padding: 24px;
+    border-radius: 12px; border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.7);
+    animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.result.show { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+.result-label { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; }
+.result-value { font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 700; color: var(--accent); }
+.result-detail { font-size: 14px; color: var(--accent3); margin-top: 8px; line-height: 1.6; }
+
+/* FEEDBACK COLORS */
+.result-safe { color: var(--safe); }
+.result-warning { color: var(--warning); }
+.result-danger { color: var(--danger); }
+.result-blue { color: var(--accent); }
+
+.score-bar { height: 6px; background: rgba(8, 145, 178, 0.08); margin-top: 15px; border-radius: 3px; overflow: hidden; }
+.score-fill { height: 100%; border-radius: 3px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); background: var(--accent); }
+.slider-val { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--accent); font-weight: 700; text-align: right; }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* FOOTER */
+footer { border-top: 1px solid var(--border); padding: 48px 0; text-align: center; background: rgba(255, 255, 255, 0.3); }
+.footer-text { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px; color: var(--muted); font-weight: 500; }
+.footer-text a { color: var(--accent); font-weight: 700; text-decoration: none; border-bottom: 1.5px solid var(--accent); }
+
+@media (max-width: 600px) {
+    .tools-grid { grid-template-columns: 1fr; gap: 24px; }
+    .hero h1 { font-size: 42px; }
+    .page-nav { display: none; }
+    .two-col { grid-template-columns: 1fr; }
+}
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container header-inner">
+    <div class="logo">BASIS <span>/ SHOONYA ORIGINS</span></div>
+    <div class="page-nav">
+      <a href="basis-tools-1.html">01 — SAFETY</a>
+      <a href="basis-tools-2.html" class="active">02 — ENVIRONMENT</a>
+      <a href="basis-tools-3.html">03 — CIVIC</a>
+    </div>
+    <div class="page-tag">PAGE 2 / 3</div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <div class="hero">
+      <div class="hero-label">Urban Intelligence Toolset · Free · Browser-Native</div>
+      <h1>Environment<br>& Resources</h1>
+      <p class="hero-sub">Physics and data tools for water, energy, heat, green cover, and sustainable living in Indian cities. All calculations run locally in your browser.</p>
+      <div class="tool-count"><strong>10 Tools</strong> · Page 2 of 3 · 30 Total</div>
+    </div>
+
+    <div class="tools-grid">
+
+      <!-- TOOL 11: Rainwater Harvesting -->
+      <div class="tool-card" style="--card-accent: #00e5ff;">
+        <div class="tool-num">T-011 · WATER</div>
+        <div class="tool-title">Rainwater Harvest Potential</div>
+        <div class="tool-desc">Calculate how many free liters of water your rooftop is wasting to the drain every monsoon. Based on Maharashtra rainfall averages.</div>
+        <div class="tool-form">
+          <div class="field-row">
+            <div class="field-label">Rooftop / Terrace Area (sq. ft)</div>
+            <input type="number" id="rwh-area" placeholder="e.g. 800" min="10" max="50000">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Location / Annual Rainfall</div>
+            <select id="rwh-rain">
+              <option value="600">Nanded (~600 mm/yr)</option>
+              <option value="700" selected>Pune (~700 mm/yr)</option>
+              <option value="900">Nashik (~900 mm/yr)</option>
+              <option value="1200">Mumbai (~1200 mm/yr)</option>
+              <option value="2500">Konkan (~2500 mm/yr)</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Roof Surface Type</div>
+            <select id="rwh-surface">
+              <option value="0.85" selected>RCC / Concrete (85% efficiency)</option>
+              <option value="0.75">Tiles / Terracotta (75%)</option>
+              <option value="0.9">GI Sheet Metal (90%)</option>
+              <option value="0.6">Green Roof / Garden (60%)</option>
+            </select>
+          </div>
+          <button class="btn btn-blue" onclick="calcRWH()">CALCULATE →</button>
+        </div>
+        <div class="result" id="rwh-result">
+          <div class="result-label">ANNUAL HARVEST POTENTIAL</div>
+          <div class="result-value" id="rwh-val"></div>
+          <div class="result-detail" id="rwh-detail"></div>
+        </div>
+      </div>
+
+      <!-- TOOL 12: Urban Water Stress (LPCD) -->
+      <div class="tool-card" style="--card-accent: #00e5ff;">
+        <div class="tool-num">T-012 · WATER</div>
+        <div class="tool-title">Water Stress Index</div>
+        <div class="tool-desc">Are you wasting, normal, or stressed? India's urban standard is 135 LPCD. Find out where your household stands.</div>
+        <div class="tool-form">
+          <div class="field-row">
+            <div class="field-label">Monthly Water Bill / Meter Reading (liters)</div>
+            <input type="number" id="lpcd-liters" placeholder="e.g. 12000" min="100" max="1000000">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Number of People in Household</div>
+            <input type="number" id="lpcd-people" placeholder="e.g. 4" min="1" max="50">
+          </div>
+          <button class="btn btn-blue" onclick="calcLPCD()">CALCULATE →</button>
+        </div>
+        <div class="result" id="lpcd-result">
+          <div class="result-label">LITERS PER CAPITA PER DAY</div>
+          <div class="result-value" id="lpcd-val"></div>
+          <div class="result-detail" id="lpcd-detail"></div>
+          <div class="score-bar"><div class="score-fill" id="lpcd-bar"></div></div>
+        </div>
+      </div>
+
+      <!-- TOOL 13: Greywater Recovery -->
+      <div class="tool-card" style="--card-accent: #39ff14;">
+        <div class="tool-num">T-013 · WATER</div>
+        <div class="tool-title">Greywater Recovery</div>
+        <div class="tool-desc">How many toilet flushes could you save by recycling your shower, AC drain, or kitchen water? Simple daily math.</div>
+        <div class="tool-form">
+          <div class="field-row">
+            <div class="field-label">Daily Shower + Basin Water (liters)</div>
+            <input type="number" id="gw-shower" placeholder="e.g. 80" min="5" max="500">
+          </div>
+          <div class="field-row">
+            <div class="field-label">AC Drain Water per Day (liters)</div>
+            <input type="number" id="gw-ac" placeholder="e.g. 10" min="0" max="100">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Toilet Flush Volume (liters per flush)</div>
+            <select id="gw-flush">
+              <option value="6">Modern Dual Flush (6L)</option>
+              <option value="9" selected>Standard (9L)</option>
+              <option value="13">Old Cistern (13L)</option>
+            </select>
+          </div>
+          <button class="btn" onclick="calcGreywater()">CALCULATE →</button>
+        </div>
+        <div class="result" id="gw-result">
+          <div class="result-label">DAILY SAVINGS</div>
+          <div class="result-value" id="gw-val"></div>
+          <div class="result-detail" id="gw-detail"></div>
+        </div>
+      </div>
+
+      <!-- TOOL 14: Urban Heat Island Score -->
+      <div class="tool-card" style="--card-accent: #ffb347;">
+        <div class="tool-num">T-014 · THERMAL</div>
+        <div class="tool-title">Urban Heat Island Score</div>
+        <div class="tool-desc">How many degrees hotter is your terrace than it should be? Calculates the UHI effect based on your surface composition.</div>
+        <div class="tool-form">
+          <div class="field-row">
+            <div class="field-label">Concrete / Dark Surface (%)</div>
+            <input type="range" id="uhi-concrete" min="0" max="100" value="70" oninput="updateUHI()">
+            <div class="slider-val" id="uhi-concrete-val">70%</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Vegetation / Green (%)</div>
+            <input type="range" id="uhi-green" min="0" max="100" value="10" oninput="updateUHI()">
+            <div class="slider-val" id="uhi-green-val">10%</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Light / Reflective Surface (%)</div>
+            <input type="range" id="uhi-light" min="0" max="100" value="20" oninput="updateUHI()">
+            <div class="slider-val" id="uhi-light-val">20%</div>
+          </div>
+          <button class="btn btn-orange" onclick="calcUHI()">CALCULATE →</button>
+        </div>
+        <div class="result" id="uhi-result">
+          <div class="result-label">HEAT ISLAND EFFECT</div>
+          <div class="result-value" id="uhi-val"></div>
+          <div class="result-detail" id="uhi-detail"></div>
+          <div class="score-bar"><div class="score-fill" id="uhi-bar"></div></div>
+        </div>
+      </div>
+
+      <!-- TOOL 15: Vertical Garden Hydrator -->
+      <div class="tool-card" style="--card-accent: #39ff14;">
+        <div class="tool-num">T-015 · GREEN LIVING</div>
+        <div class="tool-title">Balcony Garden Water Needs</div>
+        <div class="tool-desc">Exactly how many liters do your balcony plants need today? Based on evapotranspiration physics, not guesswork.</div>
+        <div class="tool-form">
+          <div class="field-row">
+            <div class="field-label">Number of Pots / Plants</div>
+            <input type="number" id="vg-pots" placeholder="e.g. 12" min="1" max="500">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Average Pot Size</div>
+            <select id="vg-size">
+              <option value="0.02">Small (< 6 inch)</option>
+              <option value="0.05" selected>Medium (6–10 inch)</option>
+              <option value="0.12">Large (10–14 inch)</option>
+              <option value="0.25">Extra Large (Grow Bag / Planter)</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Today's Temperature (°C)</div>
+            <input type="number" id="vg-temp" placeholder="e.g. 34" min="10" max="50">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Exposure</div>
+            <select id="vg-sun">
+              <option value="0.6">Shaded Balcony</option>
+              <option value="0.85" selected>Partial Sun</option>
+              <option value="1.2">Full Sun / Open Terrace</option>
+            </select>
+          </div>
+          <button class="btn" onclick="calcGarden()">CALCULATE →</button>
+        </div>
+        <div class="result" id="vg-result">
+          <div class="result-label">WATER NEEDED TODAY</div>
+          <div class="result-value" id="vg-val"></div>
+          <div class="result-detail" id="vg-detail"></div>
+        </div>
+      </div>
+
+      <!-- TOOL 16: Solar Payback Predictor -->
+      <div class="tool-card" style="--card-accent: #ffb347;">
+        <div class="tool-num">T-016 · ENERGY</div>
+        <div class="tool-title">Solar Payback Calculator</div>
+        <div class="tool-desc">How many months until your rooftop solar pays for itself? Uses PM Surya Ghar subsidy structure and Maharashtra tariff rates.</div>
+        <div class="tool-form">
+          <div class="field-row">
+            <div class="field-label">Monthly Electricity Bill (₹)</div>
+            <input type="number" id="sol2-bill" placeholder="e.g. 2500" min="100" max="100000">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Available Roof Area (sq. ft)</div>
+            <input type="number" id="sol2-area" placeholder="e.g. 300" min="50" max="5000">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Ownership Type</div>
+            <select id="sol2-own">
+              <option value="res">Residential (up to ₹78,000 subsidy)</option>
+              <option value="com">Commercial / Society (no central subsidy)</option>
+            </select>
+          </div>
+          <button class="btn btn-orange" onclick="calcSolar2()">CALCULATE →</button>
+        </div>
+        <div class="result" id="sol2-result">
+          <div class="result-label">PAYBACK PERIOD</div>
+          <div class="result-value" id="sol2-val"></div>
+          <div class="result-detail" id="sol2-detail"></div>
+        </div>
+      </div>
+
+      <!-- TOOL 17: Organic Waste Biogas -->
+      <div class="tool-card" style="--card-accent: #39ff14;">
+        <div class="tool-num">T-017 · WASTE</div>
+        <div class="tool-title">Kitchen Waste → Biogas</div>
+        <div class="tool-desc">If your society had a biogas unit, how many minutes of cooking gas could your kitchen waste generate? Converts kg to usable energy.</div>
+        <div class="tool-form">
+          <div class="field-row">
+            <div class="field-label">Wet Kitchen Waste per Day (kg)</div>
+            <input type="number" id="bg-waste" placeholder="e.g. 1.5" step="0.1" min="0.1" max="100">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Number of Households Contributing</div>
+            <input type="number" id="bg-homes" placeholder="e.g. 20" min="1" max="1000">
+          </div>
+          <button class="btn" onclick="calcBiogas()">CALCULATE →</button>
+        </div>
+        <div class="result" id="bg-result">
+          <div class="result-label">DAILY BIOGAS OUTPUT</div>
+          <div class="result-value" id="bg-val"></div>
+          <div class="result-detail" id="bg-detail"></div>
+        </div>
+      </div>
+
+      <!-- TOOL 18: Urban Tree Canopy Benefit -->
+      <div class="tool-card" style="--card-accent: #39ff14;">
+        <div class="tool-num">T-018 · GREEN COVER</div>
+        <div class="tool-title">Urban Tree Canopy Benefit</div>
+        <div class="tool-desc">How much CO₂ are the trees on your street absorbing? What temperature drop do they create? Hard numbers for tree-cover advocacy.</div>
+        <div class="tool-form">
+          <div class="field-row">
+            <div class="field-label">Number of Mature Trees on Street</div>
+            <input type="number" id="tree-count" placeholder="e.g. 15" min="1" max="10000">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Dominant Tree Type</div>
+            <select id="tree-type">
+              <option value="neem">Neem (high sequestration)</option>
+              <option value="banyan" selected>Banyan / Peepal (very high canopy)</option>
+              <option value="gulmohar">Gulmohar (moderate)</option>
+              <option value="palm">Palm (low canopy value)</option>
+              <option value="mixed">Mixed / Unknown</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Street Width (meters)</div>
+            <input type="number" id="tree-width" placeholder="e.g. 10" min="2" max="100">
+          </div>
+          <button class="btn" onclick="calcTree()">CALCULATE →</button>
+        </div>
+        <div class="result" id="tree-result">
+          <div class="result-label">ANNUAL ECOSYSTEM BENEFIT</div>
+          <div class="result-value" id="tree-val"></div>
+          <div class="result-detail" id="tree-detail"></div>
+        </div>
+      </div>
+
+      <!-- TOOL 19: EV Charging Wait Predictor -->
+      <div class="tool-card" style="--card-accent: #00e5ff;">
+        <div class="tool-num">T-019 · MOBILITY</div>
+        <div class="tool-title">EV Charging Wait Time</div>
+        <div class="tool-desc">How long will you wait at a charging station? Estimates queue time based on charger count, charge duration, and peak hour demand.</div>
+        <div class="tool-form">
+          <div class="field-row">
+            <div class="field-label">Number of Charging Points</div>
+            <input type="number" id="ev-points" placeholder="e.g. 4" min="1" max="100">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Average Charge Duration (minutes)</div>
+            <input type="number" id="ev-duration" placeholder="e.g. 40" min="5" max="480">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Vehicles Arriving per Hour (your estimate)</div>
+            <input type="number" id="ev-arrival" placeholder="e.g. 8" min="1" max="200">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Time of Day</div>
+            <select id="ev-peak">
+              <option value="0.6">Off-peak (late night / midday)</option>
+              <option value="1.0" selected>Normal hours</option>
+              <option value="1.5">Evening peak (6–9 PM)</option>
+              <option value="1.8">Weekend / Holiday peak</option>
+            </select>
+          </div>
+          <button class="btn btn-blue" onclick="calcEV()">CALCULATE →</button>
+        </div>
+        <div class="result" id="ev-result">
+          <div class="result-label">ESTIMATED WAIT TIME</div>
+          <div class="result-value" id="ev-val"></div>
+          <div class="result-detail" id="ev-detail"></div>
+        </div>
+      </div>
+
+      <!-- TOOL 20: Carbon-Free Commute Tracker -->
+      <div class="tool-card" style="--card-accent: #39ff14;">
+        <div class="tool-num">T-020 · MOBILITY</div>
+        <div class="tool-title">Carbon-Free Commute Score</div>
+        <div class="tool-desc">Log today's commute and see how much CO₂ you saved by walking, cycling, or taking public transport over a petrol vehicle.</div>
+        <div class="tool-form">
+          <div class="field-row">
+            <div class="field-label">Distance Traveled (km)</div>
+            <input type="number" id="co2-km" placeholder="e.g. 5" min="0.1" max="500" step="0.1">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Mode You Used</div>
+            <select id="co2-used">
+              <option value="0">Walking (0 g CO₂/km)</option>
+              <option value="0">Cycling (0 g CO₂/km)</option>
+              <option value="22">Electric Two-Wheeler (22 g)</option>
+              <option value="50">E-Bus / Metro (50 g)</option>
+              <option value="80">Auto-Rickshaw / CNG (80 g)</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Alternative Would Have Been</div>
+            <select id="co2-alt">
+              <option value="90">Petrol Two-Wheeler (90 g/km)</option>
+              <option value="120" selected>Petrol Car (120 g/km)</option>
+              <option value="180">Diesel Car (180 g/km)</option>
+              <option value="250">SUV / Large Vehicle (250 g/km)</option>
+            </select>
+          </div>
+          <button class="btn" onclick="calcCO2()">CALCULATE →</button>
+        </div>
+        <div class="result" id="co2-result">
+          <div class="result-label">CO₂ SAVED TODAY</div>
+          <div class="result-value" id="co2-val"></div>
+          <div class="result-detail" id="co2-detail"></div>
+        </div>
+      </div>
+
+    </div><!-- /tools-grid -->
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-text">
+      <a href="basis-tools-1.html">← SAFETY TOOLS</a> ·
+      BASIS URBAN OS · SHOONYA ORIGINS · FREE FOREVER ·
+      <a href="basis-tools-3.html">NEXT: CIVIC TOOLS →</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ─── TOOL 11: Rainwater Harvesting ────────────────────────────────────────
+function calcRWH() {
+  const area = parseFloat(document.getElementById('rwh-area').value);
+  const rain = parseInt(document.getElementById('rwh-rain').value);
+  const eff = parseFloat(document.getElementById('rwh-surface').value);
+  if (!area) return alert('Enter rooftop area.');
+
+  const areaSqM = area * 0.0929;
+  const liters = Math.round(areaSqM * (rain / 1000) * eff * 1000);
+  const tanks = Math.round(liters / 1000);
+  const days = Math.round(liters / (4 * 135)); // 4 person household
+
+  document.getElementById('rwh-val').textContent = liters.toLocaleString() + ' liters/year';
+  document.getElementById('rwh-val').className = 'result-value result-blue';
+  document.getElementById('rwh-detail').textContent =
+    `= ${tanks} full 1000L tanks · Enough for ${days} days of water for a family of 4 at 135 LPCD standard · Currently draining to waste.`;
+  showResult('rwh');
+}
+
+// ─── TOOL 12: LPCD Water Stress ───────────────────────────────────────────
+function calcLPCD() {
+  const liters = parseFloat(document.getElementById('lpcd-liters').value);
+  const people = parseInt(document.getElementById('lpcd-people').value);
+  if (!liters || !people) return alert('Fill all fields.');
+
+  const lpcd = Math.round(liters / people / 30);
+  const status = lpcd < 70 ? 'WATER STRESSED' : lpcd < 100 ? 'BELOW STANDARD' : lpcd <= 170 ? 'NORMAL' : lpcd <= 250 ? 'COMFORTABLE' : 'OVER-CONSUMING';
+  const cls = lpcd < 70 ? 'result-danger' : lpcd < 100 ? 'result-warning' : lpcd <= 200 ? 'result-safe' : 'result-warning';
+  const advice = lpcd < 70 ? 'Critically low. Check for leaks and consider RWH.' :
+                 lpcd < 100 ? 'Below WHO minimum (100 LPCD). Audit usage patterns.' :
+                 lpcd <= 170 ? '✓ Within healthy range (BIS standard: 135 LPCD).' :
+                 lpcd <= 250 ? 'Slightly high. Check for running taps and inefficient fixtures.' :
+                 '⚠ High consumption. Audit for leaks, inefficient fixtures, or data error.';
+
+  document.getElementById('lpcd-val').textContent = lpcd + ' LPCD — ' + status;
+  document.getElementById('lpcd-val').className = 'result-value ' + cls;
+  document.getElementById('lpcd-detail').textContent = advice;
+  setBar('lpcd-bar', Math.min(100, (lpcd / 300) * 100), lpcd < 100 ? '#ff4444' : lpcd <= 170 ? '#39ff14' : '#ffb347');
+  showResult('lpcd');
+}
+
+// ─── TOOL 13: Greywater Recovery ─────────────────────────────────────────
+function calcGreywater() {
+  const shower = parseFloat(document.getElementById('gw-shower').value) || 0;
+  const ac = parseFloat(document.getElementById('gw-ac').value) || 0;
+  const flush = parseInt(document.getElementById('gw-flush').value);
+  if (!shower) return alert('Enter shower water usage.');
+
+  const recoverable = (shower + ac) * 0.7;
+  const flushes = Math.floor(recoverable / flush);
+  const annualSaved = Math.round(recoverable * 365);
+  const annualKL = (annualSaved / 1000).toFixed(1);
+
+  document.getElementById('gw-val').textContent = Math.round(recoverable) + ' L/day · ' + flushes + ' flushes saved';
+  document.getElementById('gw-val').className = 'result-value result-blue';
+  document.getElementById('gw-detail').textContent =
+    `Annual saving: ${annualSaved.toLocaleString()} liters (${annualKL} KL) · At ₹30/KL → ₹${Math.round(annualKL * 30)}/year saved.`;
+  showResult('gw');
+}
+
+// ─── TOOL 14: Urban Heat Island ───────────────────────────────────────────
+function updateUHI() {
+  document.getElementById('uhi-concrete-val').textContent = document.getElementById('uhi-concrete').value + '%';
+  document.getElementById('uhi-green-val').textContent = document.getElementById('uhi-green').value + '%';
+  document.getElementById('uhi-light-val').textContent = document.getElementById('uhi-light').value + '%';
+}
+
+function calcUHI() {
+  const concrete = parseInt(document.getElementById('uhi-concrete').value);
+  const green = parseInt(document.getElementById('uhi-green').value);
+  const light = parseInt(document.getElementById('uhi-light').value);
+
+  // Albedo factors: concrete=0.2, green=0.25, light=0.65
+  const albedo = (concrete * 0.20 + green * 0.25 + light * 0.65) / 100;
+  // UHI temp increase: dark surfaces absorb more, green cools through evapotranspiration
+  const concretePenalty = concrete * 0.06; // °C per %
+  const greenBonus = green * 0.04;
+  const lightBonus = light * 0.02;
+  const uhiDelta = Math.max(0, concretePenalty - greenBonus - lightBonus).toFixed(1);
+  const pct = Math.min(100, (uhiDelta / 6) * 100);
+
+  const severity = uhiDelta < 1 ? 'Minimal UHI' : uhiDelta < 2 ? 'Moderate warming' : uhiDelta < 4 ? 'Significant UHI' : 'Severe heat island';
+  const fix = uhiDelta < 1 ? 'Surface composition is healthy.' :
+              `Adding ${Math.round((100 - green) * 0.3)}% more vegetation could reduce temperature by ~${(uhiDelta * 0.4).toFixed(1)}°C.`;
+
+  document.getElementById('uhi-val').textContent = '+' + uhiDelta + '°C hotter than baseline';
+  document.getElementById('uhi-val').className = 'result-value ' + (uhiDelta < 1 ? 'result-safe' : uhiDelta < 3 ? 'result-warning' : 'result-danger');
+  document.getElementById('uhi-detail').textContent = severity + ' · Albedo: ' + albedo.toFixed(2) + ' · ' + fix;
+  setBar('uhi-bar', pct, uhiDelta < 1 ? '#39ff14' : uhiDelta < 3 ? '#ffb347' : '#ff4444');
+  showResult('uhi');
+}
+
+// ─── TOOL 15: Balcony Garden Water ───────────────────────────────────────
+function calcGarden() {
+  const pots = parseInt(document.getElementById('vg-pots').value);
+  const size = parseFloat(document.getElementById('vg-size').value);
+  const temp = parseFloat(document.getElementById('vg-temp').value);
+  const sun = parseFloat(document.getElementById('vg-sun').value);
+  if (!pots || !temp) return alert('Fill all fields.');
+
+  // ET0 simplified: base evapotranspiration increases with temp and exposure
+  const ET0 = ((temp - 10) / 40) * 6 * sun; // mm/day baseline
+  const waterPerPot = size * ET0 * 1; // liters (1L per mm per m²)
+  const totalLiters = (pots * waterPerPot).toFixed(1);
+
+  const timing = temp > 38 ? 'Water in the evening only to minimize evaporation loss.' :
+                 temp > 30 ? 'Water early morning or evening.' : 'Morning watering is fine today.';
+
+  document.getElementById('vg-val').textContent = totalLiters + ' liters today';
+  document.getElementById('vg-val').className = 'result-value result-safe';
+  document.getElementById('vg-detail').textContent = `${(waterPerPot).toFixed(2)} L per pot · Temp: ${temp}°C · ${timing}`;
+  showResult('vg');
+}
+
+// ─── TOOL 16: Solar Payback ───────────────────────────────────────────────
+function calcSolar2() {
+  const bill = parseFloat(document.getElementById('sol2-bill').value);
+  const area = parseFloat(document.getElementById('sol2-area').value);
+  const own = document.getElementById('sol2-own').value;
+  if (!bill || !area) return alert('Fill all fields.');
+
+  // 1 kW solar needs ~100 sq.ft, generates ~4 kWh/day in Maharashtra
+  const capacityKW = Math.min(area / 100, bill / 500 * 2); // fit to roof and bill
+  const annualGenKWh = capacityKW * 4 * 365;
+  const tariff = 8.5; // MSEDCL avg ₹/kWh
+  const annualSaving = Math.round(annualGenKWh * tariff);
+  const installCost = capacityKW * 65000; // ₹65k per kW installed
+  const subsidy = own === 'res' ? Math.min(78000, capacityKW <= 2 ? capacityKW * 30000 : 60000 + (capacityKW - 2) * 18000) : 0;
+  const netCost = installCost - subsidy;
+  const paybackMonths = Math.round((netCost / annualSaving) * 12);
+  const lifetime25yr = Math.round(annualSaving * 25 - netCost);
+
+  document.getElementById('sol2-val').textContent = paybackMonths + ' months';
+  document.getElementById('sol2-val').className = 'result-value ' + (paybackMonths < 60 ? 'result-safe' : paybackMonths < 96 ? 'result-warning' : 'result-danger');
+  document.getElementById('sol2-detail').textContent =
+    `System: ${capacityKW.toFixed(1)} kW · Install cost: ₹${netCost.toLocaleString()} (after ₹${Math.round(subsidy).toLocaleString()} subsidy) · ` +
+    `Annual saving: ₹${annualSaving.toLocaleString()} · 25-yr net benefit: ₹${lifetime25yr.toLocaleString()}`;
+  showResult('sol2');
+}
+
+// ─── TOOL 17: Biogas from Kitchen Waste ──────────────────────────────────
+function calcBiogas() {
+  const wastePerHome = parseFloat(document.getElementById('bg-waste').value);
+  const homes = parseInt(document.getElementById('bg-homes').value);
+  if (!wastePerHome || !homes) return alert('Fill all fields.');
+
+  const totalWaste = wastePerHome * homes;
+  // ~0.04 m³ biogas per kg wet waste
+  const biogasM3 = totalWaste * 0.04;
+  // 1 m³ biogas ≈ 25 min cooking on 1 burner
+  const cookingMins = Math.round(biogasM3 * 25);
+  const annualKg = Math.round(totalWaste * 365 / 1000);
+
+  document.getElementById('bg-val').textContent = biogasM3.toFixed(2) + ' m³/day · ' + cookingMins + ' min cooking';
+  document.getElementById('bg-val').className = 'result-value result-safe';
+  document.getElementById('bg-detail').textContent =
+    `Total waste: ${totalWaste.toFixed(1)} kg/day · Annual input: ${annualKg} tonnes · ` +
+    `Equivalent to ${Math.round(cookingMins / 60 * 365)} hours of free cooking per year for this community.`;
+  showResult('bg');
+}
+
+// ─── TOOL 18: Tree Canopy Benefit ────────────────────────────────────────
+function calcTree() {
+  const count = parseInt(document.getElementById('tree-count').value);
+  const type = document.getElementById('tree-type').value;
+  const width = parseFloat(document.getElementById('tree-width').value);
+  if (!count || !width) return alert('Fill all fields.');
+
+  // Annual CO2 sequestration per mature tree (kg)
+  const co2 = { neem: 22, banyan: 45, gulmohar: 18, palm: 6, mixed: 20 };
+  const canopy = { neem: 20, banyan: 50, gulmohar: 15, palm: 5, mixed: 20 }; // sq.m coverage
+
+  const totalCO2 = count * co2[type];
+  const totalCanopy = count * canopy[type];
+  const streetArea = width * 100; // assume 100m street
+  const coverPct = Math.min(100, Math.round((totalCanopy / streetArea) * 100));
+  const tempDrop = (coverPct * 0.04).toFixed(1); // ~0.04°C per % canopy
+
+  document.getElementById('tree-val').textContent = totalCO2.toLocaleString() + ' kg CO₂/year';
+  document.getElementById('tree-val').className = 'result-value result-safe';
+  document.getElementById('tree-detail').textContent =
+    `Canopy coverage: ${coverPct}% of street area · Temperature reduction: −${tempDrop}°C · ` +
+    `Rainfall absorbed: ~${Math.round(count * 15)} KL/year · Equivalent to planting ${Math.round(totalCO2 / 20)} standard trees worth of offset.`;
+  showResult('tree');
+}
+
+// ─── TOOL 19: EV Charging Wait ───────────────────────────────────────────
+function calcEV() {
+  const points = parseInt(document.getElementById('ev-points').value);
+  const duration = parseInt(document.getElementById('ev-duration').value);
+  const arrival = parseInt(document.getElementById('ev-arrival').value);
+  const peak = parseFloat(document.getElementById('ev-peak').value);
+  if (!points || !duration || !arrival) return alert('Fill all fields.');
+
+  // M/M/c Erlang C approximation simplified
+  const effectiveArrival = arrival * peak;
+  const serviceRate = (60 / duration) * points; // vehicles/hr station can handle
+  const utilization = effectiveArrival / serviceRate;
+
+  let waitMin;
+  if (utilization >= 1) {
+    waitMin = 999; // system overloaded
+  } else {
+    // Simplified wait: queue buildup
+    waitMin = Math.round((utilization / (1 - utilization)) * (duration / points));
+    waitMin = Math.max(0, waitMin);
+  }
+
+  const cls = waitMin === 0 ? 'result-safe' : waitMin < 20 ? 'result-warning' : 'result-danger';
+  const msg = waitMin === 999 ? '🚨 Station overloaded. Expect very long waits or find another charger.' :
+              waitMin === 0 ? '✓ Likely available immediately.' :
+              waitMin < 20 ? 'Short wait. Manageable.' :
+              'Significant wait. Consider off-peak charging.';
+
+  document.getElementById('ev-val').textContent = waitMin === 999 ? 'OVERLOADED' : waitMin + ' min wait';
+  document.getElementById('ev-val').className = 'result-value ' + cls;
+  document.getElementById('ev-detail').textContent = msg + ` · Station utilization: ${Math.round(utilization * 100)}% · ${points} chargers · ${duration} min/charge`;
+  showResult('ev');
+}
+
+// ─── TOOL 20: Carbon Commute ─────────────────────────────────────────────
+function calcCO2() {
+  const km = parseFloat(document.getElementById('co2-km').value);
+  const used = parseInt(document.getElementById('co2-used').value);
+  const alt = parseInt(document.getElementById('co2-alt').value);
+  if (!km) return alert('Enter distance.');
+
+  const savedG = (alt - used) * km;
+  const savedKg = (savedG / 1000).toFixed(3);
+  const annualKg = ((savedG / 1000) * 250).toFixed(1); // 250 working days
+  const trees = (annualKg / 20).toFixed(1);
+
+  document.getElementById('co2-val').textContent = savedKg + ' kg CO₂ saved';
+  document.getElementById('co2-val').className = 'result-value result-safe';
+  document.getElementById('co2-detail').textContent =
+    `If you do this daily: ${annualKg} kg CO₂/year saved · Equivalent to planting ${trees} trees · ` +
+    `Distance: ${km} km · Your mode: ${used}g/km vs ${alt}g/km alternative.`;
+  showResult('co2');
+}
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────
+function showResult(id) {
+  const el = document.getElementById(id + '-result');
+  el.classList.add('show');
+}
+
+function setBar(id, pct, color) {
+  const bar = document.getElementById(id);
+  if (!bar) return;
+  bar.style.width = pct + '%';
+  bar.style.background = color;
+}
+</script>
+</body>
+</html>
