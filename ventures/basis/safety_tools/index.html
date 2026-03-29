@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Basis — Urban Safety & Structure Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=Space+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=Space+Mono&display=swap');
+
+:root {
+    /* --- OCEANIC PROFESSIONAL PALETTE --- */
+    --bg: #F0F7F9;             /* Soft Arctic Mist */
+    --surface: rgba(224, 242, 254, 0.3); /* Translucent Sea Foam */
+    --border: rgba(8, 145, 178, 0.12);    /* Subtle Teal border */
+    --accent: #0891B2;         /* Deep Mediterranean Teal */
+    --accent2: #0F172A;        /* Midnight Anchor Blue */
+    --accent3: #334155;        /* Slate Depth */
+    --text: #1E293B;           /* Professional Navy Grey */
+    --muted: #64748B;          /* Cool Slate Muted */
+    --card: rgba(255, 255, 255, 0.6); /* High-Clarity Frosted Glass */
+    
+    /* Functional Colors (Refined) */
+    --warning: #B45309;        /* Warm Amber (Beacon) */
+    --danger: #9F1239;         /* Deep Crimson */
+    --safe: #059669;           /* Emerald Lagoon */
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.6;
+}
+
+/* AMBIENT AQUATIC GRADIENTS */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(circle at 5% 5%, rgba(8, 145, 178, 0.07) 0%, transparent 40%),
+        radial-gradient(circle at 95% 95%, rgba(15, 23, 42, 0.04) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.5) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* REFINED COOL GRID */
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(8, 145, 178, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(8, 145, 178, 0.05) 1px, transparent 1px);
+    background-size: 80px 80px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.container { max-width: 1100px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+/* HEADER */
+header {
+    border-bottom: 1px solid var(--border);
+    padding: 24px 0;
+    position: sticky;
+    top: 0;
+    background: rgba(240, 247, 249, 0.8); /* Cool glass nav */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    z-index: 100;
+}
+
+.header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    color: var(--accent2);
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+
+.logo span { color: var(--accent); }
+
+.page-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.page-nav {
+    display: flex;
+    gap: 12px;
+}
+
+.page-nav a {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.4);
+}
+
+.page-nav a.active, .page-nav a:hover {
+    color: #fff;
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 4px 12px rgba(8, 145, 178, 0.2);
+}
+
+/* HERO */
+.hero {
+    padding: 100px 0 80px;
+    text-align: center;
+}
+
+.hero-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    font-weight: 700;
+}
+
+.hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(42px, 8vw, 84px);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    color: var(--accent2);
+}
+
+.hero-sub {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--accent3);
+    max-width: 600px;
+    margin: 0 auto 40px;
+    line-height: 1.8;
+    opacity: 0.9;
+}
+
+.tool-count {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    display: inline-block;
+    padding-top: 24px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.tool-count strong { color: var(--accent); }
+
+/* TOOL GRID */
+.tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 32px;
+    margin-bottom: 100px;
+}
+
+/* TOOL CARD - DEEP OCEAN GLASS */
+.tool-card {
+    background: var(--card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    padding: 32px;
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-shadow: 0 10px 40px rgba(15, 23, 42, 0.03);
+}
+
+.tool-card:hover {
+    transform: translateY(-12px);
+    background: rgba(255, 255, 255, 0.85);
+    border-color: var(--accent);
+    box-shadow: 0 30px 60px rgba(8, 145, 178, 0.12);
+}
+
+.tool-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: block;
+    opacity: 0.6;
+}
+
+.tool-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--accent2);
+}
+
+.tool-desc {
+    font-size: 14px;
+    color: var(--accent3);
+    opacity: 0.8;
+    line-height: 1.6;
+    margin-bottom: 24px;
+}
+
+/* FORM ELEMENTS */
+.tool-form { display: flex; flex-direction: column; gap: 14px; }
+.field-row { display: flex; flex-direction: column; gap: 6px; }
+
+.field-label {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+input[type="number"], select {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    padding: 12px 16px;
+    width: 100%;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+input[type="number"]:focus, select:focus {
+    border-color: var(--accent);
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(8, 145, 178, 0.1);
+}
+
+.btn {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent2);
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 8px;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+}
+
+.btn:hover { background: var(--accent); transform: scale(1.03); }
+
+/* RESULT BOX */
+.result {
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.7);
+    padding: 24px;
+    box-shadow: inset 0 2px 4px rgba(8, 145, 178, 0.05);
+}
+
+.result-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.result-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 34px;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.result-detail {
+    font-size: 13px;
+    color: var(--accent3);
+    opacity: 0.9;
+}
+
+/* SLIDERS */
+input[type="range"] {
+    accent-color: var(--accent);
+    height: 4px;
+    background: rgba(8, 145, 178, 0.1);
+    border-radius: 2px;
+}
+
+/* FOOTER */
+footer {
+    border-top: 1px solid var(--border);
+    padding: 60px 0;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.footer-text {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.footer-text a {
+    color: var(--accent);
+    font-weight: 700;
+    text-decoration: none;
+    border-bottom: 1.5px solid var(--accent);
+    padding-bottom: 2px;
+}
+
+@media (max-width: 600px) {
+    .tools-grid { grid-template-columns: 1fr; gap: 24px; }
+    .hero { padding: 60px 0; }
+    .hero h1 { font-size: 42px; }
+}
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container header-inner">
+    <div class="logo">BASIS <span>/ SHOONYA ORIGINS</span></div>
+    <div class="page-nav">
+      <a href="basis-tools-1.html" class="active">01 — SAFETY</a>
+      <a href="basis-tools-2.html">02 — ENVIRONMENT</a>
+      <a href="basis-tools-3.html">03 — CIVIC</a>
+    </div>
+    <div class="page-tag">PAGE 1 / 3</div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <div class="hero">
+      <div class="hero-label">Urban Intelligence Toolset · Free · Browser-Native</div>
+      <h1>Safety &<br>Structure</h1>
+      <p class="hero-sub">Physics-based tools for structural safety, seismic risk, and urban hazard assessment. No sign-up. No servers. All calculations happen on your device.</p>
+      <div class="tool-count"><strong>10 Tools</strong> · Page 1 of 3 · 30 Total</div>
+    </div>
+
+    <div class="tools-grid">
+
+      <!-- TOOL 1: Fire Exit Clearance -->
+      <div class="tool-card" style="--card-accent: #ff4444;">
+        <div class="tool-num">T-001 · SAFETY</div>
+        <div class="tool-title">Fire-Exit Clearance</div>
+        <div class="tool-desc">Checks if your building hallway meets safe evacuation width per occupancy. Based on NBC 2016 norms.</div>
+        <div class="tool-form">
+          <div class="field-row">
+            <div class="field-label">Corridor Width (meters)</div>
+            <input type="number" id="fire-width" placeholder="e.g. 1.5" step="0.1" min="0.5" max="10">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Number of Residents on Floor</div>
+            <input type="number" id="fire-occ" placeholder="e.g. 24" min="1" max="500">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Building Type</div>
+            <select id="fire-type">
+              <option value="res">Residential</option>
+              <option value="com">Commercial</option>
+              <option value="edu">Educational</option>
+            </select>
+          </div>
+          <button class="btn btn-danger" onclick="calcFire()">CALCULATE →</button>
+        </div>
+        <div class="result" id="fire-result">
+          <div class="result-label">EVACUATION FLOW RATE</div>
+          <div class="result-value" id="fire-val"></div>
+          <div class="result-detail" id="fire-detail"></div>
+          <div class="score-bar"><div class="score-fill" id="fire-bar"></div></div>
+        </div>
+      </div>
+
+      <!-- TOOL 2: Building Age Seismic Risk -->
+      <div class="tool-card" style="--card-accent: #ff6b35;">
+        <div class="tool-num">T-002 · SEISMIC</div>
+        <div class="tool-title">Seismic Risk Score</div>
+        <div class="tool-desc">Estimates earthquake vulnerability based on construction year, floor count, wall type, and Maharashtra seismic zone data.</div>
+        <div class="tool-form">
+          <div class="field-row">
+            <div class="field-label">Year Built</div>
+            <input type="number" id="seis-year" placeholder="e.g. 1985" min="1900" max="2024">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Number of Floors</div>
+            <input type="number" id="seis-floors" placeholder="e.g. 6" min="1" max="50">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Wall Construction Type</div>
+            <select id="seis-wall">
+              <option value="rcc">RCC Frame</option>
+              <option value="brick">Load-bearing Brick</option>
+              <option value="stone">Stone Masonry</option>
+              <option value="pre">Pre-1980 Unreinforced</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Seismic Zone</div>
+            <select id="seis-zone">
+              <option value="2">Zone II (Low — Pune suburban)</option>
+              <option value="3" selected>Zone III (Moderate — Pune city)</option>
+              <option value="4">Zone IV (High — Koyna region)</option>
+            </select>
+          </div>
+          <button class="btn btn-warning" onclick="calcSeismic()">CALCULATE →</button>
+        </div>
+        <div class="result" id="seis-result">
+          <div class="result-label">VULNERABILITY SCORE (0–100)</div>
+          <div class="result-value" id="seis-val"></div>
+          <div class="result-detail" id="seis-detail"></div>
+          <div class="score-bar"><div class="score-fill" id="seis-bar"></div></div>
+        </div>
+      </div>
+
+      <!-- TOOL 3: Structural Load Safe -->
+      <div class="tool-card" style="--card-accent: #00e5ff;">
+        <div class="tool-num">T-003 · STRUCTURAL</div>
+        <div class="tool-title">Balcony Load Checker</div>
+        <div class="tool-desc">Can your balcony hold that water tank or potted garden? Calculates safe load based on slab type and area.</div>
+        <div class="tool-form">
+          <div class="field-row">
+            <div class="field-label">Balcony Area (sq. ft)</div>
+            <input type="number" id="load-area" placeholder="e.g. 40" min="4" max="500">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Slab Type</div>
+            <select id="load-slab">
+              <option value="rcc_new">RCC (Post 2000)</option>
+              <option value="rcc_old">RCC (Pre 2000)</option>
+              <option value="hc">Hollow Core Slab</option>
+              <option value="wood">Timber Frame</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Item Weight to Place (kg)</div>
+            <input type="number" id="load-weight" placeholder="e.g. 200" min="1" max="5000">
+          </div>
+          <button class="btn" onclick="calcLoad()">CALCULATE →</button>
+        </div>
+        <div class="result" id="load-result">
+          <div class="result-label">SAFE LOAD CAPACITY</div>
+          <div class="result-value" id="load-val"></div>
+          <div class="result-detail" id="load-detail"></div>
+          <div class="score-bar"><div class="score-fill" id="load-bar"></div></div>
+        </div>
+      </div>
+
+      <!-- TOOL 4: Pothole Tire Impact -->
+      <div class="tool-card" style="--card-accent: #ff6b35;">
+        <div class="tool-num">T-004 · ROAD PHYSICS</div>
+        <div class="tool-title">Pothole Impact Force</div>
+        <div class="tool-desc">Calculates the g-force your vehicle absorbs hitting a pothole. Scientific basis for civic complaints.</div>
+        <div class="tool-form">
+          <div class="field-row">
+            <div class="field-label">Vehicle Type</div>
+            <select id="pot-type">
+              <option value="bike">Two-Wheeler (~150 kg)</option>
+              <option value="car">Car (~1200 kg)</option>
+              <option value="auto">Auto-Rickshaw (~500 kg)</option>
+              <option value="truck">Light Truck (~3000 kg)</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Speed at Impact (km/h)</div>
+            <input type="number" id="pot-speed" placeholder="e.g. 30" min="1" max="120">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Pothole Depth (cm)</div>
+            <input type="number" id="pot-depth" placeholder="e.g. 8" min="1" max="40">
+          </div>
+          <button class="btn btn-warning" onclick="calcPothole()">CALCULATE →</button>
+        </div>
+        <div class="result" id="pot-result">
+          <div class="result-label">IMPACT FORCE</div>
+          <div class="result-value" id="pot-val"></div>
+          <div class="result-detail" id="pot-detail"></div>
+        </div>
+      </div>
+
+      <!-- TOOL 5: Crowd Crush Risk -->
+      <div class="tool-card" style="--card-accent: #ff4444;">
+        <div class="tool-num">T-005 · CROWD SAFETY</div>
+        <div class="tool-title">Crowd Crush Risk</div>
+        <div class="tool-desc">Based on Fruin's Level of Service model. Calculates crowd density risk for any gathering space.</div>
+        <div class="tool-form">
+          <div class="field-row">
+            <div class="field-label">Venue Area (sq. meters)</div>
+            <input type="number" id="crowd-area" placeholder="e.g. 500" min="10" max="100000">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Number of People</div>
+            <input type="number" id="crowd-people" placeholder="e.g. 800" min="1" max="100000">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Number of Exit Paths</div>
+            <input type="number" id="crowd-exits" placeholder="e.g. 2" min="1" max="20">
+          </div>
+          <button class="btn btn-danger" onclick="calcCrowd()">CALCULATE →</button>
+        </div>
+        <div class="result" id="crowd-result">
+          <div class="result-label">CROWD DENSITY & RISK LEVEL</div>
+          <div class="result-value" id="crowd-val"></div>
+          <div class="result-detail" id="crowd-detail"></div>
+          <div class="score-bar"><div class="score-fill" id="crowd-bar"></div></div>
+        </div>
+      </div>
+
+      <!-- TOOL 6: Acoustic Sleep Zone -->
+      <div class="tool-card" style="--card-accent: #00e5ff;">
+        <div class="tool-num">T-006 · ACOUSTICS</div>
+        <div class="tool-title">Acoustic Sleep-Zone</div>
+        <div class="tool-desc">Uses the Inverse Square Law to find which room in your home is quietest. Helps with noise-sensitive work, sleep, or study.</div>
+        <div class="tool-form">
+          <div class="field-row">
+            <div class="field-label">Road Noise at Source (dB)</div>
+            <select id="ac-source">
+              <option value="70">Light Traffic (~70 dB)</option>
+              <option value="80" selected>Heavy Traffic (~80 dB)</option>
+              <option value="90">Construction Site (~90 dB)</option>
+              <option value="100">Highway / Festival (~100 dB)</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Distance: Front Room from Road (m)</div>
+            <input type="number" id="ac-front" placeholder="e.g. 5" min="1" max="200">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Distance: Back Room from Road (m)</div>
+            <input type="number" id="ac-back" placeholder="e.g. 18" min="1" max="200">
+          </div>
+          <button class="btn" onclick="calcAcoustic()">CALCULATE →</button>
+        </div>
+        <div class="result" id="ac-result">
+          <div class="result-label">ROOM NOISE LEVELS</div>
+          <div class="result-value" id="ac-val"></div>
+          <div class="result-detail" id="ac-detail"></div>
+        </div>
+      </div>
+
+      <!-- TOOL 7: Air Exchange Timer -->
+      <div class="tool-card" style="--card-accent: #39ff14;">
+        <div class="tool-num">T-007 · AIR QUALITY</div>
+        <div class="tool-title">Air-Exchange Timer</div>
+        <div class="tool-desc">How many minutes to open your window to fully refresh stale or polluted indoor air? Based on ACH (Air Changes per Hour).</div>
+        <div class="tool-form">
+          <div class="field-row">
+            <div class="field-label">Room Volume (Length × Width × Height in m³)</div>
+            <input type="number" id="air-vol" placeholder="e.g. 36" min="4" max="1000">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Window Opening Area (sq. meters)</div>
+            <input type="number" id="air-win" placeholder="e.g. 1.2" step="0.1" min="0.1" max="20">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Wind Speed</div>
+            <select id="air-wind">
+              <option value="0.5">Calm / Still</option>
+              <option value="1.5" selected>Light Breeze</option>
+              <option value="3">Moderate Wind</option>
+              <option value="6">Strong Wind</option>
+            </select>
+          </div>
+          <button class="btn" onclick="calcAir()">CALCULATE →</button>
+        </div>
+        <div class="result" id="air-result">
+          <div class="result-label">TIME TO FULLY REFRESH AIR</div>
+          <div class="result-value" id="air-val"></div>
+          <div class="result-detail" id="air-detail"></div>
+        </div>
+      </div>
+
+      <!-- TOOL 8: Flood Risk Home -->
+      <div class="tool-card" style="--card-accent: #00e5ff;">
+        <div class="tool-num">T-008 · FLOOD RISK</div>
+        <div class="tool-title">Flood Risk Checker</div>
+        <div class="tool-desc">Estimates flood vulnerability for your home based on elevation, drainage proximity, and rainfall intensity. Relevant every monsoon.</div>
+        <div class="tool-form">
+          <div class="field-row">
+            <div class="field-label">Floor Level</div>
+            <select id="flood-floor">
+              <option value="0">Ground Floor / Basement</option>
+              <option value="1">First Floor</option>
+              <option value="2">Second Floor or Above</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Distance to Drain / Nullah (meters)</div>
+            <input type="number" id="flood-drain" placeholder="e.g. 50" min="0" max="1000">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Typical Monsoon Rainfall (mm/day)</div>
+            <select id="flood-rain">
+              <option value="50">Light (&lt;50 mm)</option>
+              <option value="100">Moderate (50–100 mm)</option>
+              <option value="150" selected>Heavy (100–150 mm — Pune avg)</option>
+              <option value="200">Very Heavy (150–200 mm)</option>
+              <option value="250">Extreme (&gt;200 mm)</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Street Drainage Quality</div>
+            <select id="flood-drain-q">
+              <option value="good">Good (drains in 1–2 hrs)</option>
+              <option value="avg" selected>Average (3–6 hrs)</option>
+              <option value="poor">Poor (stagnates &gt;6 hrs)</option>
+              <option value="none">Non-existent / Blocked</option>
+            </select>
+          </div>
+          <button class="btn" onclick="calcFlood()">CALCULATE →</button>
+        </div>
+        <div class="result" id="flood-result">
+          <div class="result-label">FLOOD RISK SCORE</div>
+          <div class="result-value" id="flood-val"></div>
+          <div class="result-detail" id="flood-detail"></div>
+          <div class="score-bar"><div class="score-fill" id="flood-bar"></div></div>
+        </div>
+      </div>
+
+      <!-- TOOL 9: Window Solar Gain -->
+      <div class="tool-card" style="--card-accent: #ffb347;">
+        <div class="tool-num">T-009 · THERMAL</div>
+        <div class="tool-title">Window Heat-Gain Map</div>
+        <div class="tool-desc">Which window is heating your home most at 2 PM? Place curtains or solar film intelligently using physics, not guesswork.</div>
+        <div class="tool-form">
+          <div class="field-row">
+            <div class="field-label">Window Facing Direction</div>
+            <select id="sol-dir">
+              <option value="N">North</option>
+              <option value="NE">North-East</option>
+              <option value="E">East</option>
+              <option value="SE">South-East</option>
+              <option value="S" selected>South</option>
+              <option value="SW">South-West (worst in India)</option>
+              <option value="W">West</option>
+              <option value="NW">North-West</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Window Glass Area (sq. ft)</div>
+            <input type="number" id="sol-area" placeholder="e.g. 12" min="1" max="200">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Glass Type</div>
+            <select id="sol-glass">
+              <option value="single">Single Pane (clear)</option>
+              <option value="tinted">Tinted / Film</option>
+              <option value="double">Double Glazed</option>
+            </select>
+          </div>
+          <button class="btn btn-warning" onclick="calcSolar()">CALCULATE →</button>
+        </div>
+        <div class="result" id="sol-result">
+          <div class="result-label">PEAK HEAT GAIN</div>
+          <div class="result-value" id="sol-val"></div>
+          <div class="result-detail" id="sol-detail"></div>
+        </div>
+      </div>
+
+      <!-- TOOL 10: Infrastructure Decay Index -->
+      <div class="tool-card" style="--card-accent: #ff6b35;">
+        <div class="tool-num">T-010 · INFRASTRUCTURE</div>
+        <div class="tool-title">Infrastructure Priority Score</div>
+        <div class="tool-desc">Triage public issues scientifically. Ranks a civic problem by severity, people affected, and fix complexity — giving it a Priority Score.</div>
+        <div class="tool-form">
+          <div class="field-row">
+            <div class="field-label">Issue Severity (1 = Minor, 10 = Critical)</div>
+            <input type="range" id="infra-sev" min="1" max="10" value="5" oninput="document.getElementById('infra-sev-val').textContent=this.value">
+            <div class="slider-val" id="infra-sev-val">5</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">People Affected Daily</div>
+            <input type="number" id="infra-people" placeholder="e.g. 300" min="1" max="100000">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Fix Complexity</div>
+            <select id="infra-fix">
+              <option value="1">Simple (1 day, basic labor)</option>
+              <option value="3">Moderate (1 week, machinery)</option>
+              <option value="6">Complex (1 month, planning)</option>
+              <option value="10">Major (6+ months, tender)</option>
+            </select>
+          </div>
+          <button class="btn" onclick="calcInfra()">CALCULATE →</button>
+        </div>
+        <div class="result" id="infra-result">
+          <div class="result-label">PRIORITY INDEX</div>
+          <div class="result-value" id="infra-val"></div>
+          <div class="result-detail" id="infra-detail"></div>
+          <div class="score-bar"><div class="score-fill" id="infra-bar"></div></div>
+        </div>
+      </div>
+
+    </div><!-- /tools-grid -->
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-text">
+      BASIS URBAN OS · SHOONYA ORIGINS · FREE FOREVER ·
+      <a href="basis-tools-2.html">NEXT: ENVIRONMENT TOOLS →</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ─── TOOL 1: Fire Exit Clearance ───────────────────────────────────────────
+function calcFire() {
+  const w = parseFloat(document.getElementById('fire-width').value);
+  const occ = parseInt(document.getElementById('fire-occ').value);
+  const type = document.getElementById('fire-type').value;
+  if (!w || !occ) return showResult('fire', null, 'Please fill all fields.');
+
+  // NBC 2016: Flow rate = width / 0.055 persons per min per mm
+  // Min widths: Res 1.0m, Com 1.5m, Edu 2.0m
+  const minWidth = { res: 1.0, com: 1.5, edu: 2.0 }[type];
+  const flowRate = Math.floor((w * 1000) / 55); // persons/min
+  const evacTime = Math.ceil(occ / flowRate);
+  const safe = w >= minWidth && evacTime <= 3;
+  const pct = Math.min(100, (w / minWidth) * 60);
+
+  document.getElementById('fire-val').textContent = evacTime + ' min evacuation';
+  document.getElementById('fire-val').className = 'result-value ' + (safe ? 'result-safe' : 'result-danger');
+  document.getElementById('fire-detail').textContent =
+    `Flow rate: ${flowRate} persons/min · Min required width: ${minWidth}m · Your width: ${w}m · ` +
+    (w < minWidth ? '⚠ BELOW NBC 2016 minimum. Risk of bottleneck.' : '✓ Width compliant.');
+  setBar('fire-bar', pct, safe ? '#39ff14' : '#ff4444');
+  showResult('fire');
+}
+
+// ─── TOOL 2: Seismic Risk ──────────────────────────────────────────────────
+function calcSeismic() {
+  const year = parseInt(document.getElementById('seis-year').value);
+  const floors = parseInt(document.getElementById('seis-floors').value);
+  const wall = document.getElementById('seis-wall').value;
+  const zone = parseInt(document.getElementById('seis-zone').value);
+  if (!year || !floors) return showResult('seis', null, 'Please fill all fields.');
+
+  // Age factor
+  const age = 2024 - year;
+  let ageFactor = age < 10 ? 5 : age < 25 ? 20 : age < 40 ? 40 : age < 60 ? 65 : 85;
+
+  // Wall type vulnerability
+  const wallScore = { rcc_new: 10, rcc_old: 30, brick: 55, stone: 70, pre: 90 }[wall];
+
+  // Floor height amplification (taller = more sway)
+  const floorFactor = Math.min(floors * 3, 40);
+
+  // Zone multiplier
+  const zoneMult = { 2: 0.6, 3: 0.85, 4: 1.0 }[zone];
+
+  let score = Math.round(((ageFactor * 0.35 + wallScore * 0.45 + floorFactor * 0.2) * zoneMult));
+  score = Math.min(100, Math.max(1, score));
+
+  const level = score < 25 ? 'LOW RISK' : score < 50 ? 'MODERATE' : score < 75 ? 'HIGH RISK' : 'CRITICAL';
+  const cls = score < 25 ? 'result-safe' : score < 50 ? 'result-warning' : 'result-danger';
+  const action = score < 25 ? 'No immediate action needed.' :
+                 score < 50 ? 'Consider a structural inspection.' :
+                 score < 75 ? 'Structural audit strongly recommended.' :
+                 'Immediate structural review required. Consult a licensed civil engineer.';
+
+  document.getElementById('seis-val').textContent = score + '/100 — ' + level;
+  document.getElementById('seis-val').className = 'result-value ' + cls;
+  document.getElementById('seis-detail').textContent = action + ` Built ${year} · ${floors} floors · Zone ${zone}`;
+  setBar('seis-bar', score, score < 25 ? '#39ff14' : score < 50 ? '#ffb347' : '#ff4444');
+  showResult('seis');
+}
+
+// ─── TOOL 3: Balcony Load ─────────────────────────────────────────────────
+function calcLoad() {
+  const area = parseFloat(document.getElementById('load-area').value);
+  const slab = document.getElementById('load-slab').value;
+  const weight = parseFloat(document.getElementById('load-weight').value);
+  if (!area || !weight) return showResult('load', null, 'Please fill all fields.');
+
+  // Live load capacity in kg/sq.ft (conservative)
+  const caps = { rcc_new: 30, rcc_old: 20, hc: 15, wood: 10 };
+  const capacity = caps[slab] * area;
+  const safe = weight <= capacity * 0.8; // 80% safety margin
+  const pct = Math.min(100, (weight / capacity) * 100);
+
+  document.getElementById('load-val').textContent = Math.round(capacity) + ' kg max capacity';
+  document.getElementById('load-val').className = 'result-value ' + (safe ? 'result-safe' : 'result-danger');
+  document.getElementById('load-detail').textContent =
+    `Your item: ${weight} kg · Safe limit (80% margin): ${Math.round(capacity * 0.8)} kg · ` +
+    (safe ? '✓ Safe to place.' : '⚠ Exceeds safe limit. Consult a structural engineer.');
+  setBar('load-bar', pct, safe ? '#39ff14' : '#ff4444');
+  showResult('load');
+}
+
+// ─── TOOL 4: Pothole Impact Force ─────────────────────────────────────────
+function calcPothole() {
+  const masses = { bike: 150, car: 1200, auto: 500, truck: 3000 };
+  const type = document.getElementById('pot-type').value;
+  const mass = masses[type];
+  const speedKmh = parseFloat(document.getElementById('pot-speed').value);
+  const depthCm = parseFloat(document.getElementById('pot-depth').value);
+  if (!speedKmh || !depthCm) return showResult('pot', null, 'Please fill all fields.');
+
+  const v = speedKmh / 3.6; // m/s
+  const d = depthCm / 100;  // meters
+  const force = (mass * v * v) / (2 * d);
+  const gForce = force / (mass * 9.81);
+
+  const severity = gForce < 2 ? 'Minor jolt' : gForce < 5 ? 'Significant impact — suspension stress' :
+                   gForce < 10 ? 'Severe — tyre and axle damage risk' : 'Extreme — structural damage possible';
+
+  document.getElementById('pot-val').textContent = Math.round(force).toLocaleString() + ' N · ' + gForce.toFixed(1) + ' G';
+  document.getElementById('pot-val').className = 'result-value ' + (gForce < 2 ? 'result-safe' : gForce < 5 ? 'result-warning' : 'result-danger');
+  document.getElementById('pot-detail').textContent = severity + ` · Speed: ${speedKmh} km/h · Depth: ${depthCm} cm`;
+  showResult('pot');
+}
+
+// ─── TOOL 5: Crowd Crush Risk ─────────────────────────────────────────────
+function calcCrowd() {
+  const area = parseFloat(document.getElementById('crowd-area').value);
+  const people = parseInt(document.getElementById('crowd-people').value);
+  const exits = parseInt(document.getElementById('crowd-exits').value);
+  if (!area || !people || !exits) return showResult('crowd', null, 'Please fill all fields.');
+
+  // Fruin Level of Service: sq.m per person
+  const density = people / area; // persons/sq.m
+  const los = density < 0.5 ? 'A — Free Flow' :
+              density < 1.0 ? 'B — Reasonable' :
+              density < 2.0 ? 'C — Restricted' :
+              density < 3.0 ? 'D — Uncomfortable' :
+              density < 4.5 ? 'E — Dangerous' : 'F — CRUSH RISK';
+
+  const exitLoad = Math.ceil(people / exits);
+  const pct = Math.min(100, (density / 5) * 100);
+  const cls = density < 1 ? 'result-safe' : density < 3 ? 'result-warning' : 'result-danger';
+  const action = density >= 4.5 ? '🚨 EVACUATE. Crowd crush conditions present.' :
+                 density >= 3 ? '⚠ Restrict entry immediately. Dangerous density.' :
+                 density >= 2 ? 'Monitor closely. Limit further entry.' : '✓ Within safe parameters.';
+
+  document.getElementById('crowd-val').textContent = density.toFixed(2) + ' p/m² — LOS ' + los;
+  document.getElementById('crowd-val').className = 'result-value ' + cls;
+  document.getElementById('crowd-detail').textContent = `${exitLoad} people per exit · ${action}`;
+  setBar('crowd-bar', pct, density < 1 ? '#39ff14' : density < 3 ? '#ffb347' : '#ff4444');
+  showResult('crowd');
+}
+
+// ─── TOOL 6: Acoustic Sleep Zone ─────────────────────────────────────────
+function calcAcoustic() {
+  const src = parseInt(document.getElementById('ac-source').value);
+  const d1 = parseFloat(document.getElementById('ac-front').value);
+  const d2 = parseFloat(document.getElementById('ac-back').value);
+  if (!d1 || !d2) return showResult('ac', null, 'Please fill all fields.');
+
+  // Reference point: 1m from source
+  // dB at distance d = src - 20*log10(d/1)
+  const dbFront = src - 20 * Math.log10(d1);
+  const dbBack = src - 20 * Math.log10(d2);
+  const who = dbFront < dbBack ? 'Front room' : 'Back room';
+  const quieter = Math.min(dbFront, dbBack).toFixed(1);
+  const diff = Math.abs(dbFront - dbBack).toFixed(1);
+
+  // WHO recommends <45dB for sleep
+  const sleepOk = Math.min(dbFront, dbBack) < 45;
+  const cls = sleepOk ? 'result-safe' : dbFront < 55 ? 'result-warning' : 'result-danger';
+
+  document.getElementById('ac-val').textContent = who + ' is quieter at ' + quieter + ' dB';
+  document.getElementById('ac-val').className = 'result-value ' + cls;
+  document.getElementById('ac-detail').textContent =
+    `Front: ${dbFront.toFixed(1)} dB · Back: ${dbBack.toFixed(1)} dB · Difference: ${diff} dB · ` +
+    (sleepOk ? '✓ Below WHO sleep threshold (45 dB).' : '⚠ Above WHO sleep threshold. Consider noise insulation.');
+  showResult('ac');
+}
+
+// ─── TOOL 7: Air Exchange Timer ───────────────────────────────────────────
+function calcAir() {
+  const vol = parseFloat(document.getElementById('air-vol').value);
+  const winArea = parseFloat(document.getElementById('air-win').value);
+  const wind = parseFloat(document.getElementById('air-wind').value);
+  if (!vol || !winArea) return showResult('air', null, 'Please fill all fields.');
+
+  // ACH = (Window Area × Wind Speed × 3600) / Room Volume
+  const ach = (winArea * wind * 3600) / vol;
+  const minutes = Math.ceil(60 / ach);
+
+  const quality = minutes < 5 ? 'Excellent ventilation' : minutes < 15 ? 'Good ventilation' :
+                  minutes < 30 ? 'Moderate — keep window open longer' : 'Poor — consider cross-ventilation';
+
+  document.getElementById('air-val').textContent = minutes + ' minutes';
+  document.getElementById('air-val').className = 'result-value ' + (minutes < 15 ? 'result-safe' : minutes < 30 ? 'result-warning' : 'result-danger');
+  document.getElementById('air-detail').textContent = quality + ` · ACH: ${ach.toFixed(2)} · Window: ${winArea} m² · Wind: ${wind} m/s`;
+  showResult('air');
+}
+
+// ─── TOOL 8: Flood Risk ────────────────────────────────────────────────────
+function calcFlood() {
+  const floor = parseInt(document.getElementById('flood-floor').value);
+  const drain = parseFloat(document.getElementById('flood-drain').value);
+  const rain = parseInt(document.getElementById('flood-rain').value);
+  const drainQ = document.getElementById('flood-drain-q').value;
+  if (isNaN(drain)) return showResult('flood', null, 'Please fill all fields.');
+
+  let score = 0;
+  // Floor level (0=ground=high risk)
+  score += floor === 0 ? 40 : floor === 1 ? 20 : 5;
+  // Distance to nullah
+  score += drain < 10 ? 30 : drain < 50 ? 20 : drain < 100 ? 10 : 3;
+  // Rainfall
+  score += rain === 50 ? 5 : rain === 100 ? 15 : rain === 150 ? 20 : rain === 200 ? 28 : 35;
+  // Drainage quality
+  score += { good: 2, avg: 10, poor: 22, none: 35 }[drainQ];
+
+  score = Math.min(100, score);
+  const level = score < 20 ? 'LOW' : score < 45 ? 'MODERATE' : score < 70 ? 'HIGH' : 'VERY HIGH';
+  const cls = score < 20 ? 'result-safe' : score < 45 ? 'result-warning' : 'result-danger';
+  const advice = score < 20 ? 'Low flood risk. Basic precautions sufficient.' :
+                 score < 45 ? 'Moderate risk. Keep drainage clear. Monitor IMD alerts.' :
+                 score < 70 ? 'High risk. Elevate valuables. Have sandbags ready before monsoon.' :
+                 '🚨 Very high risk. Consider relocating during heavy rain events. Contact civic authorities about drainage.';
+
+  document.getElementById('flood-val').textContent = score + '/100 — ' + level + ' RISK';
+  document.getElementById('flood-val').className = 'result-value ' + cls;
+  document.getElementById('flood-detail').textContent = advice;
+  setBar('flood-bar', score, score < 20 ? '#39ff14' : score < 45 ? '#ffb347' : '#ff4444');
+  showResult('flood');
+}
+
+// ─── TOOL 9: Solar Window Gain ────────────────────────────────────────────
+function calcSolar() {
+  const dir = document.getElementById('sol-dir').value;
+  const area = parseFloat(document.getElementById('sol-area').value);
+  const glass = document.getElementById('sol-glass').value;
+  if (!area) return showResult('sol', null, 'Please fill all fields.');
+
+  // Solar angle factor for India (peak summer, 2PM)
+  const angles = { N: 0.1, NE: 0.3, E: 0.5, SE: 0.75, S: 0.85, SW: 1.0, W: 0.9, NW: 0.5 };
+  const shgc = { single: 0.87, tinted: 0.4, double: 0.25 };
+  const areaSqM = area * 0.0929;
+  const solarConst = 900; // W/m² typical Indian summer peak
+  const gain = solarConst * angles[dir] * shgc[glass] * areaSqM;
+  const gainKcal = (gain * 0.860).toFixed(0);
+
+  const severity = gain < 200 ? 'Low gain — minimal cooling impact' :
+                   gain < 500 ? 'Moderate — consider light curtains' :
+                   gain < 900 ? 'High — install solar film or exterior shade' :
+                   '⚠ Very high — significant AC load. Exterior shade essential.';
+
+  document.getElementById('sol-val').textContent = Math.round(gain) + ' W · ' + gainKcal + ' kcal/hr';
+  document.getElementById('sol-val').className = 'result-value ' + (gain < 300 ? 'result-safe' : gain < 700 ? 'result-warning' : 'result-danger');
+  document.getElementById('sol-detail').textContent = severity + ` · Facing: ${dir} · Area: ${area} sq.ft`;
+  showResult('sol');
+}
+
+// ─── TOOL 10: Infrastructure Priority ─────────────────────────────────────
+function calcInfra() {
+  const sev = parseInt(document.getElementById('infra-sev').value);
+  const people = parseInt(document.getElementById('infra-people').value);
+  const fix = parseInt(document.getElementById('infra-fix').value);
+  if (!people) return showResult('infra', null, 'Please enter people affected.');
+
+  // Priority = (Severity × log10(people+1)) / Fix Complexity
+  const priority = Math.round((sev * Math.log10(people + 1)) / fix * 10);
+  const score = Math.min(100, priority);
+
+  const tier = score >= 70 ? 'P1 — URGENT' : score >= 40 ? 'P2 — HIGH' : score >= 20 ? 'P3 — MEDIUM' : 'P4 — LOW';
+  const cls = score >= 70 ? 'result-danger' : score >= 40 ? 'result-warning' : score >= 20 ? '' : 'result-safe';
+  const action = score >= 70 ? 'Escalate to ward officer immediately. Use RTI if unresponsive.' :
+                 score >= 40 ? 'File formal complaint with PMC/NMC portal. Follow up in 7 days.' :
+                 score >= 20 ? 'Report via civic app. Document with photos.' :
+                 'Low priority. Monitor and report if it worsens.';
+
+  document.getElementById('infra-val').textContent = score + '/100 — ' + tier;
+  document.getElementById('infra-val').className = 'result-value ' + cls;
+  document.getElementById('infra-detail').textContent = action;
+  setBar('infra-bar', score, score >= 70 ? '#ff4444' : score >= 40 ? '#ffb347' : '#39ff14');
+  showResult('infra');
+}
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────
+function showResult(id, val, msg) {
+  const el = document.getElementById(id + '-result');
+  el.classList.add('show');
+  if (msg) {
+    el.querySelector('.result-value') && (el.querySelector('.result-value').textContent = '');
+    el.querySelector('.result-detail') && (el.querySelector('.result-detail').textContent = msg);
+  }
+}
+
+function setBar(id, pct, color) {
+  const bar = document.getElementById(id);
+  if (!bar) return;
+  bar.style.width = pct + '%';
+  bar.style.background = color;
+}
+</script>
+</body>
+</html>
