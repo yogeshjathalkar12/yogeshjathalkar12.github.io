@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Basis — Civic Intelligence Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=Space+Mono&display=swap');
+
+:root {
+    /* --- SHARED OCEANIC PRODUCT PALETTE --- */
+    --bg: #F0F7F9;             /* Soft Arctic Mist */
+    --surface: rgba(224, 242, 254, 0.3); /* Translucent Sea Foam */
+    --border: rgba(8, 145, 178, 0.12);    /* Subtle Teal border */
+    --accent: #0891B2;         /* Deep Mediterranean Teal */
+    --accent2: #0F172A;        /* Midnight Anchor Blue */
+    --accent3: #334155;        /* Slate Depth */
+    --text: #1E293B;           /* Professional Navy Grey */
+    --muted: #64748B;          /* Cool Slate Muted */
+    --card: rgba(255, 255, 255, 0.6); /* High-Clarity Frosted Glass */
+    
+    /* Functional Colors */
+    --warning: #B45309;        /* Warm Amber */
+    --danger: #9F1239;         /* Deep Crimson */
+    --safe: #059669;           /* Emerald Lagoon */
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.6;
+}
+
+/* AMBIENT AQUATIC GRADIENTS */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(circle at 20% 0%, rgba(8, 145, 178, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 100%, rgba(15, 23, 42, 0.04) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* PRODUCT GRID OVERLAY */
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(8, 145, 178, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(8, 145, 178, 0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.container { max-width: 1100px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+/* HEADER */
+header {
+    border-bottom: 1px solid var(--border);
+    padding: 24px 0;
+    position: sticky;
+    top: 0;
+    background: rgba(240, 247, 249, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    z-index: 100;
+}
+
+.header-inner { display: flex; align-items: center; justify-content: space-between; }
+
+.logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    color: var(--accent2);
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+.logo span { color: var(--accent); }
+
+.page-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.page-nav { display: flex; gap: 12px; }
+.page-nav a {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 4px;
+}
+.page-nav a.active, .page-nav a:hover {
+    color: #fff;
+    background: var(--accent2);
+    border-color: var(--accent2);
+}
+
+/* HERO */
+.hero { padding: 100px 0 80px; text-align: center; }
+.hero-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    font-weight: 700;
+}
+.hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(42px, 8vw, 84px);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    color: var(--accent2);
+}
+.hero-sub {
+    font-size: 18px;
+    color: var(--accent3);
+    max-width: 600px;
+    margin: 0 auto 40px;
+    line-height: 1.8;
+}
+.tool-count {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    display: inline-block;
+    padding-top: 24px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+.tool-count strong { color: var(--accent); }
+
+/* TOOL GRID */
+.tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 32px; margin-bottom: 100px; }
+
+/* TOOL CARD */
+.tool-card {
+    background: var(--card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    padding: 32px;
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-shadow: 0 10px 40px rgba(15, 23, 42, 0.03);
+}
+.tool-card:hover {
+    transform: translateY(-12px);
+    background: rgba(255, 255, 255, 0.85);
+    border-color: var(--accent);
+    box-shadow: 0 30px 60px rgba(8, 145, 178, 0.12);
+}
+
+.tool-num { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--accent); font-weight: 700; margin-bottom: 16px; display: block; opacity: 0.6; }
+.tool-title { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 700; margin-bottom: 12px; color: var(--accent2); }
+.tool-desc { font-size: 14px; color: var(--accent3); opacity: 0.8; line-height: 1.6; margin-bottom: 24px; }
+
+/* FORM ELEMENTS */
+.tool-form { display: flex; flex-direction: column; gap: 14px; }
+.field-row { display: flex; flex-direction: column; gap: 6px; }
+.field-label { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 10px; font-weight: 800; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; }
+
+input[type="number"], input[type="range"], select, input[type="text"] {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    padding: 12px 16px;
+    width: 100%;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    outline: none;
+}
+input[type="number"]:focus, select:focus, input[type="text"]:focus { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 4px rgba(8, 145, 178, 0.1); }
+input[type="range"] { accent-color: var(--accent); height: 4px; background: rgba(8, 145, 178, 0.1); padding: 0; }
+
+.btn {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent2);
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 8px;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+}
+.btn:hover { background: var(--accent); transform: scale(1.03); }
+
+/* BUTTON VARIANTS */
+.btn-orange { background: var(--warning); }
+.btn-cyan { background: var(--accent); }
+.btn-danger { background: var(--danger); }
+
+/* RESULT BOX */
+.result {
+    display: none; margin-top: 24px; padding: 24px;
+    border-radius: 12px; border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.7);
+    animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.result.show { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+.result-label { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; }
+.result-value { font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 700; color: var(--accent); }
+.result-detail { font-size: 14px; color: var(--accent3); margin-top: 8px; line-height: 1.6; }
+
+/* FEEDBACK COLORS */
+.result-safe { color: var(--safe); }
+.result-warning { color: var(--warning); }
+.result-danger { color: var(--danger); }
+.result-purple { color: var(--accent); }
+
+.score-bar { height: 6px; background: rgba(8, 145, 178, 0.08); margin-top: 15px; border-radius: 3px; overflow: hidden; }
+.score-fill { height: 100%; border-radius: 3px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); background: var(--accent); }
+.slider-val { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--accent); font-weight: 700; text-align: right; }
+
+/* CHECKLIST SPECIFIC */
+.checklist { display: flex; flex-direction: column; gap: 10px; }
+.check-item { display: flex; align-items: flex-start; gap: 12px; font-size: 13px; color: var(--text); cursor: pointer; line-height: 1.5; }
+.check-item input[type="checkbox"] { accent-color: var(--accent); width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px; }
+
+/* RTI OUTPUT SPECIFIC */
+.rti-output {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    padding: 20px;
+    margin-top: 16px;
+    display: none;
+    color: var(--text);
+    line-height: 1.8;
+    white-space: pre-wrap;
+    border-radius: 8px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+}
+.rti-output.show { display: block; }
+.copy-btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    font-weight: 700;
+    border: 1px solid var(--accent);
+    background: transparent;
+    padding: 6px 12px;
+    cursor: pointer;
+    margin-top: 12px;
+    letter-spacing: 1px;
+    transition: 0.3s;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+.copy-btn:hover { background: var(--accent); color: #fff; }
+
+/* FOOTER */
+footer { border-top: 1px solid var(--border); padding: 48px 0; text-align: center; background: rgba(255, 255, 255, 0.3); }
+.footer-text { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px; color: var(--muted); font-weight: 500; }
+.footer-text a { color: var(--accent); font-weight: 700; text-decoration: none; border-bottom: 1.5px solid var(--accent); }
+
+@media (max-width: 600px) {
+    .tools-grid { grid-template-columns: 1fr; gap: 24px; }
+    .hero h1 { font-size: 42px; }
+    .page-nav { display: none; }
+}
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container header-inner">
+    <div class="logo">BASIS <span>/ SHOONYA ORIGINS</span></div>
+    <div class="page-nav">
+      <a href="basis-tools-1.html">01 — SAFETY</a>
+      <a href="basis-tools-2.html">02 — ENVIRONMENT</a>
+      <a href="basis-tools-3.html" class="active">03 — CIVIC</a>
+    </div>
+    <div class="page-tag">PAGE 3 / 3</div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <div class="hero">
+      <div class="hero-label">Urban Intelligence Toolset · Free · Browser-Native</div>
+      <h1>Civic<br>Intelligence</h1>
+      <p class="hero-sub">Tools to audit your city, understand your rights, and generate data that holds systems accountable. Turn every citizen into an informed urban inspector.</p>
+      <div class="tool-count"><strong>10 Tools</strong> · Page 3 of 3 · 30 Total</div>
+    </div>
+
+    <div class="tools-grid">
+
+      <!-- TOOL 21: Walkability Audit -->
+      <div class="tool-card" style="--card-accent: #bf7fff;">
+        <div class="tool-num">T-021 · MOBILITY</div>
+        <div class="tool-title">Street Walkability Audit</div>
+        <div class="tool-desc">Grade your street from A to F. A 10-point inspection that gives any footpath a Basis Walkability Score — shareable data for your ward.</div>
+        <div class="tool-form">
+          <div class="field-row">
+            <div class="field-label">Effective Footpath Width (meters)</div>
+            <input type="number" id="walk-width" placeholder="e.g. 1.2" step="0.1" min="0" max="10">
+          </div>
+          <div class="field-label" style="margin-top:8px;">Check all that apply:</div>
+          <div class="checklist" id="walk-checks">
+            <label class="check-item"><input type="checkbox" value="10"> Continuous footpath (no gaps or breaks)</label>
+            <label class="check-item"><input type="checkbox" value="10"> No obstructions (vendors, vehicles, poles on path)</label>
+            <label class="check-item"><input type="checkbox" value="10"> Functional streetlights at night</label>
+            <label class="check-item"><input type="checkbox" value="10"> No open drains alongside footpath</label>
+            <label class="check-item"><input type="checkbox" value="10"> Tactile tiles for visually impaired</label>
+            <label class="check-item"><input type="checkbox" value="10"> Shade coverage (trees or canopy &gt;40%)</label>
+            <label class="check-item"><input type="checkbox" value="10"> Safe road-crossing point within 200m</label>
+            <label class="check-item"><input type="checkbox" value="10"> No damaged / uneven surface sections</label>
+          </div>
+          <button class="btn" onclick="calcWalk()">CALCULATE →</button>
+        </div>
+        <div class="result" id="walk-result">
+          <div class="result-label">WALKABILITY GRADE</div>
+          <div class="result-value" id="walk-val"></div>
+          <div class="result-detail" id="walk-detail"></div>
+          <div class="score-bar"><div class="score-fill" id="walk-bar"></div></div>
+        </div>
+      </div>
+
+      <!-- TOOL 22: Tanker to Tap Loss -->
+      <div class="tool-card" style="--card-accent: #00e5ff;">
+        <div class="tool-num">T-022 · WATER</div>
+        <div class="tool-title">Tanker vs Tap — True Cost</div>
+        <div class="tool-desc">How much extra are you paying for water tankers versus what piped municipal water would cost? Calculate the hidden urban tax.</div>
+        <div class="tool-form">
+          <div class="field-row">
+            <div class="field-label">Tankers per Month</div>
+            <input type="number" id="tank-count" placeholder="e.g. 4" min="1" max="100">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Cost per Tanker (₹)</div>
+            <input type="number" id="tank-cost" placeholder="e.g. 1200" min="100" max="20000">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Tanker Capacity (liters)</div>
+            <select id="tank-cap">
+              <option value="3000">3000 L (mini tanker)</option>
+              <option value="5000" selected>5000 L (standard)</option>
+              <option value="10000">10000 L (large)</option>
+            </select>
+          </div>
+          <button class="btn btn-cyan" onclick="calcTanker()">CALCULATE →</button>
+        </div>
+        <div class="result" id="tank-result">
+          <div class="result-label">MONTHLY OVERPAYMENT</div>
+          <div class="result-value" id="tank-val"></div>
+          <div class="result-detail" id="tank-detail"></div>
+        </div>
+      </div>
+
+      <!-- TOOL 23: Day-Burner Energy Waste -->
+      <div class="tool-card" style="--card-accent: #ffb347;">
+        <div class="tool-num">T-023 · ENERGY</div>
+        <div class="tool-title">Day-Burner: Wasted Streetlights</div>
+        <div class="tool-desc">Generate a social media-ready card showing how much taxpayer money streetlights left on during the day are wasting in your ward.</div>
+        <div class="tool-form">
+          <div class="field-row">
+            <div class="field-label">Number of Lights Left On (Daytime)</div>
+            <input type="number" id="sl-count" placeholder="e.g. 20" min="1" max="10000">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Light Type</div>
+            <select id="sl-type">
+              <option value="40">LED Streetlight (40W)</option>
+              <option value="70">Sodium Vapour (70W)</option>
+              <option value="150">Old Mercury Lamp (150W)</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Hours Left On During Day</div>
+            <input type="number" id="sl-hours" placeholder="e.g. 10" min="1" max="24">
+          </div>
+          <button class="btn btn-orange" onclick="calcStreetlight()">CALCULATE →</button>
+        </div>
+        <div class="result" id="sl-result">
+          <div class="result-label">TAXPAYER MONEY WASTED</div>
+          <div class="result-value" id="sl-val"></div>
+          <div class="result-detail" id="sl-detail"></div>
+        </div>
+      </div>
+
+      <!-- TOOL 24: EV vs Petrol TCO -->
+      <div class="tool-card" style="--card-accent: #39ff14;">
+        <div class="tool-num">T-024 · MOBILITY</div>
+        <div class="tool-title">EV vs Petrol — True 5-Year Cost</div>
+        <div class="tool-desc">EV salespeople hide total cost of ownership. This tool reveals the honest 5-year comparison so you can decide with real numbers.</div>
+        <div class="tool-form">
+          <div class="field-row">
+            <div class="field-label">Daily Distance (km)</div>
+            <input type="number" id="tco-km" placeholder="e.g. 40" min="1" max="500">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Vehicle Category</div>
+            <select id="tco-cat">
+              <option value="2w">Two-Wheeler</option>
+              <option value="car" selected>Car</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Current Petrol Price (₹/liter)</div>
+            <input type="number" id="tco-petrol" placeholder="e.g. 104" min="70" max="200">
+          </div>
+          <button class="btn" onclick="calcTCO()">CALCULATE →</button>
+        </div>
+        <div class="result" id="tco-result">
+          <div class="result-label">5-YEAR TOTAL COST DIFFERENCE</div>
+          <div class="result-value" id="tco-val"></div>
+          <div class="result-detail" id="tco-detail"></div>
+        </div>
+      </div>
+
+      <!-- TOOL 25: Society Maintenance Fair Split -->
+      <div class="tool-card" style="--card-accent: #bf7fff;">
+        <div class="tool-num">T-025 · HOUSING</div>
+        <div class="tool-title">Society Maintenance Fair Split</div>
+        <div class="tool-desc">Societies fight over flat-rate vs area-based billing. This tool calculates both methods and shows the fairest split per flat.</div>
+        <div class="tool-form">
+          <div class="field-row">
+            <div class="field-label">Total Monthly Maintenance Budget (₹)</div>
+            <input type="number" id="soc-budget" placeholder="e.g. 80000" min="1000" max="10000000">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Number of Flats</div>
+            <input type="number" id="soc-flats" placeholder="e.g. 40" min="2" max="1000">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Your Flat Size (sq. ft)</div>
+            <input type="number" id="soc-area" placeholder="e.g. 850" min="100" max="10000">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Society Average Flat Size (sq. ft)</div>
+            <input type="number" id="soc-avg" placeholder="e.g. 950" min="100" max="10000">
+          </div>
+          <button class="btn" onclick="calcSociety()">CALCULATE →</button>
+        </div>
+        <div class="result" id="soc-result">
+          <div class="result-label">YOUR FAIR SHARE</div>
+          <div class="result-value" id="soc-val"></div>
+          <div class="result-detail" id="soc-detail"></div>
+        </div>
+      </div>
+
+      <!-- TOOL 26: Electricity Slab Saver -->
+      <div class="tool-card" style="--card-accent: #ffb347;">
+        <div class="tool-num">T-026 · ENERGY</div>
+        <div class="tool-title">MSEDCL Slab Saver</div>
+        <div class="tool-desc">Understand exactly how your MSEDCL electricity bill is calculated across slabs — and what you'd save by cutting just a few units.</div>
+        <div class="tool-form">
+          <div class="field-row">
+            <div class="field-label">Monthly Units Consumed (kWh)</div>
+            <input type="number" id="msedcl-units" placeholder="e.g. 320" min="1" max="5000">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Connection Type</div>
+            <select id="msedcl-type">
+              <option value="res" selected>Residential (LT-1)</option>
+              <option value="com">Commercial (LT-2)</option>
+            </select>
+          </div>
+          <button class="btn btn-orange" onclick="calcMSEDCL()">CALCULATE →</button>
+        </div>
+        <div class="result" id="msedcl-result">
+          <div class="result-label">BILL BREAKDOWN</div>
+          <div class="result-value" id="msedcl-val"></div>
+          <div class="result-detail" id="msedcl-detail"></div>
+        </div>
+      </div>
+
+      <!-- TOOL 27: Property Tax Pre-Check -->
+      <div class="tool-card" style="--card-accent: #bf7fff;">
+        <div class="tool-num">T-027 · HOUSING</div>
+        <div class="tool-title">Property Tax Estimator</div>
+        <div class="tool-desc">Estimate your PMC/NMC property tax before paying an agent. Based on the Annual Rateable Value (ARV) method used by Maharashtra municipalities.</div>
+        <div class="tool-form">
+          <div class="field-row">
+            <div class="field-label">Carpet Area (sq. ft)</div>
+            <input type="number" id="pt-area" placeholder="e.g. 700" min="50" max="50000">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Property Type</div>
+            <select id="pt-type">
+              <option value="res">Residential</option>
+              <option value="com">Commercial</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Zone / Location</div>
+            <select id="pt-zone">
+              <option value="0.4">Peripheral / Rural Zone</option>
+              <option value="0.7" selected>Suburban</option>
+              <option value="1.0">Urban Core (Camp/Shivajinagar)</option>
+              <option value="1.3">Prime Commercial Zone</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Building Age</div>
+            <select id="pt-age">
+              <option value="1.0">New (< 5 years) — no discount</option>
+              <option value="0.9" selected>5–25 years (10% discount)</option>
+              <option value="0.75">25–40 years (25% discount)</option>
+              <option value="0.6">40+ years (40% discount)</option>
+            </select>
+          </div>
+          <button class="btn" onclick="calcPropertyTax()">CALCULATE →</button>
+        </div>
+        <div class="result" id="pt-result">
+          <div class="result-label">ESTIMATED ANNUAL TAX</div>
+          <div class="result-value" id="pt-val"></div>
+          <div class="result-detail" id="pt-detail"></div>
+        </div>
+      </div>
+
+      <!-- TOOL 28: Stamp Duty Calculator -->
+      <div class="tool-card" style="--card-accent: #00e5ff;">
+        <div class="tool-num">T-028 · LEGAL</div>
+        <div class="tool-title">Rent Agreement Stamp Duty</div>
+        <div class="tool-desc">Calculate exact Maharashtra stamp duty and registration fees for your lease/license agreement. Stops agents from overcharging.</div>
+        <div class="tool-form">
+          <div class="field-row">
+            <div class="field-label">Monthly Rent (₹)</div>
+            <input type="number" id="sd-rent" placeholder="e.g. 15000" min="500" max="1000000">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Agreement Duration (months)</div>
+            <input type="number" id="sd-months" placeholder="e.g. 11" min="1" max="120">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Refundable Deposit (₹)</div>
+            <input type="number" id="sd-deposit" placeholder="e.g. 60000" min="0" max="10000000">
+          </div>
+          <button class="btn btn-cyan" onclick="calcStampDuty()">CALCULATE →</button>
+        </div>
+        <div class="result" id="sd-result">
+          <div class="result-label">STAMP DUTY DUE</div>
+          <div class="result-value" id="sd-val"></div>
+          <div class="result-detail" id="sd-detail"></div>
+        </div>
+      </div>
+
+      <!-- TOOL 29: Movers Volume Estimator -->
+      <div class="tool-card" style="--card-accent: #ff6b35;">
+        <div class="tool-num">T-029 · CONSUMER</div>
+        <div class="tool-title">Packers & Movers Volume Calc</div>
+        <div class="tool-desc">Get a fair moving quote by knowing your exact cubic meters before calling a mover. Stop getting overcharged on vague "truck size" estimates.</div>
+        <div class="tool-form">
+          <div class="field-label" style="margin-bottom:8px;">Enter quantities of items you're moving:</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <div class="field-row"><div class="field-label">Beds</div><input type="number" id="mv-bed" value="0" min="0" max="20"></div>
+            <div class="field-row"><div class="field-label">Sofas</div><input type="number" id="mv-sofa" value="0" min="0" max="20"></div>
+            <div class="field-row"><div class="field-label">Wardrobes</div><input type="number" id="mv-ward" value="0" min="0" max="20"></div>
+            <div class="field-row"><div class="field-label">Refrigerators</div><input type="number" id="mv-fridge" value="0" min="0" max="5"></div>
+            <div class="field-row"><div class="field-label">Washing Machines</div><input type="number" id="mv-wm" value="0" min="0" max="5"></div>
+            <div class="field-row"><div class="field-label">TVs</div><input type="number" id="mv-tv" value="0" min="0" max="10"></div>
+            <div class="field-row"><div class="field-label">Dining Tables</div><input type="number" id="mv-dtable" value="0" min="0" max="10"></div>
+            <div class="field-row"><div class="field-label">Boxes / Cartons</div><input type="number" id="mv-boxes" value="0" min="0" max="200"></div>
+          </div>
+          <button class="btn btn-orange" onclick="calcMovers()">CALCULATE →</button>
+        </div>
+        <div class="result" id="mv-result">
+          <div class="result-label">TOTAL VOLUME ESTIMATE</div>
+          <div class="result-value" id="mv-val"></div>
+          <div class="result-detail" id="mv-detail"></div>
+        </div>
+      </div>
+
+      <!-- TOOL 30: RTI Draft Generator -->
+      <div class="tool-card" style="--card-accent: #bf7fff;">
+        <div class="tool-num">T-030 · CIVIC RIGHTS</div>
+        <div class="tool-title">RTI Application Generator</div>
+        <div class="tool-desc">Generate a legally structured RTI (Right to Information) draft for civic complaints. Costs you ₹10 to file. Most effective tool against civic negligence.</div>
+        <div class="tool-form">
+          <div class="field-row">
+            <div class="field-label">Your Name</div>
+            <input type="text" id="rti-name" placeholder="Full name">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Issue Type</div>
+            <select id="rti-issue">
+              <option value="road">Road / Pothole Repair</option>
+              <option value="water">Water Supply Failure</option>
+              <option value="drain">Drainage / Flooding</option>
+              <option value="light">Streetlight Malfunction</option>
+              <option value="garbage">Garbage Collection Failure</option>
+              <option value="permit">Building Permit / Unauthorized Construction</option>
+              <option value="tree">Tree Cutting / Felling</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Location of Issue</div>
+            <input type="text" id="rti-loc" placeholder="Street, Ward, City">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Authority to Address</div>
+            <select id="rti-auth">
+              <option value="PMC">Pune Municipal Corporation (PMC)</option>
+              <option value="PCMC">Pimpri-Chinchwad Municipal Corporation (PCMC)</option>
+              <option value="NMC">Nanded-Waghala City Municipal Corporation (NMC)</option>
+              <option value="NMMC">Navi Mumbai Municipal Corporation (NMMC)</option>
+              <option value="BMC">Brihanmumbai Municipal Corporation (BMC)</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Date Issue Noticed (approx.)</div>
+            <input type="text" id="rti-date" placeholder="e.g. January 2025">
+          </div>
+          <button class="btn" onclick="generateRTI()">GENERATE RTI DRAFT →</button>
+        </div>
+        <div class="rti-output" id="rti-output"></div>
+        <button class="copy-btn" id="rti-copy" style="display:none;" onclick="copyRTI()">COPY TO CLIPBOARD</button>
+      </div>
+
+    </div><!-- /tools-grid -->
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-text">
+      <a href="basis-tools-2.html">← ENVIRONMENT TOOLS</a> ·
+      BASIS URBAN OS · SHOONYA ORIGINS · FREE FOREVER ·
+      <a href="basis-tools-1.html">BACK TO SAFETY TOOLS ↑</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ─── TOOL 21: Walkability Audit ───────────────────────────────────────────
+function calcWalk() {
+  const width = parseFloat(document.getElementById('walk-width').value) || 0;
+  const checks = document.querySelectorAll('#walk-checks input[type="checkbox"]');
+  let checkScore = 0;
+  checks.forEach(c => { if (c.checked) checkScore += parseInt(c.value); });
+
+  // Width score: 0–20 pts
+  const widthScore = width >= 2.0 ? 20 : width >= 1.5 ? 15 : width >= 1.0 ? 10 : width >= 0.5 ? 5 : 0;
+  const total = Math.min(100, widthScore + checkScore);
+
+  const grade = total >= 85 ? 'A — Excellent' : total >= 70 ? 'B — Good' :
+                total >= 50 ? 'C — Acceptable' : total >= 30 ? 'D — Poor' : 'F — Unacceptable';
+  const cls = total >= 70 ? 'result-safe' : total >= 40 ? 'result-warning' : 'result-danger';
+  const action = total >= 70 ? 'This street meets basic walkability standards.' :
+                 total >= 40 ? 'File improvement request with your ward councillor.' :
+                 '⚠ This footpath fails minimum standards. File formal complaint with municipal authority.';
+
+  document.getElementById('walk-val').textContent = total + '/100 — ' + grade;
+  document.getElementById('walk-val').className = 'result-value ' + cls;
+  document.getElementById('walk-detail').textContent = action + ` · Width score: ${widthScore}/20 · Features: ${checkScore}/80`;
+  setBar('walk-bar', total, total >= 70 ? '#39ff14' : total >= 40 ? '#ffb347' : '#ff4444');
+  showResult('walk');
+}
+
+// ─── TOOL 22: Tanker vs Tap ──────────────────────────────────────────────
+function calcTanker() {
+  const count = parseInt(document.getElementById('tank-count').value);
+  const cost = parseFloat(document.getElementById('tank-cost').value);
+  const cap = parseInt(document.getElementById('tank-cap').value);
+  if (!count || !cost) return alert('Fill all fields.');
+
+  const totalLiters = count * cap;
+  const totalCost = count * cost;
+  const ratePerKL = (cost / (cap / 1000)).toFixed(2);
+  // PMC piped rate: ~₹5–7 per KL residential
+  const pipedCost = Math.round((totalLiters / 1000) * 6);
+  const overpayment = Math.round(totalCost - pipedCost);
+  const annualLoss = overpayment * 12;
+
+  document.getElementById('tank-val').textContent = '₹' + overpayment.toLocaleString() + '/month excess';
+  document.getElementById('tank-val').className = 'result-value result-warning';
+  document.getElementById('tank-detail').textContent =
+    `Tanker rate: ₹${ratePerKL}/KL vs PMC pipe rate: ~₹6/KL · You're paying ${Math.round(ratePerKL / 6)}× the piped rate · ` +
+    `Annual overpayment: ₹${annualLoss.toLocaleString()} · File for piped water connection via your ward officer.`;
+  showResult('tank');
+}
+
+// ─── TOOL 23: Day-Burner ─────────────────────────────────────────────────
+function calcStreetlight() {
+  const count = parseInt(document.getElementById('sl-count').value);
+  const watts = parseInt(document.getElementById('sl-type').value);
+  const hours = parseFloat(document.getElementById('sl-hours').value);
+  if (!count || !hours) return alert('Fill all fields.');
+
+  const kWh = (count * watts * hours) / 1000;
+  const ratePerKWh = 8.5; // MSEDCL approx municipal rate
+  const dailyCost = (kWh * ratePerKWh).toFixed(0);
+  const monthCost = Math.round(dailyCost * 30);
+  const yearCost = Math.round(dailyCost * 365);
+
+  document.getElementById('sl-val').textContent = '₹' + dailyCost + '/day · ₹' + monthCost.toLocaleString() + '/month';
+  document.getElementById('sl-val').className = 'result-value result-warning';
+  document.getElementById('sl-detail').textContent =
+    `Annual waste: ₹${yearCost.toLocaleString()} · Energy: ${kWh.toFixed(1)} kWh/day · ` +
+    `Report this to your ward officer or tweet at your local municipal account with this data.`;
+  showResult('sl');
+}
+
+// ─── TOOL 24: EV vs Petrol TCO ───────────────────────────────────────────
+function calcTCO() {
+  const km = parseFloat(document.getElementById('tco-km').value);
+  const cat = document.getElementById('tco-cat').value;
+  const petrolPrice = parseFloat(document.getElementById('tco-petrol').value);
+  if (!km || !petrolPrice) return alert('Fill all fields.');
+
+  const days = 1825; // 5 years
+  const totalKm = km * days;
+
+  // Petrol params
+  const petrolMileage = cat === '2w' ? 45 : 15; // km/L
+  const petrolPurchase = cat === '2w' ? 130000 : 1100000;
+  const petrolMaint = cat === '2w' ? 8000 : 25000; // annual
+  const petrolFuelCost = (totalKm / petrolMileage) * petrolPrice;
+  const petrolTotal = petrolPurchase + petrolFuelCost + (petrolMaint * 5);
+
+  // EV params
+  const evEfficiency = cat === '2w' ? 25 : 6; // km/kWh
+  const evPurchase = cat === '2w' ? 110000 : 1500000;
+  const evMaint = cat === '2w' ? 2000 : 8000;
+  const evRate = 8.5; // ₹/kWh home charging
+  const evFuelCost = (totalKm / evEfficiency) * evRate;
+  const evTotal = evPurchase + evFuelCost + (evMaint * 5);
+
+  const saving = Math.round(petrolTotal - evTotal);
+  const savingLabel = saving > 0 ? 'EV SAVES ₹' + saving.toLocaleString() : 'PETROL SAVES ₹' + Math.abs(saving).toLocaleString();
+
+  document.getElementById('tco-val').textContent = savingLabel + ' over 5 years';
+  document.getElementById('tco-val').className = 'result-value ' + (saving > 0 ? 'result-safe' : 'result-warning');
+  document.getElementById('tco-detail').textContent =
+    `Petrol total: ₹${Math.round(petrolTotal / 1000)}K · EV total: ₹${Math.round(evTotal / 1000)}K · ` +
+    `Fuel cost gap: ₹${Math.round((petrolFuelCost - evFuelCost) / 1000)}K · Based on ${totalKm.toLocaleString()} km over 5 years.`;
+  showResult('tco');
+}
+
+// ─── TOOL 25: Society Maintenance ────────────────────────────────────────
+function calcSociety() {
+  const budget = parseFloat(document.getElementById('soc-budget').value);
+  const flats = parseInt(document.getElementById('soc-flats').value);
+  const yourArea = parseFloat(document.getElementById('soc-area').value);
+  const avgArea = parseFloat(document.getElementById('soc-avg').value);
+  if (!budget || !flats || !yourArea || !avgArea) return alert('Fill all fields.');
+
+  const flatRate = Math.round(budget / flats);
+  const totalArea = avgArea * flats;
+  const areaBasedYours = Math.round((yourArea / totalArea) * budget);
+  // Hybrid: 50% flat rate + 50% area based
+  const hybrid = Math.round((flatRate * 0.5) + (areaBasedYours * 0.5));
+
+  document.getElementById('soc-val').textContent = '₹' + hybrid + '/month (hybrid)';
+  document.getElementById('soc-val').className = 'result-value result-purple';
+  document.getElementById('soc-detail').textContent =
+    `Flat rate method: ₹${flatRate.toLocaleString()} · Area-based (your ${yourArea} sq.ft): ₹${areaBasedYours.toLocaleString()} · ` +
+    `Hybrid (fairest): ₹${hybrid.toLocaleString()} · Many Maharashtra RWAs use the hybrid model per the Model Bye-Laws.`;
+  showResult('soc');
+}
+
+// ─── TOOL 26: MSEDCL Slab Saver ──────────────────────────────────────────
+function calcMSEDCL() {
+  const units = parseInt(document.getElementById('msedcl-units').value);
+  const type = document.getElementById('msedcl-type').value;
+  if (!units) return alert('Enter units consumed.');
+
+  let bill = 0;
+  let breakdown = '';
+
+  if (type === 'res') {
+    // MSEDCL LT-1 residential slabs (approximate 2024 rates)
+    const s1 = Math.min(units, 100) * 3.87;
+    const s2 = Math.min(Math.max(units - 100, 0), 200) * 8.45;
+    const s3 = Math.max(units - 300, 0) * 11.20;
+    bill = s1 + s2 + s3;
+    breakdown = `0–100 units: ₹${s1.toFixed(0)} (@₹3.87) · 101–300: ₹${s2.toFixed(0)} (@₹8.45) · 300+: ₹${s3.toFixed(0)} (@₹11.20)`;
+  } else {
+    const s1 = Math.min(units, 100) * 7.55;
+    const s2 = Math.max(units - 100, 0) * 11.80;
+    bill = s1 + s2;
+    breakdown = `0–100 units: ₹${s1.toFixed(0)} (@₹7.55) · 101+: ₹${s2.toFixed(0)} (@₹11.80)`;
+  }
+
+  // Fixed charges + taxes approximation
+  const fixed = type === 'res' ? 120 : 300;
+  const total = Math.round(bill + fixed);
+  const saving = units > 100 ? Math.round(Math.min(units - 90, 30) * (type === 'res' ? 8.45 - 3.87 : 11.80 - 7.55)) : 0;
+
+  document.getElementById('msedcl-val').textContent = '₹' + total.toLocaleString() + ' estimated';
+  document.getElementById('msedcl-val').className = 'result-value result-warning';
+  document.getElementById('msedcl-detail').textContent =
+    breakdown + ` · Fixed charges: ₹${fixed} · ` +
+    (units > 100 ? `Tip: Reducing by 10 units saves ~₹${Math.round(saving)} this month.` : 'You are in the lowest slab. Good.');
+  showResult('msedcl');
+}
+
+// ─── TOOL 27: Property Tax ────────────────────────────────────────────────
+function calcPropertyTax() {
+  const area = parseFloat(document.getElementById('pt-area').value);
+  const type = document.getElementById('pt-type').value;
+  const zone = parseFloat(document.getElementById('pt-zone').value);
+  const age = parseFloat(document.getElementById('pt-age').value);
+  if (!area) return alert('Enter carpet area.');
+
+  // ARV method: Annual Rateable Value = Area × Base Rate × Zone × Age
+  const baseRate = type === 'res' ? 8 : 20; // ₹ per sq.ft per month (conservative PMC estimate)
+  const arv = area * baseRate * zone * age * 12;
+  const taxRate = type === 'res' ? 0.28 : 0.40; // % of ARV
+  const annualTax = Math.round(arv * taxRate);
+  const semiAnnual = Math.round(annualTax / 2);
+
+  document.getElementById('pt-val').textContent = '₹' + annualTax.toLocaleString() + '/year';
+  document.getElementById('pt-val').className = 'result-value result-purple';
+  document.getElementById('pt-detail').textContent =
+    `ARV: ₹${Math.round(arv).toLocaleString()} · Half-yearly payment: ₹${semiAnnual.toLocaleString()} · ` +
+    `This is an estimate based on standard PMC ARV method. Verify with your ward office for exact figure. Agents charge ₹500–2000 for this same calculation.`;
+  showResult('pt');
+}
+
+// ─── TOOL 28: Stamp Duty ─────────────────────────────────────────────────
+function calcStampDuty() {
+  const rent = parseFloat(document.getElementById('sd-rent').value);
+  const months = parseInt(document.getElementById('sd-months').value);
+  const deposit = parseFloat(document.getElementById('sd-deposit').value) || 0;
+  if (!rent || !months) return alert('Fill all fields.');
+
+  // Maharashtra Stamp Act: Stamp duty = 0.25% of (Annual Rent + 10% of Deposit)
+  const annualRent = rent * 12;
+  const depositComponent = deposit * 0.10;
+  const stampBase = (annualRent * (months / 12)) + depositComponent;
+  const stampDuty = Math.max(500, Math.round(stampBase * 0.0025));
+  const regFee = 1000; // Fixed for leave & license
+  const total = stampDuty + regFee;
+
+  document.getElementById('sd-val').textContent = '₹' + total.toLocaleString() + ' total';
+  document.getElementById('sd-val').className = 'result-value result-purple';
+  document.getElementById('sd-detail').textContent =
+    `Stamp duty: ₹${stampDuty.toLocaleString()} · Registration fee: ₹${regFee} · ` +
+    `Duration: ${months} months · Deposit: ₹${deposit.toLocaleString()} · ` +
+    `Agents often charge ₹2,000–5,000 for this service. Do it yourself at the Sub-Registrar's office.`;
+  showResult('sd');
+}
+
+// ─── TOOL 29: Movers Volume ───────────────────────────────────────────────
+function calcMovers() {
+  // CBM (Cubic Meters) per item
+  const cbm = {
+    bed: 2.5, sofa: 2.0, ward: 2.2, fridge: 0.6,
+    wm: 0.4, tv: 0.3, dtable: 1.0, boxes: 0.1
+  };
+  const ids = ['bed','sofa','ward','fridge','wm','tv','dtable','boxes'];
+  let total = 0;
+  ids.forEach(id => {
+    const val = parseInt(document.getElementById('mv-' + id).value) || 0;
+    total += val * cbm[id];
+  });
+
+  const truck = total < 3 ? 'Mini truck (407)' : total < 7 ? 'Small truck (Canter)' :
+                total < 14 ? 'Medium truck (17 ft)' : 'Large truck (20+ ft)';
+  const estCost = Math.round(total * 1200); // rough ₹ per CBM local Pune rate
+
+  document.getElementById('mv-val').textContent = total.toFixed(1) + ' cubic meters';
+  document.getElementById('mv-val').className = 'result-value result-orange' ;
+  document.getElementById('mv-val').style.color = '#ff6b35';
+  document.getElementById('mv-detail').textContent =
+    `Appropriate vehicle: ${truck} · Estimated local rate: ₹${estCost.toLocaleString()}–${Math.round(estCost * 1.4).toLocaleString()} · ` +
+    `Get at least 3 quotes. Reject any quote that doesn't specify "per CBM" or charges per "trip" without volume disclosure.`;
+  showResult('mv');
+}
+
+// ─── TOOL 30: RTI Generator ───────────────────────────────────────────────
+function generateRTI() {
+  const name = document.getElementById('rti-name').value.trim();
+  const issue = document.getElementById('rti-issue');
+  const issueText = issue.options[issue.selectedIndex].text;
+  const loc = document.getElementById('rti-loc').value.trim();
+  const auth = document.getElementById('rti-auth').value;
+  const date = document.getElementById('rti-date').value.trim();
+  if (!name || !loc) return alert('Enter your name and location.');
+
+  const questions = {
+    road: `1. What is the sanctioned budget for road maintenance in the ward/area where [LOCATION] is located for the current financial year?\n2. When was the last repair conducted on this road? Please provide the date, contractor name, and amount spent.\n3. Is there a pending work order for repair at this location? If yes, what is the expected completion date?\n4. How many complaints have been registered for this road in the past 12 months?`,
+    water: `1. What is the scheduled water supply timing for [LOCATION] as per current distribution records?\n2. How many days in the past 6 months has supply been disrupted or reduced? Please provide a log.\n3. What is the current pipe age and condition for the main line serving this area?\n4. Are there any pending repair or replacement works sanctioned for this pipeline?`,
+    drain: `1. What is the drainage network design capacity (in liters/second) for the area around [LOCATION]?\n2. When was the last desilting or maintenance work done on drains at this location?\n3. How many flooding/waterlogging complaints were recorded at this location in the previous monsoon season?\n4. Are there any drainage improvement projects planned or sanctioned for this area?`,
+    light: `1. Who is the current maintenance contractor for streetlights in the area of [LOCATION]?\n2. What is the complaint resolution SLA (Service Level Agreement) for streetlight faults?\n3. On what date was the malfunction at [LOCATION] logged in the system?\n4. How many functioning streetlights are mapped in this ward as of the latest audit?`,
+    garbage: `1. What is the scheduled garbage collection frequency for [LOCATION] as per the current contract?\n2. Who is the designated collection agency/contractor and what is their contract value?\n3. How many complaints about collection failure have been logged in this area in the past 3 months?\n4. What is the penalty clause invoked against the contractor for missed collections?`,
+    permit: `1. Provide copies of all building permits, commencement certificates, and occupation certificates issued for the construction at [LOCATION].\n2. Has any unauthorized construction complaint been registered at this address? If yes, what action was taken?\n3. What is the sanctioned Floor Space Index (FSI) for this plot?\n4. Has any stop-work notice been issued? If yes, provide its current status.`,
+    tree: `1. Under what authority was the order to cut/fell trees at [LOCATION] issued? Provide the order number and date.\n2. Was a Tree Authority permission obtained? Provide the permission document.\n3. How many trees were authorized to be felled and how many replacement saplings are required as per policy?\n4. What is the current status of replanting obligations at this site?`
+  };
+
+  const qText = questions[issue.value].replace(/\[LOCATION\]/g, loc);
+
+  const draft = `TO,
+The Public Information Officer (PIO),
+${auth}
+
+Subject: Application Under the Right to Information Act, 2005 — Regarding ${issueText} at ${loc}
+
+Respected Sir/Madam,
+
+I, ${name}, a citizen and resident/user of the area, wish to obtain the following information under Section 6 of the Right to Information Act, 2005, relating to a civic issue at: ${loc}.
+
+The issue has been observed since approximately ${date || 'recent months'} and has not been resolved despite the passage of time.
+
+INFORMATION SOUGHT:
+
+${qText}
+
+I request that the above information be provided within the statutory period of 30 days as per Section 7(1) of the RTI Act, 2005.
+
+The prescribed fee of ₹10 is enclosed/paid via [IPO / Court Fee Stamp / Online Portal].
+
+Yours faithfully,
+${name}
+Date: ${new Date().toLocaleDateString('en-IN')}
+
+Note: If information is denied, I reserve the right to file a First Appeal under Section 19(1) of the RTI Act.`;
+
+  const output = document.getElementById('rti-output');
+  output.textContent = draft;
+  output.classList.add('show');
+  document.getElementById('rti-copy').style.display = 'inline-block';
+}
+
+function copyRTI() {
+  const text = document.getElementById('rti-output').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    document.getElementById('rti-copy').textContent = '✓ COPIED';
+    setTimeout(() => { document.getElementById('rti-copy').textContent = 'COPY TO CLIPBOARD'; }, 2000);
+  });
+}
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────
+function showResult(id) {
+  document.getElementById(id + '-result').classList.add('show');
+}
+
+function setBar(id, pct, color) {
+  const bar = document.getElementById(id);
+  if (!bar) return;
+  bar.style.width = pct + '%';
+  bar.style.background = color;
+}
+</script>
+</body>
+</html>
