@@ -1,142 +1,1155 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Basis | Smart Urban Governance</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* BASIS THEME: Civic, Trustworthy, Collaborative */
-        :root {
-            --civic-blue: #2563eb;    /* Trust Blue */
-            --civic-dark: #1e3a8a;    /* Official Navy */
-            --clean-bg: #f8fafc;
-            --text-dark: #334155;
-            --text-light: #64748b;
-        }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Basis — Urban Intelligence Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        
-        body { background-color: var(--clean-bg); color: var(--text-dark); line-height: 1.6; }
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   LIGHT MODE — DEFAULT  (Oceanic Mist, from Shoonya Origins CSS)
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  --bg:        #F0F7F9;
+  --surface:   rgba(224, 242, 254, 0.45);
+  --card:      rgba(255, 255, 255, 0.72);
+  --border:    rgba(8, 145, 178, 0.13);
+  --border2:   rgba(8, 145, 178, 0.28);
+  --accent:    #0891B2;
+  --accent2:   #0F172A;
+  --accent3:   #334155;
+  --steel:     #1E3A5F;
+  --text:      #1E293B;
+  --muted:     #64748B;
+  --dim:       #94A3B8;
+  --safe:      #059669;
+  --warning:   #B45309;
+  --danger:    #9F1239;
 
-        /* NAV */
-        nav {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 1.5rem 5%; background: white; border-bottom: 1px solid #e2e8f0;
-        }
-        .brand { font-size: 1.6rem; font-weight: 700; color: var(--civic-dark); }
-        .back-link { text-decoration: none; color: var(--text-light); font-size: 0.9rem; }
+  /* theme-specific tokens */
+  --heading:       #0F172A;
+  --header-bg:     rgba(240, 247, 249, 0.88);
+  --accent-tint:   rgba(8, 145, 178, 0.05);
+  --accent-tint2:  rgba(8, 145, 178, 0.10);
+  --glow-sm:       rgba(8, 145, 178, 0.18);
+  --glow-lg:       rgba(8, 145, 178, 0.32);
+  --city-ghost:    rgba(8, 145, 178, 0.05);
+  --pipe-section:  rgba(8, 145, 178, 0.02);
+  --promise-grad:  linear-gradient(180deg, transparent, rgba(8,145,178,0.04), transparent);
+  --form-input-bg: rgba(255, 255, 255, 0.7);
+  --form-focus-bg: #ffffff;
+  --form-focus-sh: rgba(8, 145, 178, 0.10);
 
-        /* HERO */
-        .hero {
-            padding: 7rem 5%;
-            text-align: center;
-            background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
-        }
-        h1 { font-size: 3rem; color: var(--civic-dark); margin-bottom: 1rem; line-height: 1.2; }
-        p.subtitle { font-size: 1.15rem; color: var(--text-light); max-width: 700px; margin: 0 auto 2.5rem; }
-        
-        .badge {
-            background: #dbeafe; color: var(--civic-blue); padding: 5px 15px; border-radius: 50px;
-            font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
-            margin-bottom: 1.5rem; display: inline-block;
-        }
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body:    'Plus Jakarta Sans', sans-serif;
+  --font-mono:    'Space Mono', monospace;
+}
 
-        /* MISSION STATEMENT */
-        .mission-box {
-            max-width: 900px; margin: 0 auto 5rem; padding: 2rem;
-            background: white; border-left: 4px solid var(--civic-blue);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05); border-radius: 0 12px 12px 0;
-        }
-        .mission-box p { font-style: italic; color: var(--text-dark); font-size: 1.1rem; }
+/* ═══════════════════════════════════════════════════════════════
+   DARK MODE — override via html[data-theme="dark"]
+   ═══════════════════════════════════════════════════════════════ */
+html[data-theme="dark"] {
+  --bg:        #090E1A;
+  --surface:   #0D1626;
+  --card:      rgba(13, 22, 38, 0.85);
+  --border:    rgba(0, 212, 255, 0.10);
+  --border2:   rgba(0, 212, 255, 0.20);
+  --accent:    #00D4FF;
+  --accent2:   #0A1628;
+  --accent3:   #1B3A5C;
+  --steel:     #2C4A6E;
+  --text:      #E2EAF0;
+  --muted:     #6B8EAD;
+  --dim:       #3D5A7A;
+  --safe:      #10B981;
+  --warning:   #F59E0B;
+  --danger:    #EF4444;
 
-        /* SOLUTIONS GRID */
-        .solutions { padding: 4rem 5%; background: white; }
-        .grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 3rem;
-            max-width: 1200px; margin: 0 auto;
-        }
+  --heading:       #ffffff;
+  --header-bg:     rgba(9, 14, 26, 0.88);
+  --accent-tint:   rgba(0, 212, 255, 0.04);
+  --accent-tint2:  rgba(0, 212, 255, 0.08);
+  --glow-sm:       rgba(0, 212, 255, 0.25);
+  --glow-lg:       rgba(0, 212, 255, 0.45);
+  --city-ghost:    rgba(0, 212, 255, 0.04);
+  --pipe-section:  rgba(0, 212, 255, 0.02);
+  --promise-grad:  linear-gradient(180deg, transparent, rgba(0,212,255,0.03), transparent);
+  --form-input-bg: rgba(255, 255, 255, 0.04);
+  --form-focus-bg: rgba(0, 212, 255, 0.04);
+  --form-focus-sh: rgba(0, 212, 255, 0.08);
+}
 
-        .solution-card {
-            padding: 2rem; border-radius: 12px; background: var(--clean-bg);
-            border: 1px solid #e2e8f0; transition: all 0.3s;
-        }
-        .solution-card:hover { border-color: var(--civic-blue); background: white; box-shadow: 0 10px 30px rgba(37, 99, 235, 0.1); }
-        
-        .icon-box {
-            width: 50px; height: 50px; background: var(--civic-dark); color: white;
-            display: flex; align-items: center; justify-content: center; border-radius: 8px;
-            margin-bottom: 1.5rem; font-size: 1.5rem;
-        }
+/* ─── AMBIENT LAYERS — LIGHT ─────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(circle at 20% 0%,  rgba(8, 145, 178, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 100%, rgba(15, 23, 42, 0.04)  0%, transparent 50%);
+  transition: background 0.4s ease;
+}
+/* Grid overlay — light */
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(8, 145, 178, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(8, 145, 178, 0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  transition: background-image 0.4s ease;
+}
 
-        h3 { font-size: 1.4rem; margin-bottom: 0.8rem; color: var(--civic-dark); }
-        p.desc { font-size: 0.95rem; color: var(--text-light); }
+/* ─── AMBIENT LAYERS — DARK ──────────────────────────────────── */
+html[data-theme="dark"] body::before {
+  background:
+    radial-gradient(ellipse 60% 50% at 10% 0%,  rgba(0,212,255,0.07)  0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 90% 80%,  rgba(0,90,140,0.10)   0%, transparent 60%),
+    radial-gradient(ellipse 30% 30% at 50% 50%,  rgba(10,22,40,0.6)    0%, transparent 80%);
+}
+html[data-theme="dark"] body::after {
+  background-image:
+    linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
 
-        footer { text-align: center; padding: 3rem; color: var(--text-light); font-size: 0.9rem; background: #f1f5f9; }
-    </style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.7;
+  transition: background 0.35s ease, color 0.35s ease;
+}
+
+.z1 { position: relative; z-index: 1; }
+.container { max-width: 1140px; margin: 0 auto; padding: 0 28px; position: relative; z-index: 1; }
+
+/* ─── HEADER ─────────────────────────────────────────────────── */
+header {
+  position: sticky; top: 0; z-index: 200;
+  border-bottom: 1px solid var(--border);
+  background: var(--header-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  padding: 0;
+  transition: background 0.35s ease, border-color 0.35s ease;
+}
+.header-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  height: 64px; gap: 24px;
+}
+.logo {
+  font-family: var(--font-mono);
+  font-size: 16px; font-weight: 700;
+  color: var(--text);
+  letter-spacing: 5px; text-transform: uppercase;
+  text-decoration: none; flex-shrink: 0;
+}
+.logo span { color: var(--accent); }
+
+.nav-links {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+}
+.nav-links a {
+  font-family: var(--font-body);
+  font-size: 11px; font-weight: 600;
+  color: var(--muted); text-decoration: none;
+  border: 1px solid var(--border);
+  padding: 6px 14px; border-radius: 4px;
+  letter-spacing: 1px; text-transform: uppercase;
+  transition: all 0.25s ease;
+}
+.nav-links a:hover, .nav-links a.active {
+  color: var(--accent); border-color: var(--accent);
+  background: var(--accent-tint);
+}
+.nav-links a.nav-cta {
+  background: var(--accent); color: #fff;
+  border-color: var(--accent); font-weight: 700;
+}
+.nav-links a.nav-cta:hover { background: transparent; color: var(--accent); }
+
+/* ─── THEME TOGGLE ───────────────────────────────────────────── */
+.theme-toggle {
+  font-size: 15px;
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.25s ease;
+  color: var(--muted);
+}
+.theme-toggle:hover { border-color: var(--accent); background: var(--accent-tint); }
+
+/* ─── HERO ───────────────────────────────────────────────────── */
+.hero {
+  min-height: 92vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+  padding: 120px 0 80px;
+}
+.hero-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px; font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 6px; text-transform: uppercase;
+  margin-bottom: 28px;
+  display: flex; align-items: center; gap: 12px;
+}
+.hero-eyebrow::before, .hero-eyebrow::after {
+  content: ''; display: block; width: 40px; height: 1px;
+  background: var(--accent); opacity: 0.5;
+}
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(48px, 8.5vw, 96px);
+  font-weight: 700; line-height: 1.05;
+  color: var(--heading); margin-bottom: 28px;
+}
+.hero h1 em {
+  font-style: normal; color: var(--accent);
+  text-shadow: 0 0 60px var(--glow-sm);
+}
+.hero-sub {
+  font-size: 17px; color: var(--muted);
+  max-width: 640px; margin: 0 auto 48px;
+  line-height: 1.85; font-weight: 400;
+}
+.hero-actions { display: flex; gap: 14px; align-items: center; justify-content: center; flex-wrap: wrap; }
+.btn-primary {
+  font-family: var(--font-body);
+  font-size: 12px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  padding: 16px 32px; border-radius: 6px;
+  background: var(--accent); color: #fff;
+  border: none; cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 30px var(--glow-sm);
+  text-decoration: none; display: inline-block;
+}
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 50px var(--glow-lg);
+}
+.btn-ghost {
+  font-family: var(--font-body);
+  font-size: 12px; font-weight: 600;
+  letter-spacing: 2px; text-transform: uppercase;
+  padding: 15px 32px; border-radius: 6px;
+  background: transparent; color: var(--text);
+  border: 1px solid var(--border2);
+  cursor: pointer; transition: all 0.3s ease;
+  text-decoration: none; display: inline-block;
+}
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+.hero-stats {
+  display: flex; gap: 40px; margin-top: 80px;
+  border-top: 1px solid var(--border);
+  padding-top: 40px;
+  justify-content: center; flex-wrap: wrap;
+}
+.stat-item { text-align: center; }
+.stat-num {
+  font-family: var(--font-display);
+  font-size: 38px; font-weight: 700;
+  color: var(--accent); display: block; line-height: 1;
+}
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 10px; color: var(--muted);
+  letter-spacing: 2px; text-transform: uppercase;
+  margin-top: 6px; display: block;
+}
+
+/* ─── SECTION COMMONS ────────────────────────────────────────── */
+section { padding: 100px 0; }
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 10px; font-weight: 700;
+  color: var(--accent); letter-spacing: 5px;
+  text-transform: uppercase; margin-bottom: 16px; display: block;
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(32px, 5vw, 52px);
+  font-weight: 700; color: var(--heading);
+  line-height: 1.15; margin-bottom: 16px;
+}
+.section-sub { font-size: 16px; color: var(--muted); max-width: 580px; line-height: 1.8; }
+
+/* ─── DIVIDER ─────────────────────────────────────────────────── */
+.divider {
+  width: 100%; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border2), transparent);
+}
+
+/* ─── HOW IT WORKS ───────────────────────────────────────────── */
+.steps-track {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 2px; margin-top: 64px;
+  border: 1px solid var(--border);
+  border-radius: 16px; overflow: hidden;
+}
+.step-block {
+  background: var(--card);
+  backdrop-filter: blur(16px);
+  padding: 40px 36px; position: relative;
+  transition: background 0.4s ease;
+}
+.step-block:hover { background: var(--accent-tint); }
+.step-block + .step-block { border-left: 1px solid var(--border); }
+.step-num {
+  font-family: var(--font-mono);
+  font-size: 10px; color: var(--dim);
+  text-transform: uppercase; letter-spacing: 2px;
+  margin-bottom: 28px; display: block;
+}
+.step-icon {
+  width: 52px; height: 52px;
+  border: 1px solid var(--border2); border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; margin-bottom: 24px;
+  background: var(--accent-tint);
+}
+.step-block h3 {
+  font-family: var(--font-display);
+  font-size: 24px; font-weight: 700;
+  color: var(--heading); margin-bottom: 12px;
+}
+.step-block p { font-size: 14px; color: var(--muted); line-height: 1.75; }
+.connector-arrow {
+  position: absolute; right: -14px; top: 50%;
+  transform: translateY(-50%);
+  width: 28px; height: 28px; background: var(--bg);
+  border: 1px solid var(--border2); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; color: var(--accent); z-index: 2;
+}
+
+/* ─── DETECTION GRID ─────────────────────────────────────────── */
+.detection-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px; margin-top: 64px;
+}
+.detect-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 32px 28px;
+  position: relative; overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.detect-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--accent), transparent);
+  opacity: 0; transition: opacity 0.3s;
+}
+.detect-card:hover {
+  transform: translateY(-8px); border-color: var(--border2);
+  box-shadow: 0 24px 60px var(--accent-tint2);
+}
+.detect-card:hover::before { opacity: 1; }
+.detect-tag {
+  font-family: var(--font-mono);
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  padding: 4px 10px; border-radius: 3px;
+  margin-bottom: 20px; display: inline-block;
+}
+.tag-cv    { background: var(--accent-tint2); color: var(--accent); }
+.tag-ai    { background: rgba(5,150,105,0.10); color: var(--safe); }
+.tag-crowd { background: rgba(180,83,9,0.10);  color: var(--warning); }
+html[data-theme="dark"] .tag-ai    { background: rgba(16,185,129,0.12); }
+html[data-theme="dark"] .tag-crowd { background: rgba(245,158,11,0.12); }
+
+.detect-icon { font-size: 28px; margin-bottom: 16px; display: block; }
+.detect-card h3 {
+  font-family: var(--font-display);
+  font-size: 22px; font-weight: 700;
+  color: var(--heading); margin-bottom: 10px;
+}
+.detect-card p { font-size: 13px; color: var(--muted); line-height: 1.7; }
+.detect-tech { font-family: var(--font-mono); font-size: 10px; color: var(--dim); margin-top: 18px; letter-spacing: 1px; }
+
+/* ─── PIPELINE ───────────────────────────────────────────────── */
+.pipeline-section { background: var(--pipe-section); }
+.pipeline-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; margin-top: 64px; }
+.pipeline-visual {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; padding: 36px;
+  font-family: var(--font-mono); font-size: 12px;
+}
+.pipe-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; border-radius: 8px; margin-bottom: 6px;
+  transition: background 0.25s ease;
+}
+.pipe-row:hover { background: var(--accent-tint); }
+.pipe-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.pipe-dot.cyan  { background: var(--accent);  box-shadow: 0 0 8px var(--accent); }
+.pipe-dot.green { background: var(--safe);    box-shadow: 0 0 8px var(--safe); }
+.pipe-dot.amber { background: var(--warning); box-shadow: 0 0 8px var(--warning); }
+.pipe-dot.red   { background: var(--danger);  box-shadow: 0 0 8px var(--danger); }
+.pipe-label { color: var(--text); font-weight: 700; flex: 1; }
+.pipe-sub   { color: var(--dim); font-size: 10px; }
+.pipe-badge { font-size: 9px; padding: 2px 8px; border-radius: 3px; font-weight: 700; letter-spacing: 1px; }
+.badge-live { background: rgba(5,150,105,0.12);  color: var(--safe); }
+.badge-ai   { background: var(--accent-tint2);   color: var(--accent); }
+.badge-anon { background: rgba(180,83,9,0.10);   color: var(--warning); }
+.badge-gov  { background: rgba(100,116,139,0.15); color: var(--muted); }
+html[data-theme="dark"] .badge-live { background: rgba(16,185,129,0.15); }
+html[data-theme="dark"] .badge-anon { background: rgba(245,158,11,0.12); }
+html[data-theme="dark"] .badge-gov  { background: rgba(44,74,110,0.5); }
+
+.pipeline-text h3 {
+  font-family: var(--font-display);
+  font-size: clamp(26px, 3vw, 36px); font-weight: 700;
+  color: var(--heading); margin-bottom: 18px; line-height: 1.2;
+}
+.pipeline-text p { font-size: 15px; color: var(--muted); line-height: 1.85; margin-bottom: 16px; }
+.promise-list { list-style: none; margin-top: 24px; display: flex; flex-direction: column; gap: 12px; }
+.promise-list li { display: flex; align-items: flex-start; gap: 12px; font-size: 14px; color: var(--muted); }
+.promise-list li::before { content: '›'; color: var(--accent); font-size: 18px; font-weight: 700; flex-shrink: 0; line-height: 1.2; }
+
+/* ─── CITIES ─────────────────────────────────────────────────── */
+.cities-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 64px; }
+.city-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 40px;
+  position: relative; overflow: hidden; transition: all 0.4s ease;
+}
+.city-card:hover { border-color: var(--border2); box-shadow: 0 20px 60px var(--accent-tint2); }
+.city-bg-text {
+  position: absolute; right: 20px; bottom: -10px;
+  font-family: var(--font-display); font-size: 100px; font-weight: 700;
+  color: var(--city-ghost); line-height: 1;
+  pointer-events: none; user-select: none;
+}
+.city-status {
+  font-family: var(--font-mono); font-size: 9px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 2px;
+  padding: 4px 10px; border-radius: 3px;
+  margin-bottom: 24px; display: inline-flex; align-items: center; gap: 6px;
+}
+.status-active { background: rgba(5,150,105,0.10); color: var(--safe); }
+.status-active::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--safe); animation: pulse 2s infinite; }
+.status-soon { background: rgba(180,83,9,0.10); color: var(--warning); }
+html[data-theme="dark"] .status-active { background: rgba(16,185,129,0.12); }
+html[data-theme="dark"] .status-soon   { background: rgba(245,158,11,0.12); }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+.city-card h2 {
+  font-family: var(--font-display); font-size: 40px; font-weight: 700;
+  color: var(--heading); margin-bottom: 8px;
+}
+.city-card h4 {
+  font-family: var(--font-mono); font-size: 10px; color: var(--muted);
+  letter-spacing: 3px; text-transform: uppercase; margin-bottom: 20px; font-weight: 400;
+}
+.city-card p { font-size: 14px; color: var(--muted); line-height: 1.75; }
+.city-metrics { display: flex; gap: 24px; margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--border); }
+.city-metric-val { font-family: var(--font-display); font-size: 26px; font-weight: 700; color: var(--accent); display: block; line-height: 1; }
+.city-metric-label { font-family: var(--font-mono); font-size: 9px; color: var(--dim); text-transform: uppercase; letter-spacing: 1.5px; }
+
+/* ─── TECH STRIP ─────────────────────────────────────────────── */
+.tech-strip { margin-top: 64px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.tech-pill {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 24px 20px; text-align: center; transition: all 0.3s ease;
+}
+.tech-pill:hover { border-color: var(--border2); }
+.tech-pill-icon { font-size: 24px; display: block; margin-bottom: 10px; }
+.tech-pill h4 { font-family: var(--font-mono); font-size: 11px; color: var(--text); font-weight: 700; letter-spacing: 1px; margin-bottom: 6px; }
+.tech-pill p { font-size: 12px; color: var(--dim); }
+
+/* ─── PROMISE SECTION ────────────────────────────────────────── */
+.promise-section { text-align: center; background: var(--promise-grad); padding: 120px 0; }
+.promise-title {
+  font-family: var(--font-display); font-size: clamp(42px, 7vw, 80px);
+  font-weight: 700; color: var(--heading); line-height: 1.1; margin-bottom: 28px;
+}
+.promise-title em { font-style: normal; color: var(--accent); }
+.promise-desc { font-size: 17px; color: var(--muted); max-width: 580px; margin: 0 auto 48px; line-height: 1.85; }
+.promise-signature { font-family: var(--font-mono); font-size: 11px; color: var(--dim); letter-spacing: 3px; text-transform: uppercase; margin-top: 32px; }
+.promise-signature strong { color: var(--accent); }
+
+/* ─── REPORT WIDGET ──────────────────────────────────────────── */
+.report-section { padding: 80px 0; }
+.report-wrap { display: grid; grid-template-columns: 1fr 1.2fr; gap: 64px; align-items: start; }
+.report-form-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 40px; }
+.report-form-card h3 { font-family: var(--font-display); font-size: 28px; font-weight: 700; color: var(--heading); margin-bottom: 6px; }
+.report-form-card .sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
+.form-label { font-family: var(--font-body); font-size: 10px; font-weight: 800; color: var(--dim); letter-spacing: 2px; text-transform: uppercase; }
+.form-control {
+  background: var(--form-input-bg); border: 1px solid var(--border);
+  color: var(--text); font-family: var(--font-body); font-size: 14px;
+  padding: 12px 16px; width: 100%; border-radius: 8px;
+  transition: all 0.3s ease; outline: none;
+}
+.form-control:focus { border-color: var(--accent); background: var(--form-focus-bg); box-shadow: 0 0 0 4px var(--form-focus-sh); }
+.form-control option { background: var(--surface); color: var(--text); }
+.upload-area {
+  border: 1px dashed var(--border2); border-radius: 10px; padding: 32px;
+  text-align: center; cursor: pointer; transition: all 0.3s ease; margin-bottom: 18px;
+  background: var(--accent-tint);
+}
+.upload-area:hover { border-color: var(--accent); background: var(--accent-tint2); }
+.upload-icon { font-size: 28px; margin-bottom: 10px; display: block; }
+.upload-text { font-size: 13px; color: var(--muted); }
+.upload-text strong { color: var(--accent); }
+.anon-note {
+  display: flex; align-items: center; gap: 8px; font-family: var(--font-mono);
+  font-size: 10px; color: var(--dim); letter-spacing: 1px; text-transform: uppercase;
+  padding: 10px 0; border-top: 1px solid var(--border); margin-top: 4px;
+}
+.anon-note::before { content: '🔒'; font-size: 12px; }
+.report-info h3 { font-family: var(--font-display); font-size: 32px; font-weight: 700; color: var(--heading); margin-bottom: 16px; }
+.report-info p { font-size: 15px; color: var(--muted); line-height: 1.85; margin-bottom: 20px; }
+.flow-steps { margin-top: 32px; display: flex; flex-direction: column; gap: 0; }
+.flow-step { display: flex; gap: 20px; align-items: flex-start; padding-bottom: 28px; position: relative; }
+.flow-step:not(:last-child)::before {
+  content: ''; position: absolute; left: 15px; top: 36px; width: 1px; bottom: 0;
+  background: linear-gradient(180deg, var(--border2), transparent);
+}
+.flow-step-num {
+  width: 32px; height: 32px; flex-shrink: 0;
+  border: 1px solid var(--border2); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: var(--accent);
+}
+.flow-step-content h4 { font-family: var(--font-body); font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.flow-step-content p { font-size: 13px; color: var(--dim); line-height: 1.65; }
+
+/* ─── IMPACT ─────────────────────────────────────────────────── */
+.impact-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; margin-top: 64px; background: var(--border); border-radius: 16px; overflow: hidden; }
+.impact-cell { background: var(--card); padding: 36px 28px; text-align: center; transition: background 0.3s ease; }
+.impact-cell:hover { background: var(--accent-tint); }
+.impact-num { font-family: var(--font-display); font-size: 44px; font-weight: 700; color: var(--accent); display: block; line-height: 1; }
+.impact-label { font-size: 13px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
+
+/* ─── FOOTER ─────────────────────────────────────────────────── */
+footer { border-top: 1px solid var(--border); padding: 56px 0 32px; background: var(--surface); }
+.footer-inner { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
+.footer-brand .logo { display: inline-block; margin-bottom: 14px; text-decoration: none; }
+.footer-brand p { font-size: 13px; color: var(--muted); line-height: 1.75; max-width: 280px; }
+.footer-col h5 { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--accent); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 18px; }
+.footer-col a { display: block; font-size: 13px; color: var(--muted); text-decoration: none; margin-bottom: 10px; transition: color 0.2s ease; }
+.footer-col a:hover { color: var(--text); }
+.footer-bottom { border-top: 1px solid var(--border); padding-top: 24px; display: flex; align-items: center; justify-content: space-between; }
+.footer-copy { font-family: var(--font-mono); font-size: 10px; color: var(--dim); letter-spacing: 1px; }
+.footer-tag { font-family: var(--font-mono); font-size: 10px; color: var(--dim); letter-spacing: 2px; text-transform: uppercase; }
+.footer-tag strong { color: var(--accent); }
+
+/* ─── SCROLL ANIMATIONS ──────────────────────────────────────── */
+.reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s cubic-bezier(0.4,0,0.2,1), transform 0.7s cubic-bezier(0.4,0,0.2,1); }
+.reveal.visible { opacity: 1; transform: none; }
+.reveal-d1 { transition-delay: 0.1s; }
+.reveal-d2 { transition-delay: 0.2s; }
+.reveal-d3 { transition-delay: 0.3s; }
+
+/* ─── RESPONSIVE ─────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .steps-track { grid-template-columns: 1fr; }
+  .step-block + .step-block { border-left: none; border-top: 1px solid var(--border); }
+  .pipeline-wrap { grid-template-columns: 1fr; gap: 40px; }
+  .cities-grid { grid-template-columns: 1fr; }
+  .tech-strip { grid-template-columns: repeat(2, 1fr); }
+  .impact-grid { grid-template-columns: repeat(2, 1fr); }
+  .footer-inner { grid-template-columns: 1fr 1fr; gap: 32px; }
+  .report-wrap { grid-template-columns: 1fr; gap: 40px; }
+}
+@media (max-width: 600px) {
+  .nav-links { display: none; }
+  .hero h1 { font-size: 44px; }
+  .hero-stats { gap: 24px; }
+  .detection-grid { grid-template-columns: 1fr; }
+  .tech-strip { grid-template-columns: 1fr 1fr; }
+  .impact-grid { grid-template-columns: 1fr 1fr; }
+  .footer-inner { grid-template-columns: 1fr; }
+  .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+}
+</style>
 </head>
 <body>
 
-    <nav>
-        <div class="brand">Basis</div>
-        <a href="../../index.html" class="back-link">← Shoonya Origins</a>
-    </nav>
+<!-- ═══ HEADER ════════════════════════════════════════════════ -->
+<header>
+  <div class="container">
+    <div class="header-inner">
+      <a href="#" class="logo">BA<span>S</span>IS</a>
+      <nav class="nav-links">
+        <a href="#how-it-works">FREE TOOLS FOR EVERYONE </a>
+        <a href="#detection">Safety Tools </a>
+        <a href="#cities">Civic Tools </a>
+        <a href="dashboard.html">Environment Tools</a>
+        <a href="report.html">Report Issue</a>
+        <a href="govportal.html">Gov Portal</a>
+        <a href="#report" class="nav-cta">Report Now →</a>
+      </nav>
+      <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+    </div>
+  </div>
+</header>
 
-    <section class="hero">
-        <span class="badge">Public-Private Partnership</span>
-        <h1>Empowering Cities with <br>Data-Driven Intelligence.</h1>
-        <p class="subtitle">
-            We do not govern; we enable governance. Basis provides the digital nervous system that helps municipalities and organizations maintain urban hygiene, safety, and flow.
-        </p>
-    </section>
+<!-- ═══ HERO ══════════════════════════════════════════════════ -->
+<section class="hero z1">
+  <div class="container">
+    <div class="hero-eyebrow">Urban Intelligence Platform</div>
+    <h1>
+      The Bridge Between<br />
+      <em>Mumbai & Pune</em><br />
+      and Their Government.
+    </h1>
+    <p class="hero-sub">
+      Citizens report. Our AI sees. Government acts. Basis transforms everyday frustrations — potholes, broken pipes, illegal dumping — into structured, anonymous intelligence that compels institutional change.
+    </p>
+    <div class="hero-actions">
+      <a href="#report" class="btn-primary">Report an Issue</a>
+      <a href="#how-it-works" class="btn-ghost">See How It Works</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <span class="stat-num">2</span>
+        <span class="stat-label">Cities Live</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">∞</span>
+        <span class="stat-label">Citizen Reports Accepted</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">0</span>
+        <span class="stat-label">Data Sold. Ever.</span>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <div class="mission-box">
-        <p>
-            "Our mission is to serve as a force multiplier for local governments. By providing real-time data and automated logistics support, we help civic bodies solve complex urban challenges efficiently and transparently."
-        </p>
+<div class="divider"></div>
+
+<!-- ═══ HOW IT WORKS ══════════════════════════════════════════ -->
+<section id="how-it-works">
+  <div class="container">
+    <span class="section-label reveal">Process</span>
+    <h2 class="section-title reveal reveal-d1">Three steps to a better city.</h2>
+    <p class="section-sub reveal reveal-d2">We didn't invent bureaucracy. But we're going to fix it.</p>
+
+    <div class="steps-track reveal reveal-d3">
+      <div class="step-block">
+        <span class="step-num">Step 01</span>
+        <div class="step-icon">📸</div>
+        <h3>Citizens Report</h3>
+        <p>You spot a pothole, a broken streetlight, a clogged drain. Tap the app, snap a photo, tag the location. It takes 15 seconds. Your identity stays hidden — always.</p>
+      </div>
+      <div class="step-block">
+        <span class="step-num">Step 02</span>
+        <div class="step-icon">🧠</div>
+        <h3>AI Validates & Clusters</h3>
+        <p>Our computer vision pipeline — built on OpenCV and custom-trained models — classifies the issue, confirms its severity, and groups it with related reports from across the city. Noise becomes signal.</p>
+      </div>
+      <div class="step-block">
+        <span class="step-num">Step 03</span>
+        <div class="step-icon">🏛️</div>
+        <h3>Government Receives Intelligence</h3>
+        <p>When a threshold of reports is crossed, anonymised, aggregated intelligence is delivered directly to the relevant civic body — BMC, PMC — with location clusters, severity scores, and photographic evidence.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ DETECTION SUITE ═══════════════════════════════════════ -->
+<section id="detection">
+  <div class="container">
+    <span class="section-label reveal">Detection Suite</span>
+    <h2 class="section-title reveal reveal-d1">What Basis can see.</h2>
+    <p class="section-sub reveal reveal-d2">Powered by OpenCV and deep neural networks trained on Indian urban environments. Because potholes in Pune look different from potholes in London.</p>
+
+    <div class="detection-grid">
+
+      <div class="detect-card reveal">
+        <span class="detect-tag tag-cv">Computer Vision</span>
+        <span class="detect-icon">🕳️</span>
+        <h3>Pothole Detection</h3>
+        <p>Photo-based depth estimation and surface analysis flags road damage before it becomes an accident. Severity classified as Minor, Serious, or Critical.</p>
+        <div class="detect-tech">OpenCV · Depth Estimation · Geo-clustering</div>
+      </div>
+
+      <div class="detect-card reveal reveal-d1">
+        <span class="detect-tag tag-cv">Computer Vision</span>
+        <span class="detect-icon">🗑️</span>
+        <h3>Illegal Dumping & Garbage</h3>
+        <p>Detects unauthorised waste accumulation in public spaces. Recurring hotspots are flagged automatically to solid waste management departments.</p>
+        <div class="detect-tech">Object Detection · Temporal Heatmaps</div>
+      </div>
+
+      <div class="detect-card reveal reveal-d2">
+        <span class="detect-tag tag-cv">Computer Vision</span>
+        <span class="detect-icon">🚰</span>
+        <h3>Sewage & Drainage Issues</h3>
+        <p>Identifies open manholes, overflowing drains, and pipeline leakages. Automated alerts prevent contamination crises before they spread.</p>
+        <div class="detect-tech">Anomaly Detection · Risk Scoring</div>
+      </div>
+
+      <div class="detect-card reveal">
+        <span class="detect-tag tag-cv">Computer Vision</span>
+        <span class="detect-icon">⚠️</span>
+        <h3>Broken Infrastructure</h3>
+        <p>Bent railings, cracked walls, collapsed barriers, and shattered street furniture are catalogued and routed to the responsible municipal body.</p>
+        <div class="detect-tech">Structural CV · Damage Grading</div>
+      </div>
+
+      <div class="detect-card reveal reveal-d1">
+        <span class="detect-tag tag-cv">Computer Vision</span>
+        <span class="detect-icon">🚦</span>
+        <h3>Traffic Law Violations</h3>
+        <p>Citizen-submitted footage analysed for signal jumping, wrong-way driving, and illegal parking. Evidence packaged for traffic authorities — not for surveillance.</p>
+        <div class="detect-tech">Motion Tracking · Event Detection</div>
+      </div>
+
+      <div class="detect-card reveal reveal-d2">
+        <span class="detect-tag tag-cv">Computer Vision</span>
+        <span class="detect-icon">🚯</span>
+        <h3>Littering Tracking</h3>
+        <p>Pattern analysis identifies high-littering zones and recurring offenders (anonymised) to help deploy targeted awareness and enforcement campaigns.</p>
+        <div class="detect-tech">Behaviour Analysis · Zone Mapping</div>
+      </div>
+
+      <div class="detect-card reveal">
+        <span class="detect-tag tag-ai">AI Insight</span>
+        <span class="detect-icon">📊</span>
+        <h3>Pattern Recognition & Forecasting</h3>
+        <p>Across thousands of reports, AI identifies systemic failure zones — not just isolated issues — and predicts where the next breakdown will occur before it does.</p>
+        <div class="detect-tech">LSTM · Spatial Clustering · Predictive AI</div>
+      </div>
+
+      <div class="detect-card reveal reveal-d1">
+        <span class="detect-tag tag-crowd">Crowdsourced</span>
+        <span class="detect-icon">🔒</span>
+        <h3>Anonymous Collective Intelligence</h3>
+        <p>Individual reports are meaningless. Thousands of them are a mandate. We aggregate citizen voices anonymously until the data is undeniable — then we hand it to those who can fix it.</p>
+        <div class="detect-tech">Threshold Alerts · Anonymisation Engine</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ DATA PIPELINE ═════════════════════════════════════════ -->
+<section class="pipeline-section" id="pipeline">
+  <div class="container">
+    <div class="pipeline-wrap">
+
+      <div class="pipeline-visual reveal">
+        <div style="font-family: var(--font-mono); font-size: 10px; color: var(--dim); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border);">
+          LIVE PIPELINE — MUMBAI NODE
+        </div>
+
+        <div class="pipe-row">
+          <div class="pipe-dot cyan"></div>
+          <span class="pipe-label">Citizen Report Ingested</span>
+          <span class="pipe-badge badge-live">● LIVE</span>
+        </div>
+        <div class="pipe-row">
+          <div class="pipe-dot green"></div>
+          <span class="pipe-label">Image Validated by CV</span>
+          <span class="pipe-badge badge-ai">AI</span>
+        </div>
+        <div class="pipe-row">
+          <div class="pipe-dot amber"></div>
+          <span class="pipe-label">PII Stripped — Anonymised</span>
+          <span class="pipe-badge badge-anon">ANON</span>
+        </div>
+        <div class="pipe-row">
+          <div class="pipe-dot red"></div>
+          <span class="pipe-label">Issue Classified + Scored</span>
+          <span class="pipe-badge badge-ai">AI</span>
+        </div>
+        <div class="pipe-row">
+          <div class="pipe-dot cyan"></div>
+          <span class="pipe-label">Cluster Threshold Check</span>
+          <span class="pipe-sub">Requires 15+ matching reports</span>
+        </div>
+        <div class="pipe-row">
+          <div class="pipe-dot green"></div>
+          <span class="pipe-label">Intelligence Report Generated</span>
+          <span class="pipe-badge badge-ai">AI</span>
+        </div>
+        <div class="pipe-row">
+          <div class="pipe-dot amber"></div>
+          <span class="pipe-label">Routed to Civic Authority</span>
+          <span class="pipe-badge badge-gov">BMC / PMC</span>
+        </div>
+      </div>
+
+      <div class="pipeline-text reveal reveal-d1">
+        <span class="section-label" style="margin-bottom:12px;">Data Architecture</span>
+        <h3>Your photo becomes a government brief.</h3>
+        <p>Every report travels through a multi-stage pipeline that strips personal information before it ever touches our servers. We don't know who you are. We never want to.</p>
+        <p>What reaches the government is structured, scored intelligence — not a raw complaint. We translate public frustration into institutional language that cannot be ignored.</p>
+        <ul class="promise-list">
+          <li>No names, no phone numbers, no personal identifiers leave your device</li>
+          <li>AI severity scoring prevents false reports from corrupting the dataset</li>
+          <li>Cluster thresholds mean only verified, widespread problems are escalated</li>
+          <li>All government dispatches are timestamped and tracked for resolution</li>
+          <li>Data is never sold, licensed, or shared with advertisers. Ever.</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ CITIES ════════════════════════════════════════════════ -->
+<section id="cities">
+  <div class="container">
+    <span class="section-label reveal">Coverage</span>
+    <h2 class="section-title reveal reveal-d1">Where Basis is live.</h2>
+    <p class="section-sub reveal reveal-d2">We start focused. Two cities. Every ward. Zero tolerance for broken infrastructure.</p>
+
+    <div class="cities-grid">
+
+      <div class="city-card reveal">
+        <div class="city-bg-text">MUM</div>
+        <div class="city-status status-active">Active Now</div>
+        <h2>Mumbai</h2>
+        <h4>Maharashtra · Western Coast</h4>
+        <p>Home to 20 million Mumbaikars navigating monsoon-battered roads, overflowing drains, and infrastructure that struggles to keep pace with the city's ambition. Basis is active across all 24 wards of the BMC.</p>
+        <div class="city-metrics">
+          <div>
+            <span class="city-metric-val">24</span>
+            <span class="city-metric-label">BMC Wards</span>
+          </div>
+          <div>
+            <span class="city-metric-val">20M+</span>
+            <span class="city-metric-label">Citizens Served</span>
+          </div>
+          <div>
+            <span class="city-metric-val">Active</span>
+            <span class="city-metric-label">Status</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="city-card reveal reveal-d1">
+        <div class="city-bg-text">PNQ</div>
+        <div class="city-status status-active">Active Now</div>
+        <h2>Pune</h2>
+        <h4>Maharashtra · Deccan Plateau</h4>
+        <p>A rapidly expanding tech and education hub facing growing pains — traffic congestion, expanding civic limits, and infrastructure planning that hasn't caught up with population growth. Basis serves all 15 PMC zones.</p>
+        <div class="city-metrics">
+          <div>
+            <span class="city-metric-val">15</span>
+            <span class="city-metric-label">PMC Zones</span>
+          </div>
+          <div>
+            <span class="city-metric-val">7M+</span>
+            <span class="city-metric-label">Citizens Served</span>
+          </div>
+          <div>
+            <span class="city-metric-val">Active</span>
+            <span class="city-metric-label">Status</span>
+          </div>
+        </div>
+      </div>
+
     </div>
 
-    <section class="solutions">
-        <div class="grid">
+    <!-- Tech strip -->
+    <div class="tech-strip reveal" style="margin-top: 48px;">
+      <div class="tech-pill">
+        <span class="tech-pill-icon">👁️</span>
+        <h4>OpenCV</h4>
+        <p>Computer vision backbone for image classification</p>
+      </div>
+      <div class="tech-pill">
+        <span class="tech-pill-icon">🤖</span>
+        <h4>Custom AI Models</h4>
+        <p>Trained on Indian road and urban conditions</p>
+      </div>
+      <div class="tech-pill">
+        <span class="tech-pill-icon">🗺️</span>
+        <h4>Geo-Clustering</h4>
+        <p>Spatial grouping of related reports by zone</p>
+      </div>
+      <div class="tech-pill">
+        <span class="tech-pill-icon">🔐</span>
+        <h4>Privacy Engine</h4>
+        <p>On-device PII stripping before transmission</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-            <div class="solution-card">
-                <div class="icon-box">♻️</div>
-                <h3>Smart Waste Logistics</h3>
-                <p class="desc">
-                    Collaborating with sanitation departments to deploy sensor-based bin monitoring. We optimize collection routes in real-time to prevent overflow and reduce fuel consumption for fleet vehicles.
-                </p>
-            </div>
+<div class="divider"></div>
 
-            <div class="solution-card">
-                <div class="icon-box">🛣️</div>
-                <h3>Road Maintenance Grid</h3>
-                <p class="desc">
-                    A community-sourced reporting system that identifies potholes and structural wear. We aggregate this data into heatmaps, allowing public works departments to prioritize repairs where they are needed most.
-                </p>
-            </div>
+<!-- ═══ REPORT WIDGET ═════════════════════════════════════════ -->
+<section class="report-section" id="report">
+  <div class="container">
+    <div class="report-wrap">
 
-            <div class="solution-card">
-                <div class="icon-box">💧</div>
-                <h3>Sanitation Monitoring</h3>
-                <p class="desc">
-                    IoT-enabled systems for tracking public utility cleanliness and water quality. We provide actionable dashboards to ensure city standards are met proactively, not reactively.
-                </p>
-            </div>
+      <div class="report-form-card reveal">
+        <h3>Report an Issue</h3>
+        <p class="sub">Takes 15 seconds. Completely anonymous. Could fix a road.</p>
 
-            <div class="solution-card">
-                <div class="icon-box">🏙️</div>
-                <h3>Unified City Dashboard</h3>
-                <p class="desc">
-                    Integrating disparate city data—from traffic flow to energy usage—into a single, secure interface for decision-makers to visualize the city's health at a glance.
-                </p>
-            </div>
-
+        <div class="form-group">
+          <label class="form-label">City</label>
+          <select class="form-control">
+            <option value="">Select your city</option>
+            <option>Mumbai</option>
+            <option>Pune</option>
+          </select>
         </div>
-    </section>
 
-    <footer>
-        <p>&copy; 2026 Basis Urban Management. Supporting Smarter Cities.</p>
-    </footer>
+        <div class="form-group">
+          <label class="form-label">Issue Type</label>
+          <select class="form-control">
+            <option value="">What did you spot?</option>
+            <option>Pothole / Road Damage</option>
+            <option>Garbage / Illegal Dumping</option>
+            <option>Sewage / Drainage Problem</option>
+            <option>Broken Infrastructure</option>
+            <option>Traffic Law Violation</option>
+            <option>Littering</option>
+            <option>Streetlight Failure</option>
+            <option>Other</option>
+          </select>
+        </div>
 
+        <div class="form-group">
+          <label class="form-label">Location / Landmark</label>
+          <input type="text" class="form-control" placeholder="e.g. Near Dadar station, Mumbai" />
+        </div>
+
+        <div class="upload-area">
+          <span class="upload-icon">📷</span>
+          <p class="upload-text"><strong>Tap to add a photo</strong><br/>JPG, PNG, or HEIC — max 10MB</p>
+        </div>
+
+        <button class="btn-primary" style="width:100%; border-radius:8px; font-size:13px; padding:16px;">
+          Submit Anonymously →
+        </button>
+        <div class="anon-note">Your identity is never stored or transmitted</div>
+      </div>
+
+      <div class="report-info reveal reveal-d1">
+        <span class="section-label" style="margin-bottom:12px;">Why it matters</span>
+        <h3>Your report is not a complaint.<br/>It's evidence.</h3>
+        <p>A single report gets filed and forgotten. A hundred reports from the same junction become a case that forces a response. Basis exists to turn isolated frustration into collective, verified, government-grade evidence.</p>
+        <p>We don't send you angry letters. We don't run campaigns. We build data sets that civic authorities cannot dismiss.</p>
+
+        <div class="flow-steps">
+          <div class="flow-step">
+            <div class="flow-step-num">1</div>
+            <div class="flow-step-content">
+              <h4>You report in 15 seconds</h4>
+              <p>Photo + location + category. That's all we need. No account, no name, no phone number.</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-step-num">2</div>
+            <div class="flow-step-content">
+              <h4>AI validates and scores your report</h4>
+              <p>Computer vision confirms the issue is real, classifies its type, and assigns a severity score.</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-step-num">3</div>
+            <div class="flow-step-content">
+              <h4>It clusters with similar reports</h4>
+              <p>Your report joins others from the same area. When the threshold is crossed, the cluster becomes a brief.</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-step-num">4</div>
+            <div class="flow-step-content">
+              <h4>Government receives a formal intelligence report</h4>
+              <p>BMC or PMC receives structured data — location, severity, photographic evidence, frequency — with a resolution deadline tracked publicly.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ IMPACT NUMBERS ════════════════════════════════════════ -->
+<section style="padding: 80px 0;">
+  <div class="container">
+    <span class="section-label reveal" style="text-align:center; display:block;">Impact Targets — Year One</span>
+    <span class="section-label reveal" style="text-align:center; display:block;font-size: medium;color: #059669;">" BE THE FIRST ONE TO GENERATE THE REPORT . " </span>
+    <div class="impact-grid reveal reveal-d1">
+      <div class="impact-cell">
+        <span class="impact-num">00</span>
+        <div class="impact-label">Citizen Reports<br/>Processed</div>
+      </div>
+      <div class="impact-cell">
+        <span class="impact-num">00</span>
+        <div class="impact-label">Government Briefs<br/>Delivered</div>
+      </div>
+      <div class="impact-cell">
+        <span class="impact-num">39</span>
+        <div class="impact-label">Municipal Wards<br/>Covered</div>
+      </div>
+      <div class="impact-cell">
+        <span class="impact-num">0%</span>
+        <div class="impact-label">User Data<br/>Compromised</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ PROMISE ═══════════════════════════════════════════════ -->
+<section class="promise-section">
+  <div class="container">
+    <span class="section-label reveal" style="display:block; text-align:center;">Our Commitment</span>
+    <h2 class="promise-title reveal reveal-d1">
+      Mumbai and Pune<br />
+      will work <em>better</em>.<br />
+      That's a promise.
+    </h2>
+    <p class="promise-desc reveal reveal-d2">
+      We're not a petition platform. We're not a grievance forum. We are a technology infrastructure company that uses AI, computer vision, and the collective voice of citizens to make Indian cities systematically, measurably better — one report at a time.
+    </p>
+    <div class="hero-actions reveal reveal-d3">
+      <a href="#report" class="btn-primary">Start Reporting</a>
+      <a href="govportal.html" class="btn-ghost">Government Access →</a>
+    </div>
+    <div class="promise-signature reveal" style="margin-top: 40px;">
+      Built by <strong>Shoonya Origins</strong> · Basis Division · Mumbai & Pune
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ════════════════════════════════════════════════ -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a href="#" class="logo">BA<span>S</span>IS</a>
+        <p>Urban intelligence infrastructure for Indian cities. A Shoonya Origins venture. Making Mumbai and Pune measurably better through technology, transparency, and collective action.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Platform</h5>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#detection">Detection Suite</a>
+        <a href="#report">Report an Issue</a>
+        <a href="dashboard.html">Live Dashboard</a>
+      </div>
+      <div class="footer-col">
+        <h5>Cities</h5>
+        <a href="#cities">Mumbai</a>
+        <a href="#cities">Pune</a>
+        <a href="#">Upcoming Cities</a>
+        <a href="#">Partner With Us</a>
+      </div>
+      <div class="footer-col">
+        <h5>Institution</h5>
+        <a href="govportal.html">Government Portal</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Data Ethics</a>
+        <a href="#">About Shoonya Origins</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2025 Basis — A Shoonya Origins Venture. All rights reserved.</span>
+      <span class="footer-tag">Urban Intelligence · <strong>Mumbai & Pune</strong></span>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══ SCRIPTS ═══════════════════════════════════════════════ -->
+<script>
+// ─── THEME TOGGLE ─────────────────────────────────────────────
+const themeBtn = document.getElementById('themeToggle');
+// Default = light mode (no attribute)
+themeBtn.addEventListener('click', () => {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  themeBtn.textContent = isDark ? '🌙' : '☀️';
+  // persist preference
+  localStorage.setItem('basis-theme', isDark ? 'light' : 'dark');
+});
+// Restore saved preference on load
+(function() {
+  const saved = localStorage.getItem('basis-theme');
+  if (saved === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    themeBtn.textContent = '☀️';
+  }
+})();
+
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Animated counter
+function animateCounters() {
+  document.querySelectorAll('.stat-num, .impact-num').forEach(el => {
+    const raw = el.textContent;
+    const num = parseFloat(raw.replace(/[^\d.]/g, ''));
+    if (!num || isNaN(num)) return;
+    const suffix = raw.replace(/[\d.]/g, '');
+    let start = 0; const dur = 1800;
+    const step = (ts) => {
+      if (!step.start) step.start = ts;
+      const prog = Math.min((ts - step.start) / dur, 1);
+      const eased = 1 - Math.pow(1 - prog, 3);
+      el.textContent = (num < 100 ? Math.round(eased * num) : Math.floor(eased * num)).toLocaleString() + suffix;
+      if (prog < 1) requestAnimationFrame(step);
+    };
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { requestAnimationFrame(step); obs.disconnect(); }
+    }, { threshold: 0.5 });
+    obs.observe(el);
+  });
+}
+animateCounters();
+
+// Upload area interaction
+document.querySelector('.upload-area').addEventListener('click', () => {
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = 'image/*';
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if (file) {
+      const area = document.querySelector('.upload-area');
+      area.innerHTML = `<span class="upload-icon">✅</span><p class="upload-text"><strong>${file.name}</strong><br/>Ready to submit</p>`;
+      area.style.borderColor = 'var(--safe)';
+    }
+  };
+  input.click();
+});
+
+// Submit button demo
+document.querySelector('.btn-primary[style]').addEventListener('click', function() {
+  this.textContent = '✓ Submitted — Thank you';
+  this.style.background = 'var(--safe)';
+  this.style.boxShadow = '0 0 30px rgba(16,185,129,0.3)';
+  setTimeout(() => {
+    this.textContent = 'Submit Anonymously →';
+    this.style.background = ''; this.style.boxShadow = '';
+  }, 3000);
+});
+</script>
 </body>
 </html>
