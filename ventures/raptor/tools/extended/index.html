@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAPTOR · EXTENDED ARSENAL</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #080a0e;
+    --bg2: #0d1117;
+    --bg3: #111820;
+    --border: #1e2d3d;
+    --accent: #e84a2e;
+    --accent2: #ff6b47;
+    --green: #00ff88;
+    --dim: #3a4a5a;
+    --text: #c8d8e8;
+    --text-dim: #5a7080;
+    --mono: 'Share Tech Mono', monospace;
+    --head: 'Barlow Condensed', sans-serif;
+    --body: 'Barlow', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* SCANLINE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  /* NAV */
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 40px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .nav-brand {
+    font-family: var(--head);
+    font-weight: 900;
+    font-size: 20px;
+    letter-spacing: 4px;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  .nav-status {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--green);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .nav-status::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s infinite;
+  }
+
+  .nav-back {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-back:hover { color: var(--accent); }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* HERO */
+  .hero {
+    padding: 60px 40px 40px;
+    border-bottom: 1px solid var(--border);
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .hero-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    margin-bottom: 16px;
+  }
+
+  .hero h1 {
+    font-family: var(--head);
+    font-weight: 900;
+    font-size: clamp(48px, 8vw, 80px);
+    line-height: 0.95;
+    letter-spacing: -1px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  .hero h1 em {
+    font-style: normal;
+    color: var(--accent);
+    -webkit-text-stroke: 0px;
+  }
+
+  .hero-meta {
+    display: flex;
+    gap: 40px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  .hero-meta span { color: var(--text); }
+
+  /* TOOL INDEX */
+  .tool-index {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 40px 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 40px;
+  }
+
+  .index-item {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    text-decoration: none;
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .index-item:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: rgba(232, 74, 46, 0.05);
+  }
+
+  /* TOOLS CONTAINER */
+  .tools {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px 80px;
+  }
+
+  /* TOOL BLOCK */
+  .tool {
+    border-bottom: 1px solid var(--border);
+    padding: 60px 0;
+    scroll-margin-top: 80px;
+  }
+
+  .tool-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    margin-bottom: 40px;
+  }
+
+  .tool-id {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+  }
+
+  .tool-title {
+    font-family: var(--head);
+    font-weight: 900;
+    font-size: clamp(32px, 5vw, 52px);
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: -0.5px;
+    margin-bottom: 16px;
+  }
+
+  .tool-title em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .tool-desc {
+    font-size: 14px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  .tool-outputs {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.8;
+  }
+
+  .tool-outputs strong {
+    color: var(--text);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* ENGINE PANEL */
+  .engine {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 32px;
+    font-family: var(--mono);
+  }
+
+  .engine-id {
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .engine-id .status { color: var(--green); }
+
+  .field {
+    margin-bottom: 20px;
+  }
+
+  .field label {
+    display: block;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .field input,
+  .field select {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+
+  .field input:focus,
+  .field select:focus { border-color: var(--accent); }
+
+  .field input::placeholder { color: var(--dim); }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .range-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .range-wrap input[type=range] {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 2px;
+    background: var(--border);
+    border: none;
+    padding: 0;
+  }
+
+  .range-wrap input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    background: var(--accent);
+    border-radius: 0;
+    cursor: pointer;
+  }
+
+  .range-val {
+    font-size: 13px;
+    color: var(--text);
+    min-width: 40px;
+    text-align: right;
+  }
+
+  .btn {
+    width: 100%;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    font-family: var(--head);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 14px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.2s;
+  }
+
+  .btn:hover { background: var(--accent2); }
+
+  .output {
+    margin-top: 20px;
+    padding: 20px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    font-size: 12px;
+    line-height: 1.9;
+    color: var(--text-dim);
+    min-height: 60px;
+    white-space: pre-wrap;
+  }
+
+  .output .highlight {
+    color: var(--accent);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .output .good { color: var(--green); }
+  .output .warn { color: #ffaa00; }
+  .output .bad { color: var(--accent); }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  @media (max-width: 768px) {
+    nav { padding: 14px 20px; }
+    .hero { padding: 40px 20px 30px; }
+    .tool-index { padding: 24px 20px; }
+    .tools { padding: 0 20px 60px; }
+    .tool-header { grid-template-columns: 1fr; gap: 30px; }
+    .field-row { grid-template-columns: 1fr; }
+    footer { padding: 24px 20px; flex-direction: column; gap: 8px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">Raptor</div>
+  <div class="nav-status">EXTENDED ARSENAL · 11 TOOLS LOADED</div>
+  <a href="https://shoonyaorigins.com/ventures/raptor/" class="nav-back">← BACK TO RAPTOR</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-tag">// RAPTOR · SALES ARSENAL · VOLUME II</div>
+  <h1>ELEVEN MORE<br><em>WEAPONS.</em></h1>
+  <div class="hero-meta">
+    <div>TOOLS <span>11</span></div>
+    <div>COST <span>₹0</span></div>
+    <div>SIGNUP <span>NONE</span></div>
+    <div>DATA SHARED <span>ZERO</span></div>
+  </div>
+</div>
+
+<div class="tool-index">
+  <a href="#t10" class="index-item">10 /// DEAL SCORE</a>
+  <a href="#t11" class="index-item">11 /// PRICE ANCHOR</a>
+  <a href="#t12" class="index-item">12 /// OBJECTION MAP</a>
+  <a href="#t13" class="index-item">13 /// FOLLOW-UP DECAY</a>
+  <a href="#t14" class="index-item">14 /// PROPOSAL ROI</a>
+  <a href="#t15" class="index-item">15 /// DISCOUNT IMPACT</a>
+  <a href="#t16" class="index-item">16 /// CLOSE RATE AUDIT</a>
+  <a href="#t17" class="index-item">17 /// PROSPECT HEAT</a>
+  <a href="#t18" class="index-item">18 /// MEETING COST</a>
+  <a href="#t19" class="index-item">19 /// QUOTA ATTAINMENT</a>
+  <a href="#t20" class="index-item">20 /// REFERRAL VALUE</a>
+</div>
+
+<div class="tools">
+
+  <!-- TOOL 10: DEAL QUALIFICATION SCORE -->
+  <div class="tool" id="t10">
+    <div class="tool-header">
+      <div>
+        <div class="tool-id">10 // QUALIFICATION INTELLIGENCE</div>
+        <div class="tool-title">DEAL <em>SCORE</em></div>
+        <div class="tool-desc">Most sales teams waste 60% of their time on deals that were never going to close. Score your deal across MEDDIC dimensions — Money, Authority, Need, Timeline — and get a brutally honest probability number before you spend another hour on it.</div>
+        <div class="tool-outputs">
+          <strong>// OUTPUT TELEMETRY</strong>
+          Deal qualification score /100<br>
+          Go / No-Go recommendation<br>
+          Weakest dimension flagged<br>
+          Next best action
+        </div>
+      </div>
+      <div class="engine">
+        <div class="engine-id">
+          <span>RAPTOR · DEAL QUALIFIER · v1.0</span>
+          <span class="status">● ONLINE</span>
+        </div>
+        <div class="field">
+          <label>Budget Confirmed?</label>
+          <select id="d10-budget">
+            <option value="">-- SELECT --</option>
+            <option value="3">Yes — explicit budget confirmed</option>
+            <option value="2">Approximate range discussed</option>
+            <option value="1">No budget discussed yet</option>
+            <option value="0">Told us there is no budget</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Decision Maker Access?</label>
+          <select id="d10-authority">
+            <option value="">-- SELECT --</option>
+            <option value="3">Direct access to final decision maker</option>
+            <option value="2">Champion inside, DM not met yet</option>
+            <option value="1">Working with influencer only</option>
+            <option value="0">No internal access at all</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Pain / Need Confirmed?</label>
+          <select id="d10-need">
+            <option value="">-- SELECT --</option>
+            <option value="3">Explicit pain stated, cost quantified</option>
+            <option value="2">Pain acknowledged, cost not quantified</option>
+            <option value="1">General interest, no clear pain</option>
+            <option value="0">No pain identified — exploring only</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Timeline to Decision?</label>
+          <select id="d10-timeline">
+            <option value="">-- SELECT --</option>
+            <option value="3">Hard deadline within 30 days</option>
+            <option value="2">Decision expected within 90 days</option>
+            <option value="1">Someday — no urgency expressed</option>
+            <option value="0">Actively stalling / no timeline given</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Competition Status?</label>
+          <select id="d10-competition">
+            <option value="">-- SELECT --</option>
+            <option value="3">We are only vendor being evaluated</option>
+            <option value="2">2–3 vendors, we are preferred</option>
+            <option value="1">Multiple vendors, no preference stated</option>
+            <option value="0">Competitor has strong incumbent advantage</option>
+          </select>
+        </div>
+        <button class="btn" onclick="calcDealScore()">▶ SCORE THIS DEAL</button>
+        <div class="output" id="out-t10">Configure deal parameters to run qualification audit</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOOL 11: PRICE ANCHORING CALCULATOR -->
+  <div class="tool" id="t11">
+    <div class="tool-header">
+      <div>
+        <div class="tool-id">11 // PRICING INTELLIGENCE</div>
+        <div class="tool-title">PRICE <em>ANCHOR</em></div>
+        <div class="tool-desc">Price anchoring is the single highest-leverage negotiation technique with zero cost to implement. Set your anchor wrong and you cap your upside before the conversation starts. This tool calculates your optimal anchor price, walk-away floor, and concession structure.</div>
+        <div class="tool-outputs">
+          <strong>// OUTPUT TELEMETRY</strong>
+          Optimal anchor price<br>
+          Walk-away floor<br>
+          Concession ladder (3 steps)<br>
+          Psychological framing recommendation
+        </div>
+      </div>
+      <div class="engine">
+        <div class="engine-id">
+          <span>RAPTOR · PRICE ANCHOR ENGINE · v1.0</span>
+          <span class="status">● ONLINE</span>
+        </div>
+        <div class="field">
+          <label>Your Target Price (₹)</label>
+          <input type="number" id="d11-target" placeholder="What you actually want to close at">
+        </div>
+        <div class="field">
+          <label>Your Absolute Walk-Away Floor (₹)</label>
+          <input type="number" id="d11-floor" placeholder="Minimum you will accept">
+        </div>
+        <div class="field">
+          <label>Prospect's Known Budget Range</label>
+          <select id="d11-budget">
+            <option value="">-- SELECT --</option>
+            <option value="unknown">Unknown — not disclosed</option>
+            <option value="below">Below our target price</option>
+            <option value="match">Roughly matches our target</option>
+            <option value="above">Above our target price</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Deal Sensitivity</label>
+          <select id="d11-sensitivity">
+            <option value="">-- SELECT --</option>
+            <option value="low">Low — ROI clearly exceeds cost</option>
+            <option value="medium">Medium — ROI roughly matches cost</option>
+            <option value="high">High — price is primary concern</option>
+          </select>
+        </div>
+        <button class="btn" onclick="calcPriceAnchor()">▶ CALCULATE ANCHOR STRATEGY</button>
+        <div class="output" id="out-t11">Enter pricing parameters to generate anchor strategy</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOOL 12: OBJECTION PROBABILITY MAP -->
+  <div class="tool" id="t12">
+    <div class="tool-header">
+      <div>
+        <div class="tool-id">12 // OBJECTION INTELLIGENCE</div>
+        <div class="tool-title">OBJECTION <em>MAP</em></div>
+        <div class="tool-desc">Every deal has predictable objections based on deal size, industry, and prospect seniority. Most reps get surprised by the same objections every time. This tool maps the top 3 objections you will face before your next call and gives you the counter for each.</div>
+        <div class="tool-outputs">
+          <strong>// OUTPUT TELEMETRY</strong>
+          Top 3 predicted objections<br>
+          Probability score per objection<br>
+          Counter-script for each<br>
+          Reframe strategy
+        </div>
+      </div>
+      <div class="engine">
+        <div class="engine-id">
+          <span>RAPTOR · OBJECTION ENGINE · v1.0</span>
+          <span class="status">● ONLINE</span>
+        </div>
+        <div class="field">
+          <label>Prospect Seniority</label>
+          <select id="d12-seniority">
+            <option value="">-- SELECT --</option>
+            <option value="csuite">C-Suite</option>
+            <option value="vp">VP / Director</option>
+            <option value="manager">Manager</option>
+            <option value="ic">Individual Contributor</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Deal Stage</label>
+          <select id="d12-stage">
+            <option value="">-- SELECT --</option>
+            <option value="discovery">Discovery / First call</option>
+            <option value="demo">Demo / Presentation</option>
+            <option value="proposal">Proposal sent</option>
+            <option value="negotiation">Negotiation / Close</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Deal Size</label>
+          <select id="d12-size">
+            <option value="">-- SELECT --</option>
+            <option value="smb">Under ₹1L (SMB)</option>
+            <option value="mid">₹1L – ₹10L (Mid-market)</option>
+            <option value="ent">Above ₹10L (Enterprise)</option>
+          </select>
+        </div>
+        <button class="btn" onclick="calcObjectionMap()">▶ MAP OBJECTIONS</button>
+        <div class="output" id="out-t12">Select deal profile to predict objections</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOOL 13: FOLLOW-UP DECAY CALCULATOR -->
+  <div class="tool" id="t13">
+    <div class="tool-header">
+      <div>
+        <div class="tool-id">13 // TIMING INTELLIGENCE</div>
+        <div class="tool-title">FOLLOW-UP <em>DECAY</em></div>
+        <div class="tool-desc">Every day you don't follow up, your deal probability decays. The rate depends on deal complexity, prospect seniority, and how the last interaction ended. This tool calculates your real close probability right now — and the exact cost of waiting one more week.</div>
+        <div class="tool-outputs">
+          <strong>// OUTPUT TELEMETRY</strong>
+          Current close probability<br>
+          Probability after 7 more days<br>
+          Daily decay rate<br>
+          Optimal follow-up window
+        </div>
+      </div>
+      <div class="engine">
+        <div class="engine-id">
+          <span>RAPTOR · DECAY ENGINE · v1.0</span>
+          <span class="status">● ONLINE</span>
+        </div>
+        <div class="field">
+          <label>Days Since Last Contact</label>
+          <input type="number" id="d13-days" placeholder="e.g. 5">
+        </div>
+        <div class="field">
+          <label>How Did Last Interaction End?</label>
+          <select id="d13-last">
+            <option value="">-- SELECT --</option>
+            <option value="hot">Strong — they asked for proposal / next step</option>
+            <option value="warm">Positive — good conversation, no firm next step</option>
+            <option value="neutral">Neutral — they said they'd think about it</option>
+            <option value="cold">Cold — minimal engagement / short replies</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Deal Complexity</label>
+          <select id="d13-complexity">
+            <option value="">-- SELECT --</option>
+            <option value="simple">Simple — single DM, fast cycle</option>
+            <option value="medium">Medium — 2-3 stakeholders</option>
+            <option value="complex">Complex — committee, long cycle</option>
+          </select>
+        </div>
+        <button class="btn" onclick="calcFollowUpDecay()">▶ CALCULATE DECAY</button>
+        <div class="output" id="out-t13">Enter contact data to calculate probability decay</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOOL 14: PROPOSAL ROI BUILDER -->
+  <div class="tool" id="t14">
+    <div class="tool-header">
+      <div>
+        <div class="tool-id">14 // PROPOSAL INTELLIGENCE</div>
+        <div class="tool-title">PROPOSAL <em>ROI</em></div>
+        <div class="tool-desc">Prospects don't buy your product. They buy the return on buying your product. A proposal without an ROI section is a feature list. This tool builds the financial case your prospect needs to justify the purchase to their own CFO — using their numbers, not yours.</div>
+        <div class="tool-outputs">
+          <strong>// OUTPUT TELEMETRY</strong>
+          Client ROI at 6 and 12 months<br>
+          Payback period in months<br>
+          Net benefit over 3 years<br>
+          CFO-ready justification summary
+        </div>
+      </div>
+      <div class="engine">
+        <div class="engine-id">
+          <span>RAPTOR · PROPOSAL ROI ENGINE · v1.0</span>
+          <span class="status">● ONLINE</span>
+        </div>
+        <div class="field">
+          <label>Your Annual Contract Value (₹)</label>
+          <input type="number" id="d14-acv" placeholder="What you're charging">
+        </div>
+        <div class="field">
+          <label>Client's Current Monthly Cost of Problem (₹)</label>
+          <input type="number" id="d14-pain" placeholder="Lost revenue, inefficiency, manual hours etc.">
+        </div>
+        <div class="field">
+          <label>Expected % Improvement Your Solution Delivers</label>
+          <div class="range-wrap">
+            <input type="range" id="d14-improvement" min="5" max="90" value="30" oninput="document.getElementById('d14-imp-val').textContent=this.value+'%'">
+            <span class="range-val" id="d14-imp-val">30%</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Implementation Time (months)</label>
+          <input type="number" id="d14-impl" placeholder="Time before client sees full value" value="1">
+        </div>
+        <button class="btn" onclick="calcProposalROI()">▶ BUILD ROI CASE</button>
+        <div class="output" id="out-t14">Enter deal parameters to build financial justification</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOOL 15: DISCOUNT IMPACT CALCULATOR -->
+  <div class="tool" id="t15">
+    <div class="tool-header">
+      <div>
+        <div class="tool-id">15 // MARGIN INTELLIGENCE</div>
+        <div class="tool-title">DISCOUNT <em>IMPACT</em></div>
+        <div class="tool-desc">A 10% discount feels small. It isn't. Discounting destroys margin at a rate most reps never calculate before giving it away. This tool shows you the real revenue and volume impact of any discount — and what you need to recover it.</div>
+        <div class="tool-outputs">
+          <strong>// OUTPUT TELEMETRY</strong>
+          Margin lost per deal<br>
+          Extra deals needed to recover<br>
+          Annual revenue impact<br>
+          Counter-offer recommendation
+        </div>
+      </div>
+      <div class="engine">
+        <div class="engine-id">
+          <span>RAPTOR · DISCOUNT ENGINE · v1.0</span>
+          <span class="status">● ONLINE</span>
+        </div>
+        <div class="field">
+          <label>Original Deal Value (₹)</label>
+          <input type="number" id="d15-deal" placeholder="Full price before discount">
+        </div>
+        <div class="field">
+          <label>Discount % Being Requested</label>
+          <div class="range-wrap">
+            <input type="range" id="d15-disc" min="1" max="50" value="10" oninput="document.getElementById('d15-disc-val').textContent=this.value+'%'">
+            <span class="range-val" id="d15-disc-val">10%</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Your Gross Margin %</label>
+          <div class="range-wrap">
+            <input type="range" id="d15-margin" min="10" max="95" value="60" oninput="document.getElementById('d15-margin-val').textContent=this.value+'%'">
+            <span class="range-val" id="d15-margin-val">60%</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Monthly Deal Volume (deals/month)</label>
+          <input type="number" id="d15-volume" placeholder="How many deals you close per month" value="5">
+        </div>
+        <button class="btn" onclick="calcDiscountImpact()">▶ CALCULATE DAMAGE</button>
+        <div class="output" id="out-t15">Enter deal parameters to reveal true discount cost</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOOL 16: CLOSE RATE AUDIT -->
+  <div class="tool" id="t16">
+    <div class="tool-header">
+      <div>
+        <div class="tool-id">16 // PERFORMANCE INTELLIGENCE</div>
+        <div class="tool-title">CLOSE RATE <em>AUDIT</em></div>
+        <div class="tool-desc">Your close rate is a diagnostic, not a number. A 20% close rate means something different if you're closing enterprise deals versus SMB. This tool benchmarks your close rate against industry standards, identifies which stage is bleeding the most, and tells you the one fix with the highest leverage.</div>
+        <div class="tool-outputs">
+          <strong>// OUTPUT TELEMETRY</strong>
+          Your close rate vs benchmark<br>
+          Stage-by-stage conversion audit<br>
+          Biggest leak in your funnel<br>
+          Highest-leverage fix
+        </div>
+      </div>
+      <div class="engine">
+        <div class="engine-id">
+          <span>RAPTOR · CLOSE RATE ENGINE · v1.0</span>
+          <span class="status">● ONLINE</span>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Leads Generated / Month</label>
+            <input type="number" id="d16-leads" placeholder="e.g. 100">
+          </div>
+          <div class="field">
+            <label>Discovery Calls Booked</label>
+            <input type="number" id="d16-discovery" placeholder="e.g. 40">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Proposals Sent</label>
+            <input type="number" id="d16-proposals" placeholder="e.g. 15">
+          </div>
+          <div class="field">
+            <label>Deals Closed</label>
+            <input type="number" id="d16-closed" placeholder="e.g. 5">
+          </div>
+        </div>
+        <div class="field">
+          <label>Your Market Segment</label>
+          <select id="d16-segment">
+            <option value="">-- SELECT --</option>
+            <option value="smb">SMB (deals under ₹1L)</option>
+            <option value="mid">Mid-market (₹1L–₹10L)</option>
+            <option value="ent">Enterprise (above ₹10L)</option>
+          </select>
+        </div>
+        <button class="btn" onclick="calcCloseRate()">▶ AUDIT CLOSE RATE</button>
+        <div class="output" id="out-t16">Enter funnel data to run close rate audit</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOOL 17: PROSPECT HEAT SCORE -->
+  <div class="tool" id="t17">
+    <div class="tool-header">
+      <div>
+        <div class="tool-id">17 // SIGNAL INTELLIGENCE</div>
+        <div class="tool-title">PROSPECT <em>HEAT</em></div>
+        <div class="tool-desc">Buying intent leaves signals everywhere — job postings, funding announcements, technology changes, leadership moves. This tool scores how hot your prospect is right now based on observable signals, so you contact them at the moment they're most likely to buy.</div>
+        <div class="tool-outputs">
+          <strong>// OUTPUT TELEMETRY</strong>
+          Prospect heat score /100<br>
+          Intent classification<br>
+          Top signal driving score<br>
+          Recommended outreach angle
+        </div>
+      </div>
+      <div class="engine">
+        <div class="engine-id">
+          <span>RAPTOR · HEAT SIGNAL ENGINE · v1.0</span>
+          <span class="status">● ONLINE</span>
+        </div>
+        <div class="field">
+          <label>Mark all signals you've observed</label>
+        </div>
+        <div style="display:grid;gap:10px;margin-bottom:20px;font-family:var(--mono);font-size:12px;">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;color:var(--text)"><input type="checkbox" id="s1" style="width:auto;background:var(--bg3);border:1px solid var(--border);"> Recently raised funding</label>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;color:var(--text)"><input type="checkbox" id="s2" style="width:auto;"> Hiring for roles your product addresses</label>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;color:var(--text)"><input type="checkbox" id="s3" style="width:auto;"> New leadership (CEO/CTO/VP Sales hired)</label>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;color:var(--text)"><input type="checkbox" id="s4" style="width:auto;"> Visited your website / opened your emails</label>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;color:var(--text)"><input type="checkbox" id="s5" style="width:auto;"> Competitor of theirs just made a big move</label>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;color:var(--text)"><input type="checkbox" id="s6" style="width:auto;"> They liked / commented on relevant content</label>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;color:var(--text)"><input type="checkbox" id="s7" style="width:auto;"> Attended industry event / webinar</label>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;color:var(--text)"><input type="checkbox" id="s8" style="width:auto;"> Contract with current vendor expiring soon</label>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;color:var(--text)"><input type="checkbox" id="s9" style="width:auto;"> Publicly complained about a problem you solve</label>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;color:var(--text)"><input type="checkbox" id="s10" style="width:auto;"> Replied to your outreach (any response)</label>
+        </div>
+        <button class="btn" onclick="calcProspectHeat()">▶ SCORE PROSPECT HEAT</button>
+        <div class="output" id="out-t17">Mark observed signals to generate heat score</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOOL 18: MEETING COST CALCULATOR -->
+  <div class="tool" id="t18">
+    <div class="tool-header">
+      <div>
+        <div class="tool-id">18 // EFFICIENCY INTELLIGENCE</div>
+        <div class="tool-title">MEETING <em>COST</em></div>
+        <div class="tool-desc">Every meeting your sales team attends has a real rupee cost. Most managers have no idea what their meeting overhead actually costs per quarter. This tool calculates the true cost of your sales meetings — and the revenue you need per meeting to justify them.</div>
+        <div class="tool-outputs">
+          <strong>// OUTPUT TELEMETRY</strong>
+          Cost per meeting (₹)<br>
+          Monthly meeting overhead<br>
+          Revenue needed to justify each meeting<br>
+          Meeting efficiency score
+        </div>
+      </div>
+      <div class="engine">
+        <div class="engine-id">
+          <span>RAPTOR · MEETING COST ENGINE · v1.0</span>
+          <span class="status">● ONLINE</span>
+        </div>
+        <div class="field">
+          <label>Number of Attendees</label>
+          <input type="number" id="d18-attendees" placeholder="e.g. 3" value="3">
+        </div>
+        <div class="field">
+          <label>Average Attendee Annual Salary (₹)</label>
+          <input type="number" id="d18-salary" placeholder="e.g. 1200000">
+        </div>
+        <div class="field">
+          <label>Meeting Duration (minutes)</label>
+          <div class="range-wrap">
+            <input type="range" id="d18-duration" min="15" max="120" value="60" step="15" oninput="document.getElementById('d18-dur-val').textContent=this.value+' min'">
+            <span class="range-val" id="d18-dur-val">60 min</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Meetings per Week (this team)</label>
+          <input type="number" id="d18-freq" placeholder="e.g. 8" value="8">
+        </div>
+        <div class="field">
+          <label>Your Average Deal Size (₹)</label>
+          <input type="number" id="d18-deal" placeholder="To calculate justification threshold">
+        </div>
+        <button class="btn" onclick="calcMeetingCost()">▶ CALCULATE MEETING COST</button>
+        <div class="output" id="out-t18">Enter team data to calculate meeting overhead</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOOL 19: QUOTA ATTAINMENT TRACKER -->
+  <div class="tool" id="t19">
+    <div class="tool-header">
+      <div>
+        <div class="tool-id">19 // PERFORMANCE INTELLIGENCE</div>
+        <div class="tool-title">QUOTA <em>ATTAINMENT</em></div>
+        <div class="tool-desc">Most sales reps don't know if they're on track to hit quota until it's too late. This tool calculates your real-time attainment pace, projects your end-of-month number, and tells you exactly how many deals you need to close in the remaining days to hit 100%.</div>
+        <div class="tool-outputs">
+          <strong>// OUTPUT TELEMETRY</strong>
+          Current attainment %<br>
+          Projected end-of-month number<br>
+          Deals needed in remaining days<br>
+          Required daily revenue pace
+        </div>
+      </div>
+      <div class="engine">
+        <div class="engine-id">
+          <span>RAPTOR · QUOTA ENGINE · v1.0</span>
+          <span class="status">● ONLINE</span>
+        </div>
+        <div class="field">
+          <label>Monthly Quota (₹)</label>
+          <input type="number" id="d19-quota" placeholder="Your target for this month">
+        </div>
+        <div class="field">
+          <label>Revenue Closed So Far This Month (₹)</label>
+          <input type="number" id="d19-closed" placeholder="Booked revenue to date">
+        </div>
+        <div class="field">
+          <label>Working Days Elapsed This Month</label>
+          <input type="number" id="d19-elapsed" placeholder="e.g. 10">
+        </div>
+        <div class="field">
+          <label>Working Days Remaining This Month</label>
+          <input type="number" id="d19-remaining" placeholder="e.g. 12">
+        </div>
+        <div class="field">
+          <label>Average Deal Size (₹)</label>
+          <input type="number" id="d19-avg" placeholder="Your typical deal size">
+        </div>
+        <button class="btn" onclick="calcQuotaAttainment()">▶ TRACK ATTAINMENT</button>
+        <div class="output" id="out-t19">Enter quota data to calculate attainment pace</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOOL 20: REFERRAL VALUE CALCULATOR -->
+  <div class="tool" id="t20">
+    <div class="tool-header">
+      <div>
+        <div class="tool-id">20 // GROWTH INTELLIGENCE</div>
+        <div class="tool-title">REFERRAL <em>VALUE</em></div>
+        <div class="tool-desc">Referred customers close faster, pay more, churn less, and refer others. Most companies have no referral program because they've never calculated how much a referral is actually worth. This tool calculates the true lifetime value of a referred customer versus a cold-acquired one — and what you should be willing to pay for a referral.</div>
+        <div class="tool-outputs">
+          <strong>// OUTPUT TELEMETRY</strong>
+          Referred vs cold LTV comparison<br>
+          Maximum referral reward you can afford<br>
+          Annual referral program ROI<br>
+          Program structure recommendation
+        </div>
+      </div>
+      <div class="engine">
+        <div class="engine-id">
+          <span>RAPTOR · REFERRAL ENGINE · v1.0</span>
+          <span class="status">● ONLINE</span>
+        </div>
+        <div class="field">
+          <label>Average Annual Contract Value (₹)</label>
+          <input type="number" id="d20-acv" placeholder="Revenue per customer per year">
+        </div>
+        <div class="field">
+          <label>Average Customer Lifespan (years)</label>
+          <div class="range-wrap">
+            <input type="range" id="d20-life" min="1" max="10" value="3" oninput="document.getElementById('d20-life-val').textContent=this.value+' yr'">
+            <span class="range-val" id="d20-life-val">3 yr</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Current CAC — Cold Acquisition Cost (₹)</label>
+          <input type="number" id="d20-cac" placeholder="Total sales + marketing cost per new customer">
+        </div>
+        <div class="field">
+          <label>Gross Margin %</label>
+          <div class="range-wrap">
+            <input type="range" id="d20-margin" min="10" max="95" value="65" oninput="document.getElementById('d20-margin-val').textContent=this.value+'%'">
+            <span class="range-val" id="d20-margin-val">65%</span>
+          </div>
+        </div>
+        <button class="btn" onclick="calcReferralValue()">▶ CALCULATE REFERRAL VALUE</button>
+        <div class="output" id="out-t20">Enter customer data to calculate referral economics</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>RAPTOR · EXTENDED ARSENAL · SHOONYA ORIGINS · PUNE · © 2026</span>
+  <span>ALL CALCULATIONS RUN LOCALLY · ZERO DATA COLLECTION</span>
+</footer>
+
+<script>
+function fmt(n) {
+  if (n >= 10000000) return '₹' + (n/10000000).toFixed(2) + 'Cr';
+  if (n >= 100000) return '₹' + (n/100000).toFixed(2) + 'L';
+  if (n >= 1000) return '₹' + (n/1000).toFixed(1) + 'K';
+  return '₹' + Math.round(n).toLocaleString('en-IN');
+}
+
+function setOutput(id, html) {
+  document.getElementById(id).innerHTML = html;
+}
+
+// T10: DEAL SCORE
+function calcDealScore() {
+  const b = parseInt(document.getElementById('d10-budget').value);
+  const a = parseInt(document.getElementById('d10-authority').value);
+  const n = parseInt(document.getElementById('d10-need').value);
+  const t = parseInt(document.getElementById('d10-timeline').value);
+  const c = parseInt(document.getElementById('d10-competition').value);
+  if (isNaN(b)||isNaN(a)||isNaN(n)||isNaN(t)||isNaN(c)) { setOutput('out-t10','<span class="warn">// Complete all fields to run analysis</span>'); return; }
+  const score = Math.round(((b+a+n+t+c)/15)*100);
+  const dims = [['Budget',b],['Authority',a],['Need',n],['Timeline',t],['Competition',c]];
+  const weakest = dims.sort((x,y)=>x[1]-y[1])[0][0];
+  let rec, cls;
+  if (score >= 75) { rec = 'PURSUE AGGRESSIVELY'; cls = 'good'; }
+  else if (score >= 50) { rec = 'PROCEED WITH CAUTION'; cls = 'warn'; }
+  else if (score >= 30) { rec = 'QUALIFY HARDER BEFORE INVESTING'; cls = 'warn'; }
+  else { rec = 'DISQUALIFY — REALLOCATE TIME'; cls = 'bad'; }
+  setOutput('out-t10',
+    `<span class="highlight">DEAL SCORE: ${score}/100</span>\n\n` +
+    `RECOMMENDATION: <span class="${cls}">${rec}</span>\n\n` +
+    `WEAKEST DIMENSION: ${weakest}\n` +
+    `FIX THIS FIRST: ${weakest === 'Budget' ? 'Get explicit budget confirmation on next call — ask directly: "Do you have budget allocated for this?"'
+    : weakest === 'Authority' ? 'Map the org. Ask your champion: "Who else needs to sign off on this decision?"'
+    : weakest === 'Need' ? 'Quantify the pain. Ask: "What does this problem cost you per month in lost revenue or wasted hours?"'
+    : weakest === 'Timeline' ? 'Create urgency. Ask: "What happens if this isn\'t solved by Q3?" Find their internal deadline.'
+    : 'Identify competitor weakness. Ask: "What would need to be true for you to choose us over your current evaluation?"'}`
+  );
+}
+
+// T11: PRICE ANCHOR
+function calcPriceAnchor() {
+  const target = parseFloat(document.getElementById('d11-target').value);
+  const floor = parseFloat(document.getElementById('d11-floor').value);
+  const budget = document.getElementById('d11-budget').value;
+  const sensitivity = document.getElementById('d11-sensitivity').value;
+  if (!target||!floor||!budget||!sensitivity) { setOutput('out-t11','<span class="warn">// Complete all fields to generate anchor strategy</span>'); return; }
+  let multiplier = sensitivity === 'low' ? 1.4 : sensitivity === 'medium' ? 1.25 : 1.15;
+  const anchor = Math.round(target * multiplier);
+  const c1 = Math.round(target * 1.1);
+  const c2 = Math.round(target * 1.03);
+  const c3 = target;
+  setOutput('out-t11',
+    `<span class="highlight">ANCHOR PRICE: ${fmt(anchor)}</span>\n\n` +
+    `YOUR TARGET: ${fmt(target)}\n` +
+    `WALK-AWAY FLOOR: ${fmt(floor)}\n\n` +
+    `CONCESSION LADDER:\n` +
+    `  Step 1 → ${fmt(c1)} (add 1 extra feature / service)\n` +
+    `  Step 2 → ${fmt(c2)} (extend payment terms)\n` +
+    `  Step 3 → ${fmt(c3)} (your actual target — final offer)\n\n` +
+    `FRAMING: Open at ${fmt(anchor)} with full justification. Never go below ${fmt(floor)}.\n` +
+    `Never discount without getting something in return — longer commitment, faster payment, referral.`
+  );
+}
+
+// T12: OBJECTION MAP
+function calcObjectionMap() {
+  const seniority = document.getElementById('d12-seniority').value;
+  const stage = document.getElementById('d12-stage').value;
+  const size = document.getElementById('d12-size').value;
+  if (!seniority||!stage||!size) { setOutput('out-t12','<span class="warn">// Complete all fields to map objections</span>'); return; }
+
+  const objMap = {
+    csuite: { proposal: [['ROI not proven (82%)', 'Show comparable case study. Ask: "If I showed you a customer in your industry getting X% ROI, would that address your concern?"'],['Timing is wrong (71%)', '"What would need to change internally for timing to be right? Let\'s plan for that moment."'],['We can build this internally (54%)', '"Most teams who tried spent 6-12 months and 3x the cost. What\'s your team\'s current bandwidth?"']], negotiation: [['Price too high (88%)', 'Never discount first. Ask: "Compared to what?" Then anchor to the cost of inaction.'],['Need board approval (67%)', '"What does the board need to see to approve this? Let\'s build that deck together."'],['Competitor is cheaper (61%)', '"Cheaper rarely means less expensive. What\'s the total cost including implementation and churn risk?"']] },
+    vp: { proposal: [['Not my budget to approve (75%)', '"Who owns this budget? Can we get them on a 20-minute call this week?"'],['Need to evaluate 2 more vendors (68%)', '"Understood. What criteria will you use to decide? I want to make sure we\'re fairly compared."'],['Implementation is too complex (59%)', '"What specifically concerns you about implementation? Let\'s walk through our onboarding timeline."']], negotiation: [['Price too high (79%)', 'Reframe to ROI. "This is ₹X/month. Your current problem costs you ₹Y/month. You\'re making money from day one."'],['Team won\'t adopt it (65%)', '"What has caused low adoption of tools in the past? We can design onboarding around that."'],['Too risky (52%)', '"What would remove the risk for you? Pilot? Guarantee? Phased rollout?"']] },
+    manager: { discovery: [['Need to check with my boss (85%)', '"Of course. What would you need to see to feel confident recommending this upward?"'],['We already have something for this (70%)', '"What are the top 3 gaps in what you\'re using now?"'],['Not a priority right now (60%)', '"What would make this a priority? What\'s competing for your attention?"']], demo: [['Too many features — we only need X (72%)', '"Good. Let\'s scope this to exactly what you need. What if we started with just X?"'],['Switching cost is too high (65%)', '"What\'s the actual switching cost — time, migration, retraining? Let\'s quantify it."'],['Can we get a free trial (78%)', '"Yes — here\'s what a trial looks like and what success looks like at the end of it."']] },
+    ic: { discovery: [['I\'m not the decision maker (90%)', '"Understood. Who is? And what would you need to bring to them to make the case?"'],['Send me more information (80%)', '"Of course — what specifically do you want to know more about?"'],['We don\'t have budget (65%)', '"Is budget the issue, or is it that you haven\'t made the case for budget yet?"']], demo: [['Looks complicated to set up (75%)', '"Show me your current setup. We\'ve migrated teams like yours in under 2 days."'],['I\'d have to convince my team (68%)', '"What objections do you think your team will have? Let\'s address them now."'],['We\'re not ready yet (60%)', '"What would \'ready\' look like for you? Let\'s set a concrete date."']] }
+  };
+
+  const key = seniority;
+  const stageKey = stage === 'discovery' || stage === 'demo' ? (stage) : stage === 'proposal' ? 'proposal' : 'negotiation';
+  const data = objMap[key] && objMap[key][stageKey] ? objMap[key][stageKey] : objMap[key] ? Object.values(objMap[key])[0] : null;
+
+  if (!data) { setOutput('out-t12','<span class="warn">// No pattern data for this combination — trust your gut</span>'); return; }
+
+  let out = `<span class="highlight">TOP 3 PREDICTED OBJECTIONS</span>\n\n`;
+  data.forEach((obj, i) => {
+    out += `OBJECTION ${i+1}: ${obj[0]}\nCOUNTER: ${obj[1]}\n\n`;
+  });
+  setOutput('out-t12', out);
+}
+
+// T13: FOLLOW-UP DECAY
+function calcFollowUpDecay() {
+  const days = parseInt(document.getElementById('d13-days').value);
+  const last = document.getElementById('d13-last').value;
+  const complexity = document.getElementById('d13-complexity').value;
+  if (!days||!last||!complexity) { setOutput('out-t13','<span class="warn">// Complete all fields to calculate decay</span>'); return; }
+
+  const baseProb = { hot: 75, warm: 50, neutral: 30, cold: 15 }[last];
+  const decayRate = { simple: 3.5, medium: 2.2, complex: 1.2 }[complexity];
+  const currentProb = Math.max(2, Math.round(baseProb - (days * decayRate)));
+  const prob7 = Math.max(1, Math.round(currentProb - (7 * decayRate)));
+  const dailyLoss = Math.round(decayRate * 10) / 10;
+
+  let urgency, cls;
+  if (currentProb >= 60) { urgency = 'HEALTHY — contact within 48 hours to maintain momentum'; cls = 'good'; }
+  else if (currentProb >= 35) { urgency = 'DEGRADING — contact today or lose significant ground'; cls = 'warn'; }
+  else if (currentProb >= 15) { urgency = 'CRITICAL — this deal is slipping. Contact now with new value.'; cls = 'warn'; }
+  else { urgency = 'NEAR DEAD — requires a pattern interrupt, not a follow-up'; cls = 'bad'; }
+
+  setOutput('out-t13',
+    `<span class="highlight">CURRENT CLOSE PROBABILITY: ${currentProb}%</span>\n\n` +
+    `PROBABILITY IN 7 DAYS: <span class="${prob7 < 20 ? 'bad' : 'warn'}">${prob7}%</span>\n` +
+    `DAILY DECAY RATE: -${dailyLoss}% per day\n\n` +
+    `STATUS: <span class="${cls}">${urgency}</span>\n\n` +
+    `OPTIMAL CONTACT: ${currentProb > 50 ? 'Standard follow-up — reference last conversation' : currentProb > 25 ? 'Add new value — share a case study, insight, or relevant news about their industry' : 'Pattern interrupt — try a different channel, different person, or a new angle entirely'}`
+  );
+}
+
+// T14: PROPOSAL ROI
+function calcProposalROI() {
+  const acv = parseFloat(document.getElementById('d14-acv').value);
+  const pain = parseFloat(document.getElementById('d14-pain').value);
+  const improvement = parseInt(document.getElementById('d14-improvement').value) / 100;
+  const impl = parseInt(document.getElementById('d14-impl').value) || 1;
+  if (!acv||!pain) { setOutput('out-t14','<span class="warn">// Enter deal parameters to build ROI case</span>'); return; }
+
+  const annualBenefit = pain * 12 * improvement;
+  const netBenefit6m = (annualBenefit / 2) - acv;
+  const netBenefit12m = annualBenefit - acv;
+  const netBenefit3y = (annualBenefit * 3) - (acv * 3);
+  const payback = Math.ceil(acv / (annualBenefit / 12));
+  const roi12 = Math.round(((netBenefit12m) / acv) * 100);
+
+  setOutput('out-t14',
+    `<span class="highlight">12-MONTH ROI: ${roi12}%</span>\n\n` +
+    `ANNUAL COST OF PROBLEM: ${fmt(pain*12)}\n` +
+    `ANNUAL BENEFIT DELIVERED: ${fmt(annualBenefit)}\n` +
+    `YOUR ANNUAL COST: ${fmt(acv)}\n\n` +
+    `NET BENEFIT AT 6 MONTHS: <span class="${netBenefit6m>0?'good':'bad'}">${fmt(Math.abs(netBenefit6m))} ${netBenefit6m>0?'profit':'still investing'}</span>\n` +
+    `NET BENEFIT AT 12 MONTHS: <span class="good">${fmt(netBenefit12m)}</span>\n` +
+    `NET BENEFIT OVER 3 YEARS: <span class="good">${fmt(netBenefit3y)}</span>\n` +
+    `PAYBACK PERIOD: ${payback} months\n\n` +
+    `CFO LINE: "You spend ${fmt(acv)} annually. We eliminate ${fmt(annualBenefit)} of annual cost. You're in profit by month ${payback}."`
+  );
+}
+
+// T15: DISCOUNT IMPACT
+function calcDiscountImpact() {
+  const deal = parseFloat(document.getElementById('d15-deal').value);
+  const disc = parseInt(document.getElementById('d15-disc').value) / 100;
+  const margin = parseInt(document.getElementById('d15-margin').value) / 100;
+  const volume = parseInt(document.getElementById('d15-volume').value) || 1;
+  if (!deal) { setOutput('out-t15','<span class="warn">// Enter deal value to calculate discount damage</span>'); return; }
+
+  const discountAmount = deal * disc;
+  const originalMargin = deal * margin;
+  const newMargin = (deal - discountAmount) * margin;
+  const marginLost = originalMargin - newMargin;
+  const pctMarginLost = Math.round((marginLost / originalMargin) * 100);
+  const extraDeals = Math.ceil(marginLost / newMargin);
+  const annualImpact = marginLost * volume * 12;
+
+  setOutput('out-t15',
+    `<span class="highlight">MARGIN DESTROYED: ${fmt(marginLost)} per deal</span>\n\n` +
+    `DISCOUNT AMOUNT: ${fmt(discountAmount)}\n` +
+    `ORIGINAL MARGIN: ${fmt(originalMargin)}\n` +
+    `MARGIN AFTER DISCOUNT: ${fmt(newMargin)}\n` +
+    `MARGIN LOST %: <span class="bad">${pctMarginLost}% of your margin gone for a ${Math.round(disc*100)}% discount</span>\n\n` +
+    `EXTRA DEALS NEEDED TO RECOVER: <span class="warn">${extraDeals} additional deals at the discounted price</span>\n` +
+    `ANNUAL IMPACT AT ${volume} DEALS/MONTH: <span class="bad">${fmt(annualImpact)} in margin destroyed per year</span>\n\n` +
+    `COUNTER: Instead of discounting, offer extended payment terms, additional onboarding, or a 30-day pilot. Same cost to you — no margin destroyed.`
+  );
+}
+
+// T16: CLOSE RATE AUDIT
+function calcCloseRate() {
+  const leads = parseInt(document.getElementById('d16-leads').value);
+  const discovery = parseInt(document.getElementById('d16-discovery').value);
+  const proposals = parseInt(document.getElementById('d16-proposals').value);
+  const closed = parseInt(document.getElementById('d16-closed').value);
+  const segment = document.getElementById('d16-segment').value;
+  if (!leads||!discovery||!proposals||!closed||!segment) { setOutput('out-t16','<span class="warn">// Complete all fields to run audit</span>'); return; }
+
+  const benchmarks = { smb: { l2d: 40, d2p: 40, p2c: 30, overall: 5 }, mid: { l2d: 25, d2p: 30, p2c: 25, overall: 3 }, ent: { l2d: 15, d2p: 20, p2c: 20, overall: 2 } }[segment];
+  const l2d = Math.round((discovery/leads)*100);
+  const d2p = Math.round((proposals/discovery)*100);
+  const p2c = Math.round((closed/proposals)*100);
+  const overall = Math.round((closed/leads)*100);
+
+  const stages = [
+    ['Lead → Discovery', l2d, benchmarks.l2d],
+    ['Discovery → Proposal', d2p, benchmarks.d2p],
+    ['Proposal → Close', p2c, benchmarks.p2c],
+    ['Overall', overall, benchmarks.overall]
+  ];
+
+  const weakest = stages.slice(0,3).sort((a,b) => (a[1]-a[2]) - (b[1]-b[2]))[0];
+
+  let out = `<span class="highlight">OVERALL CLOSE RATE: ${overall}% (benchmark: ${benchmarks.overall}%)</span>\n\n`;
+  stages.forEach(s => {
+    const diff = s[1] - s[2];
+    const cls = diff >= 0 ? 'good' : diff > -10 ? 'warn' : 'bad';
+    out += `${s[0]}: <span class="${cls}">${s[1]}%</span> (benchmark: ${s[2]}%) ${diff>=0?'▲'+diff+'%':'▼'+Math.abs(diff)+'%'}\n`;
+  });
+  out += `\nBIGGEST LEAK: ${weakest[0]} at ${weakest[1]}% vs ${weakest[2]}% benchmark\n`;
+  out += `FIX: ${weakest[0].includes('Lead') ? 'Tighten ICP targeting. You\'re booking calls with wrong-fit prospects.' : weakest[0].includes('Discovery') ? 'Your demo/proposal threshold is too low. Qualify harder before sending a proposal.' : 'Follow up faster post-proposal. Most deals die in silence, not rejection.'}`;
+  setOutput('out-t16', out);
+}
+
+// T17: PROSPECT HEAT
+function calcProspectHeat() {
+  const weights = [20,18,15,12,10,8,7,25,22,15];
+  const ids = ['s1','s2','s3','s4','s5','s6','s7','s8','s9','s10'];
+  const labels = ['Raised funding','Hiring for your problem','New leadership','Website/email engagement','Competitor made big move','Engaged with content','Attended industry event','Vendor contract expiring','Publicly complained about your problem','Replied to outreach'];
+  let score = 0;
+  let topSignal = '';
+  let topW = 0;
+  ids.forEach((id,i) => {
+    if (document.getElementById(id).checked) {
+      score += weights[i];
+      if (weights[i] > topW) { topW = weights[i]; topSignal = labels[i]; }
+    }
+  });
+  score = Math.min(100, score);
+
+  let intent, angle, cls;
+  if (score >= 70) { intent = 'HIGHLY ACTIVE BUYER'; cls = 'good'; angle = 'Contact today. Lead with the strongest signal you observed. Be direct about timing.'; }
+  else if (score >= 45) { intent = 'WARM — BUILDING INTENT'; cls = 'warn'; angle = 'Contact this week. Reference the signals you observed. Create a specific reason to talk.'; }
+  else if (score >= 20) { intent = 'PASSIVE — LOW URGENCY'; cls = 'warn'; angle = 'Nurture. Add value without asking for anything. Share relevant content for 2-3 weeks first.'; }
+  else { intent = 'COLD — NO OBSERVABLE INTENT'; cls = 'bad'; angle = 'Hold. Find more signals before reaching out. Cold outreach now has low probability of conversion.'; }
+
+  setOutput('out-t17',
+    `<span class="highlight">HEAT SCORE: ${score}/100</span>\n\n` +
+    `INTENT CLASSIFICATION: <span class="${cls}">${intent}</span>\n` +
+    `TOP SIGNAL: ${topSignal || 'No signals marked'}\n\n` +
+    `RECOMMENDED ANGLE: ${angle}`
+  );
+}
+
+// T18: MEETING COST
+function calcMeetingCost() {
+  const attendees = parseInt(document.getElementById('d18-attendees').value);
+  const salary = parseFloat(document.getElementById('d18-salary').value);
+  const duration = parseInt(document.getElementById('d18-duration').value);
+  const freq = parseInt(document.getElementById('d18-freq').value);
+  const deal = parseFloat(document.getElementById('d18-deal').value);
+  if (!attendees||!salary||!freq) { setOutput('out-t18','<span class="warn">// Enter team data to calculate meeting cost</span>'); return; }
+
+  const hourlyPerPerson = salary / (52 * 5 * 8);
+  const costPerMeeting = Math.round(hourlyPerPerson * attendees * (duration/60));
+  const weeklyCost = costPerMeeting * freq;
+  const monthlyCost = weeklyCost * 4.3;
+  const annualCost = monthlyCost * 12;
+  const justification = deal ? Math.ceil(annualCost / (deal * 0.3)) : null;
+
+  setOutput('out-t18',
+    `<span class="highlight">COST PER MEETING: ${fmt(costPerMeeting)}</span>\n\n` +
+    `WEEKLY MEETING OVERHEAD: ${fmt(weeklyCost)}\n` +
+    `MONTHLY MEETING OVERHEAD: ${fmt(monthlyCost)}\n` +
+    `ANNUAL MEETING OVERHEAD: <span class="warn">${fmt(annualCost)}</span>\n\n` +
+    (justification ? `DEALS NEEDED ANNUALLY TO JUSTIFY MEETINGS: ${justification}\n\n` : '') +
+    `RULE: If a meeting doesn't have a clear outcome, owner, and deadline — it should be an async message.\nEvery meeting you cut is ${fmt(costPerMeeting)} returned to productive work.`
+  );
+}
+
+// T19: QUOTA ATTAINMENT
+function calcQuotaAttainment() {
+  const quota = parseFloat(document.getElementById('d19-quota').value);
+  const closed = parseFloat(document.getElementById('d19-closed').value);
+  const elapsed = parseInt(document.getElementById('d19-elapsed').value);
+  const remaining = parseInt(document.getElementById('d19-remaining').value);
+  const avg = parseFloat(document.getElementById('d19-avg').value);
+  if (!quota||closed===undefined||!elapsed||!remaining) { setOutput('out-t19','<span class="warn">// Enter quota data to track attainment</span>'); return; }
+
+  const attainment = Math.round((closed/quota)*100);
+  const dailyPace = closed / elapsed;
+  const projected = Math.round(closed + (dailyPace * remaining));
+  const projectedAttainment = Math.round((projected/quota)*100);
+  const needed = Math.max(0, quota - closed);
+  const dailyNeeded = Math.round(needed / remaining);
+  const dealsNeeded = avg ? Math.ceil(needed / avg) : null;
+
+  let status, cls;
+  if (projectedAttainment >= 100) { status = 'ON TRACK TO HIT QUOTA'; cls = 'good'; }
+  else if (projectedAttainment >= 80) { status = 'SLIGHTLY BEHIND — PUSH HARDER'; cls = 'warn'; }
+  else if (projectedAttainment >= 60) { status = 'AT RISK — NEEDS INTERVENTION NOW'; cls = 'warn'; }
+  else { status = 'CRITICAL — QUOTA MISS LIKELY WITHOUT MAJOR CHANGE'; cls = 'bad'; }
+
+  setOutput('out-t19',
+    `<span class="highlight">CURRENT ATTAINMENT: ${attainment}%</span>\n\n` +
+    `PROJECTED END-OF-MONTH: ${fmt(projected)} (${projectedAttainment}% of quota)\n` +
+    `STATUS: <span class="${cls}">${status}</span>\n\n` +
+    `REVENUE STILL NEEDED: ${fmt(needed)}\n` +
+    `REQUIRED DAILY PACE: ${fmt(dailyNeeded)}/day\n` +
+    (dealsNeeded ? `DEALS NEEDED IN ${remaining} DAYS: ${dealsNeeded} deals at avg deal size\n` : '') +
+    `\nFOCUS: ${projectedAttainment >= 100 ? 'Protect your pipeline. Don\'t let late-stage deals slip.' : projectedAttainment >= 80 ? 'Accelerate 2-3 deals already in late stage. One push can close the gap.' : 'Identify every deal that can close this month. Call them all today.'}`
+  );
+}
+
+// T20: REFERRAL VALUE
+function calcReferralValue() {
+  const acv = parseFloat(document.getElementById('d20-acv').value);
+  const life = parseInt(document.getElementById('d20-life').value);
+  const cac = parseFloat(document.getElementById('d20-cac').value);
+  const margin = parseInt(document.getElementById('d20-margin').value) / 100;
+  if (!acv||!cac) { setOutput('out-t20','<span class="warn">// Enter customer data to calculate referral economics</span>'); return; }
+
+  const coldLTV = acv * life * margin;
+  const referredLTV = coldLTV * 1.25; // referred customers have ~25% higher LTV
+  const referredCAC = cac * 0.3; // referred customers cost ~70% less to acquire
+  const maxReward = Math.round((referredLTV - referredCAC) * 0.15);
+  const annualROI = (referredLTV - referredCAC - maxReward) / maxReward * 100;
+
+  setOutput('out-t20',
+    `<span class="highlight">REFERRED CUSTOMER LTV: ${fmt(referredLTV)}</span>\n\n` +
+    `COLD-ACQUIRED CUSTOMER LTV: ${fmt(coldLTV)}\n` +
+    `LTV PREMIUM OF REFERRED: <span class="good">+25% (${fmt(referredLTV - coldLTV)} more per customer)</span>\n\n` +
+    `COLD CAC: ${fmt(cac)}\n` +
+    `REFERRED CAC: <span class="good">${fmt(referredCAC)} (70% lower)</span>\n\n` +
+    `MAX REFERRAL REWARD YOU CAN AFFORD: <span class="highlight">${fmt(maxReward)}</span>\n` +
+    `PROGRAM ROI: ${Math.round(annualROI)}% return on every rupee paid in referral rewards\n\n` +
+    `STRUCTURE: Pay ${fmt(Math.round(maxReward*0.5))} on contract signing + ${fmt(Math.round(maxReward*0.5))} after 90 days retention. This filters referrals for quality.`
+  );
+}
+</script>
+</body>
+</html>
