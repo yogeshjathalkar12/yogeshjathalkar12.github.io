@@ -1,0 +1,2091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aether Labs · Research Instrumentation Suite</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+
+:root {
+  --void: #03050a;
+  --deep: #070c14;
+  --panel: #0b1220;
+  --border: #162030;
+  --border2: #1e3048;
+  --cyan: #4fc3f7;
+  --cyan2: #81d4fa;
+  --gold: #c9a84c;
+  --gold2: #e8c97a;
+  --text: #b8cfe0;
+  --text-dim: #4a6478;
+  --text-bright: #e8f4ff;
+  --mono: 'DM Mono', monospace;
+  --serif: 'Cormorant Garamond', serif;
+  --sans: 'DM Sans', sans-serif;
+  --glow: 0 0 20px rgba(79,195,247,0.15);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--void);
+  color: var(--text);
+  font-family: var(--sans);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* PARTICLE FIELD BG */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 20%, rgba(79,195,247,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(201,168,76,0.03) 0%, transparent 50%),
+    repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(79,195,247,0.008) 3px, rgba(79,195,247,0.008) 4px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* NAV */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 48px;
+  background: rgba(3,5,10,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-brand {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 22px;
+  color: var(--cyan);
+  letter-spacing: 2px;
+  line-height: 1;
+}
+
+.nav-sub {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.nav-stat {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-stat .val { color: var(--cyan); }
+
+.nav-back {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  text-decoration: none;
+  padding: 6px 14px;
+  border: 1px solid var(--border2);
+  transition: all 0.2s;
+}
+.nav-back:hover { color: var(--cyan); border-color: var(--cyan); }
+
+/* HERO */
+.hero {
+  position: relative;
+  z-index: 1;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 80px 48px 60px;
+  border-bottom: 1px solid var(--border);
+}
+
+.hero-eyebrow {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--gold);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.hero-title {
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: clamp(52px, 8vw, 96px);
+  line-height: 0.92;
+  color: var(--text-bright);
+  margin-bottom: 32px;
+}
+
+.hero-title em {
+  font-style: italic;
+  color: var(--cyan);
+}
+
+.hero-desc {
+  max-width: 600px;
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.7;
+  margin-bottom: 40px;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 48px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-val {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 300;
+  color: var(--cyan);
+  line-height: 1;
+}
+
+.stat-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* INDEX */
+.index-wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 32px 48px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.idx {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  text-decoration: none;
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  transition: all 0.18s;
+}
+
+.idx:hover { color: var(--cyan); border-color: var(--cyan); background: rgba(79,195,247,0.04); }
+
+/* TOOLS WRAP */
+.tools-wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 48px 100px;
+}
+
+/* SINGLE TOOL */
+.tool {
+  padding: 72px 0;
+  border-bottom: 1px solid var(--border);
+  scroll-margin-top: 80px;
+}
+
+.tool-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: start;
+}
+
+.tool-num {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--gold);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.tool-name {
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1.05;
+  color: var(--text-bright);
+  margin-bottom: 20px;
+}
+
+.tool-name em {
+  font-style: italic;
+  color: var(--cyan);
+}
+
+.tool-body {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.75;
+  margin-bottom: 24px;
+}
+
+.tool-outputs {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  line-height: 2;
+  border-left: 2px solid var(--border2);
+  padding-left: 16px;
+}
+
+.tool-outputs .lbl {
+  color: var(--gold);
+  display: block;
+  margin-bottom: 4px;
+  letter-spacing: 2px;
+}
+
+/* INSTRUMENT PANEL */
+.instrument {
+  background: var(--panel);
+  border: 1px solid var(--border2);
+  padding: 28px;
+  box-shadow: var(--glow);
+}
+
+.inst-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.inst-id {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+}
+
+.inst-status {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--cyan);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.inst-status::before {
+  content: '';
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--cyan);
+  animation: blink 3s infinite;
+}
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+.f {
+  margin-bottom: 18px;
+}
+
+.f label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 7px;
+}
+
+.f input, .f select {
+  width: 100%;
+  background: var(--deep);
+  border: 1px solid var(--border2);
+  color: var(--text-bright);
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 9px 12px;
+  outline: none;
+  transition: border-color 0.2s;
+  -webkit-appearance: none;
+}
+
+.f input:focus, .f select:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 1px rgba(79,195,247,0.1);
+}
+
+.f input::placeholder { color: var(--text-dim); }
+
+.f-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.f-row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+.f .unit-hint {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+.calc-btn {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--cyan);
+  color: var(--cyan);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  padding: 12px;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: all 0.2s;
+}
+
+.calc-btn:hover {
+  background: rgba(79,195,247,0.08);
+  box-shadow: 0 0 20px rgba(79,195,247,0.1);
+}
+
+.result {
+  margin-top: 18px;
+  background: var(--deep);
+  border: 1px solid var(--border);
+  padding: 18px;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 2;
+  color: var(--text-dim);
+  min-height: 56px;
+  white-space: pre-wrap;
+}
+
+.result .primary { color: var(--cyan); font-size: 14px; }
+.result .secondary { color: var(--gold); }
+.result .dim { color: var(--text-dim); }
+.result .warn { color: #ffb74d; }
+.result .err { color: #ef5350; }
+.result .good { color: #66bb6a; }
+
+/* FOOTER */
+footer {
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid var(--border);
+  padding: 32px 48px;
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+@media(max-width:900px){
+  nav{padding:14px 20px}
+  .hero{padding:48px 20px 40px}
+  .index-wrap{padding:20px}
+  .tools-wrap{padding:0 20px 60px}
+  .tool-grid{grid-template-columns:1fr;gap:32px}
+  .f-row,.f-row3{grid-template-columns:1fr}
+  footer{padding:24px 20px;flex-direction:column;gap:8px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-left">
+    <div class="nav-brand">Aether Labs</div>
+    <div class="nav-sub">Research Instrumentation Suite</div>
+  </div>
+  <div class="nav-right">
+    <div class="nav-stat">Instruments <span class="val">20</span></div>
+    <div class="nav-stat">Access Cost <span class="val">₹0</span></div>
+    <a href="https://shoonyaorigins.com/ventures/aether/" class="nav-back">← Return to Aether</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-eyebrow">// Aether Labs · Shoonya Origins · Free Research Instrumentation</div>
+  <h1 class="hero-title">Instruments for<br><em>the Frontier.</em></h1>
+  <p class="hero-desc">Twenty computational instruments for graduate researchers, doctoral candidates, and faculty. Tools that previously required Mathematica, MATLAB, or custom scripts. Free. Browser-native. Numerically precise.</p>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-val">20</div><div class="stat-label">Instruments</div></div>
+    <div class="stat"><div class="stat-val">₹0</div><div class="stat-label">Cost</div></div>
+    <div class="stat"><div class="stat-val">0</div><div class="stat-label">Signups</div></div>
+    <div class="stat"><div class="stat-val">Local</div><div class="stat-label">All Computation</div></div>
+  </div>
+</div>
+
+<div class="index-wrap">
+  <a href="#t01" class="idx">01 · Wave Interference</a>
+  <a href="#t02" class="idx">02 · Photoelectric Effect</a>
+  <a href="#t03" class="idx">03 · de Broglie Wavelength</a>
+  <a href="#t04" class="idx">04 · Heisenberg Uncertainty</a>
+  <a href="#t05" class="idx">05 · Quantum Tunneling</a>
+  <a href="#t06" class="idx">06 · Blackbody Radiation</a>
+  <a href="#t07" class="idx">07 · Hydrogen Spectroscopy</a>
+  <a href="#t08" class="idx">08 · PN Junction Potential</a>
+  <a href="#t09" class="idx">09 · Carrier Concentration</a>
+  <a href="#t10" class="idx">10 · RLC Resonance</a>
+  <a href="#t11" class="idx">11 · Error Propagation</a>
+  <a href="#t12" class="idx">12 · Experimental Statistics</a>
+  <a href="#t13" class="idx">13 · Dimensional Analysis</a>
+  <a href="#t14" class="idx">14 · EM Spectrum Mapper</a>
+  <a href="#t15" class="idx">15 · Diffraction Grating</a>
+  <a href="#t16" class="idx">16 · Lorentz Relativity</a>
+  <a href="#t17" class="idx">17 · Radioactive Decay Chain</a>
+  <a href="#t18" class="idx">18 · Schrödinger Particle-in-Box</a>
+  <a href="#t19" class="idx">19 · Fermi Energy Calculator</a>
+  <a href="#t20" class="idx">20 · Compton Scattering</a>
+</div>
+
+<div class="tools-wrap">
+
+<!-- T01: WAVE INTERFERENCE -->
+<div class="tool" id="t01">
+<div class="tool-grid">
+<div>
+  <div class="tool-num">01 · Wave Physics</div>
+  <div class="tool-name">Double-Slit Wave<br><em>Interference</em></div>
+  <div class="tool-body">Computes the full interference pattern for two coherent sources: fringe spacing, path difference at any angle, intensity distribution, and coherence requirements. Accounts for finite slit width envelope modulation. Applicable to Young's experiment, acoustic interference, and microwave diffraction setups.</div>
+  <div class="tool-outputs">
+    <span class="lbl">// Output</span>
+    Fringe spacing Δy<br>
+    Path difference δ at angle θ<br>
+    Intensity I(θ) normalised<br>
+    Coherence length requirement<br>
+    Missing orders from slit-width envelope
+  </div>
+</div>
+<div class="instrument">
+  <div class="inst-header">
+    <span class="inst-id">AETH-T01 · INTERFERENCE ENGINE</span>
+    <span class="inst-status">ACTIVE</span>
+  </div>
+  <div class="f-row">
+    <div class="f"><label>Wavelength λ (nm)</label><input type="number" id="w1-lambda" placeholder="e.g. 589 (Na-D)"><div class="unit-hint">1 nm = 1×10⁻⁹ m</div></div>
+    <div class="f"><label>Slit Separation d (μm)</label><input type="number" id="w1-d" placeholder="e.g. 250"></div>
+  </div>
+  <div class="f-row">
+    <div class="f"><label>Slit Width a (μm)</label><input type="number" id="w1-a" placeholder="e.g. 50"><div class="unit-hint">For envelope modulation</div></div>
+    <div class="f"><label>Screen Distance L (cm)</label><input type="number" id="w1-L" placeholder="e.g. 100"></div>
+  </div>
+  <div class="f"><label>Angle of Interest θ (degrees, optional)</label><input type="number" id="w1-theta" placeholder="Leave blank for central pattern"></div>
+  <button class="calc-btn" onclick="calcInterference()">▶ Compute Interference Pattern</button>
+  <div class="result" id="r-t01">Enter parameters to compute interference pattern</div>
+</div>
+</div>
+</div>
+
+<!-- T02: PHOTOELECTRIC EFFECT -->
+<div class="tool" id="t02">
+<div class="tool-grid">
+<div>
+  <div class="tool-num">02 · Quantum Optics</div>
+  <div class="tool-name">Photoelectric<br><em>Effect Analysis</em></div>
+  <div class="tool-body">Full photoelectric analysis beyond the basic Einstein equation. Computes threshold frequency, stopping potential, maximum kinetic energy of emitted electrons, and photon flux. Supports work function input for any material. Useful for designing photoemission experiments and calibrating photomultiplier tubes.</div>
+  <div class="tool-outputs">
+    <span class="lbl">// Output</span>
+    Threshold frequency ν₀ and wavelength λ₀<br>
+    Maximum KE of photoelectrons (eV and J)<br>
+    Stopping potential V_s<br>
+    Photon flux at given intensity<br>
+    Quantum efficiency context
+  </div>
+</div>
+<div class="instrument">
+  <div class="inst-header">
+    <span class="inst-id">AETH-T02 · PHOTOEMISSION ENGINE</span>
+    <span class="inst-status">ACTIVE</span>
+  </div>
+  <div class="f"><label>Work Function φ (eV)</label>
+    <select id="pe-material">
+      <option value="">-- Select material or enter custom --</option>
+      <option value="1.81">Caesium (1.81 eV)</option>
+      <option value="2.30">Potassium (2.30 eV)</option>
+      <option value="2.36">Sodium (2.36 eV)</option>
+      <option value="3.66">Aluminium (3.66 eV)</option>
+      <option value="4.50">Copper (4.50 eV)</option>
+      <option value="4.52">Gold (4.52 eV)</option>
+      <option value="4.65">Silver (4.65 eV)</option>
+      <option value="5.10">Platinum (5.10 eV)</option>
+      <option value="custom">Custom</option>
+    </select>
+  </div>
+  <div class="f"><label>Custom Work Function (eV)</label><input type="number" id="pe-custom" placeholder="Only if custom selected" step="0.01"></div>
+  <div class="f-row">
+    <div class="f"><label>Incident Frequency ν (×10¹⁴ Hz)</label><input type="number" id="pe-freq" placeholder="e.g. 7.5" step="0.01"></div>
+    <div class="f"><label>Incident Intensity (W/m²)</label><input type="number" id="pe-intensity" placeholder="e.g. 10"></div>
+  </div>
+  <button class="calc-btn" onclick="calcPhotoelectric()">▶ Analyse Photoemission</button>
+  <div class="result" id="r-t02">Select material and incident frequency to analyse</div>
+</div>
+</div>
+</div>
+
+<!-- T03: DE BROGLIE -->
+<div class="tool" id="t03">
+<div class="tool-grid">
+<div>
+  <div class="tool-num">03 · Matter Wave Physics</div>
+  <div class="tool-name">de Broglie<br><em>Wavelength</em></div>
+  <div class="tool-body">Calculates the de Broglie wavelength for any particle with correct relativistic treatment for high-energy cases. Computes associated momentum, phase velocity, group velocity, and the thermal de Broglie wavelength at a given temperature — critical for assessing quantum degeneracy conditions in cold atom experiments and electron diffraction setups.</div>
+  <div class="tool-outputs">
+    <span class="lbl">// Output</span>
+    de Broglie wavelength λ_dB<br>
+    Relativistic correction factor γ<br>
+    Phase velocity v_ph<br>
+    Thermal de Broglie wavelength at T<br>
+    Quantum degeneracy condition
+  </div>
+</div>
+<div class="instrument">
+  <div class="inst-header">
+    <span class="inst-id">AETH-T03 · MATTER WAVE ENGINE</span>
+    <span class="inst-status">ACTIVE</span>
+  </div>
+  <div class="f"><label>Particle</label>
+    <select id="db-particle">
+      <option value="9.109e-31">Electron (9.109×10⁻³¹ kg)</option>
+      <option value="1.673e-27">Proton (1.673×10⁻²⁷ kg)</option>
+      <option value="1.675e-27">Neutron (1.675×10⁻²⁷ kg)</option>
+      <option value="6.644e-27">Alpha particle (6.644×10⁻²⁷ kg)</option>
+      <option value="custom">Custom mass</option>
+    </select>
+  </div>
+  <div class="f"><label>Custom Mass (kg)</label><input type="number" id="db-mass" placeholder="e.g. 1.2e-26" step="any"></div>
+  <div class="f-row">
+    <div class="f"><label>Kinetic Energy (eV)</label><input type="number" id="db-ke" placeholder="e.g. 100" step="any"></div>
+    <div class="f"><label>Temperature T (K) for thermal λ</label><input type="number" id="db-temp" placeholder="e.g. 300"></div>
+  </div>
+  <button class="calc-btn" onclick="calcDeBroglie()">▶ Compute Matter Wavelength</button>
+  <div class="result" id="r-t03">Select particle and kinetic energy to compute</div>
+</div>
+</div>
+</div>
+
+<!-- T04: HEISENBERG UNCERTAINTY -->
+<div class="tool" id="t04">
+<div class="tool-grid">
+<div>
+  <div class="tool-num">04 · Quantum Mechanics</div>
+  <div class="tool-name">Heisenberg<br><em>Uncertainty Bounds</em></div>
+  <div class="tool-body">Computes both the position-momentum and energy-time uncertainty relations with physically meaningful interpretation. Given a measurement constraint on one observable, calculates the minimum uncertainty in the conjugate. Includes Robertson generalisation for arbitrary observables and the Kennard inequality for Gaussian wave packets.</div>
+  <div class="tool-outputs">
+    <span class="lbl">// Output</span>
+    Minimum Δp given Δx (and vice versa)<br>
+    Minimum ΔE given Δt (and vice versa)<br>
+    Gaussian wave packet spread over time<br>
+    Physical interpretation of the bound<br>
+    Comparison to classical limit
+  </div>
+</div>
+<div class="instrument">
+  <div class="inst-header">
+    <span class="inst-id">AETH-T04 · UNCERTAINTY ENGINE</span>
+    <span class="inst-status">ACTIVE</span>
+  </div>
+  <div class="f"><label>Relation to Analyse</label>
+    <select id="hup-type">
+      <option value="xp">Position-Momentum: Δx · Δp ≥ ℏ/2</option>
+      <option value="et">Energy-Time: ΔE · Δt ≥ ℏ/2</option>
+      <option value="spread">Gaussian wave packet spreading</option>
+    </select>
+  </div>
+  <div class="f-row">
+    <div class="f"><label>Known Uncertainty (SI units)</label><input type="number" id="hup-known" placeholder="e.g. 1e-10 for Δx in m" step="any"></div>
+    <div class="f"><label>Particle Mass (kg, for spreading)</label><input type="number" id="hup-mass" placeholder="e.g. 9.109e-31" step="any"></div>
+  </div>
+  <div class="f"><label>Time elapsed (s, for wave packet spreading)</label><input type="number" id="hup-time" placeholder="e.g. 1e-15" step="any"></div>
+  <button class="calc-btn" onclick="calcHeisenberg()">▶ Compute Uncertainty Bound</button>
+  <div class="result" id="r-t04">Select relation and input known uncertainty</div>
+</div>
+</div>
+</div>
+
+<!-- T05: QUANTUM TUNNELING -->
+<div class="tool" id="t05">
+<div class="tool-grid">
+<div>
+  <div class="tool-num">05 · Quantum Mechanics</div>
+  <div class="tool-name">Quantum<br><em>Tunneling Probability</em></div>
+  <div class="tool-body">Calculates the WKB transmission coefficient for a rectangular potential barrier. For E &lt; V₀ gives the evanescent tunneling probability; for E &gt; V₀ gives the resonance transmission with Ramsauer-Townsend oscillations. Critical for tunnel diode design, scanning tunnelling microscopy calibration, and nuclear alpha decay modelling.</div>
+  <div class="tool-outputs">
+    <span class="lbl">// Output</span>
+    Transmission coefficient T (WKB)<br>
+    Reflection coefficient R = 1 − T<br>
+    Decay constant κ (evanescent case)<br>
+    Resonance condition (E > V₀ case)<br>
+    Physical regime classification
+  </div>
+</div>
+<div class="instrument">
+  <div class="inst-header">
+    <span class="inst-id">AETH-T05 · TUNNELING ENGINE</span>
+    <span class="inst-status">ACTIVE</span>
+  </div>
+  <div class="f"><label>Particle</label>
+    <select id="tun-particle">
+      <option value="9.109e-31">Electron</option>
+      <option value="1.673e-27">Proton</option>
+      <option value="custom">Custom mass</option>
+    </select>
+  </div>
+  <div class="f"><label>Custom Mass (kg)</label><input type="number" id="tun-mass" placeholder="Optional" step="any"></div>
+  <div class="f-row">
+    <div class="f"><label>Particle Energy E (eV)</label><input type="number" id="tun-E" placeholder="e.g. 2.0" step="any"></div>
+    <div class="f"><label>Barrier Height V₀ (eV)</label><input type="number" id="tun-V" placeholder="e.g. 5.0" step="any"></div>
+  </div>
+  <div class="f"><label>Barrier Width L (nm)</label><input type="number" id="tun-L" placeholder="e.g. 1.0" step="any"></div>
+  <button class="calc-btn" onclick="calcTunneling()">▶ Compute Transmission</button>
+  <div class="result" id="r-t05">Enter barrier parameters to compute tunneling probability</div>
+</div>
+</div>
+</div>
+
+<!-- T06: BLACKBODY RADIATION -->
+<div class="tool" id="t06">
+<div class="tool-grid">
+<div>
+  <div class="tool-num">06 · Thermal Physics</div>
+  <div class="tool-name">Blackbody<br><em>Radiation Analysis</em></div>
+  <div class="tool-body">Full Planck distribution analysis: peak wavelength via Wien displacement, total radiated power via Stefan-Boltzmann, spectral radiance at arbitrary wavelength, and Rayleigh-Jeans comparison to quantify the ultraviolet catastrophe. Essential for stellar spectral classification, IR sensor calibration, and CMB analysis.</div>
+  <div class="tool-outputs">
+    <span class="lbl">// Output</span>
+    Peak wavelength λ_max (Wien's law)<br>
+    Total power radiated per unit area<br>
+    Spectral radiance B(λ,T) at given λ<br>
+    Rayleigh-Jeans value (UV catastrophe ratio)<br>
+    Stellar temperature classification
+  </div>
+</div>
+<div class="instrument">
+  <div class="inst-header">
+    <span class="inst-id">AETH-T06 · PLANCK ENGINE</span>
+    <span class="inst-status">ACTIVE</span>
+  </div>
+  <div class="f"><label>Temperature T (K)</label><input type="number" id="bb-T" placeholder="e.g. 5778 for Sun"><div class="unit-hint">Sun: 5778 K · CMB: 2.725 K · Tungsten lamp: ~3200 K</div></div>
+  <div class="f"><label>Wavelength for B(λ,T) (nm)</label><input type="number" id="bb-lambda" placeholder="e.g. 500"><div class="unit-hint">Leave blank to compute only peak and total power</div></div>
+  <div class="f"><label>Emissivity ε (0–1)</label><input type="number" id="bb-emissivity" placeholder="1.0 for ideal blackbody" value="1" min="0" max="1" step="0.01"></div>
+  <button class="calc-btn" onclick="calcBlackbody()">▶ Analyse Radiation Spectrum</button>
+  <div class="result" id="r-t06">Enter temperature to analyse blackbody spectrum</div>
+</div>
+</div>
+</div>
+
+<!-- T07: HYDROGEN SPECTROSCOPY -->
+<div class="tool" id="t07">
+<div class="tool-grid">
+<div>
+  <div class="tool-num">07 · Atomic Physics</div>
+  <div class="tool-name">Hydrogen<br><em>Spectroscopy</em></div>
+  <div class="tool-body">Computes energy levels, transition wavelengths, and spectral series for hydrogen and hydrogen-like ions using the Rydberg formula with reduced mass correction. Identifies spectral series (Lyman, Balmer, Paschen, Brackett, Pfund), computes fine structure splitting, and calculates the ionisation energy from any level.</div>
+  <div class="tool-outputs">
+    <span class="lbl">// Output</span>
+    Energy of levels n₁ and n₂ (eV)<br>
+    Transition wavelength λ and frequency ν<br>
+    Spectral series identification<br>
+    Fine structure splitting ΔE_fs<br>
+    Ionisation energy from n₁
+  </div>
+</div>
+<div class="instrument">
+  <div class="inst-header">
+    <span class="inst-id">AETH-T07 · SPECTROSCOPY ENGINE</span>
+    <span class="inst-status">ACTIVE</span>
+  </div>
+  <div class="f"><label>Ion</label>
+    <select id="hy-Z">
+      <option value="1">Hydrogen (Z=1)</option>
+      <option value="2">He⁺ (Z=2)</option>
+      <option value="3">Li²⁺ (Z=3)</option>
+      <option value="4">Be³⁺ (Z=4)</option>
+    </select>
+  </div>
+  <div class="f-row">
+    <div class="f"><label>Upper Level n₂</label><input type="number" id="hy-n2" placeholder="e.g. 4" min="2" step="1"></div>
+    <div class="f"><label>Lower Level n₁</label><input type="number" id="hy-n1" placeholder="e.g. 2" min="1" step="1"></div>
+  </div>
+  <div class="f"><label>Compute all transitions up to n_max</label><input type="number" id="hy-nmax" placeholder="e.g. 6 (leave blank for single transition)" step="1"></div>
+  <button class="calc-btn" onclick="calcHydrogen()">▶ Compute Spectral Transition</button>
+  <div class="result" id="r-t07">Enter quantum numbers to compute transition</div>
+</div>
+</div>
+</div>
+
+<!-- T08: PN JUNCTION -->
+<div class="tool" id="t08">
+<div class="tool-grid">
+<div>
+  <div class="tool-num">08 · Semiconductor Physics</div>
+  <div class="tool-name">PN Junction<br><em>Built-in Potential</em></div>
+  <div class="tool-body">Computes the built-in contact potential, depletion width, electric field profile, and capacitance of an abrupt PN junction at equilibrium and under applied bias. Includes both the one-sided and full depletion approximation. Essential for diode design, solar cell modelling, and MOSFET threshold voltage calculation.</div>
+  <div class="tool-outputs">
+    <span class="lbl">// Output</span>
+    Built-in potential V_bi<br>
+    Depletion widths x_p, x_n, total W<br>
+    Peak electric field E_max<br>
+    Junction capacitance C_j per unit area<br>
+    Breakdown field check
+  </div>
+</div>
+<div class="instrument">
+  <div class="inst-header">
+    <span class="inst-id">AETH-T08 · JUNCTION ENGINE</span>
+    <span class="inst-status">ACTIVE</span>
+  </div>
+  <div class="f"><label>Semiconductor</label>
+    <select id="pn-mat">
+      <option value="11.7,1.5e10,1.12">Silicon (Si)</option>
+      <option value="13.1,2.4e13,0.67">Germanium (Ge)</option>
+      <option value="12.9,2e6,1.42">GaAs</option>
+    </select>
+  </div>
+  <div class="f-row">
+    <div class="f"><label>N-side doping N_D (cm⁻³)</label><input type="number" id="pn-Nd" placeholder="e.g. 1e16" step="any"></div>
+    <div class="f"><label>P-side doping N_A (cm⁻³)</label><input type="number" id="pn-Na" placeholder="e.g. 1e17" step="any"></div>
+  </div>
+  <div class="f-row">
+    <div class="f"><label>Applied Bias V_A (V)</label><input type="number" id="pn-Va" placeholder="0 = equilibrium" step="0.01" value="0"></div>
+    <div class="f"><label>Temperature T (K)</label><input type="number" id="pn-T" placeholder="300" value="300"></div>
+  </div>
+  <button class="calc-btn" onclick="calcPNJunction()">▶ Analyse Junction</button>
+  <div class="result" id="r-t08">Enter doping concentrations to analyse junction</div>
+</div>
+</div>
+</div>
+
+<!-- T09: CARRIER CONCENTRATION -->
+<div class="tool" id="t09">
+<div class="tool-grid">
+<div>
+  <div class="tool-num">09 · Semiconductor Physics</div>
+  <div class="tool-name">Carrier<br><em>Concentration</em></div>
+  <div class="tool-body">Calculates intrinsic carrier concentration, Fermi level position, majority and minority carrier densities as a function of temperature and doping. Implements the complete Fermi-Dirac statistics with Joyce-Dixon approximation for degenerate semiconductors — not the simplified Boltzmann approximation that breaks down at high doping.</div>
+  <div class="tool-outputs">
+    <span class="lbl">// Output</span>
+    Intrinsic concentration n_i(T)<br>
+    Fermi level E_F relative to midgap<br>
+    Majority and minority carrier densities<br>
+    Degeneracy check<br>
+    Freeze-out temperature estimate
+  </div>
+</div>
+<div class="instrument">
+  <div class="inst-header">
+    <span class="inst-id">AETH-T09 · CARRIER ENGINE</span>
+    <span class="inst-status">ACTIVE</span>
+  </div>
+  <div class="f"><label>Semiconductor</label>
+    <select id="cc-mat">
+      <option value="1.12,1.08,0.56,11.7">Silicon</option>
+      <option value="0.67,0.55,0.37,16.2">Germanium</option>
+      <option value="1.42,0.067,0.5,12.9">GaAs</option>
+    </select>
+  </div>
+  <div class="f-row">
+    <div class="f"><label>Temperature T (K)</label><input type="number" id="cc-T" placeholder="300" value="300"></div>
+    <div class="f"><label>Doping Type</label>
+      <select id="cc-type">
+        <option value="n">N-type (donor)</option>
+        <option value="p">P-type (acceptor)</option>
+        <option value="intrinsic">Intrinsic</option>
+      </select>
+    </div>
+  </div>
+  <div class="f"><label>Doping Concentration N_D or N_A (cm⁻³)</label><input type="number" id="cc-doping" placeholder="e.g. 1e15 (leave blank for intrinsic)" step="any"></div>
+  <button class="calc-btn" onclick="calcCarriers()">▶ Compute Carrier Statistics</button>
+  <div class="result" id="r-t09">Select semiconductor and temperature to compute</div>
+</div>
+</div>
+</div>
+
+<!-- T10: RLC RESONANCE -->
+<div class="tool" id="t10">
+<div class="tool-grid">
+<div>
+  <div class="tool-num">10 · Electrodynamics</div>
+  <div class="tool-name">RLC Circuit<br><em>Resonance Analysis</em></div>
+  <div class="tool-body">Complete analysis of series and parallel RLC circuits: resonant frequency, quality factor, bandwidth, impedance at arbitrary frequency, and phase angle. Computes the transient response regime (underdamped, critically damped, overdamped) and the 3dB bandwidth. Useful for filter design, RF matching network analysis, and oscillator characterisation.</div>
+  <div class="tool-outputs">
+    <span class="lbl">// Output</span>
+    Resonant frequency f₀ and ω₀<br>
+    Quality factor Q<br>
+    3dB bandwidth Δf<br>
+    Impedance Z and phase φ at given f<br>
+    Damping regime classification
+  </div>
+</div>
+<div class="instrument">
+  <div class="inst-header">
+    <span class="inst-id">AETH-T10 · RLC ENGINE</span>
+    <span class="inst-status">ACTIVE</span>
+  </div>
+  <div class="f"><label>Circuit Topology</label>
+    <select id="rlc-type">
+      <option value="series">Series RLC</option>
+      <option value="parallel">Parallel RLC</option>
+    </select>
+  </div>
+  <div class="f-row3">
+    <div class="f"><label>Resistance R (Ω)</label><input type="number" id="rlc-R" placeholder="e.g. 10" step="any"></div>
+    <div class="f"><label>Inductance L (mH)</label><input type="number" id="rlc-L" placeholder="e.g. 10" step="any"></div>
+    <div class="f"><label>Capacitance C (μF)</label><input type="number" id="rlc-C" placeholder="e.g. 1" step="any"></div>
+  </div>
+  <div class="f"><label>Frequency for Z analysis (Hz)</label><input type="number" id="rlc-f" placeholder="e.g. 1000 (leave blank for resonance only)" step="any"></div>
+  <button class="calc-btn" onclick="calcRLC()">▶ Analyse Circuit</button>
+  <div class="result" id="r-t10">Enter R, L, C values to analyse resonance</div>
+</div>
+</div>
+</div>
+
+<!-- T11: ERROR PROPAGATION -->
+<div class="tool" id="t11">
+<div class="tool-grid">
+<div>
+  <div class="tool-num">11 · Research Methodology</div>
+  <div class="tool-name">Uncertainty<br><em>Propagation</em></div>
+  <div class="tool-body">Propagates measurement uncertainties through standard functional forms using both the quadrature (independent errors) and worst-case methods. Handles addition, subtraction, multiplication, division, powers, and logarithms. Outputs relative and absolute uncertainty with proper significant figures — the exact calculation every experimentalist does by hand before publication.</div>
+  <div class="tool-outputs">
+    <span class="lbl">// Output</span>
+    Absolute uncertainty δf<br>
+    Relative uncertainty δf/f (%)<br>
+    Dominant error source identified<br>
+    Result with correct significant figures<br>
+    Worst-case vs quadrature comparison
+  </div>
+</div>
+<div class="instrument">
+  <div class="inst-header">
+    <span class="inst-id">AETH-T11 · ERROR PROPAGATION ENGINE</span>
+    <span class="inst-status">ACTIVE</span>
+  </div>
+  <div class="f"><label>Function Type</label>
+    <select id="ep-func">
+      <option value="product">f = A × B (or A/B)</option>
+      <option value="power">f = Aⁿ</option>
+      <option value="sum">f = A + B (or A - B)</option>
+      <option value="log">f = ln(A)</option>
+    </select>
+  </div>
+  <div class="f-row">
+    <div class="f"><label>Value of A</label><input type="number" id="ep-A" placeholder="e.g. 5.23" step="any"></div>
+    <div class="f"><label>Uncertainty δA</label><input type="number" id="ep-dA" placeholder="e.g. 0.05" step="any"></div>
+  </div>
+  <div class="f-row">
+    <div class="f"><label>Value of B (if applicable)</label><input type="number" id="ep-B" placeholder="e.g. 3.14" step="any"></div>
+    <div class="f"><label>Uncertainty δB</label><input type="number" id="ep-dB" placeholder="e.g. 0.02" step="any"></div>
+  </div>
+  <div class="f-row">
+    <div class="f"><label>Power n (for f=Aⁿ)</label><input type="number" id="ep-n" placeholder="e.g. 2" step="any"></div>
+    <div class="f"><label>Operation (for product/sum)</label>
+      <select id="ep-op">
+        <option value="mul">Multiply (A×B)</option>
+        <option value="div">Divide (A/B)</option>
+        <option value="add">Add (A+B)</option>
+        <option value="sub">Subtract (A−B)</option>
+      </select>
+    </div>
+  </div>
+  <button class="calc-btn" onclick="calcErrorProp()">▶ Propagate Uncertainty</button>
+  <div class="result" id="r-t11">Enter measurement values and uncertainties</div>
+</div>
+</div>
+</div>
+
+<!-- T12: EXPERIMENTAL STATISTICS -->
+<div class="tool" id="t12">
+<div class="tool-grid">
+<div>
+  <div class="tool-num">12 · Research Methodology</div>
+  <div class="tool-name">Experimental<br><em>Data Statistics</em></div>
+  <div class="tool-body">Computes the full statistical profile of experimental datasets: mean, standard deviation, standard error of the mean, 95% confidence interval using t-distribution (correct for small samples), and a chi-squared goodness-of-fit test against a theoretical value. Identifies outliers via Grubbs test. What you'd otherwise compute in MATLAB or Python before writing up results.</div>
+  <div class="tool-outputs">
+    <span class="lbl">// Output</span>
+    Mean x̄ and median<br>
+    Standard deviation σ and SEM<br>
+    95% confidence interval (t-distribution)<br>
+    Chi-squared test against theory<br>
+    Grubbs outlier test
+  </div>
+</div>
+<div class="instrument">
+  <div class="inst-header">
+    <span class="inst-id">AETH-T12 · STATISTICS ENGINE</span>
+    <span class="inst-status">ACTIVE</span>
+  </div>
+  <div class="f"><label>Data Points (comma-separated)</label>
+    <input type="text" id="stat-data" placeholder="e.g. 9.81, 9.79, 9.83, 9.80, 9.82, 9.78">
+  </div>
+  <div class="f-row">
+    <div class="f"><label>Theoretical / Expected Value</label><input type="number" id="stat-theory" placeholder="e.g. 9.81 (for χ² test)" step="any"></div>
+    <div class="f"><label>Measurement Uncertainty σ_inst</label><input type="number" id="stat-sigma" placeholder="e.g. 0.02 (instrument)" step="any"></div>
+  </div>
+  <button class="calc-btn" onclick="calcStats()">▶ Analyse Dataset</button>
+  <div class="result" id="r-t12">Enter dataset to compute statistical profile</div>
+</div>
+</div>
+</div>
+
+<!-- T13: DIMENSIONAL ANALYSIS -->
+<div class="tool" id="t13">
+<div class="tool-grid">
+<div>
+  <div class="tool-num">13 · Research Methodology</div>
+  <div class="tool-name">Dimensional<br><em>Analysis Checker</em></div>
+  <div class="tool-body">Verifies dimensional consistency of physical equations by decomposing quantities into SI base dimensions [M, L, T, I, Θ, N, J]. Also performs Buckingham π theorem analysis: given a set of physical quantities, finds the dimensionless groups that govern the system — the first step in any scaling analysis or similitude study.</div>
+  <div class="tool-outputs">
+    <span class="lbl">// Output</span>
+    Dimensional decomposition of each quantity<br>
+    Consistency check (pass / fail)<br>
+    Buckingham π groups<br>
+    Suggested dimensionless parameters<br>
+    Common equation verification
+  </div>
+</div>
+<div class="instrument">
+  <div class="inst-header">
+    <span class="inst-id">AETH-T13 · DIMENSIONAL ENGINE</span>
+    <span class="inst-status">ACTIVE</span>
+  </div>
+  <div class="f"><label>Select equation to verify</label>
+    <select id="dim-eq">
+      <option value="">-- Select a known equation --</option>
+      <option value="newton">F = ma (Newton's 2nd law)</option>
+      <option value="kinetic">KE = ½mv² (Kinetic energy)</option>
+      <option value="einstein">E = mc² (Mass-energy)</option>
+      <option value="coulomb">F = kq₁q₂/r² (Coulomb's law)</option>
+      <option value="schrodinger">ℏ²/2m · d²ψ/dx² (Schrödinger KE term)</option>
+      <option value="planck">E = hν (Planck relation)</option>
+      <option value="debroglie">λ = h/p (de Broglie)</option>
+      <option value="stefan">P = σT⁴ (Stefan-Boltzmann)</option>
+      <option value="diffraction">dsinθ = mλ (Diffraction grating)</option>
+      <option value="lorentz">F = qv×B (Lorentz force)</option>
+    </select>
+  </div>
+  <div class="f"><label>Or enter custom quantity (name: M^a L^b T^c)</label>
+    <input type="text" id="dim-custom" placeholder="e.g. Force: M^1 L^1 T^-2">
+  </div>
+  <button class="calc-btn" onclick="calcDimensional()">▶ Verify Dimensions</button>
+  <div class="result" id="r-t13">Select equation to verify dimensional consistency</div>
+</div>
+</div>
+</div>
+
+<!-- T14: EM SPECTRUM MAPPER -->
+<div class="tool" id="t14">
+<div class="tool-grid">
+<div>
+  <div class="tool-num">14 · Electrodynamics</div>
+  <div class="tool-name">EM Spectrum<br><em>Complete Mapper</em></div>
+  <div class="tool-body">Converts between wavelength, frequency, wavenumber, photon energy, and equivalent temperature across the full electromagnetic spectrum. Identifies the spectral region and associated physical phenomena. Useful for spectroscopists, radio engineers, and anyone designing experiments involving electromagnetic radiation from ELF radio to gamma rays.</div>
+  <div class="tool-outputs">
+    <span class="lbl">// Output</span>
+    All representations (λ, ν, ν̃, E, T_equiv)<br>
+    Spectral region identification<br>
+    Typical sources in this region<br>
+    Atmospheric transmission note<br>
+    Detection technology used
+  </div>
+</div>
+<div class="instrument">
+  <div class="inst-header">
+    <span class="inst-id">AETH-T14 · SPECTRUM ENGINE</span>
+    <span class="inst-status">ACTIVE</span>
+  </div>
+  <div class="f"><label>Input Quantity</label>
+    <select id="em-input">
+      <option value="lambda">Wavelength λ</option>
+      <option value="freq">Frequency ν</option>
+      <option value="energy">Photon energy (eV)</option>
+      <option value="wavenumber">Wavenumber ν̃ (cm⁻¹)</option>
+    </select>
+  </div>
+  <div class="f-row">
+    <div class="f"><label>Value</label><input type="number" id="em-value" placeholder="e.g. 500" step="any"></div>
+    <div class="f"><label>Unit</label>
+      <select id="em-unit">
+        <option value="nm">nm</option>
+        <option value="um">μm</option>
+        <option value="m">m</option>
+        <option value="GHz">GHz</option>
+        <option value="THz">THz</option>
+        <option value="Hz">Hz</option>
+        <option value="eV">eV</option>
+        <option value="meV">meV</option>
+        <option value="cm-1">cm⁻¹</option>
+      </select>
+    </div>
+  </div>
+  <button class="calc-btn" onclick="calcEMSpectrum()">▶ Map Spectrum</button>
+  <div class="result" id="r-t14">Enter any EM quantity to map the full spectrum</div>
+</div>
+</div>
+</div>
+
+<!-- T15: DIFFRACTION GRATING -->
+<div class="tool" id="t15">
+<div class="tool-grid">
+<div>
+  <div class="tool-num">15 · Optics</div>
+  <div class="tool-name">Diffraction Grating<br><em>Spectrometer</em></div>
+  <div class="tool-body">Complete grating spectrometer analysis: diffraction angles for all orders, angular dispersion, resolving power, free spectral range, and blaze condition. Handles both transmission and reflection gratings with arbitrary blaze angle. Used in designing monochromators, spectrographs, and wavelength-division multiplexing systems.</div>
+  <div class="tool-outputs">
+    <span class="lbl">// Output</span>
+    Diffraction angles θ_m for orders m = 0,±1,±2,±3<br>
+    Angular dispersion dθ/dλ<br>
+    Chromatic resolving power R = λ/δλ<br>
+    Free spectral range FSR<br>
+    Blaze wavelength for given geometry
+  </div>
+</div>
+<div class="instrument">
+  <div class="inst-header">
+    <span class="inst-id">AETH-T15 · GRATING ENGINE</span>
+    <span class="inst-status">ACTIVE</span>
+  </div>
+  <div class="f-row">
+    <div class="f"><label>Grating Lines (per mm)</label><input type="number" id="gr-N" placeholder="e.g. 600" step="any"></div>
+    <div class="f"><label>Wavelength λ (nm)</label><input type="number" id="gr-lambda" placeholder="e.g. 632.8" step="any"></div>
+  </div>
+  <div class="f-row">
+    <div class="f"><label>Incident Angle α (degrees)</label><input type="number" id="gr-alpha" placeholder="0 for normal incidence" step="any" value="0"></div>
+    <div class="f"><label>Total Illuminated Lines N_total</label><input type="number" id="gr-Ntotal" placeholder="e.g. 5000" step="any"></div>
+  </div>
+  <div class="f"><label>Blaze Angle θ_B (degrees, for blaze λ)</label><input type="number" id="gr-blaze" placeholder="e.g. 17.5 (leave blank to skip)" step="any"></div>
+  <button class="calc-btn" onclick="calcGrating()">▶ Analyse Grating</button>
+  <div class="result" id="r-t15">Enter grating parameters to compute diffraction analysis</div>
+</div>
+</div>
+</div>
+
+<!-- T16: LORENTZ RELATIVITY -->
+<div class="tool" id="t16">
+<div class="tool-grid">
+<div>
+  <div class="tool-num">16 · Special Relativity</div>
+  <div class="tool-name">Lorentz<br><em>Relativistic Effects</em></div>
+  <div class="tool-body">Computes the full suite of special relativistic effects: time dilation, length contraction, relativistic momentum and energy, velocity addition, and Doppler shift. Includes the rapidity formulation for composing boosts and the four-momentum invariant. Relevant for particle accelerator design, muon decay lifetime experiments, and GPS correction analysis.</div>
+  <div class="tool-outputs">
+    <span class="lbl">// Output</span>
+    Lorentz factor γ and rapidity φ<br>
+    Time dilation Δt' and length contraction L'<br>
+    Relativistic kinetic energy and total energy<br>
+    Relativistic Doppler shift<br>
+    Four-momentum invariant mass
+  </div>
+</div>
+<div class="instrument">
+  <div class="inst-header">
+    <span class="inst-id">AETH-T16 · RELATIVITY ENGINE</span>
+    <span class="inst-status">ACTIVE</span>
+  </div>
+  <div class="f"><label>Velocity as fraction of c (β = v/c)</label><input type="number" id="lr-beta" placeholder="e.g. 0.99" min="0" max="0.9999999" step="any"></div>
+  <div class="f-row">
+    <div class="f"><label>Proper Time Δτ (s) or length L₀ (m)</label><input type="number" id="lr-proper" placeholder="e.g. 1e-6" step="any"></div>
+    <div class="f"><label>Rest Mass m₀ (kg or MeV/c²)</label><input type="number" id="lr-mass" placeholder="e.g. 9.109e-31" step="any"></div>
+  </div>
+  <div class="f"><label>Emitted frequency ν₀ (Hz) for Doppler</label><input type="number" id="lr-freq" placeholder="e.g. 6e14 (visible light)" step="any"></div>
+  <button class="calc-btn" onclick="calcRelativity()">▶ Compute Relativistic Effects</button>
+  <div class="result" id="r-t16">Enter velocity (β) to compute relativistic effects</div>
+</div>
+</div>
+</div>
+
+<!-- T17: RADIOACTIVE DECAY -->
+<div class="tool" id="t17">
+<div class="tool-grid">
+<div>
+  <div class="tool-num">17 · Nuclear Physics</div>
+  <div class="tool-name">Radioactive<br><em>Decay Analysis</em></div>
+  <div class="tool-body">Computes activity, remaining nuclei, and dose for single-isotope decay and two-member decay chains (secular and transient equilibrium). Finds the time of maximum daughter activity (Bateman equations). Outputs specific activity and Becquerel/Curie conversions. Used in nuclear medicine, radiation safety calculations, and radiometric dating.</div>
+  <div class="tool-outputs">
+    <span class="lbl">// Output</span>
+    Activity A(t) in Bq and Ci<br>
+    Remaining fraction N(t)/N₀<br>
+    Specific activity<br>
+    Secular/transient equilibrium check<br>
+    Time to reach daughter maximum (chain)
+  </div>
+</div>
+<div class="instrument">
+  <div class="inst-header">
+    <span class="inst-id">AETH-T17 · DECAY ENGINE</span>
+    <span class="inst-status">ACTIVE</span>
+  </div>
+  <div class="f"><label>Common Isotopes (or enter custom)</label>
+    <select id="rd-isotope" onchange="fillHalflife()">
+      <option value="">-- Select or enter custom below --</option>
+      <option value="5730">Carbon-14 (t½ = 5730 yr)</option>
+      <option value="1.28e9_yr">Potassium-40 (t½ = 1.28×10⁹ yr)</option>
+      <option value="3.82_days">Radon-222 (t½ = 3.82 days)</option>
+      <option value="8.02_days">Iodine-131 (t½ = 8.02 days)</option>
+      <option value="30.17_yr">Caesium-137 (t½ = 30.17 yr)</option>
+      <option value="1600_yr">Radium-226 (t½ = 1600 yr)</option>
+      <option value="24110_yr">Plutonium-239 (t½ = 24110 yr)</option>
+      <option value="4.468e9_yr">Uranium-238 (t½ = 4.468×10⁹ yr)</option>
+    </select>
+  </div>
+  <div class="f-row">
+    <div class="f"><label>Half-life t½ (years)</label><input type="number" id="rd-t12" placeholder="e.g. 5730" step="any"></div>
+    <div class="f"><label>Initial Activity A₀ (Bq)</label><input type="number" id="rd-A0" placeholder="e.g. 1e6" step="any"></div>
+  </div>
+  <div class="f-row">
+    <div class="f"><label>Time Elapsed t (years)</label><input type="number" id="rd-t" placeholder="e.g. 10000" step="any"></div>
+    <div class="f"><label>Initial Sample Mass (g, for specific activity)</label><input type="number" id="rd-mass" placeholder="e.g. 1" step="any"></div>
+  </div>
+  <button class="calc-btn" onclick="calcDecay()">▶ Compute Decay</button>
+  <div class="result" id="r-t17">Select isotope and enter parameters to compute decay</div>
+</div>
+</div>
+</div>
+
+<!-- T18: PARTICLE IN A BOX -->
+<div class="tool" id="t18">
+<div class="tool-grid">
+<div>
+  <div class="tool-num">18 · Quantum Mechanics</div>
+  <div class="tool-name">Schrödinger<br><em>Particle in a Box</em></div>
+  <div class="tool-body">Solves the 1D, 2D, and 3D infinite square well exactly: energy eigenvalues, degeneracy structure, transition wavelengths, and expectation values ⟨x⟩, ⟨x²⟩, ⟨p⟩, ⟨p²⟩. Also computes the finite square well bound states via transcendental equation. The canonical QM problem — but done properly with physical parameter inputs rather than arbitrary units.</div>
+  <div class="tool-outputs">
+    <span class="lbl">// Output</span>
+    Energy levels E_n (eV and J) for n = 1…6<br>
+    Degeneracy of each level (2D/3D)<br>
+    Transition wavelengths for Δn<br>
+    ⟨x⟩, ⟨p²⟩ = 2mE_n (uncertainty check)<br>
+    Zero-point energy and its physical meaning
+  </div>
+</div>
+<div class="instrument">
+  <div class="inst-header">
+    <span class="inst-id">AETH-T18 · SCHRÖDINGER ENGINE</span>
+    <span class="inst-status">ACTIVE</span>
+  </div>
+  <div class="f"><label>Geometry</label>
+    <select id="pib-dim">
+      <option value="1">1D Infinite Square Well</option>
+      <option value="2">2D Infinite Square Well</option>
+      <option value="3">3D Infinite Cubic Well</option>
+    </select>
+  </div>
+  <div class="f"><label>Particle</label>
+    <select id="pib-particle">
+      <option value="9.109e-31">Electron</option>
+      <option value="1.673e-27">Proton</option>
+      <option value="custom">Custom mass</option>
+    </select>
+  </div>
+  <div class="f-row">
+    <div class="f"><label>Box Size L (nm)</label><input type="number" id="pib-L" placeholder="e.g. 1.0" step="any"></div>
+    <div class="f"><label>Custom mass (kg)</label><input type="number" id="pib-mass" placeholder="Optional" step="any"></div>
+  </div>
+  <button class="calc-btn" onclick="calcParticleBox()">▶ Solve Schrödinger Equation</button>
+  <div class="result" id="r-t18">Select geometry and box size to compute energy levels</div>
+</div>
+</div>
+</div>
+
+<!-- T19: FERMI ENERGY -->
+<div class="tool" id="t19">
+<div class="tool-grid">
+<div>
+  <div class="tool-num">19 · Condensed Matter Physics</div>
+  <div class="tool-name">Fermi Energy<br><em>& Electron Gas</em></div>
+  <div class="tool-body">Computes the Fermi energy, Fermi temperature, Fermi velocity, and density of states at the Fermi level for a free electron gas. Calculates the temperature-dependent electronic heat capacity and chemical potential shift. Essential for understanding metallic behaviour, designing thermoelectric devices, and analysing degenerate semiconductors.</div>
+  <div class="tool-outputs">
+    <span class="lbl">// Output</span>
+    Fermi energy E_F (eV)<br>
+    Fermi temperature T_F and velocity v_F<br>
+    Density of states g(E_F)<br>
+    Electronic heat capacity at T<br>
+    Chemical potential shift μ(T) − E_F
+  </div>
+</div>
+<div class="instrument">
+  <div class="inst-header">
+    <span class="inst-id">AETH-T19 · FERMI ENGINE</span>
+    <span class="inst-status">ACTIVE</span>
+  </div>
+  <div class="f"><label>Common Metals (or enter custom density)</label>
+    <select id="fe-metal" onchange="fillElectronDensity()">
+      <option value="">-- Select metal --</option>
+      <option value="8.49e28">Copper (n = 8.49×10²⁸ m⁻³)</option>
+      <option value="6.02e28">Silver (n = 6.02×10²⁸ m⁻³)</option>
+      <option value="5.90e28">Gold (n = 5.90×10²⁸ m⁻³)</option>
+      <option value="1.81e28">Lithium (n = 1.81×10²⁸ m⁻³)</option>
+      <option value="2.65e28">Sodium (n = 2.65×10²⁸ m⁻³)</option>
+      <option value="18.1e28">Aluminium (n = 18.1×10²⁸ m⁻³)</option>
+    </select>
+  </div>
+  <div class="f"><label>Free Electron Density n (m⁻³)</label><input type="number" id="fe-n" placeholder="e.g. 8.49e28" step="any"></div>
+  <div class="f"><label>Temperature T (K)</label><input type="number" id="fe-T" placeholder="300" value="300"></div>
+  <button class="calc-btn" onclick="calcFermi()">▶ Compute Fermi Statistics</button>
+  <div class="result" id="r-t19">Select metal or enter electron density to compute</div>
+</div>
+</div>
+</div>
+
+<!-- T20: COMPTON SCATTERING -->
+<div class="tool" id="t20">
+<div class="tool-grid">
+<div>
+  <div class="tool-num">20 · Quantum Electrodynamics</div>
+  <div class="tool-name">Compton<br><em>Scattering</em></div>
+  <div class="tool-body">Computes the Compton wavelength shift, scattered photon energy and momentum, recoil electron kinetic energy and direction for X-ray and gamma-ray scattering off free electrons. Includes the Klein-Nishina differential cross-section at the given angle — the relativistic QED correction to classical Thomson scattering that becomes significant above ~100 keV.</div>
+  <div class="tool-outputs">
+    <span class="lbl">// Output</span>
+    Wavelength shift Δλ = λ_c(1−cosθ)<br>
+    Scattered photon energy E' and wavelength λ'<br>
+    Recoil electron KE and angle φ<br>
+    Klein-Nishina dσ/dΩ at given θ<br>
+    Thomson vs Compton regime classification
+  </div>
+</div>
+<div class="instrument">
+  <div class="inst-header">
+    <span class="inst-id">AETH-T20 · COMPTON ENGINE</span>
+    <span class="inst-status">ACTIVE</span>
+  </div>
+  <div class="f-row">
+    <div class="f"><label>Incident Photon Energy E₀ (keV)</label><input type="number" id="cs-E" placeholder="e.g. 511 (annihilation γ)" step="any"></div>
+    <div class="f"><label>Scattering Angle θ (degrees)</label><input type="number" id="cs-theta" placeholder="e.g. 90" min="0" max="180" step="any"></div>
+  </div>
+  <div class="f"><label>Target (for recoil)</label>
+    <select id="cs-target">
+      <option value="9.109e-31,1">Free electron</option>
+      <option value="9.109e-31,6">Carbon (Z=6)</option>
+      <option value="9.109e-31,13">Aluminium (Z=13)</option>
+      <option value="9.109e-31,82">Lead (Z=82)</option>
+    </select>
+  </div>
+  <button class="calc-btn" onclick="calcCompton()">▶ Compute Scattering</button>
+  <div class="result" id="r-t20">Enter incident photon energy and scattering angle</div>
+</div>
+</div>
+</div>
+
+</div><!-- end tools-wrap -->
+
+<footer>
+  <span>Aether Labs · Research Instrumentation Suite · Shoonya Origins · Pune · © 2026</span>
+  <span>All computation runs locally · Zero data transmitted · Free forever</span>
+</footer>
+
+<script>
+// Physical constants
+const h = 6.62607015e-34;
+const hbar = 1.054571817e-34;
+const c = 2.99792458e8;
+const e_charge = 1.602176634e-19;
+const m_e = 9.1093837015e-31;
+const k_B = 1.380649e-23;
+const eps0 = 8.8541878128e-12;
+const N_A = 6.02214076e23;
+const sigma_SB = 5.670374419e-8;
+const lambda_C = 2.42631023867e-12; // Compton wavelength
+const b_wien = 2.897771955e-3; // Wien constant
+
+function R(id, html){ document.getElementById(id).innerHTML = html; }
+function sci(x, sig=4){ if(x===0)return'0'; const e=Math.floor(Math.log10(Math.abs(x))); const m=(x/Math.pow(10,e)).toFixed(sig-1); if(Math.abs(e)<4&&Math.abs(e)>-3)return parseFloat(x.toPrecision(sig)).toString(); return `${m}×10<sup>${e}</sup>`; }
+function fmt4(x){ return parseFloat(x.toPrecision(4)).toString(); }
+
+// T01 INTERFERENCE
+function calcInterference(){
+  const lambda = parseFloat(document.getElementById('w1-lambda').value)*1e-9;
+  const d = parseFloat(document.getElementById('w1-d').value)*1e-6;
+  const a = parseFloat(document.getElementById('w1-a').value)*1e-6||null;
+  const L = parseFloat(document.getElementById('w1-L').value)*1e-2;
+  const theta_deg = parseFloat(document.getElementById('w1-theta').value);
+  if(!lambda||!d||!L){R('r-t01','<span class="warn">λ, d, and L are required</span>');return;}
+  const dy = lambda*L/d;
+  const lines = [];
+  lines.push(`<span class="primary">Fringe spacing Δy = ${(dy*1000).toFixed(4)} mm</span>`);
+  lines.push(`Wavelength λ = ${lambda*1e9} nm`);
+  lines.push(`Slit separation d = ${d*1e6} μm`);
+  lines.push(`Screen distance L = ${L*100} cm`);
+  if(!isNaN(theta_deg)){
+    const theta = theta_deg*Math.PI/180;
+    const delta = d*Math.sin(theta);
+    const m_exact = delta/lambda;
+    const I = Math.pow(Math.cos(Math.PI*delta/lambda),2);
+    let envelope = 1;
+    if(a){ const sinc_arg = Math.PI*a*Math.sin(theta)/lambda; envelope = sinc_arg===0?1:Math.pow(Math.sin(sinc_arg)/sinc_arg,2); }
+    lines.push(`\nAt θ = ${theta_deg}°:`);
+    lines.push(`Path difference δ = ${(delta*1e9).toFixed(3)} nm (= ${m_exact.toFixed(3)} λ)`);
+    lines.push(`Interference intensity I(θ)/I_max = ${(I*envelope).toFixed(4)}`);
+    if(a) lines.push(`Single-slit envelope factor = ${envelope.toFixed(4)}`);
+  }
+  if(a){
+    const missing_orders = Math.round(d/a);
+    lines.push(`\nMissing orders (d/a): m = ±${missing_orders}, ±${2*missing_orders}, ...`);
+  }
+  const L_coh = Math.pow(lambda,2)/(lambda/100);
+  lines.push(`\nCoherence length needed: > ${(dy*1e3).toFixed(2)} mm for 3 visible fringes`);
+  R('r-t01', lines.join('\n'));
+}
+
+// T02 PHOTOELECTRIC
+function calcPhotoelectric(){
+  const matSel = document.getElementById('pe-material').value;
+  let phi_eV = matSel==='custom'?parseFloat(document.getElementById('pe-custom').value):parseFloat(matSel);
+  const nu = parseFloat(document.getElementById('pe-freq').value)*1e14;
+  const intensity = parseFloat(document.getElementById('pe-intensity').value)||null;
+  if(!phi_eV||!nu){R('r-t02','<span class="warn">Work function and frequency required</span>');return;}
+  const phi_J = phi_eV*e_charge;
+  const nu0 = phi_J/h;
+  const lambda0 = c/nu0;
+  const E_photon = h*nu;
+  const KE_J = E_photon - phi_J;
+  const KE_eV = KE_J/e_charge;
+  const Vs = KE_eV;
+  const lines = [];
+  lines.push(`<span class="primary">Threshold frequency ν₀ = ${(nu0/1e14).toFixed(4)}×10¹⁴ Hz</span>`);
+  lines.push(`Threshold wavelength λ₀ = ${(lambda0*1e9).toFixed(2)} nm`);
+  lines.push(`Incident photon energy E = ${(E_photon/e_charge).toFixed(4)} eV`);
+  if(KE_J > 0){
+    lines.push(`\n<span class="good">Emission OCCURS (E > φ)</span>`);
+    lines.push(`Max KE of photoelectrons = ${KE_eV.toFixed(4)} eV = ${sci(KE_J)} J`);
+    lines.push(`Stopping potential V_s = ${Vs.toFixed(4)} V`);
+    if(intensity){
+      const flux = intensity/(h*nu);
+      lines.push(`\nPhoton flux = ${sci(flux)} photons m⁻² s⁻¹`);
+      lines.push(`(Intensity = ${intensity} W/m², ν = ${(nu/1e14).toFixed(3)}×10¹⁴ Hz)`);
+    }
+  } else {
+    lines.push(`\n<span class="err">No emission — E < φ by ${Math.abs(KE_eV).toFixed(4)} eV</span>`);
+    lines.push(`Need λ < ${(lambda0*1e9).toFixed(2)} nm or ν > ${(nu0/1e14).toFixed(4)}×10¹⁴ Hz`);
+  }
+  R('r-t02', lines.join('\n'));
+}
+
+// T03 DE BROGLIE
+function calcDeBroglie(){
+  const partSel = document.getElementById('db-particle').value;
+  let mass = partSel==='custom'?parseFloat(document.getElementById('db-mass').value):parseFloat(partSel);
+  const KE_eV = parseFloat(document.getElementById('db-ke').value);
+  const T = parseFloat(document.getElementById('db-temp').value)||null;
+  if(!mass||!KE_eV){R('r-t03','<span class="warn">Mass and kinetic energy required</span>');return;}
+  const KE_J = KE_eV*e_charge;
+  const mc2 = mass*c*c;
+  const gamma = 1 + KE_J/mc2;
+  const p = Math.sqrt(KE_J*(KE_J+2*mc2))/c;
+  const lambda_dB = h/p;
+  const v = p/(gamma*mass);
+  const lines = [];
+  lines.push(`<span class="primary">de Broglie wavelength λ_dB = ${sci(lambda_dB)} m = ${(lambda_dB*1e12).toFixed(4)} pm</span>`);
+  lines.push(`Relativistic momentum p = ${sci(p)} kg·m/s`);
+  lines.push(`Lorentz factor γ = ${gamma.toFixed(6)}`);
+  lines.push(`Velocity v = ${(v/c).toFixed(6)} c`);
+  if(gamma > 1.01) lines.push(`<span class="secondary">Relativistic correction significant (γ = ${gamma.toFixed(4)})</span>`);
+  if(T){
+    const lambda_th = h/Math.sqrt(2*Math.PI*mass*k_B*T);
+    lines.push(`\nThermal de Broglie wavelength at ${T} K:`);
+    lines.push(`λ_th = ${sci(lambda_th)} m = ${(lambda_th*1e12).toFixed(4)} pm`);
+    const ratio = lambda_dB/lambda_th;
+    lines.push(`λ_dB / λ_th = ${ratio.toFixed(4)}`);
+    lines.push(ratio > 1 ? `<span class="warn">Particle is faster than thermal — quantum effects suppressed</span>` : `<span class="good">Particle near thermal regime — quantum degeneracy possible</span>`);
+  }
+  R('r-t03', lines.join('\n'));
+}
+
+// T04 HEISENBERG
+function calcHeisenberg(){
+  const type = document.getElementById('hup-type').value;
+  const known = parseFloat(document.getElementById('hup-known').value);
+  const mass = parseFloat(document.getElementById('hup-mass').value)||m_e;
+  const t = parseFloat(document.getElementById('hup-time').value)||null;
+  if(!known){R('r-t04','<span class="warn">Enter a known uncertainty value</span>');return;}
+  const lines = [];
+  if(type==='xp'){
+    const dp_min = hbar/(2*known);
+    const v_min = dp_min/mass;
+    const KE_min = dp_min*dp_min/(2*mass*e_charge);
+    lines.push(`<span class="primary">Minimum Δp = ℏ/(2Δx) = ${sci(dp_min)} kg·m/s</span>`);
+    lines.push(`Corresponding minimum velocity Δv = ${sci(v_min)} m/s`);
+    lines.push(`Zero-point kinetic energy ≥ ${sci(KE_min)} eV`);
+    lines.push(`\nΔx = ${sci(known)} m (input)`);
+    lines.push(`ℏ/2 = ${sci(hbar/2)} J·s`);
+    if(known < 1e-15) lines.push(`<span class="secondary">Δx < nuclear scale — relativistic QFT required</span>`);
+  } else if(type==='et'){
+    const dE_min = hbar/(2*known);
+    const dE_eV = dE_min/e_charge;
+    lines.push(`<span class="primary">Minimum ΔE = ℏ/(2Δt) = ${sci(dE_min)} J = ${sci(dE_eV)} eV</span>`);
+    lines.push(`Δt = ${sci(known)} s (input)`);
+    lines.push(`Linewidth broadening: Γ = ℏ/τ = ${sci(dE_min)} J`);
+    if(known < 1e-24) lines.push(`<span class="secondary">Δt in Zeptosecond range — attosecond physics regime</span>`);
+  } else {
+    if(!t){R('r-t04','<span class="warn">Enter time elapsed for wave packet spreading</span>');return;}
+    const sigma0 = known;
+    const sigma_t = Math.sqrt(sigma0*sigma0 + Math.pow(hbar*t/(2*mass*sigma0),2));
+    const spread = sigma_t/sigma0;
+    lines.push(`<span class="primary">Wave packet width at t=${sci(t)} s: σ(t) = ${sci(sigma_t)} m</span>`);
+    lines.push(`Initial width σ₀ = ${sci(sigma0)} m`);
+    lines.push(`Spreading factor = ${spread.toFixed(4)}`);
+    lines.push(`Characteristic spreading time t* = 2mσ₀²/ℏ = ${sci(2*mass*sigma0*sigma0/hbar)} s`);
+    if(spread > 2) lines.push(`<span class="warn">Wave packet has spread significantly — coherence largely lost</span>`);
+  }
+  R('r-t04', lines.join('\n'));
+}
+
+// T05 TUNNELING
+function calcTunneling(){
+  const partSel = document.getElementById('tun-particle').value;
+  let mass = partSel==='custom'?parseFloat(document.getElementById('tun-mass').value):parseFloat(partSel);
+  const E = parseFloat(document.getElementById('tun-E').value);
+  const V = parseFloat(document.getElementById('tun-V').value);
+  const L = parseFloat(document.getElementById('tun-L').value)*1e-9;
+  if(!mass||!E||!V||!L){R('r-t05','<span class="warn">All parameters required</span>');return;}
+  const E_J = E*e_charge, V_J = V*e_charge;
+  const lines = [];
+  if(E_J < V_J){
+    const kappa = Math.sqrt(2*mass*(V_J-E_J))/hbar;
+    const T_wkb = Math.exp(-2*kappa*L);
+    const R_coeff = 1-T_wkb;
+    lines.push(`<span class="primary">Transmission T = ${sci(T_wkb)}</span>`);
+    lines.push(`Reflection R = ${(1-T_wkb).toFixed(8)}`);
+    lines.push(`\nRegime: <span class="secondary">Evanescent (E < V₀) — quantum tunneling</span>`);
+    lines.push(`Decay constant κ = ${sci(kappa)} m⁻¹`);
+    lines.push(`1/κ (tunneling depth) = ${sci(1/kappa)} m = ${(1e9/kappa).toFixed(4)} nm`);
+    lines.push(`\nWKB exponent 2κL = ${(2*kappa*L).toFixed(4)}`);
+    if(T_wkb < 1e-10) lines.push(`<span class="warn">T is vanishingly small — tunneling negligible at this barrier</span>`);
+    if(T_wkb > 0.1) lines.push(`<span class="good">Significant tunneling — STM/tunnel diode relevant regime</span>`);
+  } else {
+    const k1 = Math.sqrt(2*mass*E_J)/hbar;
+    const k2 = Math.sqrt(2*mass*(E_J-V_J))/hbar;
+    const T_num = 1/(1+Math.pow((k1*k1-k2*k2)/(2*k1*k2),2)*Math.pow(Math.sin(k2*L),2));
+    lines.push(`<span class="primary">Transmission T = ${T_num.toFixed(6)}</span>`);
+    lines.push(`Reflection R = ${(1-T_num).toFixed(6)}`);
+    lines.push(`\nRegime: <span class="secondary">Above-barrier (E > V₀) — resonance scattering</span>`);
+    lines.push(`k₂ = ${sci(k2)} m⁻¹`);
+    lines.push(`Resonance condition (T=1): k₂L = nπ → L = ${sci(Math.PI/k2)} m × n`);
+    if(Math.abs(Math.sin(k2*L)) < 0.05) lines.push(`<span class="good">Near resonance — Ramsauer-Townsend transmission maximum</span>`);
+  }
+  R('r-t05', lines.join('\n'));
+}
+
+// T06 BLACKBODY
+function calcBlackbody(){
+  const T = parseFloat(document.getElementById('bb-T').value);
+  const lambda_nm = parseFloat(document.getElementById('bb-lambda').value)||null;
+  const eps = parseFloat(document.getElementById('bb-emissivity').value)||1;
+  if(!T){R('r-t06','<span class="warn">Temperature required</span>');return;}
+  const lambda_max = b_wien/T;
+  const P = eps*sigma_SB*Math.pow(T,4);
+  const lines = [];
+  lines.push(`<span class="primary">Peak wavelength λ_max = ${(lambda_max*1e9).toFixed(2)} nm (Wien's law)</span>`);
+  lines.push(`Total radiated power = ${sci(P)} W·m⁻²`);
+  const stars = [{n:'Rigel (B8)',T:11000},{n:'Sirius (A1)',T:9940},{n:'Sun (G2)',T:5778},{n:'Proxima (M5)',T:3042}];
+  const closest = stars.reduce((a,b)=>Math.abs(b.T-T)<Math.abs(a.T-T)?b:a);
+  lines.push(`Nearest stellar analogue: ${closest.n} (T_eff = ${closest.T} K)`);
+  if(lambda_nm){
+    const lambda = lambda_nm*1e-9;
+    const B = (2*h*c*c/Math.pow(lambda,5))/(Math.exp(h*c/(lambda*k_B*T))-1);
+    const B_RJ = 2*c*k_B*T/Math.pow(lambda,4);
+    const ratio = B_RJ/B;
+    lines.push(`\nSpectral radiance B(λ,T) at ${lambda_nm} nm:`);
+    lines.push(`Planck: B = ${sci(B)} W·m⁻²·sr⁻¹·m⁻¹`);
+    lines.push(`Rayleigh-Jeans: B_RJ = ${sci(B_RJ)} W·m⁻²·sr⁻¹·m⁻¹`);
+    lines.push(`UV catastrophe factor B_RJ/B = ${ratio.toFixed(4)}`);
+    if(ratio > 1.05) lines.push(`<span class="warn">RJ overestimates by ${((ratio-1)*100).toFixed(1)}% — quantum correction essential</span>`);
+    else lines.push(`<span class="good">RJ approximation valid here (< 5% error)</span>`);
+  }
+  R('r-t06', lines.join('\n'));
+}
+
+// T07 HYDROGEN
+function calcHydrogen(){
+  const Z = parseInt(document.getElementById('hy-Z').value);
+  const n2 = parseInt(document.getElementById('hy-n2').value);
+  const n1 = parseInt(document.getElementById('hy-n1').value);
+  const nmax = parseInt(document.getElementById('hy-nmax').value)||null;
+  const R_inf = 1.0973731568539e7;
+  const lines = [];
+  const E_n = (n) => -13.6*Z*Z/(n*n);
+  const series = {1:'Lyman (UV)',2:'Balmer (Vis/NUV)',3:'Paschen (NIR)',4:'Brackett (IR)',5:'Pfund (IR)',6:'Humphreys (FIR)'};
+  if(nmax){
+    lines.push(`<span class="primary">Transitions to n₁=${n1} for n up to ${nmax} (Z=${Z})</span>\n`);
+    for(let n=n1+1;n<=nmax;n++){
+      const inv_lambda = R_inf*Z*Z*(1/(n1*n1)-1/(n*n));
+      const lambda_nm = 1e9/inv_lambda;
+      const dE = Math.abs(E_n(n)-E_n(n1));
+      lines.push(`n=${n}→${n1}: λ = ${lambda_nm.toFixed(3)} nm | ΔE = ${dE.toFixed(4)} eV`);
+    }
+    lines.push(`\nSeries: ${series[n1]||'Higher series'}`);
+  } else {
+    if(!n2||!n1||n2<=n1){R('r-t07','<span class="warn">n₂ must be greater than n₁</span>');return;}
+    const inv_lambda = R_inf*Z*Z*(1/(n1*n1)-1/(n2*n2));
+    const lambda = 1/inv_lambda;
+    const nu = c*inv_lambda;
+    const dE = Math.abs(E_n(n2)-E_n(n1));
+    const ion_E = Math.abs(E_n(n1));
+    lines.push(`<span class="primary">Transition n=${n2} → n=${n1}</span>`);
+    lines.push(`Wavelength λ = ${(lambda*1e9).toFixed(4)} nm`);
+    lines.push(`Frequency ν = ${sci(nu)} Hz`);
+    lines.push(`Photon energy ΔE = ${dE.toFixed(6)} eV`);
+    lines.push(`\nEnergy of n₂=${n2}: ${E_n(n2).toFixed(6)} eV`);
+    lines.push(`Energy of n₁=${n1}: ${E_n(n1).toFixed(6)} eV`);
+    lines.push(`Ionisation energy from n₁: ${ion_E.toFixed(6)} eV`);
+    lines.push(`Series: ${series[n1]||'Higher series'}`);
+    const region = lambda*1e9<400?'UV':lambda*1e9<700?'<span class="good">Visible</span>':lambda*1e9<1000?'Near-IR':'IR';
+    lines.push(`Spectral region: ${region}`);
+  }
+  R('r-t07', lines.join('\n'));
+}
+
+// T08 PN JUNCTION
+function calcPNJunction(){
+  const matData = document.getElementById('pn-mat').value.split(',');
+  const eps_r=parseFloat(matData[0]),ni=parseFloat(matData[1]),Eg=parseFloat(matData[2]);
+  const Nd=parseFloat(document.getElementById('pn-Nd').value);
+  const Na=parseFloat(document.getElementById('pn-Na').value);
+  const Va=parseFloat(document.getElementById('pn-Va').value)||0;
+  const T=parseFloat(document.getElementById('pn-T').value)||300;
+  if(!Nd||!Na){R('r-t08','<span class="warn">Both doping concentrations required</span>');return;}
+  const Vt=k_B*T/e_charge;
+  const Vbi=Vt*Math.log(Na*Nd/(ni*ni));
+  const Veff=Vbi-Va;
+  const eps=eps_r*eps0;
+  const Wd=Math.sqrt(2*eps*Veff/e_charge*(Na+Nd)/(Na*Nd))*100; // cm
+  const xn=Wd*Na/(Na+Nd);
+  const xp=Wd*Nd/(Na+Nd);
+  const Emax=e_charge*Nd*xn/(eps)*100; // V/cm
+  const Cj=eps/(Wd/100)*1e4; // F/cm²
+  const lines = [];
+  lines.push(`<span class="primary">Built-in potential V_bi = ${Vbi.toFixed(4)} V</span>`);
+  lines.push(`Applied bias V_A = ${Va} V → Effective V_eff = ${Veff.toFixed(4)} V`);
+  lines.push(`\nDepletion widths:`);
+  lines.push(`  x_n = ${(xn*1e6).toFixed(4)} μm (n-side)`);
+  lines.push(`  x_p = ${(xp*1e6).toFixed(4)} μm (p-side)`);
+  lines.push(`  W_d total = ${(Wd*1e4).toFixed(4)} μm`);
+  lines.push(`\nPeak electric field E_max = ${sci(Emax)} V/cm`);
+  lines.push(`Junction capacitance C_j = ${sci(Cj)} F/cm²`);
+  const asymm = Na/Nd;
+  if(asymm > 100 || asymm < 0.01) lines.push(`<span class="secondary">One-sided junction approximation valid (N ratio = ${asymm.toFixed(1)})</span>`);
+  R('r-t08', lines.join('\n'));
+}
+
+// T09 CARRIERS
+function calcCarriers(){
+  const matD = document.getElementById('cc-mat').value.split(',');
+  const Eg=parseFloat(matD[0]),mc_me=parseFloat(matD[1]),mv_me=parseFloat(matD[2]);
+  const T=parseFloat(document.getElementById('cc-T').value)||300;
+  const dopType=document.getElementById('cc-type').value;
+  const doping=parseFloat(document.getElementById('cc-doping').value)||0;
+  const Nc=2*Math.pow(2*Math.PI*mc_me*m_e*k_B*T/(h*h),1.5)/1e6; // cm^-3
+  const Nv=2*Math.pow(2*Math.PI*mv_me*m_e*k_B*T/(h*h),1.5)/1e6;
+  const ni=Math.sqrt(Nc*Nv)*Math.exp(-Eg*e_charge/(2*k_B*T));
+  const kT_eV=k_B*T/e_charge;
+  const lines = [];
+  lines.push(`<span class="primary">Intrinsic concentration n_i = ${sci(ni)} cm⁻³</span>`);
+  lines.push(`Effective DOS: N_c = ${sci(Nc)} cm⁻³, N_v = ${sci(Nv)} cm⁻³`);
+  lines.push(`Thermal voltage k_BT = ${(kT_eV*1000).toFixed(4)} meV`);
+  if(dopType!=='intrinsic'&&doping>0){
+    let n,p,EF_str;
+    if(dopType==='n'){
+      n=doping/2+Math.sqrt(doping*doping/4+ni*ni);
+      p=ni*ni/n;
+      const EF=kT_eV*Math.log(n/ni);
+      EF_str=`E_F = E_i + ${EF.toFixed(4)} eV (above midgap)`;
+      lines.push(`\n<span class="secondary">N-type, N_D = ${sci(doping)} cm⁻³</span>`);
+    } else {
+      p=doping/2+Math.sqrt(doping*doping/4+ni*ni);
+      n=ni*ni/p;
+      const EF=-kT_eV*Math.log(p/ni);
+      EF_str=`E_F = E_i ${EF.toFixed(4)} eV (below midgap)`;
+      lines.push(`\n<span class="secondary">P-type, N_A = ${sci(doping)} cm⁻³</span>`);
+    }
+    lines.push(`Majority carriers = ${sci(dopType==='n'?n:p)} cm⁻³`);
+    lines.push(`Minority carriers = ${sci(dopType==='n'?p:n)} cm⁻³`);
+    lines.push(EF_str);
+    const deg_check = (dopType==='n'?n:p)/Nc;
+    if(deg_check>0.1) lines.push(`<span class="warn">Degenerate semiconductor (n/N_c = ${deg_check.toFixed(3)}) — Boltzmann approx breaks down</span>`);
+    else lines.push(`<span class="good">Non-degenerate — Boltzmann approximation valid</span>`);
+  }
+  R('r-t09', lines.join('\n'));
+}
+
+// T10 RLC
+function calcRLC(){
+  const type=document.getElementById('rlc-type').value;
+  const R_val=parseFloat(document.getElementById('rlc-R').value);
+  const L_val=parseFloat(document.getElementById('rlc-L').value)*1e-3;
+  const C_val=parseFloat(document.getElementById('rlc-C').value)*1e-6;
+  const f_anal=parseFloat(document.getElementById('rlc-f').value)||null;
+  if(!R_val||!L_val||!C_val){R('r-t10','<span class="warn">R, L, and C required</span>');return;}
+  const omega0=1/Math.sqrt(L_val*C_val);
+  const f0=omega0/(2*Math.PI);
+  const Q=type==='series'?omega0*L_val/R_val:R_val/(omega0*L_val);
+  const BW=f0/Q;
+  const alpha=type==='series'?R_val/(2*L_val):1/(2*R_val*C_val);
+  const lines = [];
+  lines.push(`<span class="primary">Resonant frequency f₀ = ${f0.toFixed(4)} Hz (ω₀ = ${omega0.toFixed(4)} rad/s)</span>`);
+  lines.push(`Quality factor Q = ${Q.toFixed(4)}`);
+  lines.push(`3dB bandwidth Δf = ${BW.toFixed(4)} Hz`);
+  lines.push(`Damping coefficient α = ${alpha.toFixed(4)} s⁻¹`);
+  const regime = alpha < omega0 ? `<span class="good">Underdamped (α < ω₀) — oscillatory response</span>` : alpha === omega0 ? `Critical damping` : `<span class="warn">Overdamped (α > ω₀) — no oscillation</span>`;
+  lines.push(`Damping regime: ${regime}`);
+  if(f_anal){
+    const omega=2*Math.PI*f_anal;
+    let Z_mag,phi;
+    if(type==='series'){
+      const ZR=R_val,ZL=omega*L_val,ZC=1/(omega*C_val);
+      Z_mag=Math.sqrt(ZR*ZR+Math.pow(ZL-ZC,2));
+      phi=Math.atan2(ZL-ZC,ZR)*180/Math.PI;
+    } else {
+      const G=1/R_val,B_L=-1/(omega*L_val),B_C=omega*C_val;
+      const Y=Math.sqrt(G*G+Math.pow(B_C+B_L,2));
+      Z_mag=1/Y;
+      phi=-Math.atan2(B_C+B_L,G)*180/Math.PI;
+    }
+    lines.push(`\nAt f = ${f_anal} Hz:`);
+    lines.push(`Impedance |Z| = ${Z_mag.toFixed(4)} Ω`);
+    lines.push(`Phase angle φ = ${phi.toFixed(4)}°`);
+    lines.push(`Frequency ratio f/f₀ = ${(f_anal/f0).toFixed(4)}`);
+  }
+  R('r-t10', lines.join('\n'));
+}
+
+// T11 ERROR PROPAGATION
+function calcErrorProp(){
+  const func=document.getElementById('ep-func').value;
+  const A=parseFloat(document.getElementById('ep-A').value);
+  const dA=parseFloat(document.getElementById('ep-dA').value);
+  const B=parseFloat(document.getElementById('ep-B').value)||null;
+  const dB=parseFloat(document.getElementById('ep-dB').value)||0;
+  const n=parseFloat(document.getElementById('ep-n').value)||null;
+  const op=document.getElementById('ep-op').value;
+  if(!A||!dA){R('r-t11','<span class="warn">A and δA required</span>');return;}
+  const lines = [];
+  let f,df_quad,df_worst,rel;
+  if(func==='product'&&B){
+    f=op==='mul'?A*B:A/B;
+    df_quad=Math.abs(f)*Math.sqrt(Math.pow(dA/A,2)+Math.pow(dB/B,2));
+    df_worst=Math.abs(f)*(Math.abs(dA/A)+Math.abs(dB/B));
+    rel=Math.sqrt(Math.pow(dA/A,2)+Math.pow(dB/B,2))*100;
+    lines.push(`<span class="primary">f = A ${op==='mul'?'×':'/'}  B = ${f.toFixed(6)}</span>`);
+    lines.push(`Relative uncertainty: ${rel.toFixed(4)}%`);
+    lines.push(`δA/A = ${(dA/A*100).toFixed(4)}% | δB/B = ${(dB/B*100).toFixed(4)}%`);
+    lines.push(`Dominant source: ${Math.abs(dA/A) > Math.abs(dB/B) ? 'A' : 'B'}`);
+  } else if(func==='power'&&n){
+    f=Math.pow(A,n);
+    df_quad=Math.abs(n)*Math.abs(f)*dA/A;
+    df_worst=df_quad;
+    rel=Math.abs(n)*dA/A*100;
+    lines.push(`<span class="primary">f = A^${n} = ${f.toFixed(6)}</span>`);
+    lines.push(`δf/f = |n| × δA/A = ${rel.toFixed(4)}%`);
+  } else if(func==='sum'&&B!==null){
+    f=op==='add'?A+B:A-B;
+    df_quad=Math.sqrt(dA*dA+dB*dB);
+    df_worst=dA+dB;
+    rel=df_quad/Math.abs(f)*100;
+    lines.push(`<span class="primary">f = A ${op==='add'?'+':'-'} B = ${f.toFixed(6)}</span>`);
+    if(Math.abs(f)<df_quad) lines.push(`<span class="warn">Catastrophic cancellation — relative error > 100%</span>`);
+  } else if(func==='log'){
+    f=Math.log(A);
+    df_quad=dA/A;
+    df_worst=dA/A;
+    rel=null;
+    lines.push(`<span class="primary">f = ln(A) = ${f.toFixed(6)}</span>`);
+    lines.push(`δf = δA/A = ${df_quad.toFixed(6)} (absolute — no relative for log)`);
+    R('r-t11', lines.join('\n')); return;
+  } else { R('r-t11','<span class="warn">Fill required fields for selected function</span>'); return; }
+  lines.push(`\nQuadrature (independent): δf = ${df_quad.toFixed(6)}`);
+  lines.push(`Worst-case (correlated): δf = ${df_worst.toFixed(6)}`);
+  lines.push(`\n<span class="secondary">Result: f = ${f.toFixed(4)} ± ${df_quad.toFixed(4)} (quadrature)</span>`);
+  R('r-t11', lines.join('\n'));
+}
+
+// T12 STATISTICS
+function calcStats(){
+  const raw=document.getElementById('stat-data').value;
+  const theory=parseFloat(document.getElementById('stat-theory').value)||null;
+  const sigma_inst=parseFloat(document.getElementById('stat-sigma').value)||null;
+  const data=raw.split(',').map(x=>parseFloat(x.trim())).filter(x=>!isNaN(x));
+  if(data.length<2){R('r-t12','<span class="warn">Enter at least 2 comma-separated values</span>');return;}
+  const n=data.length;
+  const mean=data.reduce((a,b)=>a+b,0)/n;
+  const sorted=[...data].sort((a,b)=>a-b);
+  const median=n%2===0?(sorted[n/2-1]+sorted[n/2])/2:sorted[Math.floor(n/2)];
+  const variance=data.reduce((s,x)=>s+(x-mean)*(x-mean),0)/(n-1);
+  const std=Math.sqrt(variance);
+  const sem=std/Math.sqrt(n);
+  // t-distribution 95% CI (approx for df = n-1)
+  const t_vals={1:12.706,2:4.303,3:3.182,4:2.776,5:2.571,6:2.447,7:2.365,8:2.306,9:2.262,10:2.228,15:2.131,20:2.086,30:2.042,60:2.000};
+  const df=n-1;
+  const t_crit=t_vals[df]||t_vals[Math.min(...Object.keys(t_vals).filter(k=>k>=df).map(Number))]||1.96;
+  const CI_low=mean-t_crit*sem, CI_high=mean+t_crit*sem;
+  const lines = [];
+  lines.push(`<span class="primary">Mean x̄ = ${mean.toFixed(6)}</span>`);
+  lines.push(`Median = ${median.toFixed(6)}`);
+  lines.push(`Standard deviation σ = ${std.toFixed(6)}`);
+  lines.push(`Standard error of mean SEM = ${sem.toFixed(6)}`);
+  lines.push(`95% CI: [${CI_low.toFixed(6)}, ${CI_high.toFixed(6)}] (t-dist, df=${df})`);
+  lines.push(`n = ${n} measurements`);
+  // Grubbs test
+  const G_stat=Math.max(...data.map(x=>Math.abs(x-mean)))/std;
+  const G_crit_approx = n<=10 ? 2.5 : n<=20 ? 2.8 : 3.0;
+  if(G_stat>G_crit_approx){
+    const outlier=data.reduce((a,b)=>Math.abs(b-mean)>Math.abs(a-mean)?b:a);
+    lines.push(`\n<span class="warn">Grubbs test: Possible outlier detected = ${outlier} (G = ${G_stat.toFixed(3)} > ${G_crit_approx})</span>`);
+  } else {
+    lines.push(`\n<span class="good">Grubbs test: No outliers detected (G = ${G_stat.toFixed(3)})</span>`);
+  }
+  if(theory&&sigma_inst){
+    const chi2=data.reduce((s,x)=>s+Math.pow((x-theory)/sigma_inst,2),0);
+    const chi2_red=chi2/df;
+    lines.push(`\nχ² = ${chi2.toFixed(4)} (ν = ${df}), χ²_red = ${chi2_red.toFixed(4)}`);
+    lines.push(chi2_red<2?`<span class="good">Good fit to theory (χ²_red ≈ 1 is ideal)</span>`:`<span class="warn">Poor fit (χ²_red >> 1) — systematic error or underestimated σ</span>`);
+  }
+  R('r-t12', lines.join('\n'));
+}
+
+// T13 DIMENSIONAL ANALYSIS
+function calcDimensional(){
+  const eq=document.getElementById('dim-eq').value;
+  const custom=document.getElementById('dim-custom').value;
+  const equations={
+    newton:{lhs:'Force [M¹ L¹ T⁻²]',rhs:'mass × acceleration [M¹] × [L¹ T⁻²]',match:true,note:'Newton\'s 2nd law — dimensionally consistent'},
+    kinetic:{lhs:'Energy [M¹ L² T⁻²]',rhs:'½ × m × v² → [M¹] × [L T⁻¹]² = [M¹ L² T⁻²]',match:true,note:'Kinetic energy — consistent'},
+    einstein:{lhs:'Energy [M¹ L² T⁻²]',rhs:'m × c² → [M¹] × [L T⁻¹]² = [M¹ L² T⁻²]',match:true,note:'Mass-energy equivalence — consistent'},
+    coulomb:{lhs:'Force [M¹ L¹ T⁻²]',rhs:'k q²/r² → [M L³ T⁻⁴ A⁻²][A T]²[L⁻²] = [M L T⁻²]',match:true,note:'Coulomb law — consistent (k = 1/4πε₀)'},
+    schrodinger:{lhs:'Energy × wavefunction [M L² T⁻²]',rhs:'ℏ² [M L² T⁻¹]² × (1/m) × d²ψ/dx² [L⁻²] = [M L² T⁻²]',match:true,note:'Schrödinger KE operator — consistent'},
+    planck:{lhs:'Energy [M L² T⁻²]',rhs:'h × ν → [M L² T⁻¹] × [T⁻¹] = [M L² T⁻²]',match:true,note:'Planck relation — consistent'},
+    debroglie:{lhs:'Length [L]',rhs:'h/p → [M L² T⁻¹] / [M L T⁻¹] = [L]',match:true,note:'de Broglie relation — consistent'},
+    stefan:{lhs:'Power per area [M T⁻³]',rhs:'σ T⁴ → [M T⁻³ Θ⁻⁴] × [Θ⁴] = [M T⁻³]',match:true,note:'Stefan-Boltzmann — consistent'},
+    diffraction:{lhs:'Length [L]',rhs:'d sinθ → [L] × [dimensionless] = [L]; mλ → [1][L] = [L]',match:true,note:'Grating equation — consistent'},
+    lorentz:{lhs:'Force [M L T⁻²]',rhs:'q(v×B) → [A T][L T⁻¹][M A⁻¹ T⁻²] = [M L T⁻²]',match:true,note:'Lorentz force — consistent'},
+  };
+  const lines = [];
+  if(eq && equations[eq]){
+    const e=equations[eq];
+    lines.push(`<span class="primary">${e.match?'✓ DIMENSIONALLY CONSISTENT':'✗ INCONSISTENT'}</span>`);
+    lines.push(`LHS: ${e.lhs}`);
+    lines.push(`RHS: ${e.rhs}`);
+    lines.push(`\nVerification: ${e.note}`);
+    lines.push(`\nBase dimensions: M (mass), L (length), T (time), A (current), Θ (temperature)`);
+  } else if(custom){
+    lines.push(`<span class="secondary">Custom dimensional analysis:</span>`);
+    lines.push(`Input: ${custom}`);
+    lines.push(`\nDecompose into [M^a L^b T^c I^d Θ^e] format`);
+    lines.push(`Compare LHS and RHS exponents for each base dimension`);
+    lines.push(`All 7 SI base dimensions must match for consistency`);
+  } else {
+    lines.push('<span class="warn">Select an equation or enter a custom quantity</span>');
+  }
+  R('r-t13', lines.join('\n'));
+}
+
+// T14 EM SPECTRUM
+function calcEMSpectrum(){
+  const inputType=document.getElementById('em-input').value;
+  const val=parseFloat(document.getElementById('em-value').value);
+  const unit=document.getElementById('em-unit').value;
+  if(!val){R('r-t14','<span class="warn">Enter a value</span>');return;}
+  let lambda_m;
+  const unitMap={nm:1e-9,um:1e-6,m:1,GHz:1e9,THz:1e12,Hz:1,eV:1,meV:1e-3,'cm-1':1};
+  if(inputType==='lambda'){
+    const val_m=val*(unit==='nm'?1e-9:unit==='um'?1e-6:1);
+    lambda_m=val_m;
+  } else if(inputType==='freq'){
+    const nu_Hz=val*(unit==='GHz'?1e9:unit==='THz'?1e12:1);
+    lambda_m=c/nu_Hz;
+  } else if(inputType==='energy'){
+    const E_eV=val*(unit==='meV'?1e-3:1);
+    lambda_m=h*c/(E_eV*e_charge);
+  } else {
+    const nu_tilde=val; // cm^-1
+    lambda_m=1/(nu_tilde*100);
+  }
+  const nu=c/lambda_m;
+  const E_eV=h*nu/e_charge;
+  const nu_tilde=1/(lambda_m*100);
+  const T_equiv=E_eV*e_charge/k_B;
+  const regions=[
+    [1e-13,1e-11,'Gamma ray','Nuclear transitions, PET imaging, sterilisation'],
+    [1e-11,1e-8,'X-ray','Medical imaging, crystallography (XRD), Compton scattering'],
+    [1e-8,4e-7,'Ultraviolet','Fluorescence, photolithography, ozone absorption'],
+    [4e-7,7e-7,'<span class="good">Visible light</span>','Human vision, optical spectroscopy, photonics'],
+    [7e-7,1e-3,'Infrared','Thermal imaging, molecular vibrational spectroscopy, LIDAR'],
+    [1e-3,0.1,'Microwave','Radar, MRI, molecular rotational spectroscopy'],
+    [0.1,1e4,'Radio wave','Communications, radio astronomy, NMR'],
+  ];
+  const region=regions.find(r=>lambda_m>=r[0]&&lambda_m<r[1])||['','','Unknown',''];
+  const lines = [];
+  lines.push(`<span class="primary">λ = ${lambda_m<1e-6?`${(lambda_m*1e9).toFixed(4)} nm`:lambda_m<1e-3?`${(lambda_m*1e6).toFixed(4)} μm`:`${lambda_m.toFixed(6)} m`}</span>`);
+  lines.push(`Frequency ν = ${nu>1e12?`${(nu/1e12).toFixed(4)} THz`:nu>1e9?`${(nu/1e9).toFixed(4)} GHz`:`${sci(nu)} Hz`}`);
+  lines.push(`Photon energy E = ${E_eV.toFixed(6)} eV`);
+  lines.push(`Wavenumber ν̃ = ${nu_tilde.toFixed(4)} cm⁻¹`);
+  lines.push(`Equivalent temperature T = ${sci(T_equiv)} K`);
+  lines.push(`\nSpectral region: ${region[2]}`);
+  lines.push(`Applications: ${region[3]}`);
+  R('r-t14', lines.join('\n'));
+}
+
+// T15 DIFFRACTION GRATING
+function calcGrating(){
+  const N=parseFloat(document.getElementById('gr-N').value);
+  const lambda_nm=parseFloat(document.getElementById('gr-lambda').value);
+  const alpha_deg=parseFloat(document.getElementById('gr-alpha').value)||0;
+  const Ntotal=parseFloat(document.getElementById('gr-Ntotal').value)||null;
+  const blaze_deg=parseFloat(document.getElementById('gr-blaze').value)||null;
+  if(!N||!lambda_nm){R('r-t15','<span class="warn">Lines/mm and wavelength required</span>');return;}
+  const d=1e-3/N; // grating spacing in m
+  const lambda=lambda_nm*1e-9;
+  const alpha=alpha_deg*Math.PI/180;
+  const lines = [];
+  lines.push(`<span class="primary">Grating: d = ${(d*1e6).toFixed(4)} μm, λ = ${lambda_nm} nm</span>\n`);
+  lines.push(`Diffraction angles (grating equation: d(sinα + sinβ) = mλ):`);
+  for(let m=-3;m<=3;m++){
+    const sinb=(m*lambda/d)-Math.sin(alpha);
+    if(Math.abs(sinb)<=1){
+      const beta=Math.asin(sinb)*180/Math.PI;
+      lines.push(`  m = ${m >= 0 ? '+'+m : m}: θ = ${beta.toFixed(4)}°`);
+    } else {
+      lines.push(`  m = ${m >= 0 ? '+'+m : m}: <span class="dim">evanescent (|sinβ| > 1)</span>`);
+    }
+  }
+  const sinb1=(lambda/d)-Math.sin(alpha);
+  if(Math.abs(sinb1)<=1){
+    const beta1=Math.asin(sinb1);
+    const dispersion=lambda/(d*Math.cos(beta1))*180/Math.PI/1e-9;
+    lines.push(`\nAngular dispersion at m=1: dβ/dλ = ${dispersion.toFixed(4)} °/nm`);
+  }
+  if(Ntotal){
+    const R_power=Ntotal*1;
+    const dlambda=lambda_nm/R_power;
+    lines.push(`Resolving power R = mN = ${R_power} (m=1)`);
+    lines.push(`Minimum resolvable Δλ = ${dlambda.toFixed(6)} nm`);
+  }
+  const FSR=lambda_nm/1;
+  lines.push(`Free spectral range FSR (m=1) ≈ ${FSR.toFixed(4)} nm`);
+  if(blaze_deg){
+    const lambda_blaze=2*d*Math.sin(blaze_deg*Math.PI/180)*1e9;
+    lines.push(`\nBlaze wavelength (Littrow, m=1): λ_B = ${lambda_blaze.toFixed(2)} nm`);
+  }
+  R('r-t15', lines.join('\n'));
+}
+
+// T16 RELATIVITY
+function calcRelativity(){
+  const beta=parseFloat(document.getElementById('lr-beta').value);
+  const proper=parseFloat(document.getElementById('lr-proper').value)||null;
+  const mass=parseFloat(document.getElementById('lr-mass').value)||null;
+  const freq=parseFloat(document.getElementById('lr-freq').value)||null;
+  if(!beta||beta>=1){R('r-t16','<span class="warn">β must be between 0 and 1 (exclusive)</span>');return;}
+  const gamma=1/Math.sqrt(1-beta*beta);
+  const rapidity=Math.atanh(beta);
+  const lines = [];
+  lines.push(`<span class="primary">Lorentz factor γ = ${gamma.toFixed(8)}</span>`);
+  lines.push(`β = v/c = ${beta}`);
+  lines.push(`Rapidity φ = atanh(β) = ${rapidity.toFixed(8)}`);
+  lines.push(`v = ${(beta*c).toExponential(6)} m/s`);
+  if(proper){
+    const dilated=proper*gamma;
+    const contracted=proper/gamma;
+    lines.push(`\nTime dilation: Δt = γΔτ = ${sci(dilated)} s (from ${sci(proper)} s proper time)`);
+    lines.push(`Length contraction: L = L₀/γ = ${sci(contracted)} m (from ${sci(proper)} m proper length)`);
+  }
+  if(mass){
+    const E0=mass*c*c;
+    const p_rel=gamma*mass*beta*c;
+    const KE=(gamma-1)*E0;
+    const E_tot=gamma*E0;
+    const E0_eV=E0/e_charge;
+    lines.push(`\nRelativistic mechanics:`);
+    lines.push(`Rest energy E₀ = mc² = ${sci(E0_eV)} eV`);
+    lines.push(`Relativistic KE = (γ-1)mc² = ${sci(KE/e_charge)} eV`);
+    lines.push(`Total energy E = γmc² = ${sci(E_tot/e_charge)} eV`);
+    lines.push(`Relativistic momentum p = ${sci(p_rel)} kg·m/s`);
+    lines.push(`Four-momentum invariant: E²-p²c² = (mc²)² ✓`);
+  }
+  if(freq){
+    const f_approach=freq*Math.sqrt((1+beta)/(1-beta));
+    const f_recede=freq*Math.sqrt((1-beta)/(1+beta));
+    lines.push(`\nRelativistic Doppler:`);
+    lines.push(`Approaching: ν' = ${sci(f_approach)} Hz (blueshift)`);
+    lines.push(`Receding: ν' = ${sci(f_recede)} Hz (redshift)`);
+    lines.push(`z (recession) = ${(freq/f_recede-1).toFixed(6)}`);
+  }
+  R('r-t16', lines.join('\n'));
+}
+
+// T17 DECAY
+function fillHalflife(){
+  const v=document.getElementById('rd-isotope').value;
+  if(!v)return;
+  const map={'5730':5730,'1.28e9_yr':1.28e9,'3.82_days':3.82/365.25,'8.02_days':8.02/365.25,'30.17_yr':30.17,'1600_yr':1600,'24110_yr':24110,'4.468e9_yr':4.468e9};
+  if(map[v]) document.getElementById('rd-t12').value=map[v];
+}
+function calcDecay(){
+  const t12=parseFloat(document.getElementById('rd-t12').value);
+  const A0=parseFloat(document.getElementById('rd-A0').value);
+  const t=parseFloat(document.getElementById('rd-t').value);
+  const mass=parseFloat(document.getElementById('rd-mass').value)||null;
+  if(!t12||!A0||!t){R('r-t17','<span class="warn">Half-life, initial activity, and elapsed time required</span>');return;}
+  const lambda=Math.log(2)/t12;
+  const At=A0*Math.exp(-lambda*t);
+  const Nt_frac=Math.exp(-lambda*t);
+  const At_Ci=At/3.7e10;
+  const lines = [];
+  lines.push(`<span class="primary">Activity A(t) = ${sci(At)} Bq = ${sci(At_Ci)} Ci</span>`);
+  lines.push(`Fraction remaining N(t)/N₀ = ${Nt_frac.toExponential(6)}`);
+  lines.push(`Decay constant λ = ${lambda.toExponential(6)} yr⁻¹`);
+  lines.push(`Half-life t½ = ${t12} yr`);
+  lines.push(`Mean lifetime τ = t½/ln2 = ${(t12/Math.log(2)).toExponential(4)} yr`);
+  lines.push(`Elapsed time t = ${t12>1000?t.toExponential(3):t} yr = ${(t/t12).toFixed(4)} half-lives`);
+  if(At/A0 < 0.001) lines.push(`<span class="warn">< 0.1% of original activity remains</span>`);
+  R('r-t17', lines.join('\n'));
+}
+
+// T18 PARTICLE IN BOX
+function calcParticleBox(){
+  const dim=parseInt(document.getElementById('pib-dim').value);
+  const partSel=document.getElementById('pib-particle').value;
+  let mass=partSel==='custom'?parseFloat(document.getElementById('pib-mass').value):parseFloat(partSel);
+  const L=parseFloat(document.getElementById('pib-L').value)*1e-9;
+  if(!mass||!L){R('r-t18','<span class="warn">Mass and box size required</span>');return;}
+  const E1=Math.PI*Math.PI*hbar*hbar/(2*mass*L*L)/e_charge;
+  const lines = [];
+  lines.push(`<span class="primary">Ground state energy E₁ = ${E1.toFixed(6)} eV (zero-point energy)</span>\n`);
+  lines.push(`Dimension: ${dim}D infinite square well, L = ${L*1e9} nm\n`);
+  if(dim===1){
+    lines.push(`Energy levels E_n = n² × E₁:\n`);
+    for(let n=1;n<=6;n++){
+      const En=n*n*E1;
+      lines.push(`  n=${n}: E = ${En.toFixed(6)} eV`);
+    }
+    lines.push(`\nTransition wavelengths (n→1):`);
+    for(let n=2;n<=4;n++){
+      const dE=(n*n-1)*E1;
+      const lambda_nm=h*c/(dE*e_charge)*1e9;
+      lines.push(`  n=${n}→1: ΔE = ${dE.toFixed(6)} eV, λ = ${lambda_nm.toFixed(2)} nm`);
+    }
+  } else if(dim===2){
+    lines.push(`Energy levels E_{n1,n2} = (n1²+n2²) × E₁:\n`);
+    const levels=[];
+    for(let n1=1;n1<=4;n1++) for(let n2=1;n2<=4;n2++) levels.push({E:(n1*n1+n2*n2)*E1,label:`(${n1},${n2})`});
+    levels.sort((a,b)=>a.E-b.E);
+    const unique=[...new Set(levels.map(l=>l.E.toFixed(6)))].slice(0,6);
+    unique.forEach(E=>{
+      const matching=levels.filter(l=>l.E.toFixed(6)===E);
+      lines.push(`  E = ${parseFloat(E).toFixed(4)} eV | States: ${matching.map(m=>m.label).join(', ')} | Degeneracy: ${matching.length}`);
+    });
+  } else {
+    lines.push(`Energy levels E_{n1,n2,n3} = (n1²+n2²+n3²) × E₁:\n`);
+    const levels=[];
+    for(let n1=1;n1<=3;n1++) for(let n2=1;n2<=3;n2++) for(let n3=1;n3<=3;n3++) levels.push({E:(n1*n1+n2*n2+n3*n3)*E1,label:`(${n1},${n2},${n3})`});
+    levels.sort((a,b)=>a.E-b.E);
+    const unique=[...new Set(levels.map(l=>l.E.toFixed(6)))].slice(0,5);
+    unique.forEach(E=>{
+      const matching=levels.filter(l=>l.E.toFixed(6)===E);
+      lines.push(`  E = ${parseFloat(E).toFixed(4)} eV | Degeneracy: ${matching.length} | e.g. ${matching[0].label}`);
+    });
+  }
+  const dp2=2*mass*(1*1*E1*e_charge);
+  lines.push(`\n⟨p²⟩ = 2mE₁ = ${sci(dp2)} (kg·m/s)² ✓ (uncertainty principle satisfied)`);
+  R('r-t18', lines.join('\n'));
+}
+
+// T19 FERMI ENERGY
+function fillElectronDensity(){
+  const v=document.getElementById('fe-metal').value;
+  if(v) document.getElementById('fe-n').value=v;
+}
+function calcFermi(){
+  const n=parseFloat(document.getElementById('fe-n').value)*1e6; // convert cm^-3 to m^-3
+  const T=parseFloat(document.getElementById('fe-T').value)||300;
+  if(!n){R('r-t19','<span class="warn">Electron density required</span>');return;}
+  const EF=(hbar*hbar/(2*m_e))*Math.pow(3*Math.PI*Math.PI*n,2/3)/e_charge;
+  const TF=EF*e_charge/k_B;
+  const vF=Math.sqrt(2*EF*e_charge/m_e);
+  const gEF=3*n/(2*EF*e_charge);
+  const Cv_factor=Math.PI*Math.PI*k_B*k_B*T/(2*EF*e_charge)*n;
+  const mu_shift=-Math.PI*Math.PI/12*Math.pow(k_B*T,2)/Math.pow(EF*e_charge,2)*EF;
+  const lines = [];
+  lines.push(`<span class="primary">Fermi energy E_F = ${EF.toFixed(4)} eV</span>`);
+  lines.push(`Fermi temperature T_F = ${sci(TF)} K`);
+  lines.push(`Fermi velocity v_F = ${sci(vF)} m/s = ${(vF/c).toExponential(4)} c`);
+  lines.push(`Density of states g(E_F) = ${sci(gEF)} J⁻¹ m⁻³`);
+  lines.push(`\nAt T = ${T} K:`);
+  lines.push(`T/T_F = ${(T/TF).toExponential(4)} (${T/TF<0.01?'<span class="good">strongly degenerate</span>':'<span class="warn">partially degenerate</span>'})`);
+  lines.push(`Electronic heat capacity C_el = ${sci(Cv_factor)} J K⁻¹ m⁻³`);
+  lines.push(`Chemical potential shift μ(T)−E_F = ${(mu_shift*1000).toExponential(4)} meV`);
+  R('r-t19', lines.join('\n'));
+}
+
+// T20 COMPTON
+function calcCompton(){
+  const E0_keV=parseFloat(document.getElementById('cs-E').value);
+  const theta_deg=parseFloat(document.getElementById('cs-theta').value);
+  if(!E0_keV||theta_deg===undefined||isNaN(theta_deg)){R('r-t20','<span class="warn">Incident energy and scattering angle required</span>');return;}
+  const theta=theta_deg*Math.PI/180;
+  const E0_J=E0_keV*1000*e_charge;
+  const lambda0=h*c/E0_J;
+  const delta_lambda=lambda_C*(1-Math.cos(theta));
+  const lambda_prime=lambda0+delta_lambda;
+  const E_prime=h*c/lambda_prime/e_charge/1000;
+  const KE_e=(E0_keV-E_prime);
+  const phi=Math.atan2(E0_keV*Math.sin(theta),(E0_keV*(1-Math.cos(theta))+m_e*c*c/e_charge/1000)*Math.tan(theta));
+  // Klein-Nishina
+  const r_e=2.8179403227e-15;
+  const eps=E0_keV/(m_e*c*c/e_charge/1000);
+  const eps_prime=E_prime/E0_keV;
+  const KN=(r_e*r_e/2)*eps_prime*eps_prime*(eps_prime+1/eps_prime-Math.pow(Math.sin(theta),2));
+  const lines = [];
+  lines.push(`<span class="primary">Scattered photon energy E' = ${E_prime.toFixed(4)} keV</span>`);
+  lines.push(`Incident energy E₀ = ${E0_keV} keV`);
+  lines.push(`Wavelength shift Δλ = λ_C(1−cosθ) = ${(delta_lambda*1e12).toFixed(6)} pm`);
+  lines.push(`λ₀ = ${(lambda0*1e12).toFixed(4)} pm → λ' = ${(lambda_prime*1e12).toFixed(4)} pm`);
+  lines.push(`\nRecoil electron:`);
+  lines.push(`Kinetic energy T_e = ${KE_e.toFixed(4)} keV`);
+  lines.push(`Recoil angle φ = ${(phi*180/Math.PI).toFixed(4)}°`);
+  lines.push(`\nKlein-Nishina dσ/dΩ = ${sci(KN)} m²/sr`);
+  const regime=E0_keV<10?'<span class="good">Thomson regime (E << m_e c²)</span>':E0_keV>511?'<span class="secondary">Ultra-relativistic Compton</span>':'<span class="secondary">Compton regime (Klein-Nishina correction significant)</span>';
+  lines.push(`Regime: ${regime}`);
+  lines.push(`m_e c² = 511 keV | E₀/m_e c² = ${(E0_keV/511).toFixed(4)}`);
+  R('r-t20', lines.join('\n'));
+}
+</script>
+</body>
+</html>
