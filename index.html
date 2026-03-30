@@ -31,6 +31,7 @@
             --bulb-color: #cbd5e1; 
             --bulb-glow: none;
             --btn-text: #673de6; 
+            --btn-text-filled: #ffffff;
         }
 
         /* Dark Mode Overrides */
@@ -49,6 +50,7 @@
             --bulb-color: #ffaa00;
             --bulb-glow: drop-shadow(0 0 15px rgba(255, 170, 0, 0.8));
             --btn-text: #fbbf24;
+            --btn-text-filled: #1c1917; /* Dark text for yellow button */
         }
 
         html { 
@@ -68,7 +70,6 @@
             line-height: 1.6;
             min-height: 100vh;
             overflow-x: hidden;
-            /* SLOW TRANSITION: 1.5 seconds for a heavy, smooth feel */
             transition: background 1.5s ease, color 1.5s ease;
         }
 
@@ -83,6 +84,49 @@
             display: flex; 
             flex-direction: column; 
             align-items: center;
+        }
+
+        /* =========================================
+           DECLARATION SECTION
+           ========================================= */
+        .declaration-section {
+            padding: 2rem 20px 6rem;
+            text-align: center;
+        }
+        
+        .declaration-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 4rem 3rem;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+            transition: all 1.5s ease;
+        }
+
+        .declaration-quote {
+            font-family:'Times New Roman', Times, serif; 
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary );
+            margin-bottom: 2rem;
+            transition: color 1.5s ease;
+        }
+
+        .declaration-text {
+            font-size: 1.15rem;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+            transition: color 1.5s ease;
+        }
+
+        .declaration-text.highlight {
+            font-weight: 700;
+            margin-bottom: 0;
+            margin-top: 2rem;
         }
 
         .wire { 
@@ -105,7 +149,7 @@
             border-radius: 50%; 
             border: 2px solid #475569;
             filter: var(--bulb-glow); 
-            transition: all 0.3s ease; /* Bulb lights up quickly */
+            transition: all 0.3s ease; 
             position: relative; 
             z-index: 2;
         }
@@ -148,6 +192,107 @@
         }
 
         /* =========================================
+           STATS & COUNTER SECTION
+           ========================================= */
+        .stats-section {
+            padding: 2rem 20px 5rem;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .stat-card {
+            flex: 1;
+            min-width: 250px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2.5rem 1rem;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+            transition: all 0.4s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px var(--accent-glow);
+        }
+
+        .stat-number {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+            line-height: 1;
+            transition: color 1.5s ease;
+        }
+
+        .stat-number span {
+            font-size: 2.5rem;
+            color: var(--text-dark);
+            transition: color 1.5s ease;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            transition: color 1.5s ease;
+        }
+
+        .stats-cta {
+            font-size: 1.2rem;
+            color: var(--text-dark);
+            font-weight: 600;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+            transition: color 1.5s ease;
+        }
+
+        .stats-cta a {
+            color: var(--primary);
+            text-decoration: none;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .stats-cta a:hover {
+            text-decoration: underline;
+            filter: brightness(1.2);
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                gap: 1.5rem;
+                flex-direction: column;
+                align-items: center;
+            }
+            .stat-card {
+                width: 100%;
+                max-width: 350px;
+            }
+            .stat-number {
+                font-size: 3rem;
+            }
+            .stats-cta {
+                font-size: 1.1rem;
+                padding: 0 15px;
+            }
+        }
+
+        /* =========================================
            3. HEADER & HERO
            ========================================= */
         header {
@@ -170,7 +315,7 @@
             color: var(--text-dark); 
             letter-spacing: -0.5px; 
             transition: color 1.5s ease; 
-            cursor: pointer; /* Hint that logo is clickable */
+            cursor: pointer; 
             user-select: none;
         }
 
@@ -275,15 +420,9 @@
             gap: 2.5rem; 
         }
 
-        .card-link { 
-            text-decoration: none; 
-            color: inherit; 
-            display: block; 
-        }
-
         .card {
             position: relative; 
-            height: 500px; 
+            height: 520px; /* Slightly taller to fit two buttons */
             border-radius: 24px; 
             overflow: hidden;
             box-shadow: var(--shadow); 
@@ -377,12 +516,38 @@
             transition: color 1.5s ease; 
         }
 
-        /* Click to Explore Button */
+        /* --- BUTTON LAYOUT UPDATES --- */
+        .card-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .extra-btn {
+            background: var(--primary);
+            color: var(--btn-text-filled);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .extra-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+
         .card-btn {
             display: inline-block; 
             font-size: 0.9rem; 
             font-weight: 700;
-            color: var(--btn-text); /* Dynamically changes with theme */
+            color: var(--btn-text);
+            text-decoration: none;
             transition: all 0.3s ease; 
             position: relative;
         }
@@ -402,6 +567,82 @@
 
         .card:hover .card-btn { 
             text-decoration: underline; 
+        }
+
+
+        /* =========================================
+           UPDATES & NOTIFICATIONS SECTION
+           ========================================= */
+        .updates-section {
+            padding: 4rem 20px 2rem;
+            transition: background 1.5s ease;
+        }
+
+        .updates-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        .notification-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-left: 5px solid var(--primary);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        .notification-card:hover {
+            transform: translateX(10px);
+            box-shadow: 0 15px 35px var(--accent-glow);
+        }
+
+        .notification-badge {
+            display: inline-block;
+            background: var(--accent-glow);
+            color: var(--primary);
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            transition: all 1.5s ease;
+        }
+
+        body.dark-mode .notification-badge {
+            color: var(--btn-text);
+        }
+
+        .notification-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+            transition: color 1.5s ease;
+        }
+
+        .notification-desc {
+            color: var(--text-light);
+            font-size: 1.05rem;
+            line-height: 1.6;
+            transition: color 1.5s ease;
+        }
+
+        @media (max-width: 768px) {
+            .notification-card {
+                padding: 1.5rem;
+            }
+            .notification-card:hover {
+                transform: translateY(-5px); /* Vertical lift looks better on mobile */
+            }
         }
 
         /* =========================================
@@ -465,7 +706,7 @@
             width: 100%; 
             padding: 16px; 
             background: var(--primary); 
-            color: var(--btn-text-filled); /* Dynamic text color */
+            color: var(--btn-text-filled);
             border: none; 
             border-radius: 12px; 
             font-size: 1.1rem; 
@@ -547,11 +788,14 @@
             .container { padding: 0 15px 4rem; }
             .contact-section { padding: 3rem 15px; }
             .grid { grid-template-columns: 1fr; gap: 1.5rem; }
-            .card { height: 450px; }
+            .card { height: 480px; }
             .card-content { padding: 1.5rem; }
             .form-container { padding: 1.5rem; }
             .lamp-container { right: 5%; }
             .wire { height: 40px; }
+            .declaration-container { padding: 3.5rem 1.5rem; }
+            .declaration-quote { font-size: 1.5rem; }
+            .declaration-text { font-size: 1rem; }
         }
         @media (max-width: 480px) {
             h1 { font-size: 2rem; }
@@ -584,96 +828,168 @@
         </p>
     </section>
 
+    <div class="declaration-section" data-aos="fade-up" data-aos-duration="1200">
+        <div class="container declaration-container">
+            <h2 class="declaration-quote">Logic is a Utility, Not a Luxury.</h2>
+            
+            <p class="declaration-text">
+                At Shoonya Origins, we believe that fundamental logic—the decision trees and calculations that drive our industries—should never be a luxury.
+            </p>
+            
+            <p class="declaration-text">
+                We are releasing 107+ Professional Intelligence Tools across our 6 ventures, open to everyone. From this moment on, critical software won’t be locked behind signups or paid tiers. You won’t have to wonder if your data is being used against you. Every calculation stays local; every decision is yours.
+            </p>
+            
+            <p class="declaration-text highlight">
+                These tools are on us. Many more to come. 
+            </p>
+        </div>
+    </div>
+
+    </div>
+
+    <div class="stats-section" data-aos="fade-up" data-aos-duration="1200">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card" data-aos="zoom-in" data-aos-delay="100">
+                    <h2 class="stat-number">107<span>+</span></h2>
+                    <p class="stat-label">Open Tools</p>
+                </div>
+                <div class="stat-card" data-aos="zoom-in" data-aos-delay="200">
+                    <h2 class="stat-number">0<span>%</span></h2>
+                    <p class="stat-label">Data Shared</p>
+                </div>
+                <div class="stat-card" data-aos="zoom-in" data-aos-delay="300">
+                    <h2 class="stat-number">100<span>%</span></h2>
+                    <p class="stat-label">Yours</p>
+                </div>
+            </div>
+            <p class="stats-cta" data-aos="fade-up" data-aos-delay="400">
+                <a href="#contact">Fill out the form below</a> to tell us more about what you want us to build next.
+            </p>
+        </div>
+    </div>
     <div class="container">
         <div class="section-label" data-aos="fade-in" data-aos-delay="400">Our Ecosystem</div>
         <div class="grid">
             
-            
-            <a href="ventures/aura/" class="card-link" data-aos="fade-up" data-aos-delay="100">
-                <div class="card bg-aura">
-                    <span class="card-tag">Health</span>
-                    <div class="card-content">
-                        <h3 class="card-title">Aura</h3>
-                        <p class="card-desc">A non-invasive system predicting vitals using sensor fusion and AI , predictive health monitoring and total health ecosystem at a single place</p>
-                        <div class="card-btn">Click to Explore</div>
+            <div class="card bg-aura" data-aos="fade-up" data-aos-delay="100">
+                <span class="card-tag">Health</span>
+                <div class="card-content">
+                    <h3 class="card-title">Aura</h3>
+                    <p class="card-desc">A non-invasive system predicting vitals using sensor fusion and AI, predictive health monitoring and total health ecosystem at a single place.</p>
+                    <div class="card-actions">
+                        <a href="#" class="extra-btn">View Open Tools</a>
+                        <a href="ventures/aura/" class="card-btn">Click to Explore</a>
                     </div>
                 </div>
-            </a>
+            </div>
 
-            <a href="ventures/construct/" class="card-link" data-aos="fade-up" data-aos-delay="200">
-                <div class="card bg-civitas">
-                    <span class="card-tag">Infrastructure</span>
-                    <div class="card-content">
-                        <h3 class="card-title">CONSTRUCT</h3>
-                        <p class="card-desc">Autonomous  vehicles and system for Heavy infrastructure and sustainable construction projects laying the smart foundation for tomorrow.</p>
-                        <div class="card-btn">Click to Explore</div>
+            <div class="card bg-civitas" data-aos="fade-up" data-aos-delay="200">
+                <span class="card-tag">Infrastructure</span>
+                <div class="card-content">
+                    <h3 class="card-title">CONSTRUCT</h3>
+                    <p class="card-desc">Autonomous vehicles and system for Heavy infrastructure and sustainable construction projects laying the smart foundation for tomorrow.</p>
+                    <div class="card-actions">
+                        <a href="#" class="extra-btn">View Open Tools</a>
+                        <a href="ventures/construct/" class="card-btn">Click to Explore</a>
                     </div>
                 </div>
-            </a>
+            </div>
 
-            <a href="ventures/basis/" class="card-link" data-aos="fade-up" data-aos-delay="300">
-                <div class="card bg-basis">
-                    <span class="card-tag">Urban Management</span>
-                    <div class="card-content">
-                        <h3 class="card-title">Basis</h3>
-                        <p class="card-desc">Autonomus Smart city management: roads repair, waste collection, and river rejuvenation systems equipped with  autonomous vehicles and AI.</p>
-                        <div class="card-btn">Click to Explore</div>
+            <div class="card bg-basis" data-aos="fade-up" data-aos-delay="300">
+                <span class="card-tag">Urban Management</span>
+                <div class="card-content">
+                    <h3 class="card-title">Basis</h3>
+                    <p class="card-desc">Autonomous Smart city management: roads repair, waste collection, and river rejuvenation systems equipped with autonomous vehicles and AI.</p>
+                    <div class="card-actions">
+                        <a href="#" class="extra-btn">View Open Tools</a>
+                        <a href="ventures/basis/" class="card-btn">Click to Explore</a>
                     </div>
                 </div>
-            </a>
+            </div>
 
-            <a href="ventures/raptor/" class="card-link" data-aos="fade-up" data-aos-delay="0">
-                <div class="card bg-raptor">
-                    <span class="card-tag">Marketing AI</span>
-                    <div class="card-content">
-                        <h3 class="card-title">Raptor</h3>
-                        <p class="card-desc">Start to end AI-driven growth engine automating sales pitches, marketing funnels, and client acquisition and retention . leveraging data science  for scalable growth.</p>
-                        <div class="card-btn">Click to Explore</div>
+            <div class="card bg-raptor" data-aos="fade-up" data-aos-delay="0">
+                <span class="card-tag">Marketing AI</span>
+                <div class="card-content">
+                    <h3 class="card-title">Raptor</h3>
+                    <p class="card-desc">Start to end AI-driven growth engine automating sales pitches, marketing funnels, and client acquisition and retention, leveraging data science.</p>
+                    <div class="card-actions">
+                        <a href="#" class="extra-btn">View Open Tools</a>
+                        <a href="ventures/raptor/" class="card-btn">Click to Explore</a>
                     </div>
                 </div>
-            </a>
+            </div>
 
-            <a href="ventures/shakti/" class="card-link" data-aos="fade-up" data-aos-delay="0">
-                <div class="card bg-sentinel">
-                    <span class="card-tag">Defense</span>
-                    <div class="card-content">
-                        <h3 class="card-title">Shakti</h3>
-                        <p class="card-desc">Next-generation automated technology for unmanned defense, wearable smart devices critical in combat and  computing systems for protecting national interests.</p>
-                        <div class="card-btn">Click to Explore</div>
+            <div class="card bg-sentinel" data-aos="fade-up" data-aos-delay="0">
+                <span class="card-tag">Defense</span>
+                <div class="card-content">
+                    <h3 class="card-title">Shakti</h3>
+                    <p class="card-desc">Next-generation automated technology for unmanned defense, wearable smart devices critical in combat and computing systems.</p>
+                    <div class="card-actions">
+                        <a href="#" class="extra-btn">View Open Tools</a>
+                        <a href="ventures/shakti/" class="card-btn">Click to Explore</a>
                     </div>
                 </div>
-            </a>
+            </div>
 
-
-            <a href="ventures/aether/" class="card-link" data-aos="fade-up" data-aos-delay="100">
-                <div class="card bg-aether">
-                    <span class="card-tag">Deep Tech</span>
-                    <div class="card-content">
-                        <h3 class="card-title">Aether Labs</h3>
-                        <p class="card-desc">Pure research in quantum mechanics, wave physics, quantum computing and advanced hardware development. ==>Its  still in development.</p>
-                        <div class="card-btn">Click to Explore</div>
+            <div class="card bg-aether" data-aos="fade-up" data-aos-delay="100">
+                <span class="card-tag">Deep Tech</span>
+                <div class="card-content">
+                    <h3 class="card-title">Aether Labs</h3>
+                    <p class="card-desc">Pure research in quantum mechanics, wave physics, quantum computing and advanced hardware development. ==> Its still in development.</p>
+                    <div class="card-actions">
+                        <a href="#" class="extra-btn">View Open Tools</a>
+                        <a href="ventures/aether/" class="card-btn">Click to Explore</a>
                     </div>
                 </div>
-            </a>
+            </div>
 
-            <a href="ventures/shoonya-systems/" class="card-link" data-aos="fade-up" data-aos-delay="200">
-                <div class="card bg-systems">
-                    <span class="card-tag">Software</span>
-                    <div class="card-content">
-                        <h3 class="card-title">Shoonya Systems</h3>
-                        <p class="card-desc">B2B Technology solutions: Custom apps, database management, and Computer Vision integration.</p>
-                        <div class="card-btn">Click to Explore</div>
+            <div class="card bg-systems" data-aos="fade-up" data-aos-delay="200">
+                <span class="card-tag">Software</span>
+                <div class="card-content">
+                    <h3 class="card-title">Shoonya Systems</h3>
+                    <p class="card-desc">B2B Technology solutions: Custom apps, database management, and Computer Vision integration.</p>
+                    <div class="card-actions">
+                        <a href="#" class="extra-btn">View Open Tools</a>
+                        <a href="ventures/shoonya-systems/" class="card-btn">Click to Explore</a>
                     </div>
                 </div>
-            </a>
+            </div>
 
         </div>
     </div>
 
+    <section class="updates-section" id="updates">
+        <div class="container" style="padding-bottom: 2rem;">
+            <div class="section-label" data-aos="fade-in">Latest Updates</div>
+            
+            <div class="updates-grid">
+                
+                <div class="notification-card" data-aos="fade-up" data-aos-delay="100">
+                    <span class="notification-badge">Coming Soon</span>
+                    <h3 class="notification-title">Autonomous Safety & Anti-Theft Plugins</h3>
+                    <p class="notification-desc">
+                        Our new autonomous safety and anti-theft plugins are going to be available for everyone very soon. We are finalizing the logic to ensure maximum security without compromising your data privacy.
+                    </p>
+                </div>
+
+                <div class="notification-card" data-aos="fade-up" data-aos-delay="200">
+                    <span class="notification-badge">Coming soon </span>
+                    <h3 class="notification-title">FreeBasic CRM & Essential Sales Tools</h3>
+                    <p class="notification-desc">
+                    We are rolling out a free, foundational CRM to help you seamlessly track clients and manage contacts. Alongside this, expect a suite of simple, no-cost sales tools designed to streamline your daily operations without the premium price tag.   
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
     <section class="contact-section" id="contact">
         <div class="container">
             <div class="section-label" data-aos="fade-in">Get in Touch</div>
-            <h2 style="text-align: center; font-size: 2rem; margin-bottom: 2rem; color: var(--text-dark);" data-aos="fade-up">Partner with Shoonya</h2>
+            <h2 style="text-align: center; font-size: 2rem; margin-bottom: 2rem; color: var(--text-dark);" data-aos="fade-up">Grow with Shoonya</h2>
             
             <div class="form-container" data-aos="zoom-in" data-aos-duration="1000">
                 <form action="https://formsubmit.co/YOUR_EMAIL_HERE" method="POST">
@@ -740,8 +1056,6 @@
         const switchElement = document.getElementById('lightSwitch');
         const body = document.body;
         let isAnimating = false; 
-
-        // No localStorage checking here = Always default to Day Mode
 
         switchElement.addEventListener('click', () => {
             if (isAnimating) return;
@@ -934,4 +1248,3 @@
 
 </body>
 </html>
-
