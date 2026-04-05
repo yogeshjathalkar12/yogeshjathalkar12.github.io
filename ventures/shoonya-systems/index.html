@@ -3,103 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shoonya Systems | Digital Core</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Shoonya Systems | Infrastructure Dashboard</title>
+    <link rel="icon" type="image/png" href="/images/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
-        /* SHOONYA SYSTEMS THEME: Raw Code, Terminal, Engineering */
         :root {
-            --terminal-bg: #0c0c0c;
-            --terminal-green: #00ff41;
-            --terminal-dim: #008f11;
-            --text-white: #e5e5e5;
-            --grid-line: rgba(0, 255, 65, 0.1);
+            --bg-soft: #F9F8F6;
+            --sidebar-bg: #FFFFFF;
+            --accent-earth: #6B705C; /* Sage Green */
+            --accent-clay: #A44A3F;  /* Earthy Red */
+            --text-main: #2D2D2D;
+            --border: #E5E0D8;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Fira Code', monospace; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background-color: var(--bg-soft); 
+            color: var(--text-main); 
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR DASHBOARD NAVIGATION */
+        aside {
+            width: 260px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+        }
+
+        .logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 3rem; color: var(--accent-earth); }
         
-        body { background-color: var(--terminal-bg); color: var(--text-white); }
+        .nav-group { margin-bottom: 2rem; }
+        .nav-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: #999; margin-bottom: 1rem; display: block; }
+        .nav-item { display: block; text-decoration: none; color: var(--text-main); font-size: 0.9rem; margin-bottom: 0.8rem; transition: 0.3s; }
+        .nav-item:hover { color: var(--accent-clay); padding-left: 5px; }
 
-        /* NAV */
-        nav {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 1.5rem 5%; border-bottom: 1px solid var(--terminal-dim);
-        }
-        .brand { font-size: 1.2rem; font-weight: 600; color: var(--terminal-green); }
-        .brand::before { content: '>'; margin-right: 10px; }
-        .back-link { text-decoration: none; color: var(--text-white); font-size: 0.9rem; }
-        .back-link:hover { color: var(--terminal-green); text-decoration: underline; }
-
-        /* HERO */
-        .hero {
-            min-height: 80vh;
-            display: flex; flex-direction: column; justify-content: center;
-            padding: 0 5%;
-            background-image: linear-gradient(var(--grid-line) 1px, transparent 1px),
-            linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-            background-size: 40px 40px;
+        /* MAIN CONTENT AREA */
+        main {
+            margin-left: 260px;
+            flex: 1;
+            padding: 4rem 10%;
         }
 
-        h1 { font-size: 3.5rem; color: var(--text-white); margin-bottom: 1rem; }
-        .cursor { display: inline-block; width: 20px; height: 5px; background: var(--terminal-green); animation: blink 1s infinite; }
+        .header-meta { font-size: 0.8rem; color: var(--accent-earth); font-weight: 700; text-transform: uppercase; margin-bottom: 1rem; }
+        h1 { font-family: 'Playfair Display', serif; font-size: 3.5rem; line-height: 1.1; margin-bottom: 2rem; color: var(--text-main); }
         
-        p.subtitle { color: var(--terminal-green); max-width: 600px; line-height: 1.8; margin-bottom: 3rem; }
-
-        /* SERVICES LIST */
-        .services { padding: 4rem 5%; border-top: 1px solid var(--terminal-dim); }
-        .service-item {
-            margin-bottom: 3rem;
-            padding-left: 20px;
-            border-left: 2px solid var(--terminal-dim);
+        .vision-text { 
+            font-size: 1.1rem; 
+            line-height: 1.8; 
+            color: #555; 
+            max-width: 750px; 
+            margin-bottom: 4rem;
+            border-left: 3px solid var(--border);
+            padding-left: 2rem;
         }
-        .service-item h3 { font-size: 1.5rem; margin-bottom: 0.5rem; color: white; }
-        .service-item p { color: #888; font-size: 0.9rem; max-width: 500px; }
 
-        /* FOOTER */
-        footer { padding: 3rem 5%; color: #444; font-size: 0.8rem; }
+        /* DASHBOARD GRID */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
 
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        .card {
+            background: white;
+            padding: 2rem;
+            border: 1px solid var(--border);
+            transition: transform 0.3s ease;
+        }
+        .card:hover { transform: translateY(-5px); border-color: var(--accent-earth); }
 
-        @media (max-width: 768px) { h1 { font-size: 2.2rem; } }
+        .card-num { font-size: 0.8rem; color: var(--accent-clay); font-weight: bold; margin-bottom: 1rem; display: block; }
+        .card h3 { margin-bottom: 1rem; font-size: 1.2rem; }
+        .card p { font-size: 0.95rem; color: #666; line-height: 1.6; }
+
+        footer { margin-top: 6rem; font-size: 0.8rem; color: #aaa; border-top: 1px solid var(--border); padding-top: 2rem; }
+
+        @media (max-width: 900px) {
+            aside { display: none; }
+            main { margin-left: 0; padding: 2rem; }
+            h1 { font-size: 2.5rem; }
+        }
     </style>
 </head>
 <body>
 
-    <nav>
-        <div class="brand">sys.root_access</div>
-        <a href="../../index.html" class="back-link">[ .. ] Back</a>
-    </nav>
-
-    <section class="hero">
-        <p style="color: #666; margin-bottom: 10px;">// Initializing Core Architecture...</p>
-        <h1>Building the Digital<br>Nervous System<span class="cursor"></span></h1>
-        <br>
-        <p class="subtitle">
-            Shoonya Systems engineers the fundamental software layers that power our conglomerate. From custom operating systems to military-grade encryption protocols.
-        </p>
-    </section>
-
-    <section class="services">
+    <aside>
+        <div class="logo">Shoonya.</div>
         
-        <div class="service-item">
-            <h3>01. Zero-Trust Architecture</h3>
-            <p>Developing cybersecurity frameworks where no device, user, or packet is trusted by default. Every byte is verified.</p>
+        <div class="nav-group">
+            <span class="nav-label">Core Ventures</span>
+            <a href="#" class="nav-item">Construct (Infra)</a>
+            <a href="#" class="nav-item">Sentinel (Defense)</a>
+            <a href="#" class="nav-item">Aura (Health)</a>
         </div>
 
-        <div class="service-item">
-            <h3>02. High-Performance Computing</h3>
-            <p>Designing the cloud infrastructure required to process Aether's data and Sentinel's video feeds in real-time.</p>
+        <div class="nav-group">
+            <span class="nav-label">Navigation</span>
+            <a href="../../index.html" class="nav-item">Root Directory</a>
+            <a href="#" class="nav-item">Systems Status</a>
+        </div>
+    </aside>
+
+    <main>
+        <div class="header-meta">Division: Shoonya Systems</div>
+        <h1>The Digital Backbone of Modern Infrastructure.</h1>
+        
+        <div class="vision-text">
+            Shoonya Systems is not just a software company; it is an architectural firm for the digital age. We engineer the invisible layers—encryption, automation, and core compute—that allow massive conglomerates to operate with biological precision.
         </div>
 
-        <div class="service-item">
-            <h3>03. Embedded Systems</h3>
-            <p>Writing low-level firmware for robotic actuators, drone flight controllers, and medical sensors.</p>
+        <div class="stats-grid">
+            <div class="card">
+                <span class="card-num">SYSTEM_01</span>
+                <h3>Zero-Trust Security</h3>
+                <p>We deploy proprietary encryption protocols designed for the high-stakes environments of defense and heavy industry. If a single byte is unverified, it does not pass.</p>
+            </div>
+
+            <div class="card">
+                <span class="card-num">SYSTEM_02</span>
+                <h3>Industrial Automation</h3>
+                <p>Bridging the gap between legacy hardware and modern AI. Our embedded systems breathe intelligence into robotic actuators and sensor arrays.</p>
+            </div>
+
+            <div class="card">
+                <span class="card-num">SYSTEM_03</span>
+                <h3>High-Volume Compute</h3>
+                <p>Processing the real-time data streams required for smart cities and global logistics. Scalable infrastructure built for 99.99% uptime.</p>
+            </div>
         </div>
 
-    </section>
-
-    <footer>
-        <p>Shoonya Systems > STATUS: ONLINE</p>
-    </footer>
+        <footer>
+            © 2026 Shoonya Origins | Established in Pune, India.
+        </footer>
+    </main>
 
 </body>
 </html>
