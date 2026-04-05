@@ -3,601 +3,354 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sarja Foundation Website Mockup</title>
+    <title>Sarja Foundation | Building Resilient Communities</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    
     <style>
-        /* Modern font stack for clean look */
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
-
-        /* Root variables for color palette */
         :root {
-            --bg-color-main: #f4eee1; /* warm beige */
-            --bg-color-header-footer: #fff; /* white */
-            --text-color: #333; /* dark charcoal */
-            --accent-primary-green: #4d6c4d; /* sage/olive green for one set of buttons and accent */
-            --accent-primary-orange: #d16b47; /* terracotta/burnt orange for donate and key actions */
-            --highlight-color: #f9f4ec; /* lighter beige for impact section */
-            --card-bg-color: #fff; /* white */
-            --browser-bar-bg: #eaecef; /* grey for browser tabs */
+            /* Calm Earth Palette */
+            --sage-green: #4A5D4E;
+            --clay: #B36A5E;
+            --sand: #F2E8CF;
+            --stone: #7D7D7D;
+            --deep-earth: #2C332D;
+            --bone-white: #FCFAf7;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            margin: 0;
-            padding: 0;
-            background-color: #e5e5e5; /* surrounding desk/office environment */
-            font-family: 'Poppins', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bone-white);
+            color: var(--deep-earth);
+            line-height: 1.6;
+            overflow-x: hidden;
         }
 
-        /* --- Desk Setup with iMac --- */
-        .desk-setup {
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: flex-end; /* iMac sits on the desk */
-            width: 100%;
-            height: 100vh;
-            overflow: hidden;
-            background: radial-gradient(circle, #f9f9f9 0%, #e9e9e9 100%); /* soft office lighting */
-        }
-
-        /* Office items on the desk */
-        .desk-setup .pencils {
-            position: absolute;
-            bottom: 30px;
-            left: 5%;
-            font-size: 80px;
-            color: #777;
-            transform: rotate(-10deg);
-        }
-        .desk-setup .plant {
-            position: absolute;
-            bottom: 20px;
-            right: 5%;
-            font-size: 80px;
-            color: #777;
-        }
-
-        /* iMac monitor frame */
-        .imac-frame {
-            position: relative;
-            width: 80vw;
-            height: calc(80vw * 0.7); /* Apple large screen ratio */
-            background-color: #fff;
-            border-radius: 40px;
-            box-shadow: 0 50px 100px rgba(0,0,0,0.3);
-            border: 2px solid #ccc;
-            overflow: hidden; /* contain the screen content */
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Screen area for the website */
-        .imac-screen {
-            flex-grow: 1;
-            background-color: #fcfcfc;
-            margin: 15px; /* bezel on sides */
-            margin-bottom: 30px; /* bottom bezel is larger for Apple logo, which we'll placeholder */
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        /* Browser top bar */
-        .browser-window-header {
-            height: 40px;
-            background-color: var(--browser-bar-bg);
-            border-bottom: 1px solid #ccc;
-            display: flex;
-            align-items: center;
-            padding: 0 15px;
-            gap: 15px;
-        }
-        .browser-window-header .dots {
-            display: flex;
-            gap: 5px;
-        }
-        .browser-window-header .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-        }
-        .browser-window-header .dot.red { background-color: #ff5f56; }
-        .browser-window-header .dot.yellow { background-color: #ffbd2e; }
-        .browser-window-header .dot.green { background-color: #27c93f; }
-
-        .browser-window-header .tab-bar {
-            display: flex;
-            gap: 5px;
-            flex-grow: 1;
-        }
-        .browser-window-header .tab {
-            background-color: #fff;
-            border: 1px solid #ccc;
-            padding: 3px 15px;
-            border-radius: 5px;
-            font-size: 11px;
-            color: #333;
-        }
-        .browser-window-header .tab.active {
-            background-color: #fff;
-            border-bottom: 1px solid #fff; /* overlap active tab with screen */
-        }
-        .browser-window-header .url-bar {
-            background-color: #fff;
-            border: 1px solid #ccc;
-            padding: 3px 10px;
-            border-radius: 5px;
-            font-size: 11px;
-            color: #777;
-            width: 250px;
-        }
-        .browser-window-header .search-icon {
-            font-size: 12px;
-            color: #777;
-        }
-
-        /* --- Website Content --- */
-        .website-content {
-            flex-grow: 1;
-            background-color: var(--bg-color-main);
-            overflow-y: scroll; /* simulate website scrolling */
-            color: var(--text-color);
-        }
-
-        /* Global containers */
-        .container {
-            width: 90%;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        /* Header section */
-        header {
-            background-color: var(--bg-color-header-footer);
-            padding: 15px 0;
-            border-bottom: 1px solid #eaecef;
-        }
-        header .container {
+        /* --- Navigation --- */
+        nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 1.5rem 10%;
+            background: rgba(252, 250, 247, 0.95);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(74, 93, 78, 0.1);
         }
-        .logo-group {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
+
         .logo {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 24px;
-            color: var(--accent-primary-green);
-        }
-        .foundation-name {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 22px;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
             font-weight: 700;
-            color: var(--text-color);
-            line-height: 1;
+            color: var(--sage-green);
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
         }
-        .foundation-sub {
-            font-size: 11px;
-            color: #777;
-            margin-top: 2px;
+
+        .logo span {
+            font-size: 0.7rem;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 2px;
+            color: var(--stone);
         }
 
         nav ul {
-            margin: 0;
-            padding: 0;
-            list-style: none;
             display: flex;
-            gap: 30px;
+            list-style: none;
+            gap: 2.5rem;
         }
+
         nav ul li a {
             text-decoration: none;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-color);
-        }
-        .donate-btn-top {
-            background-color: var(--accent-primary-orange);
-            color: #fff;
-            border: none;
-            padding: 10px 25px;
-            border-radius: 50px;
-            font-size: 13px;
+            color: var(--deep-earth);
             font-weight: 600;
-            cursor: pointer;
+            font-size: 0.9rem;
+            transition: var(--transition);
         }
 
-        /* Hero section */
+        nav ul li a:hover {
+            color: var(--clay);
+        }
+
+        .btn-donate {
+            background-color: var(--clay);
+            color: white;
+            padding: 0.8rem 1.8rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(179, 106, 94, 0.2);
+            transition: var(--transition);
+        }
+
+        .btn-donate:hover {
+            transform: translateY(-2px);
+            background-color: #9e5a4f;
+        }
+
+        /* --- Hero Section --- */
         .hero {
-            background-color: var(--highlight-color);
-            padding: 60px 0;
-            position: relative;
-        }
-        .hero-img-placeholder {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('https://via.placeholder.com/1600x600?text=Sarja+Foundation+Impact+Image'); /* placeholder for full width image */
-            background-size: cover;
-            background-position: center;
-            opacity: 0.1; /* very faint overlay as in original */
-            z-index: 1;
-        }
-        .hero .container {
-            position: relative;
-            z-index: 2;
-            text-align: center;
-        }
-        .hero h1 {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 42px;
-            font-weight: 700;
-            color: var(--text-color);
-            margin: 0;
-            line-height: 1.1;
-        }
-        .hero h2 {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 42px;
-            font-weight: 700;
-            color: var(--text-color);
-            margin: 0;
-            margin-bottom: 15px;
-            line-height: 1.1;
-        }
-        .hero p {
-            font-size: 15px;
-            color: #555;
-            max-width: 700px;
-            margin: 0 auto;
-            margin-bottom: 30px;
-        }
-        .hero-buttons {
+            height: 85vh;
             display: flex;
+            align-items: center;
             justify-content: center;
-            gap: 20px;
-        }
-        .hero-btn {
-            border: none;
-            padding: 12px 35px;
-            border-radius: 50px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        .hero-btn.green {
-            background-color: var(--accent-primary-green);
-            color: #fff;
-        }
-        .hero-btn.orange {
-            background-color: var(--accent-primary-orange);
-            color: #fff;
+            text-align: center;
+            padding: 0 10%;
+            background: linear-gradient(rgba(44, 51, 45, 0.4), rgba(44, 51, 45, 0.4)), 
+                        url('https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&q=80&w=2070') center/cover;
+            color: white;
         }
 
-        /* Programs grid */
-        .programs {
-            padding: 60px 0;
-            background-color: var(--bg-color-main);
+        .hero-content h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
         }
-        .programs-grid {
+
+        .hero-content p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            font-weight: 300;
+        }
+
+        /* --- Impact Stats --- */
+        .stats-bar {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
-        }
-        .program-card {
-            background-color: var(--card-bg-color);
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            background: var(--sage-green);
+            color: var(--sand);
+            padding: 3rem 10%;
             text-align: center;
-            position: relative;
+        }
+
+        .stat-item h3 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* --- Pillars of Service --- */
+        .section {
+            padding: 6rem 10%;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: var(--sage-green);
+            margin-bottom: 1rem;
+        }
+
+        .pillars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .pillar-card {
+            background: white;
+            padding: 3rem 2rem;
+            border-radius: 8px;
+            border-bottom: 4px solid var(--sand);
+            transition: var(--transition);
+        }
+
+        .pillar-card:hover {
+            transform: translateY(-10px);
+            border-bottom-color: var(--clay);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+        }
+
+        .pillar-card h4 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            color: var(--sage-green);
+        }
+
+        /* --- Transparency Section --- */
+        .transparency {
+            background-color: var(--sand);
+            border-radius: 12px;
+            padding: 3rem;
             display: flex;
-            flex-direction: column;
             align-items: center;
+            gap: 3rem;
         }
-        .program-card .icon-placeholder {
-            font-size: 40px;
-            color: var(--accent-primary-green);
-            margin-bottom: 15px;
-        }
-        .program-card .child-illustration-placeholder {
-            width: 100%;
-            height: 120px;
-            background-image: url('https://via.placeholder.com/300x120?text=Program+Illustration');
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-            margin-bottom: 20px;
-        }
-        .program-card h3 {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 20px;
+
+        .transparency-text { flex: 2; }
+        .transparency-badges { flex: 1; display: flex; gap: 1rem; }
+
+        .badge {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.8rem;
             font-weight: 600;
-            color: var(--accent-primary-green);
-            margin: 0;
-            margin-bottom: 10px;
-        }
-        .program-card p {
-            font-size: 13px;
-            color: #666;
-            margin: 0;
-            line-height: 1.5;
+            color: var(--sage-green);
+            border: 1px solid rgba(74, 93, 78, 0.2);
         }
 
-        /* Impact stats */
-        .impact-stats {
-            background-color: var(--highlight-color);
-            padding: 50px 0;
-        }
-        .impact-stats .container {
-            display: flex;
-            justify-content: center;
-            gap: 50px;
-        }
-        .stat-group {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .stat-illustration-placeholder {
-            font-size: 40px;
-            color: var(--accent-primary-orange);
-        }
-        .stat-details {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-        .stat-details .number {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--text-color);
-            line-height: 1;
-        }
-        .stat-details .description {
-            font-size: 12px;
-            color: #555;
-            text-transform: uppercase;
-        }
-
-        /* Success Stories */
-        .stories {
-            padding: 60px 0;
-            background-color: var(--bg-color-main);
-        }
-        .stories h2 {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 26px;
-            font-weight: 700;
-            color: var(--text-color);
-            margin: 0;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        .stories p.description {
-            font-size: 14px;
-            color: #666;
-            max-width: 600px;
-            margin: 0 auto;
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        .stories-container {
-            display: flex;
-            justify-content: space-around;
-            gap: 20px;
-        }
-        .story-item {
-            text-align: center;
-            width: calc(33% - 20px);
-        }
-        .story-portrait-placeholder {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background-image: url('https://via.placeholder.com/100x100?text=Portrait');
-            background-size: cover;
-            background-position: center;
-            margin: 0 auto;
-            margin-bottom: 15px;
-        }
-        .story-item p.quote {
-            font-size: 12px;
-            font-style: italic;
-            color: #777;
-            line-height: 1.4;
-        }
-
-        /* Be Part Of Change */
-        .get-involved {
-            background-color: var(--bg-color-header-footer);
-            padding: 60px 0;
-            position: relative;
-        }
-        .get-involved .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .get-involved .text-group {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-        .get-involved .interlinked-figures-placeholder {
-            font-size: 40px;
-            color: var(--accent-primary-orange);
-        }
-        .get-involved h2 {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 26px;
-            font-weight: 700;
-            color: var(--text-color);
-            margin: 0;
-        }
-        .get-involved button {
-            background-color: var(--accent-primary-orange);
-            color: #fff;
-            border: none;
-            padding: 12px 35px;
-            border-radius: 50px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        /* Footer */
+        /* --- Footer --- */
         footer {
-            background-color: var(--bg-color-header-footer);
-            padding: 40px 0;
-            border-top: 1px solid #eaecef;
-        }
-        footer .container {
-            display: flex;
-            justify-content: space-between;
-            gap: 30px;
-        }
-        footer .logo-col {
-            width: 30%;
-        }
-        footer .info-col {
-            width: 30%;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            font-size: 12px;
-            color: #777;
-        }
-        footer .social-col {
-            width: 30%;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        footer h4 {
-            font-size: 13px;
-            margin: 0;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-        }
-        footer .social-icons {
-            display: flex;
-            gap: 15px;
-        }
-        footer .partners-group {
-            display: flex;
-            gap: 10px;
-        }
-        .partner-logo-placeholder {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background-color: #eee;
-            font-size: 14px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #aaa;
-        }
-        .copyright {
-            text-align: center;
-            font-size: 11px;
-            color: #999;
-            margin-top: 30px;
+            background: var(--deep-earth);
+            color: var(--sand);
+            padding: 5rem 10% 2rem;
         }
 
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 4rem;
+            margin-bottom: 4rem;
+        }
+
+        .footer-col h5 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-col p, .footer-col li {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(242, 232, 207, 0.1);
+            padding-top: 2rem;
+            text-align: center;
+            font-size: 0.8rem;
+            opacity: 0.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav ul { display: none; }
+            .hero-content h1 { font-size: 2.5rem; }
+            .footer-grid { grid-template-columns: 1fr; }
+            .transparency { flex-direction: column; text-align: center; }
+            .stats-bar { grid-template-columns: 1fr; gap: 2rem; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="desk-setup">
-        <div class="pencils">✏️</div>
-        <div class="plant">🌿</div>
+    <nav>
+        <a href="#" class="logo">
+            SARJA FOUNDATION
+            <span>REGISTERED TRUST • INDIA</span>
+        </a>
+        <ul>
+            <li><a href="#about">Our Vision</a></li>
+            <li><a href="#impact">Pillars</a></li>
+            <li><a href="#contact">Transparency</a></li>
+        </ul>
+        <a href="#" class="btn-donate">Support Our Cause</a>
+    </nav>
 
-        <div class="imac-frame">
-            <div class="imac-screen">
-                <div class="browser-window-header">
-                    <div class="dots">
-                        <div class="dot red"></div>
-                        <div class="dot yellow"></div>
-                        <div class="dot green"></div>
-                    </div>
-                    <div class="tab-bar">
-                        <div class="tab">Sarja Foundation | Indian NGO</div>
-                        <div class="tab active">OUR IMPACT</div>
-                        <div class="tab">+</div>
-                    </div>
-                    <div class="url-bar">sarjafoundation.com</div>
-                    <div class="search-icon">🔍</div>
-                </div>
+    <header class="hero">
+        <div class="hero-content">
+            <h1>Rooted in Empathy.<br>Driven by Change.</h1>
+            <p>A registered non-profit trust dedicated to uplifting underserved communities through sustainable education and healthcare initiatives.</p>
+            <a href="#about" class="btn-donate" style="background: transparent; border: 2px solid white;">Learn More</a>
+        </div>
+    </header>
 
-                <div class="website-content">
-                    <header>
-                        <div class="container">
-                            <div class="logo-group">
-                                <div class="logo">🤝</div> <div class="text-group">
-                                    <div class="foundation-name">SARJA FOUNDATION</div>
-                                    <div class="foundation-sub">Registered NGO/Trust, India</div>
-                                </div>
-                            </div>
-                            <nav>
-                                <ul>
-                                    <li><a href="#home">HOME</a></li>
-                                    <li><a href="#about">ABOUT US</a></li>
-                                    <li><a href="#programs">OUR PROGRAMS</a></li>
-                                    <li><a href="#impact">IMPACT</a></li>
-                                </ul>
-                            </nav>
-                            <button class="donate-btn-top">DONATE NOW</button>
-                        </div>
-                    </header>
+    <section class="stats-bar">
+        <div class="stat-item">
+            <h3>12+</h3>
+            <p>Active Projects</p>
+        </div>
+        <div class="stat-item">
+            <h3>5,000+</h3>
+            <p>Lives Impacted</p>
+        </div>
+        <div class="stat-item">
+            <h3>100%</h3>
+            <p>Transparency</p>
+        </div>
+    </section>
 
-                    <main>
-                        <section class="hero">
-                            <div class="hero-img-placeholder"></div>
-                            <div class="container">
-                                <h1>EMPOWERING COMMUNITIES.</h1>
-                                <h2>BUILDING A BRIGHTER INDIA.</h2>
-                                <p>Supporting education, healthcare, and sustainable livelihoods for under-served populations across India.</p>
-                                <div class="hero-buttons">
-                                    <button class="hero-btn green">OUR IMPACT</button>
-                                    <button class="hero-btn orange">DONATE TODAY</button>
-                                </div>
-                            </div>
-                        </section>
+    <section class="section" id="about">
+        <div class="section-title">
+            <h2>Our Core Pillars</h2>
+            <p>How Sarja Foundation creates lasting social impact.</p>
+        </div>
+        <div class="pillars-grid">
+            <div class="pillar-card">
+                <h4>Inclusive Education</h4>
+                <p>Bridging the gap for children in remote areas by providing digital resources and foundational tutoring.</p>
+            </div>
+            <div class="pillar-card">
+                <h4>Community Health</h4>
+                <p>Organizing mobile clinics and mental health awareness programs for labor-intensive communities.</p>
+            </div>
+            <div class="pillar-card">
+                <h4>Livelihood Support</h4>
+                <p>Vocational training for women and youth to foster financial independence and dignity.</p>
+            </div>
+        </div>
+    </section>
 
-                        <section id="programs" class="programs">
-                            <div class="container">
-                                <div class="programs-grid">
-                                    <div class="program-card">
-                                        <div class="icon-placeholder">📚</div>
-                                        <div class="child-illustration-placeholder"></div>
-                                        <h3>EDUCATION</h3>
-                                        <p>Providing foundational literacy, vocational training, and creative learning opportunities to enable a brighter future for children in need.</p>
-                                    </div>
-                                    <div class="program-card">
-                                        <div class="icon-placeholder">❤️</div>
-                                        <div class="child-illustration-placeholder"></div>
-                                        <h3>HEALTHCARE</h3>
-                                        <p>Delivering accessible medical care, health education, and essential support to improve well-being and life expectancy.</p>
-                                    </div>
-                                    <div class="program-card">
-                                        <div class="icon-placeholder">🌱</div>
-                                        <div class="child-illustration-placeholder"></div>
-                                        <h3>LIVELIHOODS</h3>
-                                        <p>Equipping individuals with essential skills, mentoring, and sustainable income-generating opportunities for economic self-sufficiency.</p>
-                                    </div
+    <section class="section" style="padding-top: 0;">
+        <div class="transparency">
+            <div class="transparency-text">
+                <h3 style="font-family: 'Playfair Display'; font-size: 1.8rem; margin-bottom: 1rem;">Trust & Accountability</h3>
+                <p>As a registered Indian Trust, we maintain the highest standards of financial integrity. All our annual reports and audit statements are available for public review to ensure your contributions reach those in need.</p>
+            </div>
+            <div class="transparency-badges">
+                <div class="badge">Section 80G<br>Tax Exempt</div>
+                <div class="badge">12A<br>Certified</div>
+                <div class="badge">NITI Aayog<br>Darpan Reg.</div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h5>Sarja Foundation</h5>
+                <p>Empowering the marginalized through structured intervention and compassionate outreach. Registered under the Indian Trusts Act, 1882.</p>
+            </div>
+            <div class="footer-col">
+                <h5>Quick Links</h5>
+                <ul style="list-style: none;">
+                    <li>About Our Trustees</li>
+                    <li>Annual Reports</li>
+                    <li>Volunteer With Us</li>
+                    <li>Privacy Policy</li>
+                </ul>
+            </div>
+            <div class="footer-col" id="contact">
+                <h5>Contact Us</h5>
+                <p>Head Office: Pune/Nanded, Maharashtra</p>
+                <p>Email: contact@sarjafoundation.org</p>
+                <p>Phone: +91 (0) 20 XXXX XXXX</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2026 Sarja Foundation. All donations are tax-exempt under section 80G of the Income Tax Act.
+        </div>
+    </footer>
+
+</body>
+</html>
