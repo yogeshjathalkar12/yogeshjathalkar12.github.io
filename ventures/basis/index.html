@@ -10,6 +10,10 @@
 
   gtag('config', 'G-XV0W5ZV0RQ');
 </script>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Basis — Urban Intelligence Platform</title>
@@ -459,6 +463,19 @@ html[data-theme="dark"] .status-soon   { background: rgba(245,158,11,0.12); }
   font-family: var(--font-display); font-size: 40px; font-weight: 700;
   color: var(--heading); margin-bottom: 8px;
 }
+#map {
+  height: 250px;
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 18px;
+  border: 1px solid var(--border2);
+  z-index: 1; /* Keep it below the header */
+}
+.leaflet-container {
+  background: var(--surface) !important;
+  font-family: var(--font-body);
+}
+
 .city-card h4 {
   font-family: var(--font-mono); font-size: 10px; color: var(--muted);
   letter-spacing: 3px; text-transform: uppercase; margin-bottom: 20px; font-weight: 400;
@@ -937,6 +954,12 @@ footer { border-top: 1px solid var(--border); padding: 56px 0 32px; background: 
         </div>
 
         <div class="form-group">
+                <label class="form-label">Location Picker</label>
+                <div id="map"></div> 
+                <input type="text" class="form-control" id="locationInput" placeholder="Or type landmark here..." />
+        </div>
+
+        <div class="form-group">
           <label class="form-label">Location / Landmark</label>
           <input type="text" class="form-control" placeholder="e.g. Near Dadar station, Mumbai" />
         </div>
@@ -1131,31 +1154,88 @@ function animateCounters() {
   });
 }
 animateCounters();
+// ─── MAP & BACKEND INTEGRATION ─────────────────────────────────
+let selectedFile = null;
+let marker;
+let currentCoords = { lat: 18.5204, lng: 73.8567 }; // Default: Pune
+const workerUrl = "https://spring-mud-eaa0shoonya-api.yogeshjathalkar.workers.dev/";
 
-// Upload area interaction
-document.querySelector('.upload-area').addEventListener('click', () => {
-  const input = document.createElement('input');
-  input.type = 'file'; input.accept = 'image/*';
-  input.onchange = e => {
-    const file = e.target.files[0];
-    if (file) {
-      const area = document.querySelector('.upload-area');
-      area.innerHTML = `<span class="upload-icon">✅</span><p class="upload-text"><strong>${file.name}</strong><br/>Ready to submit</p>`;
-      area.style.borderColor = 'var(--safe)';
-    }
-  };
-  input.click();
+// 1. Initialize Leaflet Map
+const map = L.map('map').setView([19.0760, 72.8777], 11); // Center on Mumbai initially
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap'
+}).addTo(map);
+
+// Add a draggable marker
+marker = L.marker([19.0760, 72.8777], { draggable: true }).addTo(map);
+
+// Try to find the user's real location to center the map
+map.locate({setView: true, maxZoom: 16});
+
+map.on('locationfound', (e) => {
+    marker.setLatLng(e.latlng);
+    currentCoords = { lat: e.latlng.lat, lng: e.latlng.lng };
 });
 
-// Submit button demo
-document.querySelector('.btn-primary[style]').addEventListener('click', function() {
-  this.textContent = '✓ Submitted — Thank you';
-  this.style.background = 'var(--safe)';
-  this.style.boxShadow = '0 0 30px rgba(16,185,129,0.3)';
-  setTimeout(() => {
-    this.textContent = 'Submit Anonymously →';
-    this.style.background = ''; this.style.boxShadow = '';
-  }, 3000);
+// Update coords when marker is dragged
+marker.on('dragend', function(e) {
+    const position = marker.getLatLng();
+    currentCoords = { lat: position.lat, lng: position.lng };
+});
+
+// 2. Handle file selection
+document.querySelector('.upload-area').addEventListener('click', () => {
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = 'image/*';
+    input.onchange = e => {
+        selectedFile = e.target.files[0];
+        if (selectedFile) {
+            const area = document.querySelector('.upload-area');
+            area.innerHTML = `<span class="upload-icon">✅</span><p class="upload-text"><strong>${selectedFile.name}</strong><br/>Ready</p>`;
+            area.style.borderColor = 'var(--safe)';
+        }
+    };
+    input.click();
+});
+
+// 3. Submit to Cloudflare & Supabase
+document.querySelector('.btn-primary[style*="width:100%"]').addEventListener('click', async function() {
+    const btn = this;
+    const forms = document.querySelectorAll('.form-control');
+    
+    const city = forms[0].value;
+    const issueType = forms[1].value;
+    const locationText = forms[2].value;
+
+    if (!selectedFile || !city || !issueType) {
+        alert("Missing Data: Need Photo, City, and Issue Type.");
+        return;
+    }
+
+    btn.textContent = 'Transmitting Data...';
+    btn.disabled = true;
+
+    const formData = new FormData();
+    formData.append("image", selectedFile);
+    formData.append("city", city);
+    formData.append("issueType", issueType);
+    formData.append("location", locationText);
+    formData.append("lat", currentCoords.lat);
+    formData.append("lng", currentCoords.lng);
+
+    try {
+        const response = await fetch(workerUrl, { method: "POST", body: formData });
+        if (response.ok) {
+            btn.textContent = '✓ Reported to Basis';
+            btn.style.background = 'var(--safe)';
+            setTimeout(() => { location.reload(); }, 3000); // Reload to reset
+        } else { throw new Error(); }
+    } catch (e) {
+        btn.textContent = 'Error - Try Again';
+        btn.style.background = 'var(--danger)';
+        btn.disabled = false;
+    }
 });
 </script>
 </body>
