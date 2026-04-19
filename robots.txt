@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://shoonyaorigins.com/sitemap.xml
