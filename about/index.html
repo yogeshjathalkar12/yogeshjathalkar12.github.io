@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XV0W5ZV0RQ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XV0W5ZV0RQ');
+    </script>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About | Shoonya Origins - High-Stakes Systems Engineering</title>
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        /* =========================================
+           1. THEME VARIABLES & SETUP (STRICT TEMPLATE MATCH)
+           ========================================= */
+        :root {
+            --primary: #673de6; 
+            --accent-glow: rgba(103, 61, 230, 0.3);
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --bg-gradient: linear-gradient(135deg, #f8f9ff 0%, #eef1ff 100%);
+            --header-bg: rgba(255, 255, 255, 0.85);
+            --card-bg: rgba(255, 255, 255, 0.6);
+            --card-border: rgba(255, 255, 255, 0.5);
+            --shadow: 0 20px 50px rgba(0,0,0,0.1);
+            --blur-overlay: radial-gradient(circle at 50% 110%, rgba(255, 255, 255, 1) 25%, rgba(255, 255, 255, 0.9) 45%, rgba(255, 255, 255, 0.5) 65%, rgba(255, 255, 255, 0) 85%);
+            --bulb-color: #cbd5e1; 
+            --bulb-glow: none;
+            --btn-text: #673de6; 
+            --btn-text-filled: #ffffff;
+        }
+
+        body.dark-mode {
+            --primary: #fbbf24;
+            --accent-glow: rgba(251, 191, 36, 0.25);
+            --text-dark: #fefce8;
+            --text-light: #9ca3af;
+            --bg-gradient: linear-gradient(135deg, #0c0a09 0%, #1c1917 100%);
+            --header-bg: rgba(12, 10, 9, 0.85);
+            --card-bg: rgba(28, 25, 23, 0.6);
+            --card-border: rgba(251, 191, 36, 0.1);
+            --blur-overlay: radial-gradient(circle at 50% 110%, rgba(12, 10, 9, 1) 25%, rgba(12, 10, 9, 0.9) 45%, rgba(12, 10, 9, 0.5) 65%, rgba(12, 10, 9, 0) 85%);
+            --bulb-color: #ffaa00;
+            --bulb-glow: drop-shadow(0 0 15px rgba(255, 170, 0, 0.8));
+            --btn-text: #fbbf24;
+            --btn-text-filled: #1c1917;
+        }
+
+        html { scroll-behavior: smooth; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background 1.5s ease, color 1.5s ease;
+        }
+
+        .lamp-container { position: fixed; top: 0; right: 10%; z-index: 1000; display: flex; flex-direction: column; align-items: center; }
+        .wire { width: 2px; height: 60px; background: #475569; }
+        .bulb { width: 40px; height: 40px; background: var(--bulb-color); border-radius: 50%; border: 2px solid #475569; filter: var(--bulb-glow); transition: all 0.3s ease; position: relative; z-index: 2; }
+        .socket { width: 20px; height: 15px; background: #334155; margin: 0 auto -5px; position: relative; z-index: 1; border-radius: 2px; }
+        .pull-string { width: 1px; height: 60px; background: #94a3b8; margin: 0 auto; position: relative; top: -2px; cursor: pointer; transition: height 0.2s; }
+        .knob { width: 8px; height: 14px; background: #64748b; border-radius: 4px; position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%); }
+        .lamp-container:active .pull-string, .lamp-container.pulled .pull-string { height: 85px; }
+
+        header { background: var(--header-bg); backdrop-filter: blur(10px); padding: 1.5rem 5%; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px; transition: color 1.5s ease; cursor: pointer; }
+        .logo span { color: var(--primary); }
+
+        .hero-section { padding: 8rem 20px 4rem; text-align: center; }
+        h1 { font-size: 3.5rem; color: var(--text-dark); margin-bottom: 1.5rem; line-height: 1.1; font-weight: 800; }
+        .gradient-text { background: linear-gradient(135deg, #673de6 0%, #2f2f2f 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        body.dark-mode .gradient-text { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); -webkit-background-clip: text; }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px 6rem; }
+        
+        .story-block { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 24px; padding: 4rem; margin-bottom: 4rem; backdrop-filter: blur(10px); }
+        .story-title { font-size: 2.2rem; margin-bottom: 1.5rem; color: var(--text-dark); font-weight: 800; }
+        .story-text { font-size: 1.1rem; line-height: 1.8; color: var(--text-dark); margin-bottom: 1.5rem; opacity: 0.9; }
+
+        .philosophy-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        .p-card { background: var(--card-bg); border: 1px solid var(--card-border); padding: 2.5rem; border-radius: 20px; transition: all 0.4s ease; border-left: 4px solid var(--primary); }
+        .p-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px var(--accent-glow); }
+        .p-title { font-size: 1.3rem; font-weight: 800; margin-bottom: 1rem; color: var(--text-dark); text-transform: uppercase; letter-spacing: 1px; }
+
+        .section-label { text-align: center; text-transform: uppercase; letter-spacing: 2px; font-size: 0.85rem; color: var(--primary); font-weight: 700; margin-bottom: 2rem; display: block; }
+
+        footer { background: #0b0f19; color: #a0a0a5; padding: 4rem 20px; text-align: center; }
+        .footer-links { margin: 2rem 0; display: flex; justify-content: center; gap: 2rem; }
+        .footer-links a { color: white; text-decoration: none; font-weight: 600; }
+
+        #gameCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background: #000; cursor: none; display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="lamp-container" id="lightSwitch">
+        <div class="wire"></div>
+        <div class="socket"></div>
+        <div class="bulb"></div>
+        <div class="pull-string"><div class="knob"></div></div>
+    </div>
+
+    <header data-aos="fade-down">
+        <div class="logo" id="logoTrigger">Shoonya<span>Origins</span></div>
+    </header>
+
+    <section class="hero-section">
+        <p style="color: var(--text-light); font-size: 1.1rem; max-width: 650px; margin: 0 auto; font-weight: 500;" data-aos="fade-up" data-aos-delay="200">
+            A deep-tech ecosystem engineered for adaptation, creation, and the solving of mission-critical global challenges.
+        </p>
+    </section>
+
+    <div class="container">
+        <div class="story-block" data-aos="fade-up">
+            <span class="section-label">Executive Overview</span>
+            <h2 class="story-title">Systems Engineering from First Principles.</h2>
+            <p class="story-text">
+                Shoonya Origins is a systems integration firm  focused on high-stakes sectors. From unmanned defense systems and quantum-ready hardware to autonomous urban management, our operations are defined by technical rigor and the removal of secondary dependencies.
+            </p>
+            <p class="story-text">
+                Our approach is rooted in **Operational Adaptation**. We build modular technologies that evolve in real-time, providing resilience in environments where failure is not an option. By integrating Computer Vision, GPS, and sensor fusion, we create unified intelligence layers for complex physical infrastructure.
+            </p>
+        </div>
+
+        <span class="section-label" data-aos="fade-in">Core Operational Vectors</span>
+        <div class="philosophy-grid">
+            <div class="p-card" data-aos="zoom-in" data-aos-delay="100">
+                <h3 class="p-title">Mission-Critical Security</h3>
+                <p style="color: var(--text-light);">Development of autonomous unmanned systems and tactical computing environments designed for persistent surveillance and defense-grade stability.</p>
+            </div>
+            <div class="p-card" data-aos="zoom-in" data-aos-delay="200">
+                <h3 class="p-title">Adaptive Infrastructure</h3>
+                <p style="color: var(--text-light);">Engineering self-correcting systems for smart cities and heavy industries, focused on sustainable automation and long-term asset management.</p>
+            </div>
+            <div class="p-card" data-aos="zoom-in" data-aos-delay="300">
+                <h3 class="p-title">Sovereign Strategic Utility</h3>
+                <p style="color: var(--text-light);">Deployment of open-access intelligence tools to democratize advanced calculation, ensuring that professional-grade logic is a universal utility.</p>
+            </div>
+        </div>
+
+        <div class="story-block" style="margin-top: 4rem; text-align: center;" data-aos="fade-up">
+            <h2 class="story-title">Advancing Global Operational Capacity</h2>
+            <p class="story-text" style="max-width: 800px; margin: 0 auto;">
+                Shoonya Origins exists to solve problems at their point of origin. By focusing on humane practices and sustainable engineering, we provide the technical foundation required for a high-functioning, secure, and intelligent global future.
+            </p>
+        </div>
+    </div>
+
+    <footer>
+        <div class="logo" style="color: white; margin-bottom: 1rem;">Shoonya<span>Origins</span></div>
+        <div class="footer-links">
+            <a href="index.html">Home</a>
+            <a href="mailto:yogeshjathalkar@gmail.com">Mail Us </a>
+            <a href="https://linkedin.com" target="_blank">LinkedIn</a>
+        </div>
+        <p>&copy; 2026 Shoonya Origins. All Rights Reserved.</p>
+        <p style="font-size: 0.8rem; margin-top: 1rem; opacity: 0.4;">Pune Headquarters | Mission-Critical Systems</p>
+    </footer>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 800, once: true });
+        
+        const switchElement = document.getElementById('lightSwitch');
+        switchElement.addEventListener('click', () => {
+            switchElement.classList.add('pulled');
+            setTimeout(() => {
+                document.body.classList.toggle('dark-mode');
+                switchElement.classList.remove('pulled');
+            }, 250);
+        });
+
+        // Template Game Trigger
+        const logoTrigger = document.getElementById('logoTrigger');
+        let clickCount = 0;
+        logoTrigger.addEventListener('click', () => {
+            clickCount++;
+            setTimeout(() => { clickCount = 0; }, 1000);
+            if (clickCount >= 5) { document.body.classList.add('active-game'); }
+        });
+    </script>
+</body>
+</html>
