@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XV0W5ZV0RQ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XV0W5ZV0RQ');
+    </script>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Log | Shoonya Origins - High-Stakes Systems Engineering</title>
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #673de6; 
+            --accent-glow: rgba(103, 61, 230, 0.3);
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --bg-gradient: linear-gradient(135deg, #f8f9ff 0%, #eef1ff 100%);
+            --header-bg: rgba(255, 255, 255, 0.85);
+            --card-bg: rgba(255, 255, 255, 0.6);
+            --card-border: rgba(255, 255, 255, 0.5);
+            --shadow: 0 20px 50px rgba(0,0,0,0.1);
+            --bulb-color: #cbd5e1; 
+            --bulb-glow: none;
+        }
+
+        body.dark-mode {
+            --primary: #fbbf24;
+            --accent-glow: rgba(251, 191, 36, 0.25);
+            --text-dark: #fefce8;
+            --text-light: #9ca3af;
+            --bg-gradient: linear-gradient(135deg, #0c0a09 0%, #1c1917 100%);
+            --header-bg: rgba(12, 10, 9, 0.85);
+            --card-bg: rgba(28, 25, 23, 0.6);
+            --card-border: rgba(251, 191, 36, 0.1);
+            --bulb-color: #ffaa00;
+            --bulb-glow: drop-shadow(0 0 15px rgba(255, 170, 0, 0.8));
+        }
+
+        html { scroll-behavior: smooth; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            transition: background 1.5s ease, color 1.5s ease;
+        }
+
+        /* LAMP SWITCH */
+        .lamp-container { position: fixed; top: 0; right: 10%; z-index: 1000; display: flex; flex-direction: column; align-items: center; }
+        .wire { width: 2px; height: 60px; background: #475569; }
+        .bulb { width: 40px; height: 40px; background: var(--bulb-color); border-radius: 50%; border: 2px solid #475569; filter: var(--bulb-glow); transition: all 0.3s ease; position: relative; z-index: 2; }
+        .socket { width: 20px; height: 15px; background: #334155; margin: 0 auto -5px; position: relative; z-index: 1; border-radius: 2px; }
+        .pull-string { width: 1px; height: 60px; background: #94a3b8; margin: 0 auto; position: relative; top: -2px; cursor: pointer; transition: height 0.2s; }
+        .knob { width: 8px; height: 14px; background: #64748b; border-radius: 4px; position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%); }
+        .lamp-container:active .pull-string, .lamp-container.pulled .pull-string { height: 85px; }
+
+        header { background: var(--header-bg); backdrop-filter: blur(10px); padding: 1.5rem 5%; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px; text-decoration: none; }
+        .logo span { color: var(--primary); }
+
+        .hero-section { padding: 8rem 20px 4rem; text-align: center; }
+        h1 { font-size: 3.5rem; color: var(--text-dark); margin-bottom: 1.5rem; line-height: 1.1; font-weight: 800; }
+        
+        .container { max-width: 900px; margin: 0 auto; padding: 0 20px 6rem; }
+        
+        /* BLOG POST */
+        .blog-post { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 24px; padding: 3rem; margin-bottom: 4rem; backdrop-filter: blur(10px); }
+        .post-meta { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; color: var(--primary); font-weight: 700; margin-bottom: 1rem; display: block; }
+        .post-title { font-size: 2.2rem; margin-bottom: 1.5rem; color: var(--text-dark); font-weight: 800; line-height: 1.2; }
+        .post-text { font-size: 1.1rem; line-height: 1.8; color: var(--text-dark); margin-bottom: 1.5rem; opacity: 0.9; }
+
+        /* IMAGE PLACEHOLDER */
+        .rover-image-container { 
+            width: 100%; 
+            height: 450px; 
+            background: #e2e8f0; 
+            border-radius: 16px; 
+            margin: 2rem 0; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            overflow: hidden;
+            border: 2px dashed var(--primary);
+        }
+        .rover-image-container img { width: 100%; height: 100%; object-fit: cover; }
+        body.dark-mode .rover-image-container { background: #1c1917; }
+
+        /* LINKEDIN CTA */
+        .linkedin-cta { 
+            display: inline-block; 
+            padding: 1rem 2rem; 
+            background: var(--primary); 
+            color: white; 
+            text-decoration: none; 
+            border-radius: 12px; 
+            font-weight: 700; 
+            margin-top: 2rem; 
+            transition: all 0.3s ease;
+        }
+        .linkedin-cta:hover { transform: translateY(-3px); box-shadow: 0 10px 20px var(--accent-glow); }
+
+        footer { background: #0b0f19; color: #a0a0a5; padding: 4rem 20px; text-align: center; }
+        .footer-links { margin: 2rem 0; display: flex; justify-content: center; gap: 2rem; }
+        .footer-links a { color: white; text-decoration: none; font-weight: 600; }
+
+        @media (max-width: 768px) { h1 { font-size: 2.5rem; } .blog-post { padding: 2rem; } .rover-image-container { height: 250px; } }
+    </style>
+</head>
+<body>
+
+    <div class="lamp-container" id="lightSwitch">
+        <div class="wire"></div>
+        <div class="socket"></div>
+        <div class="bulb"></div>
+        <div class="pull-string"><div class="knob"></div></div>
+    </div>
+
+    <header data-aos="fade-down">
+        <a href="index.html" class="logo">Shoonya<span>Origins</span></a>
+        <nav><a href="index.html" style="text-decoration: none; color: var(--text-dark); font-weight: 700; font-size: 0.9rem;">← Back to Main</a></nav>
+    </header>
+
+    <section class="hero-section">
+        <span style="text-transform: uppercase; letter-spacing: 3px; font-size: 0.8rem; font-weight: 800; color: var(--primary);">Weekly Blog</span>
+        <h1 data-aos="fade-up">THE SHOONYA <span>BOOK</span></h1>
+    </section>
+
+    <div class="container">
+        
+        <article class="blog-post" data-aos="fade-up">
+            <span class="post-meta">April 22, 2026 | Hardware Validation</span>
+            <h2 class="post-title">Beyond the Tin Shade: Shakti-01 Clears 40° Incline</h2>
+            
+            <p class="post-text">
+                For four years, the mission of **Shoonya Origins** existed only in technical blueprints and mental simulations. Six months ago, we made the collective decision to pivot from traditional corporate comfort to the raw reality of systems engineering. Today, that transition has been validated by physics.
+            </p>
+
+            <div class="rover-image-container">
+                <img src="images/shakti01-climb.jpg" alt="Shakti-01 Rover 40-degree climb validation">
+                <p style="position: absolute; color: var(--text-light); font-size: 0.9rem;">[ Place Rover Image Here ]</p>
+            </div>
+
+            <p class="post-text">
+                The **Shakti-01** prototype has officially surpassed its primary performance benchmarks. In our latest field test, the unit successfully hauled a **30kg industrial payload** up a **40-degree uncompacted incline**. 
+            </p>
+
+            <p class="post-text">
+                What makes this milestone critical is the underlying architecture. Shakti-01 operates on a **sovereign ESP32 WiFi network**, creating an independent communication mesh that removes secondary dependencies. It doesn't rely on external cloud infrastructure; it relies on self-contained logic.
+            </p>
+
+            <p class="post-text">
+                We are now concluding the "wooden chassis" phase. Our focus has shifted to the next operational tier: **planetary gear systems**, **industrial-grade alloys**, and **oversized off-road mobility**. 
+            </p>
+
+            <p class="post-text">
+                The technical debt of the last 180 days is being paid off in torque and reliability. As we scale toward the Shakti-02, our mission remains clear: building the sovereign technological infrastructure that handles the world's most high-stakes environments.
+            </p>
+
+            <a href="INSERT_YOUR_LINKEDIN_POST_URL_HERE" target="_blank" class="linkedin-cta">
+                View the Full Test Footage on LinkedIn
+            </a>
+            
+        </article>
+
+        <div style="text-align: center; opacity: 0.5; padding: 2rem;">
+            <p>Next Intelligence Update: Weekend of April 26</p>
+        </div>
+
+    </div>
+
+    <footer>
+        <div class="logo" style="color: white; margin-bottom: 1rem;">Shoonya<span>Origins</span></div>
+        <div class="footer-links">
+            <a href="index.html">Sovereign Ecosystem</a>
+            <a href="mailto:yogeshjathalkar@gmail.com">Systems Inquiry</a>
+            <a href="https://linkedin.com" target="_blank">LinkedIn</a>
+        </div>
+        <p>&copy; 2026 Shoonya Origins. Pune HQ.</p>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 800, once: true });
+        const switchElement = document.getElementById('lightSwitch');
+        switchElement.addEventListener('click', () => {
+            switchElement.classList.add('pulled');
+            setTimeout(() => {
+                document.body.classList.toggle('dark-mode');
+                switchElement.classList.remove('pulled');
+            }, 250);
+        });
+    </script>
+</body>
+</html>
