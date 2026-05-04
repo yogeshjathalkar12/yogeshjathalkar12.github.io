@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arsenal | Yogesh S. Jathalkar — Shoonya Origins</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700;800&display=swap" rel="stylesheet">
+<style>
+/* =========================================
+   1. THEME VARIABLES & SETUP (exact match)
+   ========================================= */
+:root {
+  --primary: #673de6;
+  --accent-glow: rgba(103, 61, 230, 0.3);
+  --text-dark: #1e293b;
+  --text-light: #64748b;
+  --bg-gradient: linear-gradient(135deg, #f8f9ff 0%, #eef1ff 100%);
+  --header-bg: rgba(255, 255, 255, 0.85);
+  --card-bg: rgba(255, 255, 255, 0.6);
+  --card-border: rgba(255, 255, 255, 0.5);
+  --shadow: 0 20px 50px rgba(0,0,0,0.1);
+  --blur-overlay: radial-gradient(circle at 50% 110%, rgba(255,255,255,1) 25%, rgba(255,255,255,0.9) 45%, rgba(255,255,255,0.5) 65%, rgba(255,255,255,0) 85%);
+  --bulb-color: #cbd5e1;
+  --bulb-glow: none;
+  --btn-text: #673de6;
+  --btn-text-filled: #ffffff;
+}
+
+body.dark-mode {
+  --primary: #fbbf24;
+  --accent-glow: rgba(251,191,36,0.25);
+  --text-dark: #fefce8;
+  --text-light: #9ca3af;
+  --bg-gradient: linear-gradient(135deg, #0c0a09 0%, #1c1917 100%);
+  --header-bg: rgba(12,10,9,0.85);
+  --card-bg: rgba(28,25,23,0.6);
+  --card-border: rgba(251,191,36,0.1);
+  --blur-overlay: radial-gradient(circle at 50% 110%, rgba(12,10,9,1) 25%, rgba(12,10,9,0.9) 45%, rgba(12,10,9,0.5) 65%, rgba(12,10,9,0) 85%);
+  --bulb-color: #ffaa00;
+  --bulb-glow: drop-shadow(0 0 15px rgba(255,170,0,0.8));
+  --btn-text: #fbbf24;
+  --btn-text-filled: #1c1917;
+}
+
+html { scroll-behavior: smooth; }
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+body {
+  background: var(--bg-gradient);
+  color: var(--text-dark);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background 1.5s ease, color 1.5s ease;
+}
+
+/* =========================================
+   LAMP (exact from original)
+   ========================================= */
+.lamp-container {
+  position: fixed; top: 0; right: 10%; z-index: 1000;
+  display: flex; flex-direction: column; align-items: center;
+}
+.wire { width: 2px; height: 60px; background: #475569; z-index: 1; }
+.bulb-fixture { position: relative; z-index: 2; cursor: pointer; }
+.bulb {
+  width: 40px; height: 40px; background: var(--bulb-color);
+  border-radius: 50%; border: 2px solid #475569;
+  filter: var(--bulb-glow); transition: all 0.3s ease;
+  position: relative; z-index: 2;
+}
+.socket { width: 20px; height: 15px; background: #334155; margin: 0 auto -5px; position: relative; z-index: 1; border-radius: 2px; }
+.pull-string {
+  width: 1px; height: 60px; background: #94a3b8; margin: 0 auto;
+  position: relative; top: -2px; cursor: pointer;
+  transition: height 0.2s cubic-bezier(0.175,0.885,0.32,1.275);
+}
+.knob { width: 8px; height: 14px; background: #64748b; border-radius: 4px; position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%); }
+.lamp-container:active .pull-string,
+.lamp-container.pulled .pull-string { height: 85px; }
+
+/* =========================================
+   HEADER
+   ========================================= */
+header {
+  background: var(--header-bg); backdrop-filter: blur(10px);
+  padding: 1.5rem 5%; position: sticky; top: 0; z-index: 100;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  display: flex; justify-content: space-between; align-items: center;
+  transition: background 1.5s ease;
+}
+.logo { font-size: 1.5rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px; transition: color 1.5s ease; }
+.logo span { color: var(--primary); transition: color 1.5s ease; }
+.header-nav { display: flex; gap: 2rem; align-items: center; }
+.header-nav a { color: var(--text-light); text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: color 0.3s; }
+.header-nav a:hover { color: var(--primary); }
+
+/* =========================================
+   HERO
+   ========================================= */
+.hero-section {
+  padding: 8rem 20px 6rem;
+  min-height: 70vh;
+  display: flex; flex-direction: column; justify-content: center;
+  text-align: center; position: relative; overflow: hidden;
+}
+.hero-section::before {
+  content: ''; position: absolute; top: -50%; left: 50%; transform: translateX(-50%);
+  width: 800px; height: 800px;
+  background: radial-gradient(circle, var(--accent-glow) 0%, rgba(0,0,0,0) 70%);
+  z-index: -1; transition: background 1.5s ease;
+  animation: pulse-glow 10s infinite alternate;
+}
+@keyframes pulse-glow {
+  0% { transform: translateX(-50%) scale(1); opacity: 0.8; }
+  100% { transform: translateX(-50%) scale(1.2); opacity: 0.5; }
+}
+h1 { font-size: 3.5rem; color: var(--text-dark); margin-bottom: 1.5rem; line-height: 1.1; font-weight: 800; transition: color 1.5s ease; }
+.gradient-text {
+  background: linear-gradient(135deg, #673de6 0%, #2f2f2f 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-size: 200% auto; animation: gradient-move 5s ease infinite;
+}
+body.dark-mode .gradient-text {
+  background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+@keyframes gradient-move {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+p.subtitle {
+  font-size: 1.25rem; color: var(--text-light); margin-bottom: 3rem;
+  max-width: 650px; margin-left: auto; margin-right: auto; transition: color 1.5s ease;
+}
+.hero-stats {
+  display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap;
+  margin-top: 2rem;
+}
+.hero-stat { text-align: center; }
+.hero-stat-num { font-size: 2.5rem; font-weight: 800; color: var(--primary); line-height: 1; }
+.hero-stat-label { font-size: 0.8rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 4px; }
+
+/* =========================================
+   DECLARATION SECTION (exact match)
+   ========================================= */
+.declaration-section { padding: 2rem 20px 6rem; text-align: center; }
+.declaration-container {
+  max-width: 800px; margin: 0 auto;
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  border-radius: 24px; padding: 4rem 3rem;
+  box-shadow: var(--shadow); backdrop-filter: blur(10px);
+  transition: all 1.5s ease;
+}
+.declaration-quote {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 2.4rem; font-weight: 800; color: var(--primary);
+  margin-bottom: 2rem; transition: color 1.5s ease;
+}
+.declaration-text { font-size: 1.1rem; color: var(--text-dark); margin-bottom: 1.5rem; line-height: 1.8; transition: color 1.5s ease; }
+.declaration-text.highlight { font-weight: 700; margin-bottom: 0; margin-top: 2rem; }
+
+/* =========================================
+   FILTERS
+   ========================================= */
+.filters-section { padding: 0 20px 3rem; }
+.filters-container { max-width: 1300px; margin: 0 auto; }
+.section-label {
+  text-align: center; text-transform: uppercase; letter-spacing: 2px;
+  font-size: 0.85rem; color: var(--primary); font-weight: 700; margin-bottom: 2rem;
+  display: block; transition: color 1.5s ease;
+}
+.filter-pills {
+  display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+.filter-pill {
+  padding: 8px 20px; border-radius: 50px; font-size: 0.85rem; font-weight: 700;
+  cursor: pointer; transition: all 0.3s ease;
+  border: 2px solid var(--card-border);
+  background: var(--card-bg); color: var(--text-light);
+  backdrop-filter: blur(10px);
+}
+.filter-pill:hover, .filter-pill.active {
+  background: var(--primary); color: var(--btn-text-filled);
+  border-color: var(--primary);
+  box-shadow: 0 4px 20px var(--accent-glow);
+}
+
+/* =========================================
+   MAIN GRID (exact card system)
+   ========================================= */
+.container { max-width: 1300px; margin: 0 auto; padding: 0 20px 6rem; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 2.5rem; }
+
+/* card categories get gradient bg colors instead of images */
+.card {
+  position: relative; border-radius: 24px; overflow: hidden;
+  box-shadow: var(--shadow); transition: all 0.4s cubic-bezier(0.25,0.8,0.25,1);
+  border: 1px solid var(--card-border);
+  display: flex; align-items: flex-end; min-height: 520px;
+}
+.card:hover { transform: translateY(-10px) scale(1.02); box-shadow: 0 30px 70px var(--accent-glow); }
+.card::before {
+  content: ''; position: absolute; inset: 0; z-index: 1;
+  background: var(--blur-overlay); transition: background 1.5s ease;
+}
+
+/* card bg gradients by category */
+.card-defense   { background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 40%, #0d2137 100%); }
+.card-saas      { background: linear-gradient(135deg, #1a0533 0%, #3d1273 40%, #240a5e 100%); }
+.card-health    { background: linear-gradient(135deg, #0a2e1a 0%, #14532d 40%, #052e16 100%); }
+.card-infra     { background: linear-gradient(135deg, #1c1003 0%, #451a03 40%, #292524 100%); }
+.card-urban     { background: linear-gradient(135deg, #0c1629 0%, #1e3a5f 40%, #0f2d48 100%); }
+.card-research  { background: linear-gradient(135deg, #0d0d2b 0%, #1a1a4e 40%, #0a0a2e 100%); }
+.card-ai        { background: linear-gradient(135deg, #1a0a2e 0%, #3d1060 40%, #1c0635 100%); }
+.card-idex      { background: linear-gradient(135deg, #1a0000 0%, #4a0000 40%, #2d0000 100%); }
+
+.card-tag {
+  position: absolute; top: 2rem; left: 2rem; z-index: 3;
+  padding: 8px 16px; background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(15px); border-radius: 50px;
+  font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1px; color: white; border: 1px solid rgba(255,255,255,0.3);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 1.5s ease;
+}
+.card-status {
+  position: absolute; top: 2rem; right: 2rem; z-index: 3;
+  padding: 6px 12px; border-radius: 50px;
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+}
+.status-live    { background: rgba(34,197,94,0.2); color: #4ade80; border: 1px solid rgba(74,222,128,0.4); }
+.status-trl     { background: rgba(251,191,36,0.2); color: #fcd34d; border: 1px solid rgba(252,211,77,0.4); }
+.status-proto   { background: rgba(99,102,241,0.2); color: #a5b4fc; border: 1px solid rgba(165,180,252,0.4); }
+.status-idea    { background: rgba(156,163,175,0.2); color: #d1d5db; border: 1px solid rgba(209,213,219,0.3); }
+.status-idex    { background: rgba(239,68,68,0.2); color: #fca5a5; border: 1px solid rgba(252,165,165,0.4); }
+
+.card-content {
+  position: relative; z-index: 2; padding: 2.5rem; width: 100%;
+  transition: transform 0.4s ease;
+}
+.card:hover .card-content { transform: translateY(-5px); }
+
+.card-title { font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; color: #ffffff; line-height: 1.1; }
+.card-desc { color: rgba(255,255,255,0.7); font-size: 1rem; line-height: 1.6; font-weight: 500; margin-bottom: 1.2rem; }
+
+.card-tech-stack {
+  display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;
+}
+.tech-tag {
+  padding: 4px 10px; border-radius: 6px;
+  background: rgba(255,255,255,0.1); backdrop-filter: blur(5px);
+  border: 1px solid rgba(255,255,255,0.15);
+  font-size: 0.7rem; font-weight: 700; color: rgba(255,255,255,0.8);
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+.card-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.extra-btn {
+  background: var(--primary); color: var(--btn-text-filled);
+  padding: 10px 20px; border-radius: 8px; font-weight: 700; font-size: 0.88rem;
+  text-decoration: none; transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2); display: inline-block;
+}
+.extra-btn:hover { transform: translateY(-2px); filter: brightness(1.15); box-shadow: 0 6px 20px var(--accent-glow); }
+.extra-btn.outline {
+  background: transparent; color: rgba(255,255,255,0.8);
+  border: 1.5px solid rgba(255,255,255,0.3);
+  box-shadow: none;
+}
+.extra-btn.outline:hover { background: rgba(255,255,255,0.1); }
+
+/* card highlight metric row */
+.card-metrics {
+  display: flex; gap: 1.5rem; margin-bottom: 1.2rem;
+}
+.metric { text-align: center; }
+.metric-val { font-size: 1.4rem; font-weight: 800; color: #fff; line-height: 1; }
+.metric-label { font-size: 0.65rem; color: rgba(255,255,255,0.55); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+/* hidden state for filtering */
+.card-wrap { transition: opacity 0.4s ease, transform 0.4s ease; }
+.card-wrap.hidden { opacity: 0; pointer-events: none; transform: scale(0.95); display: none; }
+
+/* =========================================
+   STATS SECTION (exact match)
+   ========================================= */
+.stats-section { padding: 2rem 20px 5rem; text-align: center; }
+.stats-grid {
+  display: flex; justify-content: center; gap: 3rem; margin-bottom: 2.5rem;
+  flex-wrap: wrap; max-width: 1000px; margin-left: auto; margin-right: auto;
+}
+.stat-card {
+  flex: 1; min-width: 220px;
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  border-radius: 20px; padding: 2.5rem 1rem; box-shadow: var(--shadow);
+  backdrop-filter: blur(10px); transition: all 0.4s ease;
+}
+.stat-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px var(--accent-glow); }
+.stat-number { font-size: 3.5rem; font-weight: 800; color: var(--text-dark); margin-bottom: 0.5rem; line-height: 1; transition: color 1.5s ease; }
+.stat-number span { font-size: 2.5rem; color: var(--primary); }
+.stat-label { font-size: 1rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 1.5px; transition: color 1.5s ease; }
+
+/* =========================================
+   NOTIFICATION CARDS (exact match)
+   ========================================= */
+.updates-section { padding: 4rem 20px 2rem; }
+.updates-grid { display: flex; flex-direction: column; gap: 1.5rem; max-width: 850px; margin: 0 auto; }
+.notification-card {
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  border-left: 5px solid var(--primary); border-radius: 16px;
+  padding: 2rem; box-shadow: var(--shadow); backdrop-filter: blur(10px);
+  transition: all 0.4s ease; position: relative;
+}
+.notification-card:hover { transform: translateX(10px); box-shadow: 0 15px 35px var(--accent-glow); }
+.notification-badge {
+  display: inline-block; background: var(--accent-glow); color: var(--primary);
+  padding: 5px 12px; border-radius: 50px; font-size: 0.75rem;
+  font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+  margin-bottom: 1rem; transition: all 1.5s ease;
+}
+body.dark-mode .notification-badge { color: var(--btn-text); }
+.notification-title { font-size: 1.3rem; font-weight: 700; color: var(--text-dark); margin-bottom: 0.5rem; transition: color 1.5s ease; }
+.notification-desc { color: var(--text-light); font-size: 1rem; line-height: 1.6; transition: color 1.5s ease; }
+
+/* =========================================
+   FOOTER (exact match)
+   ========================================= */
+footer { background: #0b0f19; color: #a0a0a5; padding: 4rem 20px; text-align: center; }
+.footer-links { margin: 2rem 0; display: flex; justify-content: center; gap: 2rem; }
+.footer-links a { color: white; text-decoration: none; font-weight: 500; transition: color 0.3s; }
+.footer-links a:hover { color: var(--primary); }
+.footer-logo { font-size: 1.5rem; font-weight: 800; color: white; margin-bottom: 1rem; }
+.footer-logo span { color: var(--primary); }
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+@media (max-width: 768px) {
+  h1 { font-size: 2.2rem; }
+  .grid { grid-template-columns: 1fr; gap: 1.5rem; }
+  .card { min-height: 480px; }
+  .card-content { padding: 1.5rem; }
+  .hero-section { padding: 6rem 15px 4rem; }
+  .stats-grid { gap: 1.5rem; flex-direction: column; align-items: center; }
+  .declaration-container { padding: 3rem 1.5rem; }
+  .declaration-quote { font-size: 1.6rem; }
+  .lamp-container { right: 5%; }
+  .hero-stats { gap: 1.5rem; }
+  .filter-pills { gap: 0.5rem; }
+}
+@media (max-width: 480px) {
+  h1 { font-size: 1.9rem; }
+  .header-nav { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- LAMP (exact original) -->
+<div class="lamp-container" id="lightSwitch" title="Pull to toggle">
+  <div class="wire"></div>
+  <div class="socket"></div>
+  <div class="bulb"></div>
+  <div class="pull-string"><div class="knob"></div></div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">Shoonya<span>Origins</span> <span style="font-size:0.9rem;font-weight:500;color:var(--text-light);margin-left:0.5rem">/ Arsenal</span></div>
+  <nav class="header-nav">
+    <a href="https://shoonyaorigins.com">Home</a>
+    <a href="#projects">Projects</a>
+    <a href="#idex">iDEX</a>
+    <a href="https://linkedin.com/in/yogesh-jathalkar-67b179208">LinkedIn</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero-section">
+  <h1>
+    Every System I've<br>
+    <span class="gradient-text">Built From Scratch.</span>
+  </h1>
+  <p class="subtitle">
+    A first-principles engineer operating at the intersection of signal intelligence, autonomous systems,
+    AI, and sovereign infrastructure — documented end-to-end.
+  </p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="hero-stat-num">20+</div><div class="hero-stat-label">Projects</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">130+</div><div class="hero-stat-label">Open Tools</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">5</div><div class="hero-stat-label">iDEX Applications</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">50+</div><div class="hero-stat-label">Web Deployments</div></div>
+  </div>
+</section>
+
+<!-- DECLARATION -->
+<div class="declaration-section">
+  <div class="declaration-container">
+    <h2 class="declaration-quote">"Build sovereign or don't build at all."</h2>
+    <p class="declaration-text">
+      I'm Yogesh S. Jathalkar — Founder & CTO of Shoonya Origins. Pursuing a BSc in Physics and a BCA simultaneously,
+      I approach every engineering problem from first principles. This is not a portfolio of side projects.
+      These are operational defense proposals, live SaaS platforms, deployed hardware, and national-scale infrastructure blueprints.
+    </p>
+    <p class="declaration-text">
+      Every tool, every system, every iDEX proposal on this page was designed, architected, and built by me — 
+      entirely without foreign platforms, foreign cloud dependencies, or foreign threat libraries.
+    </p>
+    <p class="declaration-text highlight">Yogesh S. Jathalkar — Pune, India. Let's connect.</p>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-section">
+  <div class="stats-grid">
+    <div class="stat-card"><h2 class="stat-number">130<span>+</span></h2><p class="stat-label">Open Tools</p></div>
+    <div class="stat-card"><h2 class="stat-number">0<span>%</span></h2><p class="stat-label">Data Shared</p></div>
+    <div class="stat-card"><h2 class="stat-number">100<span>%</span></h2><p class="stat-label">Sovereign</p></div>
+    <div class="stat-card"><h2 class="stat-number">5<span>+</span></h2><p class="stat-label">iDEX Proposals</p></div>
+  </div>
+</div>
+
+<!-- FILTERS -->
+<section class="filters-section" id="projects">
+  <div class="filters-container">
+    <span class="section-label">Filter by Domain</span>
+    <div class="filter-pills">
+      <button class="filter-pill active" data-filter="all">All Work</button>
+      <button class="filter-pill" data-filter="defense">Defence & SIGINT</button>
+      <button class="filter-pill" data-filter="idex">iDEX Applications</button>
+      <button class="filter-pill" data-filter="saas">SaaS & AI</button>
+      <button class="filter-pill" data-filter="health">Health Tech</button>
+      <button class="filter-pill" data-filter="infra">Infrastructure</button>
+      <button class="filter-pill" data-filter="urban">Urban & Civic</button>
+      <button class="filter-pill" data-filter="research">Research & Deep Tech</button>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECT GRID -->
+<div class="container">
+  <div class="grid" id="projectGrid">
+
+    <!-- 1. SAMPATI -->
+    <div class="card-wrap" data-cat="defense idex">
+      <div class="card card-defense">
+        <span class="card-tag">Defence / SIGINT</span>
+        <span class="card-status status-trl">TRL-7 | iDEX Prime</span>
+        <div class="card-content">
+          <div class="card-metrics">
+            <div class="metric"><div class="metric-val">72h+</div><div class="metric-label">Persistence</div></div>
+            <div class="metric"><div class="metric-val">&lt;100m</div><div class="metric-label">Localization</div></div>
+            <div class="metric"><div class="metric-val">18GHz</div><div class="metric-label">Spectrum</div></div>
+          </div>
+          <h3 class="card-title">Project SAMPATI</h3>
+          <p class="card-desc">Aerostatic-Hybrid ESM Network. A persistent, stealth-enabled distributed surveillance system using TDOA triangulation, Frequency Selective Surface (FSS) skin, and 200km virtual aperture synthesis for sub-100m threat localization at 5000m altitude.</p>
+          <div class="card-tech-stack">
+            <span class="tech-tag">TDOA</span><span class="tech-tag">GPSDO</span><span class="tech-tag">Jetson Orin AGX</span>
+            <span class="tech-tag">FSS Stealth</span><span class="tech-tag">0.5–18 GHz</span><span class="tech-tag">LPI Radar</span>
+          </div>
+          <div class="card-actions">
+            <a href="https://shoonyaorigins.com/ventures/sentinel/sampati/" class="extra-btn" target="_blank">View Project</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. IGNIS-COGNITIVE (PS 5) -->
+    <div class="card-wrap" data-cat="defense idex">
+      <div class="card card-idex">
+        <span class="card-tag">Defence / CEW</span>
+        <span class="card-status status-idex">iDEX ADITI 4.0 — PS 5</span>
+        <div class="card-content">
+          <div class="card-metrics">
+            <div class="metric"><div class="metric-val">&lt;50ms</div><div class="metric-label">OODA Loop</div></div>
+            <div class="metric"><div class="metric-val">DRL</div><div class="metric-label">Waveform AI</div></div>
+            <div class="metric"><div class="metric-val">DRFM</div><div class="metric-label">Soft Kill</div></div>
+          </div>
+          <h3 class="card-title">IGNIS-COGNITIVE</h3>
+          <p class="card-desc">Cognitive Electronic Warfare ecosystem for the Indian Army. Autonomous Sense-Learn-Adapt loop using Compressive Sensing (OMP), LSTM + Transformer signal characterization, Deep Q-Network countermeasure synthesis, and Terrain-Intent Fusion via Bayesian Belief Networks.</p>
+          <div class="card-tech-stack">
+            <span class="tech-tag">DQN / DRL</span><span class="tech-tag">MUSIC DF</span><span class="tech-tag">DRFM</span>
+            <span class="tech-tag">GaN PA</span><span class="tech-tag">FPGA</span><span class="tech-tag">HPM</span>
+          </div>
+          <div class="card-actions">
+            <a href="#" class="extra-btn outline">Army PS 5 Proposal</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. SENTINEL-R (PS 24) -->
+    <div class="card-wrap" data-cat="defense idex">
+      <div class="card card-idex">
+        <span class="card-tag">Defence / Space SSA</span>
+        <span class="card-status status-idex">iDEX ADITI 4.0 — PS 24</span>
+        <div class="card-content">
+          <div class="card-metrics">
+            <div class="metric"><div class="metric-val">30,000+</div><div class="metric-label">Objects Tracked</div></div>
+            <div class="metric"><div class="metric-val">&lt;5s</div><div class="metric-label">Hypersonic Alert</div></div>
+            <div class="metric"><div class="metric-val">9</div><div class="metric-label">Modules</div></div>
+          </div>
+          <h3 class="card-title">ASTRR / SENTINEL-R</h3>
+          <p class="card-desc">Sovereign Space Domain Awareness platform for the IAF. Integrates SGP4/SDP4 orbital propagation, UKF hypersonic tracking, LSTM manoeuvre intent classification, RF-fingerprint cataloguing, and NRLMSISE-00 re-entry impact prediction. 7 ruggedized HPC nodes.</p>
+          <div class="card-tech-stack">
+            <span class="tech-tag">SGP4/SDP4</span><span class="tech-tag">UKF</span><span class="tech-tag">KD-Tree</span>
+            <span class="tech-tag">Foster's Pc</span><span class="tech-tag">Apache Kafka</span><span class="tech-tag">LSTM</span>
+          </div>
+          <div class="card-actions">
+            <a href="#" class="extra-btn outline">IAF PS 24 Proposal</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. SENTINEL-R OSINT (PS 18) -->
+    <div class="card-wrap" data-cat="defense idex saas">
+      <div class="card card-idex">
+        <span class="card-tag">Defence / OSINT</span>
+        <span class="card-status status-idex">iDEX ADITI 4.0 — PS 18</span>
+        <div class="card-content">
+          <div class="card-metrics">
+            <div class="metric"><div class="metric-val">100+</div><div class="metric-label">Score Params</div></div>
+            <div class="metric"><div class="metric-val">80%</div><div class="metric-label">Manpower Reduction</div></div>
+          </div>
+          <h3 class="card-title">SENTINEL-R OSINT</h3>
+          <p class="card-desc">Sovereign AI Intelligence Brain for the IAF to autonomously harvest, verify, and neutralize global misinformation. Hybrid LLM + RNN architecture for deepfake pattern detection, source credibility scoring across 100+ parameters, and GIS-mapped intelligence dashboards.</p>
+          <div class="card-tech-stack">
+            <span class="tech-tag">LLM + RNN</span><span class="tech-tag">YOLO CV</span><span class="tech-tag">GIS</span>
+            <span class="tech-tag">Deepfake Detection</span><span class="tech-tag">On-Premise</span>
+          </div>
+          <div class="card-actions">
+            <a href="https://shoonyaorigins.com/ventures/raptor/" class="extra-btn" target="_blank">View Raptor</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. VAHAK-AI (PS 8) -->
+    <div class="card-wrap" data-cat="defense idex infra">
+      <div class="card card-idex">
+        <span class="card-tag">Defence / Autonomous Logistics</span>
+        <span class="card-status status-idex">iDEX ADITI 4.0 — PS 8</span>
+        <div class="card-content">
+          <div class="card-metrics">
+            <div class="metric"><div class="metric-val">MPC</div><div class="metric-label">Path Control</div></div>
+            <div class="metric"><div class="metric-val">V2V</div><div class="metric-label">Mesh Net</div></div>
+          </div>
+          <h3 class="card-title">VAHAK-AI</h3>
+          <p class="card-desc">Transforms existing Indian Army B Vehicles into autonomous, terrain-aware logistics platforms. TANOS (Terrain-Aware Navigation OS) with YOLOv10 semantic segmentation, Model Predictive Control for Himalayan gradient physics, and Pathfinder-Follower convoy swarm via encrypted V2V mesh.</p>
+          <div class="card-tech-stack">
+            <span class="tech-tag">YOLOv10</span><span class="tech-tag">MPC</span><span class="tech-tag">V2V Mesh</span>
+            <span class="tech-tag">Sensor Fusion</span><span class="tech-tag">Autonomous Nav</span>
+          </div>
+          <div class="card-actions">
+            <a href="#" class="extra-btn outline">Army PS 8 Proposal</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Shakti-01 -->
+    <div class="card-wrap" data-cat="defense">
+      <div class="card card-defense">
+        <span class="card-tag">Robotics / Hardware</span>
+        <span class="card-status status-trl">Validated Prototype</span>
+        <div class="card-content">
+          <div class="card-metrics">
+            <div class="metric"><div class="metric-val">30kg</div><div class="metric-label">Payload</div></div>
+            <div class="metric"><div class="metric-val">40°</div><div class="metric-label">Incline</div></div>
+            <div class="metric"><div class="metric-val">4WD</div><div class="metric-label">Drivetrain</div></div>
+          </div>
+          <h3 class="card-title">Shakti-01</h3>
+          <p class="card-desc">Autonomous Tactical Rover with Host-Edge distributed compute. ESP32 real-time motor control over WebSockets, YOLO object detection via Mobile-as-Sensor (MaaS), and remote workstation neural inference. Validated 30kg payload on 40-degree incline.</p>
+          <div class="card-tech-stack">
+            <span class="tech-tag">ESP32</span><span class="tech-tag">YOLO</span><span class="tech-tag">WebSockets</span>
+            <span class="tech-tag">OpenCV</span><span class="tech-tag">4WD High-Torque</span>
+          </div>
+          <div class="card-actions">
+            <a href="https://www.linkedin.com/posts/yogesh-jathalkar-67b179208_shoonyaorigins-robotics-foundergrit-ugcPost-7452595114100572161-6qMB" class="extra-btn" target="_blank">See Demo</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. Project SENTINEL -->
+    <div class="card-wrap" data-cat="defense">
+      <div class="card card-defense">
+        <span class="card-tag">Defence / Sensor Fusion</span>
+        <span class="card-status status-proto">Prototype</span>
+        <div class="card-content">
+          <div class="card-metrics">
+            <div class="metric"><div class="metric-val">4</div><div class="metric-label">Sensor Modes</div></div>
+            <div class="metric"><div class="metric-val">59:00</div><div class="metric-label">Golden Hour Timer</div></div>
+          </div>
+          <h3 class="card-title">Project S.E.N.T.I.N.E.L</h3>
+          <p class="card-desc">Distributed Sensor Ecosystem with full-spectrum threat acquisition: EVM heartbeat detection through foliage, rPPG in darkness, ESP32 RF Sniffer for NLOS digital footprints. Game-Theory pathfinding, trauma detection, and zero-distraction haptic interface for warfighters.</p>
+          <div class="card-tech-stack">
+            <span class="tech-tag">EVM</span><span class="tech-tag">rPPG</span><span class="tech-tag">RF Sniffer</span>
+            <span class="tech-tag">Game Theory</span><span class="tech-tag">Sensor Fusion</span><span class="tech-tag">Haptics</span>
+          </div>
+          <div class="card-actions">
+            <a href="#" class="extra-btn outline">Technical Spec</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. Legion -->
+    <div class="card-wrap" data-cat="defense">
+      <div class="card card-defense">
+        <span class="card-tag">Defence / Swarms</span>
+        <span class="card-status status-idea">Next Project</span>
+        <div class="card-content">
+          <div class="card-metrics">
+            <div class="metric"><div class="metric-val">3</div><div class="metric-label">Domains</div></div>
+            <div class="metric"><div class="metric-val">15kg+</div><div class="metric-label">Quadruped Load</div></div>
+          </div>
+          <h3 class="card-title">Project Legion</h3>
+          <p class="card-desc">Multi-Domain Heterogeneous Swarm — Air (tactical sacrificial UAVs), Sea (bio-mimetic Manta Ray AUVs for acoustic stealth), Land (MULE quadrupeds for Himalayan terrain + Shakti-02 combat rover). Decentralized swarm intelligence; no Queen node failure point.</p>
+          <div class="card-tech-stack">
+            <span class="tech-tag">Swarm AI</span><span class="tech-tag">Mesh Networking</span><span class="tech-tag">AUV</span>
+            <span class="tech-tag">Quadruped</span><span class="tech-tag">Decentralized</span>
+          </div>
+          <div class="card-actions">
+            <a href="#" class="extra-btn outline">Concept</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. Ignis DEW -->
+    <div class="card-wrap" data-cat="defense">
+      <div class="card card-defense">
+        <span class="card-tag">Defence / DEW</span>
+        <span class="card-status status-idea">Next Project</span>
+        <div class="card-content">
+          <div class="card-metrics">
+            <div class="metric"><div class="metric-val">2</div><div class="metric-label">Kill Stages</div></div>
+            <div class="metric"><div class="metric-val">HPM</div><div class="metric-label">Directed Energy</div></div>
+          </div>
+          <h3 class="card-title">Project Ignis</h3>
+          <p class="card-desc">Two-stage Electronic Neutralization. Stage 1: Multi-wave jamming + GPS spoofing to blind and disorient. Stage 2: High-Power Microwave (HPM) pulse enters via antenna apertures, inducing 1000V+ spikes that melt CPU traces — Total Electronic Kill without any kinetic signature.</p>
+          <div class="card-tech-stack">
+            <span class="tech-tag">HPM</span><span class="tech-tag">DRFM Spoofing</span><span class="tech-tag">Directed Energy</span>
+            <span class="tech-tag">GPS Denial</span><span class="tech-tag">Anti-Drone</span>
+          </div>
+          <div class="card-actions">
+            <a href="#" class="extra-btn outline">Concept</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10. Raptor -->
+    <div class="card-wrap" data-cat="saas ai">
+      <div class="card card-saas">
+        <span class="card-tag">SaaS / AI</span>
+        <span class="card-status status-live">Live — v1.0.0</span>
+        <div class="card-content">
+          <div class="card-metrics">
+            <div class="metric"><div class="metric-val">100+</div><div class="metric-label">Score Params</div></div>
+            <div class="metric"><div class="metric-val">60%</div><div class="metric-label">Friction Reduced</div></div>
+          </div>
+          <h3 class="card-title">Project Raptor</h3>
+          <p class="card-desc">Autonomous B2B Sales Intelligence Engine. Dual-brain Hybrid LLM + RNN architecture — LLMs for pitch crafting, RNNs for long-term deal pattern memory. Self-Retuning Engine feeds every win/loss back into 100+ parameter scoring. Autonomous LinkedIn/web market hunting agents.</p>
+          <div class="card-tech-stack">
+            <span class="tech-tag">LLM</span><span class="tech-tag">RNN</span><span class="tech-tag">Sentiment Analysis</span>
+            <span class="tech-tag">Autonomous Agents</span><span class="tech-tag">React Native</span>
+          </div>
+          <div class="card-actions">
+            <a href="https://shoonyaorigins.com/ventures/raptor/" class="extra-btn" target="_blank">Visit Raptor</a>
+            <a href="https://shoonyaorigins.com/ventures/raptor/tools/" class="extra-btn outline" target="_blank">Free Tools</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 11. SUA -->
+    <div class="card-wrap" data-cat="saas ai infra">
+      <div class="card card-saas">
+        <span class="card-tag">AI / Industrial Audit</span>
+        <span class="card-status status-live">Live Prototype</span>
+        <div class="card-content">
+          <div class="card-metrics">
+            <div class="metric"><div class="metric-val">80%</div><div class="metric-label">Friction Cut</div></div>
+            <div class="metric"><div class="metric-val">4-tier</div><div class="metric-label">Verify Stack</div></div>
+          </div>
+          <h3 class="card-title">Shoonya Universal Auditor</h3>
+          <p class="card-desc">Sovereign Digital Twin for autonomous material intelligence. YOLO + ResNet-18 visual acquisition, physics-aware mass verification, Leaflet GIS coordinate tracking, and on-device Llama-3-8b Oracle for zero-cloud-footprint reasoning. Continuous Reinforcement Loop for on-site neural adaptation.</p>
+          <div class="card-tech-stack">
+            <span class="tech-tag">YOLOv10</span><span class="tech-tag">ResNet-18</span><span class="tech-tag">Llama-3-8b</span>
+            <span class="tech-tag">Leaflet GIS</span><span class="tech-tag">PySide6</span><span class="tech-tag">On-Premise</span>
+          </div>
+          <div class="card-actions">
+            <a href="#" class="extra-btn outline">Case Study</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 12. Construct -->
+    <div class="card-wrap" data-cat="infra saas">
+      <div class="card card-infra">
+        <span class="card-tag">Infrastructure / CV</span>
+        <span class="card-status status-live">Online</span>
+        <div class="card-content">
+          <div class="card-metrics">
+            <div class="metric"><div class="metric-val">70%</div><div class="metric-label">Oversight Cut</div></div>
+            <div class="metric"><div class="metric-val">BIM</div><div class="metric-label">Sync</div></div>
+          </div>
+          <h3 class="card-title">Project Construct</h3>
+          <p class="card-desc">AI-driven construction site automation. Custom YOLOv8/v10 models for PPE compliance and equipment tracking. Reality Capture pipeline syncing drone visual telemetry with BIM for real-time structural deviation detection. Predictive bottleneck analysis via statistical slippage engine.</p>
+          <div class="card-tech-stack">
+            <span class="tech-tag">YOLOv8/v10</span><span class="tech-tag">BIM Sync</span><span class="tech-tag">Point Cloud</span>
+            <span class="tech-tag">FastAPI</span><span class="tech-tag">Edge Inference</span><span class="tech-tag">Jetson</span>
+          </div>
+          <div class="card-actions">
+            <a href="https://shoonyaorigins.com/ventures/construct/" class="extra-btn" target="_blank">Visit Construct</a>
+            <a href="https://shoonyaorigins.com/ventures/construct/tools/" class="extra-btn outline" target="_blank">Free Tools</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 13. Aura -->
+    <div class="card-wrap" data-cat="health">
+      <div class="card card-health">
+        <span class="card-tag">Health Tech / EVM</span>
+        <span class="card-status status-proto">EVM Online | Engine: Prototype</span>
+        <div class="card-content">
+          <div class="card-metrics">
+            <div class="metric"><div class="metric-val">0</div><div class="metric-label">Contact Required</div></div>
+            <div class="metric"><div class="metric-val">50+</div><div class="metric-label">Diagnostic Tools</div></div>
+          </div>
+          <h3 class="card-title">Project Aura</h3>
+          <p class="card-desc">Non-invasive bio-intelligence via Eulerian Video Magnification (EVM). Extracts real-time BPM and respiratory frequency from standard RGB video by amplifying sub-pixel colour variations. rPPG blood flow tracking in darkness. Sleep apnea detection via micro-apneic event CV analysis.</p>
+          <div class="card-tech-stack">
+            <span class="tech-tag">EVM</span><span class="tech-tag">rPPG</span><span class="tech-tag">React Native</span>
+            <span class="tech-tag">OpenCV</span><span class="tech-tag">Contactless Vitals</span>
+          </div>
+          <div class="card-actions">
+            <a href="https://shoonyaorigins.com/ventures/aura/" class="extra-btn" target="_blank">Visit Aura</a>
+            <a href="https://shoonyaorigins.com/ventures/aura/tools/" class="extra-btn outline" target="_blank">50+ Free Tools</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 14. Basis -->
+    <div class="card-wrap" data-cat="urban infra">
+      <div class="card card-urban">
+        <span class="card-tag">Urban Intelligence</span>
+        <span class="card-status status-live">Online</span>
+        <div class="card-content">
+          <div class="card-metrics">
+            <div class="metric"><div class="metric-val">40%</div><div class="metric-label">Cost Reduction</div></div>
+            <div class="metric"><div class="metric-val">100+</div><div class="metric-label">Civic Tools</div></div>
+          </div>
+          <h3 class="card-title">Project Basis</h3>
+          <p class="card-desc">Autonomous Urban Management Network. Google Street View OSINT pipeline feeding custom CV models to detect potholes, garbage hotspots, and infrastructure damage city-wide. Edge-to-Basis-Cloud pipeline. Shakti-derived maintenance rover fleet for physical remediation.</p>
+          <div class="card-tech-stack">
+            <span class="tech-tag">YOLOv10</span><span class="tech-tag">Leaflet GIS</span><span class="tech-tag">Supabase</span>
+            <span class="tech-tag">OpenCV</span><span class="tech-tag">Cloudflare</span><span class="tech-tag">React Native</span>
+          </div>
+          <div class="card-actions">
+            <a href="https://shoonyaorigins.com/ventures/basis/" class="extra-btn" target="_blank">Visit Basis</a>
+            <a href="https://shoonyaorigins.com/ventures/basis/civic_tools/" class="extra-btn outline" target="_blank">Civic Tools</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 15. Aether -->
+    <div class="card-wrap" data-cat="research">
+      <div class="card card-research">
+        <span class="card-tag">Deep Tech / Research</span>
+        <span class="card-status status-live">Online</span>
+        <div class="card-content">
+          <div class="card-metrics">
+            <div class="metric"><div class="metric-val">20+</div><div class="metric-label">Research Tools</div></div>
+            <div class="metric"><div class="metric-val">Grad</div><div class="metric-label">Level Instruments</div></div>
+          </div>
+          <h3 class="card-title">Aether Labs</h3>
+          <p class="card-desc">Democratized Research Infrastructure. Graduate-level browser-based physics and engineering simulators — free, zero signup, local computation only. Physics simulators for rocker-bogie mechanics, RF propagation patterns, orbital mechanics. Global decentralized research collectives architecture.</p>
+          <div class="card-tech-stack">
+            <span class="tech-tag">Quantum Mechanics</span><span class="tech-tag">Wave Physics</span>
+            <span class="tech-tag">Browser-Native</span><span class="tech-tag">Zero Signup</span>
+          </div>
+          <div class="card-actions">
+            <a href="https://shoonyaorigins.com/ventures/aether/" class="extra-btn" target="_blank">Visit Aether</a>
+            <a href="https://shoonyaorigins.com/ventures/aether/tools/" class="extra-btn outline" target="_blank">Instruments</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 16. Astra-Q (PS 9) -->
+    <div class="card-wrap" data-cat="research defense idex">
+      <div class="card card-research">
+        <span class="card-tag">Quantum / Defence</span>
+        <span class="card-status status-idex">iDEX ADITI 4.0 — PS 9</span>
+        <div class="card-content">
+          <div class="card-metrics">
+            <div class="metric"><div class="metric-val">Cryo</div><div class="metric-label">Free Architecture</div></div>
+            <div class="metric"><div class="metric-val">Day-0</div><div class="metric-label">Detection</div></div>
+          </div>
+          <h3 class="card-title">Astra-Q</h3>
+          <p class="card-desc">Sovereign Quantum Transduction & Detection for the IAF. First-principles engineering to convert weak RF signals into high-fidelity quantum states for noise-free analysis. Cryogenic-free architecture for tactical field deployment. Detects stealth assets and low-signature emitters invisible to classical radar.</p>
+          <div class="card-tech-stack">
+            <span class="tech-tag">Quantum Sensing</span><span class="tech-tag">Quantum Transduction</span>
+            <span class="tech-tag">Cryogenic-Free</span><span class="tech-tag">Sub-Wavelength</span>
+          </div>
+          <div class="card-actions">
+            <a href="#" class="extra-btn outline">IAF PS 9 Proposal</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 17. 130+ Tools -->
+    <div class="card-wrap" data-cat="saas research">
+      <div class="card card-saas">
+        <span class="card-tag">Open Tools / Micro-SaaS</span>
+        <span class="card-status status-live">130+ Live</span>
+        <div class="card-content">
+          <div class="card-metrics">
+            <div class="metric"><div class="metric-val">130+</div><div class="metric-label">Tools</div></div>
+            <div class="metric"><div class="metric-val">0</div><div class="metric-label">Signups Needed</div></div>
+            <div class="metric"><div class="metric-val">100%</div><div class="metric-label">Client-Side</div></div>
+          </div>
+          <h3 class="card-title">Arsenal of Open Tools</h3>
+          <p class="card-desc">130+ browser-based calculators, simulators, and diagnostic tools across Health, Sales, Construction, Physics Research, and Urban Management. Zero signups. Zero data transmission. All computation local. Designed to replace gated SaaS products with free, privacy-first alternatives.</p>
+          <div class="card-tech-stack">
+            <span class="tech-tag">Vanilla JS</span><span class="tech-tag">Static Site</span><span class="tech-tag">Zero Backend</span>
+            <span class="tech-tag">Client-Side</span><span class="tech-tag">Privacy-First</span>
+          </div>
+          <div class="card-actions">
+            <a href="https://shoonyaorigins.com/ventures/raptor/tools/" class="extra-btn" target="_blank">Sales Tools</a>
+            <a href="https://shoonyaorigins.com/ventures/aura/tools/" class="extra-btn outline" target="_blank">Health Tools</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 18. Mobile Apps -->
+    <div class="card-wrap" data-cat="saas">
+      <div class="card card-saas">
+        <span class="card-tag">Mobile / React Native</span>
+        <span class="card-status status-proto">Beta — Pre-Launch</span>
+        <div class="card-content">
+          <div class="card-metrics">
+            <div class="metric"><div class="metric-val">4</div><div class="metric-label">Apps</div></div>
+            <div class="metric"><div class="metric-val">Cross</div><div class="metric-label">Platform</div></div>
+          </div>
+          <h3 class="card-title">Mobile App Ecosystem</h3>
+          <p class="card-desc">Four React Native applications across the Shoonya ecosystem: Raptor (real-time WebSocket sales agent monitoring), Aura (EVM contactless vitals via mobile camera), Civitas (Construct field command with PPE compliance logging), Basis (citizen urban issue mapping with GPS-stamped imagery).</p>
+          <div class="card-tech-stack">
+            <span class="tech-tag">React Native</span><span class="tech-tag">WebSockets</span><span class="tech-tag">Push Notifications</span>
+            <span class="tech-tag">GPS Stamp</span><span class="tech-tag">EVM Mobile</span>
+          </div>
+          <div class="card-actions">
+            <a href="https://shoonyaorigins.com" class="extra-btn outline" target="_blank">Shoonya Ecosystem</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 19. 50+ Web Deployments -->
+    <div class="card-wrap" data-cat="saas">
+      <div class="card card-saas">
+        <span class="card-tag">DevOps / Web Infrastructure</span>
+        <span class="card-status status-live">Live</span>
+        <div class="card-content">
+          <div class="card-metrics">
+            <div class="metric"><div class="metric-val">50+</div><div class="metric-label">Web Pages</div></div>
+            <div class="metric"><div class="metric-val">&lt;100ms</div><div class="metric-label">PageSpeed</div></div>
+          </div>
+          <h3 class="card-title">Web Infrastructure</h3>
+          <p class="card-desc">50+ high-performance HTML/CSS/JS pages on Indian-owned cloud infrastructure (Yotta/NxtGen) for data sovereignty. Nuitka Python-to-C++ compilation for 10–20% performance gains and IP protection. GitHub Actions CI/CD with code-signing and zero-trust deployment for defense-grade safety standards.</p>
+          <div class="card-tech-stack">
+            <span class="tech-tag">Static SSG</span><span class="tech-tag">Nuitka</span><span class="tech-tag">GitHub Actions</span>
+            <span class="tech-tag">Indian Cloud</span><span class="tech-tag">Code-Signing</span>
+          </div>
+          <div class="card-actions">
+            <a href="https://shoonyaorigins.com" class="extra-btn" target="_blank">shoonyaorigins.com</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /grid -->
+</div><!-- /container -->
+
+<!-- IDEX ANCHOR -->
+<span id="idex"></span>
+
+<!-- UPDATES: iDEX STATUS -->
+<section class="updates-section">
+  <div class="container" style="padding-bottom: 2rem;">
+    <span class="section-label">iDEX ADITI 4.0 — Submission Status</span>
+    <div class="updates-grid">
+
+      <div class="notification-card">
+        <span class="notification-badge">In Evaluation</span>
+        <h3 class="notification-title">SAMPATI — iDEX Prime Challenge</h3>
+        <p class="notification-desc">Aerostatic-Hybrid ESM Network for persistent border surveillance and sub-100m threat localization. TRL-7. Currently in the evaluation phase at iDEX.</p>
+      </div>
+
+      <div class="notification-card">
+        <span class="notification-badge">Submitted — PS 5 (Army)</span>
+        <h3 class="notification-title">IGNIS-COGNITIVE — Cognitive Electronic Warfare System</h3>
+        <p class="notification-desc">Autonomous Sense-Learn-Adapt CEW ecosystem. DRL-driven DRFM countermeasures, Terrain-Intent Fusion, SAMPATI-EW drone nodes. Up to Rs. 25 Cr ADITI 4.0 grant.</p>
+      </div>
+
+      <div class="notification-card">
+        <span class="notification-badge">Submitted — PS 24 (IAF)</span>
+        <h3 class="notification-title">SENTINEL-R / ASTRR — Sovereign Space Domain Awareness</h3>
+        <p class="notification-desc">9-module SSA platform for the IAF. SGP4, UKF hypersonic tracking, LSTM manoeuvre detection, RF fingerprint cataloguing. 7 ruggedized HPC nodes. Up to Rs. 25 Cr grant.</p>
+      </div>
+
+      <div class="notification-card">
+        <span class="notification-badge">Submitted — PS 18 (IAF)</span>
+        <h3 class="notification-title">SENTINEL-R OSINT — Information Dominance Platform</h3>
+        <p class="notification-desc">Sovereign LLM+RNN intelligence brain for deepfake detection, source credibility scoring, and GIS-mapped intelligence dashboards for the Indian Air Force.</p>
+      </div>
+
+      <div class="notification-card">
+        <span class="notification-badge">Submitted — PS 8 (Army)</span>
+        <h3 class="notification-title">VAHAK-AI — Autonomous Logistics for Indian Army B Vehicles</h3>
+        <p class="notification-desc">YOLOv10 terrain segmentation, MPC physics-accurate pathfinding for Himalayan gradients, V2V encrypted convoy swarm. Protects warfighters on high-risk supply routes.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER (exact match) -->
+<footer>
+  <div class="footer-logo">Shoonya<span>Origins</span></div>
+  <div class="footer-links">
+    <a href="https://linkedin.com/in/yogesh-jathalkar-67b179208" target="_blank">LinkedIn</a>
+    <a href="https://shoonyaorigins.com/about">About</a>
+    <a href="https://shoonyaorigins.com">Home</a>
+    <a href="mailto:yogesh@shoonyaorigins.com">Contact</a>
+  </div>
+  <p>&copy; 2026 Yogesh S. Jathalkar — Shoonya Origins. All Rights Reserved.</p>
+  <p style="font-size: 0.8rem; margin-top: 1rem; opacity: 0.5;">Pune, India | BSc Physics (Fergusson College) | BCA (IGNOU)</p>
+</footer>
+
+<script>
+/* LAMP — exact original logic */
+const switchEl = document.getElementById('lightSwitch');
+const body = document.body;
+let isAnimating = false;
+
+switchEl.addEventListener('click', () => {
+  if (isAnimating) return;
+  isAnimating = true;
+  switchEl.classList.add('pulled');
+  setTimeout(() => {
+    body.classList.toggle('dark-mode');
+    switchEl.classList.remove('pulled');
+    isAnimating = false;
+  }, 250);
+});
+
+/* FILTER LOGIC */
+const pills = document.querySelectorAll('.filter-pill');
+const cards = document.querySelectorAll('.card-wrap');
+
+pills.forEach(pill => {
+  pill.addEventListener('click', () => {
+    pills.forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+
+    const filter = pill.dataset.filter;
+    cards.forEach(card => {
+      const cats = card.dataset.cat || '';
+      if (filter === 'all' || cats.includes(filter)) {
+        card.classList.remove('hidden');
+        card.style.display = '';
+      } else {
+        card.classList.add('hidden');
+        card.style.display = 'none';
+      }
+    });
+  });
+});
+
+/* Scroll fade-in on cards */
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.style.opacity = '1';
+      entry.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.1 });
+
+cards.forEach((card, i) => {
+  card.style.opacity = '0';
+  card.style.transform = 'translateY(30px)';
+  card.style.transition = `opacity 0.6s ease ${i * 0.05}s, transform 0.6s ease ${i * 0.05}s`;
+  observer.observe(card);
+});
+</script>
+</body>
+</html>
