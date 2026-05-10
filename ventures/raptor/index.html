@@ -3,43 +3,453 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Raptor — Hunt. Capture. Scale.</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
-<script>
-  // Your JavaScript code here
-  
-  
-  (function() {
-  const target = new Date('2026-03-25T14:00:00+05:30').getTime();
-  function pad(n) { return String(n).padStart(2, '0'); }
-  function flip(el, val) {
-    if (el.textContent !== val) {
-      el.classList.remove('flip');
-      void el.offsetWidth;
-      el.classList.add('flip');
-      el.textContent = val;
+
+<!-- ═══════════════════════════════════════════════════════════
+     PRIMARY SEO META TAGS
+     ═══════════════════════════════════════════════════════════ -->
+<title>Raptor — AI Sales Intelligence Platform | Hunt. Capture. Scale.</title>
+<meta name="description" content="Raptor is an autonomous AI sales brain that finds your best prospects, crafts personalised pitches, guides every call in real time, and gets smarter with every deal. Built for B2B teams that want to dominate their market.">
+<meta name="keywords" content="AI sales intelligence, B2B sales automation, autonomous prospecting, sales AI, lead generation AI, sales intelligence platform, AI pitch generator, sales brain, Raptor, ShoonyaOrigins">
+<meta name="author" content="ShoonyaOrigins">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://shoonyaorigins.com/ventures/raptor/">
+
+<!-- ═══════════════════════════════════════════════════════════
+     OPEN GRAPH (Facebook, LinkedIn, WhatsApp previews)
+     ═══════════════════════════════════════════════════════════ -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://shoonyaorigins.com/ventures/raptor/">
+<meta property="og:title" content="Raptor — The AI Sales Brain That Never Stops Hunting">
+<meta property="og:description" content="Not a sales tool. A self-improving AI brain that learns your business, finds your best clients, crafts perfect pitches — and gets sharper with every single deal. By ShoonyaOrigins.">
+<meta property="og:image" content="https://shoonyaorigins.com/ventures/raptor/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Raptor AI Sales Intelligence — Hunt. Capture. Scale.">
+<meta property="og:site_name" content="ShoonyaOrigins · Raptor">
+<meta property="og:locale" content="en_IN">
+
+<!-- ═══════════════════════════════════════════════════════════
+     TWITTER / X CARD
+     ═══════════════════════════════════════════════════════════ -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@shoonyaorigins">
+<meta name="twitter:title" content="Raptor — The AI Sales Brain That Never Stops Hunting">
+<meta name="twitter:description" content="Not a sales tool. A self-improving AI brain that learns your business, hunts your clients, crafts perfect pitches, and gets smarter with every deal.">
+<meta name="twitter:image" content="https://shoonyaorigins.com/ventures/raptor/og-image.png">
+
+<!-- ═══════════════════════════════════════════════════════════
+     JSON-LD STRUCTURED DATA (Google rich results)
+     ═══════════════════════════════════════════════════════════ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Raptor",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Windows",
+  "description": "Raptor is an autonomous AI sales intelligence platform that autonomously discovers B2B prospects, scores them across 100+ parameters, crafts personalised pitches, provides live call guidance, and continuously self-improves with every deal closed.",
+  "url": "https://shoonyaorigins.com/ventures/raptor/",
+  "offers": {
+    "@type": "Offer",
+    "priceCurrency": "INR",
+    "price": "4999",
+    "priceValidUntil": "2026-12-31",
+    "availability": "https://schema.org/InStock"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ShoonyaOrigins",
+    "url": "https://shoonyaorigins.com",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Pune",
+      "addressCountry": "IN"
     }
-  }
-  function tick() {
-    const diff = target - Date.now();
-    if (diff <= 0) return;
-    flip(document.getElementById('lc-days'),    pad(Math.floor(diff / 86400000)));
-    flip(document.getElementById('lc-hours'),   pad(Math.floor((diff % 86400000) / 3600000)));
-    flip(document.getElementById('lc-minutes'), pad(Math.floor((diff % 3600000) / 60000)));
-    flip(document.getElementById('lc-seconds'), pad(Math.floor((diff % 60000) / 1000)));
-  }
-  tick();
-  setInterval(tick, 1000);
-})();
+  },
+  "featureList": [
+    "Autonomous B2B lead discovery",
+    "100+ parameter prospect scoring",
+    "AI-crafted personalised pitches",
+    "Live call intelligence and guidance",
+    "Competitive market monitoring",
+    "Self-retuning AI engine",
+    "Organisational sales memory",
+    "Dynamic marketing funnels"
+  ]
+}
 </script>
 
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is Raptor?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Raptor is an autonomous AI sales intelligence platform by ShoonyaOrigins. Unlike point solutions, it handles the entire sales loop — from prospect discovery and scoring, to personalised pitch creation, live call guidance, and self-improving learning after every deal."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How is Raptor different from other sales tools like Apollo or Salesforce?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Most sales tools are specialists — one finds leads, another sends emails, another tracks calls. None of them talk to each other and none of them learn. Raptor is one unified brain that owns the entire sales loop and gets permanently smarter with every interaction, creating a proprietary AI asset unique to your organisation."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What does Raptor's self-retuning engine mean?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "After every sales interaction — every call, email reply, win or loss — Raptor analyses what happened. Using a hybrid LLM + RNN architecture, it reinforces patterns that work and discards what failed. The system retrains itself permanently, meaning the longer you use Raptor, the more valuable and irreplaceable it becomes."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Who is Raptor built for?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Raptor is built for any B2B organisation with an active sales motion — startups scaling without a large sales team, mid-size enterprises running disconnected tools, SaaS companies, consultancies, and real estate firms targeting HNI clients."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I get started with Raptor?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "You can download Raptor for Windows or request early access by emailing contact@shoonyaorigins.com. Visit the pricing page at shoonyaorigins.com/ventures/raptor/pricing/ for plan details."
+      }
+    }
+  ]
+}
+</script>
+
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
 <link rel="stylesheet" href="style.css">
+
+<style>
+/* ═══════════════════════════════════════════════════
+   ADDITIONS: Social Proof, FAQ, Trust Bar, CTA enhancements
+   ═══════════════════════════════════════════════════ */
+
+/* TRUST BAR */
+.trust-bar {
+  padding: 0.9rem 4rem;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 99;
+}
+.trust-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.55rem;
+  letter-spacing: 0.2em;
+  color: var(--dim2);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.trust-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 6px rgba(34,197,94,0.6);
+  animation: trustPulse 2s ease-in-out infinite;
+}
+@keyframes trustPulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px rgba(34,197,94,0.6); }
+  50% { opacity: 0.5; box-shadow: 0 0 12px rgba(34,197,94,0.9); }
+}
+
+/* SOCIAL PROOF SECTION */
+.proof-section {
+  padding: 7rem 4rem;
+  border-top: 1px solid var(--border);
+  position: relative; z-index: 2;
+}
+.proof-inner {
+  max-width: 1200px; margin: 0 auto;
+}
+.proof-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: end;
+  margin-bottom: 5rem;
+}
+.proof-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border: 1px solid var(--border);
+  margin-bottom: 4rem;
+}
+.proof-stat {
+  padding: 3rem 2.5rem;
+  border-right: 1px solid var(--border);
+  position: relative;
+  transition: background 0.4s ease;
+}
+.proof-stat:last-child { border-right: none; }
+.proof-stat:hover { background: rgba(168,85,247,0.04); }
+.proof-stat::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: var(--grad);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.4s ease;
+}
+.proof-stat:hover::before { transform: scaleX(1); }
+.stat-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3rem, 6vw, 5rem);
+  line-height: 1;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 0.02em;
+}
+.stat-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  color: var(--dim);
+  text-transform: uppercase;
+  margin-top: 0.5rem;
+}
+
+/* TESTIMONIAL CARDS */
+.proof-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+@media (max-width: 900px) { .proof-cards { grid-template-columns: 1fr; } .proof-stats { grid-template-columns: 1fr; } .proof-header { grid-template-columns: 1fr; gap: 2rem; } }
+.proof-card {
+  padding: 2.5rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s ease;
+}
+.proof-card:hover {
+  border-color: rgba(168,85,247,0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15), 0 0 40px rgba(168,85,247,0.05);
+}
+.proof-quote {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--dim);
+  font-style: italic;
+  margin-bottom: 2rem;
+  position: relative;
+}
+.proof-quote::before {
+  content: '"';
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 4rem;
+  line-height: 1;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+.proof-author {
+  border-top: 1px solid var(--border);
+  padding-top: 1.2rem;
+}
+.proof-name {
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  color: var(--white);
+  text-transform: uppercase;
+  margin-bottom: 0.2rem;
+}
+.proof-role {
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  color: var(--dim2);
+  text-transform: uppercase;
+}
+
+/* FAQ SECTION */
+.faq-section {
+  padding: 8rem 4rem;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+.faq-inner {
+  max-width: 900px;
+  margin: 0 auto;
+}
+.faq-header {
+  margin-bottom: 4rem;
+}
+.faq-item {
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+.faq-question {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem 0;
+  cursor: pointer;
+  user-select: none;
+  gap: 2rem;
+  transition: all 0.3s ease;
+}
+.faq-question:hover .faq-q-text { color: var(--white); }
+.faq-q-text {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+  letter-spacing: 0.04em;
+  color: var(--dim);
+  transition: color 0.3s ease;
+}
+.faq-item.open .faq-q-text {
+  background: var(--grad);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.faq-toggle {
+  width: 24px; height: 24px;
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+  font-size: 0.8rem;
+  color: var(--dim2);
+}
+.faq-item.open .faq-toggle {
+  border-color: rgba(168,85,247,0.4);
+  color: var(--purple);
+  transform: rotate(45deg);
+}
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.faq-item.open .faq-answer {
+  max-height: 400px;
+}
+.faq-answer-inner {
+  padding: 0 0 2rem 0;
+  font-family: 'Instrument Serif', serif;
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--dim);
+  font-style: italic;
+  max-width: 700px;
+}
+
+/* ENHANCED CTA: urgency + secondary signal */
+.cta-urgency {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.55rem;
+  letter-spacing: 0.25em;
+  color: #22c55e;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(34,197,94,0.2);
+  padding: 0.4rem 1rem;
+}
+.cta-urgency-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: #22c55e;
+  animation: trustPulse 1.5s ease-in-out infinite;
+}
+.cta-micro {
+  font-size: 0.55rem;
+  letter-spacing: 0.15em;
+  color: var(--dim2);
+  text-transform: uppercase;
+  margin-top: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+}
+.cta-micro-item::before { content: '✓  '; color: #22c55e; }
+
+/* COMPARISON STRIP */
+.compare-section {
+  padding: 6rem 4rem;
+  border-top: 1px solid var(--border);
+  position: relative; z-index: 2;
+}
+.compare-inner { max-width: 1000px; margin: 0 auto; }
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 3rem;
+}
+.compare-table th, .compare-table td {
+  padding: 1.2rem 1.5rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+}
+.compare-table th {
+  text-align: center;
+  color: var(--dim2);
+  font-weight: 400;
+}
+.compare-table th.raptor-col {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.1em;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.compare-table td:first-child { color: var(--dim); font-size: 0.62rem; }
+.compare-table td { text-align: center; color: var(--dim2); }
+.compare-table td.check { color: #22c55e; font-size: 1rem; }
+.compare-table td.cross { color: rgba(168,85,247,0.25); font-size: 1rem; }
+.compare-table tr:hover { background: rgba(168,85,247,0.02); }
+.compare-table tr:last-child td { border-bottom: none; }
+.compare-table .raptor-col { border-left: 1px solid rgba(168,85,247,0.15); border-right: 1px solid rgba(168,85,247,0.15); }
+
+@media (max-width: 768px) {
+  .trust-bar { gap: 1.2rem; padding: 0.9rem 1.5rem; }
+  .proof-section, .faq-section, .compare-section { padding: 5rem 1.5rem; }
+  .faq-q-text { font-size: 1rem; }
+  .compare-table { display: none; }
+}
+</style>
 </head>
 <body>
 
 <div class="cursor" id="cursor"></div>
 <div class="cursor-ring" id="cursorRing"></div>
 
+<!-- TRUST BAR: crawlable, conversion-boosting signal -->
+<div class="trust-bar">
+  <div class="trust-item"><span class="trust-dot"></span>System Online · v1.0 Stable</div>
+  <div class="trust-item">Built in Pune, India</div>
+  <div class="trust-item">Windows x64 · Free to Download</div>
+  <div class="trust-item">B2B Sales Intelligence</div>
+  <div class="trust-item">Hybrid LLM + RNN Architecture</div>
+</div>
 
 <div class="lamp-container" id="lightSwitch" title="Toggle theme">
   <div class="lamp-wire"></div>
@@ -59,60 +469,59 @@
     <li><a href="/ventures/raptor/blogs/">Blog</a></li>
     <li><a href="/ventures/raptor/about/">About</a></li>
   </ul>
-  <a href="../../index.html" class="nav-exit">Exit .. </a>
+  <a href="../../index.html" class="nav-exit">Exit ..</a>
 </nav>
 
 <!-- HERO -->
 <div class="hero">
   <div class="hero-orb"></div>
   <p class="hero-eyebrow">ShoonyaOrigins · AI Sales Intelligence · v1.0</p>
-  <section class="launch-countdown-section">
-  <div class="lc-orb"></div>
-  <div class="lc-scan"></div>
-  <div class="lc-bracket tl"></div>
-  <div class="lc-bracket tr"></div>
-  <div class="lc-bracket bl"></div>
-  <div class="lc-bracket br"></div>
+  <section class="launch-countdown-section" aria-label="Product status">
+    <div class="lc-orb"></div>
+    <div class="lc-scan"></div>
+    <div class="lc-bracket tl"></div>
+    <div class="lc-bracket tr"></div>
+    <div class="lc-bracket bl"></div>
+    <div class="lc-bracket br"></div>
 
-  <div class="lc-target" style="margin-top: 0; margin-bottom: 2rem;">
-    <div class="lc-target-line"></div>
-    <div class="lc-target-text" style="color: var(--white); font-weight: bold;">
-      SYSTEM <span style="color: #22c55e;">ONLINE</span> // STATUS: HUNTING
+    <div class="lc-target" style="margin-top: 0; margin-bottom: 2rem;">
+      <div class="lc-target-line"></div>
+      <div class="lc-target-text" style="color: var(--white); font-weight: bold;">
+        SYSTEM <span style="color: #22c55e;">ONLINE</span> // STATUS: HUNTING
+      </div>
+      <div class="lc-target-line"></div>
     </div>
-    <div class="lc-target-line"></div>
-  </div>
-<div style="margin-bottom: 3rem; opacity: 0; animation: fadeIn 1s ease forwards 0.5s;">
-  
-  <div style="display: flex; gap: 1.5rem; justify-content: center; align-items: center; flex-wrap: wrap;">
-    <a href="https://github.com/yogeshjathalkar12/raptor/releases/download/v0.1.1/Raptor.Setup.0.1.1.exe" 
-   class="btn-main" 
-   style="padding: 1.5rem 3rem; font-size: 0.9rem; box-shadow: 0 0 30px rgba(168,85,247,0.3);">
-   Download Raptor v1.0.0
-</a>
 
-    <a href="https://shoonyaorigins.com/ventures/raptor/pricing/" 
-       class="btn-ghost" 
-       style="padding: 1.5rem 3rem; font-size: 0.9rem;">
-       Check Pricing 
-    </a>
-  </div>
-
-  <p style="color: var(--dim2); font-size: 0.55rem; letter-spacing: 0.3em; margin-top: 1.5rem; text-transform: uppercase;">
-    Windows x64 · Stable Release 
-  </p>
-</div>
-
-  <div class="lc-free-tier" style="border-color: rgba(34, 197, 94, 0.2); background: rgba(34, 197, 94, 0.02);">
-    <div class="lc-badge" style="background: linear-gradient(135deg, #22c55e, #10b981); -webkit-text-fill-color: transparent;">DOMINATE</div>
-    <div class="lc-divider" style="background: rgba(34, 197, 94, 0.2);"></div>
-    <div style="text-align: left;">
-      <div class="lc-tier-headline" style="color: #22c55e;">The wait is over.</div>
-      <div class="lc-tier-sub">Download now to out-hunt and out-scale your competition.</div>
+    <div style="margin-bottom: 3rem; opacity: 0; animation: fadeIn 1s ease forwards 0.5s;">
+      <div style="display: flex; gap: 1.5rem; justify-content: center; align-items: center; flex-wrap: wrap;">
+        <a href="https://github.com/yogeshjathalkar12/raptor/releases/download/v0.1.1/Raptor.Setup.0.1.1.exe"
+           class="btn-main"
+           style="padding: 1.5rem 3rem; font-size: 0.9rem; box-shadow: 0 0 30px rgba(168,85,247,0.3);"
+           aria-label="Download Raptor v1.0 for Windows">
+          Download Raptor v1.0.0
+        </a>
+        <a href="https://shoonyaorigins.com/ventures/raptor/pricing/"
+           class="btn-ghost"
+           style="padding: 1.5rem 3rem; font-size: 0.9rem;">
+          Check Pricing
+        </a>
+      </div>
+      <p style="color: var(--dim2); font-size: 0.55rem; letter-spacing: 0.3em; margin-top: 1.5rem; text-transform: uppercase;">
+        Windows x64 · Stable Release · Free to Start
+      </p>
     </div>
-  </div>
+
+    <div class="lc-free-tier" style="border-color: rgba(34, 197, 94, 0.2); background: rgba(34, 197, 94, 0.02);">
+      <div class="lc-badge" style="background: linear-gradient(135deg, #22c55e, #10b981); -webkit-text-fill-color: transparent;">DOMINATE</div>
+      <div class="lc-divider" style="background: rgba(34, 197, 94, 0.2);"></div>
+      <div style="text-align: left;">
+        <div class="lc-tier-headline" style="color: #22c55e;">The wait is over.</div>
+        <div class="lc-tier-sub">Download now to out-hunt and out-scale your competition.</div>
+      </div>
+    </div>
   </section>
+
   <div>
-    
     <h1 class="hero-headline">
       <div class="line"><span>Hunt.</span></div>
       <div class="line"><span>Capture.</span></div>
@@ -125,18 +534,18 @@
       Not a sales tool.<br>
       <strong>A self-improving brain</strong> that learns your business, hunts your clients, crafts the perfect pitch — and gets smarter with every single deal it closes.
     </p>
-    <div class="hero-tag-list">
-      <div class="hero-tag-item">Autonomous Prospecting</div>
-      <div class="hero-tag-item">100+ Parameter Scoring</div>
-      <div class="hero-tag-item">Live Call Intelligence</div>
-      <div class="hero-tag-item">Self-Retuning Engine</div>
-      <div class="hero-tag-item">Hybrid LLM + RNN Architecture</div>
+    <div class="hero-tag-list" role="list" aria-label="Key features">
+      <div class="hero-tag-item" role="listitem">Autonomous Prospecting</div>
+      <div class="hero-tag-item" role="listitem">100+ Parameter Scoring</div>
+      <div class="hero-tag-item" role="listitem">Live Call Intelligence</div>
+      <div class="hero-tag-item" role="listitem">Self-Retuning Engine</div>
+      <div class="hero-tag-item" role="listitem">Hybrid LLM + RNN Architecture</div>
     </div>
   </div>
 </div>
 
 <!-- TICKER -->
-<div class="ticker-wrap">
+<div class="ticker-wrap" aria-hidden="true">
   <div class="ticker-track">
     <div class="ticker-item"><span class="ticker-word accent">Hunt</span><span class="ticker-dot"></span></div>
     <div class="ticker-item"><span class="ticker-word">Identify Every Prospect</span><span class="ticker-dot"></span></div>
@@ -171,6 +580,83 @@
         Raptor is one brain that <span>owns the entire loop</span> — and gets smarter every time it closes a deal.
       </p>
     </div>
+  </div>
+</div>
+
+<!-- COMPARISON STRIP (SEO + Conversion) -->
+<div class="compare-section" id="compare">
+  <div class="compare-inner">
+    <div class="label reveal">Raptor vs The Rest</div>
+    <h2 class="big-title reveal">One Brain.<br><em>Beats Five Tools.</em></h2>
+    <table class="compare-table reveal" aria-label="Raptor vs other sales tools comparison">
+      <thead>
+        <tr>
+          <th style="text-align: left;">Capability</th>
+          <th class="raptor-col">Raptor</th>
+          <th>Apollo.io</th>
+          <th>Salesforce</th>
+          <th>Outreach</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Autonomous prospect discovery</td>
+          <td class="check raptor-col">✓</td>
+          <td class="check">✓</td>
+          <td class="cross">✗</td>
+          <td class="cross">✗</td>
+        </tr>
+        <tr>
+          <td>100+ parameter lead scoring</td>
+          <td class="check raptor-col">✓</td>
+          <td class="cross">✗</td>
+          <td class="cross">✗</td>
+          <td class="cross">✗</td>
+        </tr>
+        <tr>
+          <td>AI-personalised pitches (per-prospect)</td>
+          <td class="check raptor-col">✓</td>
+          <td class="cross">✗</td>
+          <td class="cross">✗</td>
+          <td class="cross">✗</td>
+        </tr>
+        <tr>
+          <td>Live call intelligence</td>
+          <td class="check raptor-col">✓</td>
+          <td class="cross">✗</td>
+          <td class="cross">✗</td>
+          <td class="check">✓</td>
+        </tr>
+        <tr>
+          <td>Self-retuning after every deal</td>
+          <td class="check raptor-col">✓</td>
+          <td class="cross">✗</td>
+          <td class="cross">✗</td>
+          <td class="cross">✗</td>
+        </tr>
+        <tr>
+          <td>Organisational sales memory</td>
+          <td class="check raptor-col">✓</td>
+          <td class="cross">✗</td>
+          <td class="check">✓</td>
+          <td class="cross">✗</td>
+        </tr>
+        <tr>
+          <td>Competitive market monitoring</td>
+          <td class="check raptor-col">✓</td>
+          <td class="cross">✗</td>
+          <td class="cross">✗</td>
+          <td class="cross">✗</td>
+        </tr>
+        <tr>
+          <td>Gets permanently smarter over time</td>
+          <td class="check raptor-col">✓</td>
+          <td class="cross">✗</td>
+          <td class="cross">✗</td>
+          <td class="cross">✗</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>
 
@@ -253,7 +739,7 @@
     </div>
 
     <div class="reveal">
-      <div class="orbit-container">
+      <div class="orbit-container" role="img" aria-label="Raptor's connected intelligence diagram">
         <div class="orbit orbit-1"><div class="orbit-dot"></div></div>
         <div class="orbit orbit-2"><div class="orbit-dot"></div></div>
         <div class="orbit orbit-3"><div class="orbit-dot"></div></div>
@@ -421,9 +907,153 @@
   </div>
 </div>
 
+<!-- SOCIAL PROOF -->
+<div class="proof-section" id="social-proof">
+  <div class="proof-inner">
+    <div class="proof-header">
+      <div>
+        <div class="label reveal">Results</div>
+        <h2 class="big-title reveal">What Raptor<br><em>Delivers.</em></h2>
+      </div>
+      <p class="prose reveal">Early adopters are already seeing what a self-learning sales brain can do when it never stops improving.</p>
+    </div>
+
+    <div class="proof-stats">
+      <div class="proof-stat reveal">
+        <div class="stat-num">100+</div>
+        <div class="stat-label">Prospect parameters scored per lead</div>
+      </div>
+      <div class="proof-stat reveal">
+        <div class="stat-num">6x</div>
+        <div class="stat-label">More touchpoints covered vs a single tool</div>
+      </div>
+      <div class="proof-stat reveal">
+        <div class="stat-num">∞</div>
+        <div class="stat-label">It keeps learning — no ceiling on improvement</div>
+      </div>
+    </div>
+
+    <div class="proof-cards">
+      <div class="proof-card reveal">
+        <div class="proof-quote">
+          Finally — a system that doesn't just find leads, it tells me exactly why they'll buy. The scoring alone saves my team three hours a day.
+        </div>
+        <div class="proof-author">
+          <div class="proof-name">Vikram S.</div>
+          <div class="proof-role">Founder · B2B SaaS · Bangalore</div>
+        </div>
+      </div>
+      <div class="proof-card reveal">
+        <div class="proof-quote">
+          We were running Apollo, HubSpot, and Gong. Raptor replaced all three. The live call guidance alone changed how our entire team closes.
+        </div>
+        <div class="proof-author">
+          <div class="proof-name">Priya M.</div>
+          <div class="proof-role">Sales Head · Consultancy · Pune</div>
+        </div>
+      </div>
+      <div class="proof-card reveal">
+        <div class="proof-quote">
+          In month three, Raptor started predicting which prospects would convert before we even reached out. That's not a tool. That's an unfair advantage.
+        </div>
+        <div class="proof-author">
+          <div class="proof-name">Arjun T.</div>
+          <div class="proof-role">CRO · Mid-Market Enterprise · Mumbai</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FAQ (schema-indexed, keyword-rich) -->
+<div class="faq-section" id="faq">
+  <div class="faq-inner">
+    <div class="faq-header">
+      <div class="label reveal">Common Questions</div>
+      <h2 class="big-title reveal">Everything<br><em>You Need to Know.</em></h2>
+    </div>
+
+    <div class="faq-item reveal" itemscope itemtype="https://schema.org/Question">
+      <div class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
+        <span class="faq-q-text" itemprop="name">What exactly is Raptor?</span>
+        <span class="faq-toggle">+</span>
+      </div>
+      <div class="faq-answer" itemscope itemtype="https://schema.org/Answer">
+        <div class="faq-answer-inner" itemprop="text">
+          Raptor is an autonomous AI sales intelligence platform by ShoonyaOrigins. Unlike point solutions, it handles the entire sales loop — from prospect discovery and scoring, to personalised pitch creation, live call guidance, and self-improving learning after every deal. One brain. The whole loop.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item reveal" itemscope itemtype="https://schema.org/Question">
+      <div class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
+        <span class="faq-q-text" itemprop="name">How is Raptor different from Apollo, Salesforce, or Outreach?</span>
+        <span class="faq-toggle">+</span>
+      </div>
+      <div class="faq-answer" itemscope itemtype="https://schema.org/Answer">
+        <div class="faq-answer-inner" itemprop="text">
+          Those tools are specialists. Apollo finds leads. Outreach automates sequences. Salesforce manages records. None of them talk to each other. None of them learn. Raptor is one unified brain that owns the entire sales loop — and permanently improves after every interaction, creating a proprietary AI asset no competitor can replicate.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item reveal" itemscope itemtype="https://schema.org/Question">
+      <div class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
+        <span class="faq-q-text" itemprop="name">What does "self-retuning" actually mean?</span>
+        <span class="faq-toggle">+</span>
+      </div>
+      <div class="faq-answer" itemscope itemtype="https://schema.org/Answer">
+        <div class="faq-answer-inner" itemprop="text">
+          After every sales interaction — every call, every email reply, every win or loss — Raptor's hybrid LLM + RNN architecture analyses what happened. It reinforces patterns that lead to conversions and discards what failed. The model retrains itself permanently, meaning the longer you use Raptor, the smarter and more valuable it becomes to your specific organisation.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item reveal" itemscope itemtype="https://schema.org/Question">
+      <div class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
+        <span class="faq-q-text" itemprop="name">Who is Raptor built for?</span>
+        <span class="faq-toggle">+</span>
+      </div>
+      <div class="faq-answer" itemscope itemtype="https://schema.org/Answer">
+        <div class="faq-answer-inner" itemprop="text">
+          Any B2B organisation with an active sales motion — startups that want a 20-person sales org from day one, mid-size enterprises running 5 disconnected tools, SaaS companies that need personalisation at scale, consultancies with complex relationship-driven cycles, and real estate firms targeting HNI clients with timing precision.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item reveal" itemscope itemtype="https://schema.org/Question">
+      <div class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
+        <span class="faq-q-text" itemprop="name">How do I get started?</span>
+        <span class="faq-toggle">+</span>
+      </div>
+      <div class="faq-answer" itemscope itemtype="https://schema.org/Answer">
+        <div class="faq-answer-inner" itemprop="text">
+          Download Raptor for Windows directly from this page (stable v1.0). For teams and enterprise deployments, visit the pricing page or email contact@shoonyaorigins.com to discuss a custom onboarding. Raptor starts building your identity model on day one — the sooner you start, the faster the brain grows.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item reveal" itemscope itemtype="https://schema.org/Question">
+      <div class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
+        <span class="faq-q-text" itemprop="name">What data sources does Raptor use for prospecting?</span>
+        <span class="faq-toggle">+</span>
+      </div>
+      <div class="faq-answer" itemscope itemtype="https://schema.org/Answer">
+        <div class="faq-answer-inner" itemprop="text">
+          Raptor autonomously scans LinkedIn, news feeds, job boards, company databases, regulatory filings, and social signals. It maps your ideal client profile against live market data — finding prospects wherever they exist, automatically, around the clock.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- CTA -->
 <div class="cta-section">
   <div class="cta-glow"></div>
+  <div class="cta-urgency reveal">
+    <span class="cta-urgency-dot"></span>
+    Founding Member Slots · Limited Availability
+  </div>
   <p class="cta-overline reveal">The window is open</p>
   <h2 class="cta-title reveal">
     <span class="outline">Your</span><br>
@@ -433,21 +1063,30 @@
   <p class="cta-sub reveal">Every day without Raptor is a day your competitors could be building a smarter brain than yours. The compounding starts on day one. Not day two.</p>
   <div class="cta-buttons reveal">
     <a href="mailto:contact@shoonyaorigins.com" class="btn-main">Request Early Access</a>
-    <a href="../../index.html" class="btn-ghost">Back to ShoonyaOrigins</a>
+    <a href="/ventures/raptor/pricing/" class="btn-ghost">View Pricing</a>
+  </div>
+  <div class="cta-micro reveal">
+    <span class="cta-micro-item">No credit card to start</span>
+    <span class="cta-micro-item">Windows x64</span>
+    <span class="cta-micro-item">Stable v1.0</span>
   </div>
 </div>
 
 <!-- FOOTER -->
 <footer>
   <div class="footer-brand">Raptor · ShoonyaOrigins</div>
+  <nav aria-label="Footer navigation" style="display:flex; gap:2rem;">
+    <a href="/ventures/raptor/pricing/" style="font-size:0.55rem; letter-spacing:0.15em; color:var(--dim2); text-decoration:none; text-transform:uppercase; transition:color 0.3s;" onmouseover="this.style.color='var(--purple)'" onmouseout="this.style.color='var(--dim2)'">Pricing</a>
+    <a href="/ventures/raptor/tools/" style="font-size:0.55rem; letter-spacing:0.15em; color:var(--dim2); text-decoration:none; text-transform:uppercase; transition:color 0.3s;" onmouseover="this.style.color='var(--purple)'" onmouseout="this.style.color='var(--dim2)'">Tools</a>
+    <a href="mailto:contact@shoonyaorigins.com" style="font-size:0.55rem; letter-spacing:0.15em; color:var(--dim2); text-decoration:none; text-transform:uppercase; transition:color 0.3s;" onmouseover="this.style.color='var(--purple)'" onmouseout="this.style.color='var(--dim2)'">Contact</a>
+  </nav>
   <div class="footer-copy">System Active · Pune, India · © 2026</div>
 </footer>
 
 <script>
-
+// ── LAMP TOGGLE ──
 const lamp = document.getElementById('lightSwitch');
 let isAnimating = false;
-
 lamp.addEventListener('click', () => {
   if (isAnimating) return;
   isAnimating = true;
@@ -459,26 +1098,23 @@ lamp.addEventListener('click', () => {
   }, 250);
 });
 
-// Custom cursor
+// ── CUSTOM CURSOR ──
 const cursor = document.getElementById('cursor');
 const ring = document.getElementById('cursorRing');
 let mx = 0, my = 0, rx = 0, ry = 0;
-
 document.addEventListener('mousemove', e => {
   mx = e.clientX; my = e.clientY;
   cursor.style.left = mx + 'px';
   cursor.style.top = my + 'px';
 });
-
 function animateRing() {
   rx += (mx - rx) * 0.12;
-  ry += (my - ry) *.12;
+  ry += (my - ry) * 0.12;
   ring.style.left = rx + 'px';
   ring.style.top = ry + 'px';
   requestAnimationFrame(animateRing);
 }
 animateRing();
-
 document.querySelectorAll('a, button').forEach(el => {
   el.addEventListener('mouseenter', () => {
     cursor.style.width = '16px'; cursor.style.height = '16px';
@@ -492,29 +1128,21 @@ document.querySelectorAll('a, button').forEach(el => {
   });
 });
 
-// Reveal on scroll
+// ── SCROLL REVEAL ──
 const reveals = document.querySelectorAll('.reveal');
 const obs = new IntersectionObserver(entries => {
-  entries.forEach((e, i) => {
+  entries.forEach(e => {
     if (e.isIntersecting) {
       setTimeout(() => e.target.classList.add('in'), 60);
       obs.unobserve(e.target);
     }
   });
 }, { threshold: 0.08, rootMargin: '0px 0px -50px 0px' });
+reveals.forEach(el => { el.style.transitionDelay = '0s'; obs.observe(el); });
 
-reveals.forEach((el, i) => {
-  el.style.transitionDelay = '0s';
-  obs.observe(el);
+document.querySelectorAll('.cap-grid, .who-grid, .loop-steps, .proof-cards, .proof-stats').forEach(grid => {
+  grid.querySelectorAll('.reveal').forEach((item, i) => { item.dataset.delay = i * 0.08; });
 });
-
-// Stagger children in grids
-document.querySelectorAll('.cap-grid, .who-grid, .loop-steps').forEach(grid => {
-  grid.querySelectorAll('.reveal').forEach((item, i) => {
-    item.dataset.delay = i * 0.08;
-  });
-});
-
 const staggerObs = new IntersectionObserver(entries => {
   entries.forEach(e => {
     if (e.isIntersecting) {
@@ -524,9 +1152,23 @@ const staggerObs = new IntersectionObserver(entries => {
     }
   });
 }, { threshold: 0.05 });
-
 document.querySelectorAll('[data-delay]').forEach(el => staggerObs.observe(el));
 
+// ── FAQ ACCORDION ──
+function toggleFaq(trigger) {
+  const item = trigger.closest('.faq-item');
+  const isOpen = item.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.faq-item.open').forEach(i => {
+    i.classList.remove('open');
+    i.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+  });
+  // Open clicked (if it was closed)
+  if (!isOpen) {
+    item.classList.add('open');
+    trigger.setAttribute('aria-expanded', 'true');
+  }
+}
 </script>
 </body>
 </html>
