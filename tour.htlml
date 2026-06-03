@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="preload" as="image" href="images/rover.webp">
+    <!-- Google Tag Manager -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XV0W5ZV0RQ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XV0W5ZV0RQ');
+    </script>
+    <!-- Apollo Tracking -->
+    <script>
+        function initApollo(){
+            var n=Math.random().toString(36).substring(7),o=document.createElement("script");
+            o.src="https://assets.apollo.io/micro/website-tracker/tracker.iife.js?nocache="+n;
+            o.async=true; o.defer=true;
+            o.onload=function(){window.trackingFunctions.onLoad({appId:"69e9e2c18fee4b000dacb54c"})};
+            document.head.appendChild(o);
+        }
+        initApollo();
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Tour | Shoonya Origins</title>
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <meta name="google-site-verification" content="B8lE_HL53IWDazD-NuitU_ISBLoD6tV-ZgGqyIu8K-E" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Light Switch -->
+    <div class="lamp-container" id="lightSwitch" title="Pull to toggle">
+        <div class="wire"></div>
+        <div class="socket"></div>
+        <div class="bulb"></div>
+        <div class="pull-string"><div class="knob"></div></div>
+    </div>
+
+    <header data-aos="fade-down" data-aos-duration="1000">
+        <div class="logo" id="logoTrigger">Shoonya<span>Origins</span></div>
+    </header>
+
+    <section class="hero-section" id="hero-target">
+        <h1 data-aos="fade-up" data-aos-duration="1200">
+            Technology that <br><span class="gradient-text"> pushes human capabilities..</span>
+        </h1>
+        <p class="subtitle" data-aos="fade-up" data-aos-delay="200" data-aos-duration="1200">
+            An innovation ecosystem advancing Defense, Health, Infrastructure, Research and Business Intelligence.
+        </p>
+        <div class="hero-actions" data-aos="fade-up" data-aos-delay="300">
+            <a href="tour.html" class="hero-btn btn-gamified">Explore the Game</a>
+            <a href="#ecosystem" class="hero-btn btn-professional">Explore Free Tools</a>
+        </div>
+    </section>
+
+    <div class="game-map" id="ecosystem">
+        <div class="card bg-aura map-node node-left" id="card-aura" data-aos="zoom-in">
+            <span class="card-tag">Sector 1: Health</span>
+            <div class="card-content">
+                <h3 class="card-title">AURA</h3>
+                <p class="card-desc">Bio-metric scanning array and local sensor fusion. Status: Online.</p>
+                <div class="card-actions">
+                    <a href="ventures/aura/" class="extra-btn main-card-link">Enter Sector</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card bg-civitas map-node node-right" id="card-construct" data-aos="zoom-in">
+            <span class="card-tag">Sector 2: Infrastructure</span>
+            <div class="card-content">
+                <h3 class="card-title">CONSTRUCT</h3>
+                <p class="card-desc">Heavy vehicular autonomous routing and structural architecture. Status: Standby.</p>
+                <div class="card-actions">
+                    <a href="ventures/construct/" class="extra-btn main-card-link">Enter Sector</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card bg-basis map-node node-left" id="card-basis" data-aos="zoom-in">
+            <span class="card-tag">Sector 3: Urban</span>
+            <div class="card-content">
+                <h3 class="card-title">BASIS</h3>
+                <p class="card-desc">Smart city civic logic and automated resource rejuvenation. Status: Online.</p>
+                <div class="card-actions">
+                    <a href="ventures/basis/" class="extra-btn main-card-link">Enter Sector</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card bg-raptor map-node node-right" id="card-raptor" data-aos="zoom-in">
+            <span class="card-tag">Sector 4: Growth</span>
+            <div class="card-content">
+                <h3 class="card-title">RAPTOR</h3>
+                <p class="card-desc">Target acquisition AI converted for high-velocity market scaling. Status: Online.</p>
+                <div class="card-actions">
+                    <a href="ventures/raptor/" class="extra-btn main-card-link">Enter Sector</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card bg-sentinel map-node node-center" id="card-shakti" data-aos="zoom-in">
+            <span class="card-tag">Sector 5: Defense</span>
+            <div class="card-content">
+                <h3 class="card-title">SHAKTI</h3>
+                <p class="card-desc">Unmanned tactical hardware and localized combat computation. Status: Classified.</p>
+                <div class="card-actions">
+                    <a href="ventures/shakti/" class="extra-btn main-card-link">Request Clearance</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="logo" style="color: white; margin-bottom: 1rem;">Shoonya<span>Origins</span></div>
+        <div class="footer-links">
+            <a href="https://www.linkedin.com/in/yogesh-jathalkar-67b179208/" target="_blank">LinkedIn</a>
+            <a href="privacy.html" target="_blank">Privacy Policy</a>
+            <a href="terms.html" target="_blank">Terms of Service</a>
+            <a href="disclaimer.html" target="_blank">Legal Disclaimer</a>
+            <a href="mailto:yogeshjathalkar@gmail.com">Contact Us</a>
+        </div>
+        <p>&copy; 2026 Shoonya Origins. All Rights Reserved.</p>
+        <p class="footer-location">Pune, India</p>
+    </footer>
+
+    <!-- =========================================
+         ROVER TOUR GUIDE UI (single instance)
+    ========================================= -->
+    <div id="tour-curtain"></div>
+
+    <div id="rover-bot">
+        <div id="rover-speech">
+            <div id="rover-chat-history">
+                <p class="bot-msg" id="rover-text">Initializing Shoonya Systems...</p>
+            </div>
+            <div id="rover-input-area" style="display: none;">
+                <input type="text" id="rover-user-input" placeholder="Ask me anything..." autocomplete="off">
+                <button id="rover-send-btn">&uarr;</button>
+            </div>
+            <button id="rover-action-btn">Start Tour</button>
+        </div>
+        <img src="images/rover_love.webp" id="rover-sprite" alt="Shoonya Rover">
+    </div>
+
+    <!-- Hidden Game Layers -->
+    <div id="cosmosBackground"></div>
+    <canvas id="gameCanvas"></canvas>
+    <div id="blastOverlay"></div>
+
+    <div id="gameUI">
+        <div>MASS: <span id="scoreVal">0</span></div>
+        <div>PRESS 'ESC' TO EXIT</div>
+    </div>
+    <div id="gameOverlay">
+        <h2 style="font-size: 2rem; margin-bottom: 20px;">SYSTEM OVERRIDE DETECTED</h2>
+        <p>ENTERING THE VOID...</p>
+        <p style="margin-top: 20px; font-size: 0.8rem; opacity: 0.7;">Click to Start</p>
+    </div>
+    <div id="warningScreen">
+        <h1 style="font-size: 2rem;">⚠ CRITICAL MASS STABILITY LOSS ⚠</h1>
+        <p style="margin-top: 1rem;">SINGULARITY IMMINENT...</p>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ offset: 100, duration: 800, easing: 'ease-out-cubic', once: true });
+
+        // Light Switch Logic
+        const switchElement = document.getElementById('lightSwitch');
+        const body = document.body;
+        let isAnimating = false;
+        switchElement.addEventListener('click', () => {
+            if (isAnimating) return;
+            isAnimating = true;
+            switchElement.classList.add('pulled');
+            setTimeout(() => {
+                body.classList.toggle('dark-mode');
+                switchElement.classList.remove('pulled');
+                isAnimating = false;
+            }, 250);
+        });
+    </script>
+
+    <script src="rover-engine.js"></script>
+</body>
+</html>
