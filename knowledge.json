@@ -1,0 +1,34 @@
+[
+    {
+        "tags": ["aura", "health", "vitals", "medical", "doctor", "sensor"],
+        "response": "Aura is our non-invasive health portal. It utilizes advanced sensor fusion algorithms to predict physiological vitals locally. Click the Aura card to view the open tools!"
+    },
+    {
+        "tags": ["raptor", "marketing", "sales", "clients", "growth", "engine"],
+        "response": "Raptor is our AI growth engine. It automates sales pitches and funnels without sharing your client data."
+    },
+    {
+        "tags": ["shakti", "defense", "military", "combat", "unmanned", "security"],
+        "response": "Shakti focuses on unmanned defense tech. Note: this is for informational research only; we do not host tactical software on this public site."
+    },
+    {
+        "tags": ["construct", "basis", "infrastructure", "city", "urban", "heavy"],
+        "response": "Construct and Basis handle our autonomous infrastructure and smart city management. They are designed for heavy vehicular navigation and sustainable construction."
+    },
+    {
+        "tags": ["aether", "quantum", "physics", "labs", "research"],
+        "response": "Aether Labs is our pure research division focusing on quantum mechanics and advanced hardware. It is currently still in development."
+    },
+    {
+        "tags": ["free", "cost", "price", "money", "pay", "subscription"],
+        "response": "All 130+ tools currently on this platform are absolutely free and run locally on your browser. No signups or paid tiers are required."
+    },
+    {
+        "tags": ["contact", "touch", "email", "support", "developer", "founder"],
+        "response": "You can reach our lead developer directly at yogeshjathalkar@gmail.com, or scroll down to the contact form to send us a direct message."
+    },
+    {
+        "tags": ["hello", "hi", "hey", "greetings", "sup", "who are you"],
+        "response": "Greetings! I am the Shoonya Rover. How can I assist you with our deep-tech ecosystem today?"
+    }
+]
