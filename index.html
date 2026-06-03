@@ -1,58 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-XV0W5ZV0RQ"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XV0W5ZV0RQ');
+    </script>
+    <script>
+        function initApollo(){
+            var n=Math.random().toString(36).substring(7),o=document.createElement("script");
+            o.src="https://assets.apollo.io/micro/website-tracker/tracker.iife.js?nocache="+n;
+            o.async=true; o.defer=true;
+            o.onload=function(){window.trackingFunctions.onLoad({appId:"69e9e2c18fee4b000dacb54c"})};
+            document.head.appendChild(o);
+        }
+        initApollo();
+    </script>
 
-  gtag('config', 'G-XV0W5ZV0RQ');
-</script>
-<script>function initApollo(){var n=Math.random().toString(36).substring(7),o=document.createElement("script");
-o.src="https://assets.apollo.io/micro/website-tracker/tracker.iife.js?nocache="+n,o.async=!0,o.defer=!0,
-o.onload=function(){window.trackingFunctions.onLoad({appId:"69e9e2c18fee4b000dacb54c"})},
-document.head.appendChild(o)}initApollo();</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shoonya Origins | Innovating Tomorrow</title>
     <link rel="icon" type="image/png" href="images/favicon.png">
     <meta name="google-site-verification" content="B8lE_HL53IWDazD-NuitU_ISBLoD6tV-ZgGqyIu8K-E" />
-    
+
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700;800&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-
-<link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- =========================================
-     WELCOME GATEWAY MODAL
-     ========================================= -->
-<div id="gatewayModal" style="position: fixed; inset: 0; background: rgba(12, 10, 9, 0.95); z-index: 100000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(15px); transition: opacity 0.5s ease;">
-    <div style="background: linear-gradient(135deg, #1c1917 0%, #0c0a09 100%); border: 1px solid rgba(251, 191, 36, 0.15); padding: 3.5rem 2.5rem; border-radius: 28px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 30px 60px rgba(0,0,0,0.6);">
-        <h2 style="color: #fefce8; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 2rem; font-weight: 800; margin-bottom: 1rem; letter-spacing: -0.5px;">Welcome to <span style="color: #673de6;">Shoonya</span> Origins</h2>
-        <p style="color: #9ca3af; font-size: 1.05rem; line-height: 1.6; margin-bottom: 2.5rem;">Choose how you wish to explore our deep-tech ecosystem today.</p>
-        
-        <div style="display: flex; flex-direction: column; gap: 1rem;">
-            <button onclick="selectSiteMode('gamified')" style="background: #673de6; color: white; border: none; padding: 16px; border-radius: 50px; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(103, 61, 230, 0.4);">
-                Gamified Exploration (Interactive Tour)
-            </button>
-            <button onclick="selectSiteMode('professional')" style="background: transparent; color: #9ca3af; border: 2px solid #44403c; padding: 14px; border-radius: 50px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.3s ease;">
-                Standard Professional View
-            </button>
+    <div id="gatewayModal" class="gateway-modal">
+        <div class="gateway-inner">
+            <h2 class="gateway-title">Welcome to <span>Shoonya</span> Origins</h2>
+            <p class="gateway-subtitle">Choose how you wish to explore our deep-tech ecosystem today.</p>
+            <div class="gateway-btns">
+                <button onclick="selectSiteMode('gamified')" class="gateway-btn-primary">
+                    Gamified Exploration (Interactive Tour)
+                </button>
+                <button onclick="selectSiteMode('professional')" class="gateway-btn-secondary">
+                    Standard Professional View
+                </button>
+            </div>
         </div>
     </div>
-</div>
 
     <div class="lamp-container" id="lightSwitch" title="Pull to toggle">
         <div class="wire"></div>
         <div class="socket"></div>
         <div class="bulb"></div>
-        <div class="pull-string">
-            <div class="knob"></div>
-        </div>
+        <div class="pull-string"><div class="knob"></div></div>
     </div>
 
     <header data-aos="fade-down" data-aos-duration="1000">
@@ -66,17 +64,16 @@ document.head.appendChild(o)}initApollo();</script>
         <p class="subtitle" data-aos="fade-up" data-aos-delay="200" data-aos-duration="1200">
             An innovation ecosystem advancing Defense, Health, Infrastructure, Research and Business Intelligence.
         </p>
-    </section>
-    
         <div class="hero-actions" data-aos="fade-up" data-aos-delay="300">
             <a href="tour.html" class="hero-btn btn-gamified">Explore the Game</a>
             <a href="#ecosystem" class="hero-btn btn-professional">Explore Free Tools</a>
         </div>
-<br><br>
-    <div class="container">
+    </section>
+
+    <div class="container" id="ecosystem">
         <div class="section-label" data-aos="fade-in" data-aos-delay="400">Our Ecosystem</div>
         <div class="grid">
-            
+
             <div class="card bg-aura" data-aos="fade-up" data-aos-delay="100">
                 <span class="card-tag">Health</span>
                 <div class="card-content">
@@ -88,7 +85,6 @@ document.head.appendChild(o)}initApollo();</script>
                     </div>
                 </div>
             </div>
-            
 
             <div class="card bg-civitas" data-aos="fade-up" data-aos-delay="200">
                 <span class="card-tag">Infrastructure</span>
@@ -133,7 +129,7 @@ document.head.appendChild(o)}initApollo();</script>
                     <p class="card-desc">Next-generation automated technology for unmanned defense, wearable smart devices critical in combat and computing systems.</p>
                     <div class="card-actions">
                         <a href="ventures/shakti/" class="extra-btn main-card-link">Click to Explore</a>
-                       </div>
+                    </div>
                 </div>
             </div>
 
@@ -141,7 +137,7 @@ document.head.appendChild(o)}initApollo();</script>
                 <span class="card-tag">Deep Tech</span>
                 <div class="card-content">
                     <h3 class="card-title">Aether Labs</h3>
-                    <p class="card-desc">Pure research in quantum mechanics, wave physics, quantum computing and advanced hardware development. ==> Its still in development.</p>
+                    <p class="card-desc">Pure research in quantum mechanics, wave physics, quantum computing and advanced hardware development. Still in development.</p>
                     <div class="card-actions">
                         <a href="ventures/aether/tools/" class="extra-btn tools-btn">View Open Tools</a>
                         <a href="ventures/aether/" class="extra-btn main-card-link">Click to Explore</a>
@@ -163,49 +159,39 @@ document.head.appendChild(o)}initApollo();</script>
         </div>
     </div>
 
-    
-
     <section class="updates-section" id="updates">
         <div class="container" style="padding-bottom: 2rem;">
             <div class="section-label" data-aos="fade-in">Latest Updates</div>
-            
             <div class="updates-grid">
-                
                 <div class="notification-card" data-aos="fade-up" data-aos-delay="100">
                     <span class="notification-badge">Coming Soon</span>
-                    <h3 class="notification-title">Autonomous Safety & Anti-Theft Plugins</h3>
+                    <h3 class="notification-title">Autonomous Safety &amp; Anti-Theft Plugins</h3>
                     <p class="notification-desc">
                         Our new autonomous safety and anti-theft plugins are going to be available for everyone very soon. We are finalizing the logic to ensure maximum security without compromising your data privacy.
                     </p>
                 </div>
-
                 <div class="notification-card" data-aos="fade-up" data-aos-delay="200">
-                    <span class="notification-badge">Coming soon </span>
-                    <h3 class="notification-title">FreeBasic CRM & Essential Sales Tools</h3>
+                    <span class="notification-badge">Coming Soon</span>
+                    <h3 class="notification-title">FreeBasic CRM &amp; Essential Sales Tools</h3>
                     <p class="notification-desc">
-                    We are rolling out a free, foundational CRM to help you seamlessly track clients and manage contacts. Alongside this, expect a suite of simple, no-cost sales tools designed to streamline your daily operations without the premium price tag.   
+                        We are rolling out a free, foundational CRM to help you seamlessly track clients and manage contacts. Alongside this, expect a suite of simple, no-cost sales tools designed to streamline your daily operations without the premium price tag.
                     </p>
                 </div>
-
             </div>
         </div>
     </section>
 
-    
     <div class="declaration-section" data-aos="fade-up" data-aos-duration="1200">
         <div class="container declaration-container">
-            <h2 class="declaration-quote">Free Tools On us </h2>
-            
+            <h2 class="declaration-quote">Free Tools On us</h2>
             <p class="declaration-text">
                 At Shoonya Origins, we believe that fundamental logic—the decision trees and calculations that drive our industries—should never be a luxury.
             </p>
-            
             <p class="declaration-text">
-                We are releasing 130+ Professional Intelligence Tools across our 6 ventures, open to everyone. From this moment on, critical software won’t be locked behind signups or paid tiers. You won’t have to wonder if your data is being used against you. Every calculation stays local; every decision is yours.
+                We are releasing 130+ Professional Intelligence Tools across our 6 ventures, open to everyone. From this moment on, critical software won't be locked behind signups or paid tiers. You won't have to wonder if your data is being used against you. Every calculation stays local; every decision is yours.
             </p>
-            
             <p class="declaration-text highlight">
-                These tools are on us. Many more to come. 
+                These tools are on us. Many more to come.
             </p>
         </div>
     </div>
@@ -235,8 +221,7 @@ document.head.appendChild(o)}initApollo();</script>
     <section class="contact-section" id="contact">
         <div class="container">
             <div class="section-label" data-aos="fade-in">Get in Touch</div>
-            <h2 style="text-align: center; font-size: 2rem; margin-bottom: 2rem; color: var(--text-dark);" data-aos="fade-up">Grow with Shoonya</h2>
-            
+            <h2 class="contact-heading" data-aos="fade-up">Grow with Shoonya</h2>
             <div class="form-container" data-aos="zoom-in" data-aos-duration="1000">
                 <form action="https://formsubmit.co/YOUR_EMAIL_HERE" method="POST">
                     <input type="text" name="_honey" style="display:none">
@@ -258,27 +243,23 @@ document.head.appendChild(o)}initApollo();</script>
             </div>
         </div>
     </section>
-<footer>
+
+    <footer>
         <div class="logo" style="color: white; margin-bottom: 1rem;">Shoonya<span>Origins</span></div>
         <div class="footer-links">
             <a href="https://www.linkedin.com/in/yogesh-jathalkar-67b179208/" target="_blank">LinkedIn</a>
-            <a href="/about">About </a>
+            <a href="/about">About</a>
             <a href="/about/blogs" target="_blank">Blogs</a>
             <a href="mailto:yogeshjathalkar@gmail.com">Contact Us</a>
-            <a href="about/privacy.html" target="_blank">Privacy Policy</a>
-            <a href="about/terms.html" target="_blank">Terms of Service</a>
-            <a href="about/disclaimer.html" target="_blank">Legal Disclaimer</a> 
         </div>
         <p>&copy; 2026 Shoonya Origins. All Rights Reserved.</p>
-        <p style="font-size: 0.8rem; margin-top: 1rem; opacity: 0.5;">Pune, India</p>
+        <p class="footer-location">Pune, India</p>
     </footer>
-
 
     <div id="cosmosBackground"></div>
     <canvas id="gameCanvas"></canvas>
     <div id="blastOverlay"></div>
 
-    
     <div id="gameUI">
         <div>MASS: <span id="scoreVal">0</span></div>
         <div>PRESS 'ESC' TO EXIT</div>
@@ -288,11 +269,11 @@ document.head.appendChild(o)}initApollo();</script>
         <p>ENTERING THE VOID...</p>
         <p style="margin-top: 20px; font-size: 0.8rem; opacity: 0.7;">Click to Start</p>
     </div>
-    
     <div id="warningScreen">
         <h1 style="font-size: 2rem;">⚠ CRITICAL MASS STABILITY LOSS ⚠</h1>
         <p style="margin-top: 1rem;">SINGULARITY IMMINENT...</p>
     </div>
+
     <div id="pro-ai-agent">
         <div id="pro-speech-bubble" style="display: none;">
             <div id="pro-chat-history">
@@ -308,46 +289,66 @@ document.head.appendChild(o)}initApollo();</script>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        // 1. Initialize Animation on Scroll
-        AOS.init({ 
-            offset: 100, 
-            duration: 800, 
-            easing: 'ease-out-cubic', 
-            once: true 
-        });
+        // =========================================
+        // 1. AOS Init (FIX: disabled on mobile to prevent jitter)
+        // =========================================
+        AOS.init({ disable: 'mobile', offset: 100, duration: 800, easing: 'ease-out-cubic', once: true });
 
-        // 2. SWITCH LOGIC (Simple Slow Fade, Default Day)
+        // =========================================
+        // 2. Light Switch
+        // =========================================
         const switchElement = document.getElementById('lightSwitch');
         const body = document.body;
-        let isAnimating = false; 
+        let isAnimating = false;
 
         switchElement.addEventListener('click', () => {
             if (isAnimating) return;
             isAnimating = true;
-
-            // Animate the Pull String
             switchElement.classList.add('pulled');
-
-            // Wait briefly for the pull string to go down (250ms), then toggle theme
             setTimeout(() => {
                 body.classList.toggle('dark-mode');
                 switchElement.classList.remove('pulled');
-                isAnimating = false; 
-            }, 250); 
+                isAnimating = false;
+            }, 250);
         });
 
-        // 3. THE HIDDEN GAME LOGIC (The Void)
+        // =========================================
+        // 3. Gateway Modal (FIX: Replaced conflicting block)
+        // =========================================
+        window.addEventListener('DOMContentLoaded', () => {
+            const modal = document.getElementById('gatewayModal');
+            const savedMode = localStorage.getItem('shoonya_mode');
+            if (savedMode) {
+                modal.style.display = 'none';
+            } else {
+                modal.style.display = 'flex';
+            }
+        });
+
+        function selectSiteMode(mode) {
+            localStorage.setItem('shoonya_mode', mode);
+            const modal = document.getElementById('gatewayModal');
+            modal.style.opacity = '0';
+            setTimeout(() => modal.style.display = 'none', 500);
+            if (mode === 'gamified') {
+                window.location.href = 'tour.html';
+            }
+        }
+
+        // =========================================
+        // 4. Hidden Game
+        // =========================================
         const logoTrigger = document.getElementById('logoTrigger');
         let clickCount = 0;
         let clickTimer;
-        
+
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const gameOverlay = document.getElementById('gameOverlay');
         const scoreVal = document.getElementById('scoreVal');
         const warningScreen = document.getElementById('warningScreen');
         const blastOverlay = document.getElementById('blastOverlay');
-        
+
         let gameActive = false;
         let animationId;
         let player = { x: 0, y: 0, r: 10, color: '#fff' };
@@ -356,12 +357,10 @@ document.head.appendChild(o)}initApollo();</script>
         let mouseX = 0;
         let mouseY = 0;
 
-        // Trigger Listener (5 Clicks rapidly)
         logoTrigger.addEventListener('click', () => {
             clickCount++;
             clearTimeout(clickTimer);
-            clickTimer = setTimeout(() => { clickCount = 0; }, 500); 
-            
+            clickTimer = setTimeout(() => { clickCount = 0; }, 500);
             if (clickCount >= 5) {
                 startGameSequence();
                 clickCount = 0;
@@ -384,56 +383,38 @@ document.head.appendChild(o)}initApollo();</script>
             loop();
         }
 
-        // --- NEW: BLAST AND RESTART LOGIC ---
         function triggerBlastAndRestart() {
-            gameActive = false; // Stop Game Loop
+            gameActive = false;
             cancelAnimationFrame(animationId);
-            
-            // 1. Show Warning
             warningScreen.style.display = 'block';
-            
-            // 2. Wait 1.5 seconds, then BLAST
             setTimeout(() => {
-                blastOverlay.classList.add('active'); // Fade to White (3s duration)
-                
-                // 3. Wait for blast to fill screen (2s), then RESET behind the white curtain
+                blastOverlay.classList.add('active');
                 setTimeout(() => {
-                    // Reset Game State
                     score = 20;
                     scoreVal.innerText = score;
                     particles = [];
                     warningScreen.style.display = 'none';
-                    
-                    // 4. Fade out blast and resume
                     blastOverlay.classList.remove('active');
-                    
-                    // Small delay to let blast clear before moving
                     setTimeout(() => {
                         gameActive = true;
                         loop();
                     }, 2000);
-                    
-                }, 3000); // Duration of the white-out
-                
-            }, 1500); // Duration of the warning
+                }, 3000);
+            }, 1500);
         }
 
-        // Game Loop
         function loop() {
             if (!gameActive) return;
-            // Erases old frames to transparent so the CSS image shows through
             ctx.globalCompositeOperation = 'destination-out';
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)'; 
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Resets the canvas so particles draw normally
             ctx.globalCompositeOperation = 'source-over';
 
             player.x += (mouseX - player.x) * 0.1;
             player.y += (mouseY - player.y) * 0.1;
 
             ctx.beginPath();
-            ctx.arc(player.x, player.y, Math.max(5, player.r + (score/10)), 0, Math.PI * 2);
+            ctx.arc(player.x, player.y, Math.max(5, player.r + (score / 10)), 0, Math.PI * 2);
             ctx.fillStyle = '#fff';
             ctx.shadowBlur = 20;
             ctx.shadowColor = '#fff';
@@ -453,18 +434,17 @@ document.head.appendChild(o)}initApollo();</script>
                 ctx.fill();
 
                 const dist = Math.hypot(player.x - p.x, player.y - p.y);
-                const playerRadius = Math.max(5, player.r + (score/10));
-                
+                const playerRadius = Math.max(5, player.r + (score / 10));
+
                 if (dist < playerRadius + p.r) {
                     if (p.type === 'good') {
                         score += 10;
                     } else {
-                        // BAD PARTICLE LOGIC
                         if (score <= 0) {
                             triggerBlastAndRestart();
-                            return; 
+                            return;
                         } else {
-                            score = Math.max(0, score - 20); 
+                            score = Math.max(0, score - 20);
                             canvas.style.transform = `translate(${Math.random()*10-5}px, ${Math.random()*10-5}px)`;
                             setTimeout(() => canvas.style.transform = 'none', 50);
                         }
@@ -480,7 +460,7 @@ document.head.appendChild(o)}initApollo();</script>
         }
 
         function spawnParticle() {
-            const type = Math.random() > 0.3 ? 'good' : 'bad'; 
+            const type = Math.random() > 0.3 ? 'good' : 'bad';
             particles.push({
                 x: Math.random() * canvas.width,
                 y: Math.random() * canvas.height,
@@ -512,131 +492,81 @@ document.head.appendChild(o)}initApollo();</script>
             }
         });
 
-function selectSiteMode(mode) {
-    localStorage.setItem('shoonya_mode', mode);
-    const modal = document.getElementById('gatewayModal');
-    
-    if (modal) {
-        modal.style.opacity = '0';
-        setTimeout(() => modal.style.display = 'none', 500);
-    }
-    
-    if (mode === 'gamified') {
-        window.location.href = 'tour.html';
-    }
-}
+        // =========================================
+        // 5. Professional AI Chat Agent
+        // =========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            const avatar = document.getElementById('pro-agent-avatar');
+            const bubble = document.getElementById('pro-speech-bubble');
+            const chatHistory = document.getElementById('pro-chat-history');
+            const userInput = document.getElementById('pro-user-input');
+            const sendBtn = document.getElementById('pro-send-btn');
+            let knowledgeBase = [];
 
-// Run check immediately on load
-window.addEventListener('DOMContentLoaded', checkNavigationGate);
-</script>
-<script>
-    // 1. Logic to show modal only if NO preference is saved
-    window.addEventListener('DOMContentLoaded', () => {
-        const modal = document.getElementById('gatewayModal');
-        const savedMode = localStorage.getItem('shoonya_mode');
-
-        if (savedMode) {
-            // User has visited before, hide the modal immediately
-            modal.style.display = 'none';
-        } else {
-            // First time visitor, keep modal visible
-            modal.style.display = 'flex';
-        }
-    });
-
-    // 2. Logic to handle the choice
-    function selectSiteMode(mode) {
-        // Save the choice so it never shows again
-        localStorage.setItem('shoonya_mode', mode);
-        
-        const modal = document.getElementById('gatewayModal');
-        modal.style.opacity = '0';
-        setTimeout(() => modal.style.display = 'none', 500);
-
-        // Redirect only if they choose Gamified
-        if (mode === 'gamified') {
-            window.location.href = 'tour.html';
-        }
-        // If 'professional', we do nothing, the modal just closes and they see index.html
-    }
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const avatar = document.getElementById('pro-agent-avatar');
-        const bubble = document.getElementById('pro-speech-bubble');
-        const chatHistory = document.getElementById('pro-chat-history');
-        const userInput = document.getElementById('pro-user-input');
-        const sendBtn = document.getElementById('pro-send-btn');
-        let knowledgeBase = [];
-
-        // 1. Toggle Chat Window
-        avatar.addEventListener('click', () => {
-            if (bubble.style.display === 'none') {
-                bubble.style.display = 'flex';
-                // Load knowledge if not loaded yet
-                if (knowledgeBase.length === 0) {
-                    fetch('knowledge.json')
-                        .then(res => res.json())
-                        .then(data => knowledgeBase = data)
-                        .catch(err => console.error("Failed to load knowledge", err));
-                }
-            } else {
-                bubble.style.display = 'none';
-            }
-        });
-
-        // 2. Chat UI Updater
-        function appendMessage(text, sender) {
-            const p = document.createElement('p');
-            p.className = sender === 'user' ? 'user-msg' : 'bot-msg';
-            p.innerText = text;
-            chatHistory.appendChild(p);
-            chatHistory.scrollTop = chatHistory.scrollHeight;
-        }
-
-        // 3. Static Search Engine
-        function handleChat() {
-            const text = userInput.value.trim().toLowerCase();
-            if (!text) return;
-
-            appendMessage(userInput.value, 'user');
-            userInput.value = '';
-
-            const thinkingId = 'thinking-' + Date.now();
-            const p = document.createElement('p');
-            p.className = 'bot-msg';
-            p.id = thinkingId;
-            p.innerText = "Processing...";
-            chatHistory.appendChild(p);
-            chatHistory.scrollTop = chatHistory.scrollHeight;
-
-            setTimeout(() => {
-                document.getElementById(thinkingId).remove();
-                let finalReply = "I am a local knowledge assistant. Try asking about our ventures like Aura, Construct, or Raptor.";
-                let bestMatchCount = 0;
-
-                knowledgeBase.forEach(record => {
-                    let matchCount = 0;
-                    record.tags.forEach(tag => {
-                        if (text.includes(tag)) matchCount++;
-                    });
-                    if (matchCount > bestMatchCount) {
-                        bestMatchCount = matchCount;
-                        finalReply = record.response;
+            avatar.addEventListener('click', () => {
+                if (bubble.style.display === 'none' || bubble.style.display === '') {
+                    bubble.style.display = 'flex';
+                    if (knowledgeBase.length === 0) {
+                        fetch('knowledge.json')
+                            .then(res => res.json())
+                            .then(data => { knowledgeBase = data; })
+                            .catch(err => console.error("Failed to load knowledge", err));
                     }
-                });
+                } else {
+                    bubble.style.display = 'none';
+                }
+            });
 
-                appendMessage(finalReply, 'bot');
-            }, 500);
-        }
+            function appendMessage(text, sender) {
+                const p = document.createElement('p');
+                p.className = sender === 'user' ? 'user-msg' : 'bot-msg';
+                p.innerText = text;
+                chatHistory.appendChild(p);
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+            }
 
-        // 4. Bind Inputs
-        sendBtn.addEventListener('click', handleChat);
-        userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') handleChat();
+            function handleChat() {
+                const text = userInput.value.trim().toLowerCase();
+                if (!text) return;
+
+                appendMessage(userInput.value, 'user');
+                userInput.value = '';
+
+                const thinkingId = 'thinking-' + Date.now();
+                const p = document.createElement('p');
+                p.className = 'bot-msg';
+                p.id = thinkingId;
+                p.innerText = "Processing...";
+                chatHistory.appendChild(p);
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+
+                setTimeout(() => {
+                    const el = document.getElementById(thinkingId);
+                    if (el) el.remove();
+
+                    let finalReply = "I am a local knowledge assistant. Try asking about our ventures like Aura, Construct, or Raptor.";
+                    let bestMatchCount = 0;
+
+                    knowledgeBase.forEach(record => {
+                        let matchCount = 0;
+                        record.tags.forEach(tag => {
+                            if (text.includes(tag)) matchCount++;
+                        });
+                        if (matchCount > bestMatchCount) {
+                            bestMatchCount = matchCount;
+                            finalReply = record.response;
+                        }
+                    });
+
+                    appendMessage(finalReply, 'bot');
+                }, 500);
+            }
+
+            sendBtn.addEventListener('click', handleChat);
+            userInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleChat();
+            });
         });
-    });
-</script>
-    
+    </script>
 </body>
 </html>
