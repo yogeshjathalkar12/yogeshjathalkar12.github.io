@@ -178,7 +178,7 @@ header {
     text-align: center; 
     position: relative; 
     overflow: hidden; 
-    background-image: var(--hero-overlay), url('images/rover.jpeg');
+    background-image: var(--hero-overlay), url('images/rover.png');
     background-size: cover; 
     background-position: center;
     background-repeat: no-repeat;
@@ -400,22 +400,33 @@ p.subtitle {
     gap: 2.5rem; 
 }
 
+/* FIX: Card minimum height and transition optimization to prevent jittering */
 .card {
     position: relative; 
-    height: 520px; 
+    min-height: 520px; 
+    height: 100%;
     border-radius: 24px; 
     overflow: hidden;
     box-shadow: var(--shadow); 
-    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
     border: 1px solid var(--card-border);
     background-size: cover; 
     background-position: center; 
     display: flex; 
     align-items: flex-end;
+    
+    /* 1. ANTI-JITTER MAGIC */
+    transition: transform 0.4s ease-out, box-shadow 0.4s ease-out;
+    backface-visibility: hidden;
+    transform: translateZ(0); /* Forces GPU Hardware Acceleration */
+    will-change: transform;
+    
+    /* 2. CURSOR LOCK */
+    cursor: pointer; 
 }
 
 .card:hover { 
-    transform: translateY(-10px) scale(1.02); 
+    /* Removed scale(1.02) to stop grid recalculation jitter */
+    transform: translateY(-12px); 
     box-shadow: 0 30px 70px var(--accent-glow); 
 }
 
@@ -438,12 +449,15 @@ p.subtitle {
 .bg-systems  { background-image: url('images/systems.png');  }
 
 .card-content { 
-    position: static; /* Required for stretched link to work over the whole card */
+    position: static; 
     padding: 2.5rem; 
-    width: 100%; 
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
-/* Pushes all text above the blur overlay */
 .card-content > * {
     position: relative;
     z-index: 2;
@@ -496,12 +510,16 @@ body.dark-mode .card-title {
     transition: color 1.5s ease; 
 }
 
+/* FIX: Changed to row so buttons don't push out of the card */
 .card-actions {
-    position: static; /* Required for stretched link */
+    position: static; 
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
     gap: 12px;
     align-items: flex-start;
+    z-index: 10;
+    margin-top: 15px;
 }
 
 .extra-btn {
@@ -522,25 +540,27 @@ body.dark-mode .card-title {
     box-shadow: 0 6px 20px var(--accent-glow);
 }
 
-/* --- STRETCHED LINK LOGIC --- */
+/* FIX: Stretched link implementation */
 .main-card-link {
     position: static; 
 }
 
 .main-card-link:hover {
-    transform: none; /* Prevents the invisible link from collapsing on hover */
+    transform: none; 
 }
 
 .main-card-link::after {
     content: "";
     position: absolute;
     inset: 0; 
-    z-index: 5; 
+    z-index: 5; /* Stays below the tools button */
+    cursor: pointer; /* Forces the hand cursor over the whole card */
 }
 
 .tools-btn {
     position: relative;
-    z-index: 10; 
+    z-index: 10; /* Keeps this clickable separately */
+    cursor: pointer;
 }
 
 /* =========================================
@@ -763,6 +783,7 @@ footer {
     .logo { font-size: 1.2rem; }
     .footer-links { flex-direction: column; gap: 1rem; }
 }
+
 /* --- COSMOS BACKGROUND ANIMATION --- */
 #cosmosBackground {
     position: fixed; 
@@ -771,27 +792,19 @@ footer {
     width: 100%; 
     height: 100%;
     z-index: 9998;
-    
-    /* ADDED: A dark overlay gradient directly on top of the image to dim it */
     background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('images/bigbang.png'); 
-    
     background-size: cover;
     background-position: center;
-    background-color: #000; /* Acts as a solid base */
+    background-color: #000; 
     opacity: 0;
     pointer-events: none;
     transition: opacity 1s ease-in-out;
     display: none;
-    
-    /* The 40-second slow zoom animation */
     animation: expandVoid 40s linear infinite alternate;
 }
 
-/* Make it visible when the game starts */
 .active-game #cosmosBackground {
     display: block;
-    
-    /* CHANGED: Set to 1 so it acts as a solid wall hiding the website */
     opacity: 1; 
 }
 
@@ -845,7 +858,6 @@ footer {
     transform: translateY(-3px);
 }
 
-/* Mobile Fix for Buttons */
 @media (max-width: 480px) {
     .hero-actions {
         flex-direction: column;
@@ -856,22 +868,20 @@ footer {
         width: 100%;
     }
 }
+
 /* =========================================
    8. ROVER TOUR GUIDE (GAMIFIED UI)
    ========================================= */
 #rover-bot {
-    position: absolute; /* Allows it to drive around the actual document height */
-    top: 50vh;          /* Initial spawn point */
-    left: -200px;       /* Starts off-screen */
-    z-index: 9900;      /* Above cards, below the void game */
+    position: absolute; 
+    top: 50vh;          
+    left: -200px;       
+    z-index: 9900;      
     display: flex;
     flex-direction: column;
     align-items: center;
-    pointer-events: none; /* Prevents the rover from blocking clicks on the site */
-    
-    /* This creates the smooth driving motion automatically */
-    transition: top 1.2s cubic-bezier(0.25, 0.8, 0.25, 1), 
-                left 1.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    pointer-events: none; 
+    transition: top 1.2s cubic-bezier(0.25, 0.8, 0.25, 1), left 1.2s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 #rover-sprite {
@@ -891,16 +901,13 @@ footer {
     margin-bottom: 15px;
     max-width: 250px;
     text-align: center;
-    pointer-events: auto; /* Re-enable clicks just for the bubble */
-    
-    /* Speech Bubble Tail */
+    pointer-events: auto; 
     position: relative;
     transform: scale(0);
     opacity: 0;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* Make bubble visible when active */
 #rover-speech.active {
     transform: scale(1);
     opacity: 1;
@@ -948,28 +955,27 @@ footer {
 #tour-curtain {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.8); /* Darkens the background by 80% */
-    z-index: 8500; /* Sits below the robot but above the website */
+    background: rgba(0, 0, 0, 0.8); 
+    z-index: 8500; 
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.5s ease;
 }
 
-/* When the tour is running, fade the curtain in */
 #tour-curtain.active {
     opacity: 1;
-    pointer-events: auto; /* Blocks clicks on background elements */
+    pointer-events: auto; 
 }
 
-/* This class gets applied to whatever the robot is talking about */
 .tour-focus {
     position: relative !important;
-    z-index: 8600 !important; /* Pops it above the dark curtain */
+    z-index: 8600 !important; 
     border-radius: 24px;
     background: var(--card-bg);
     box-shadow: 0 0 0 2px var(--primary), 0 20px 50px rgba(103, 61, 230, 0.4) !important;
     transition: all 0.5s ease;
 }
+
 /* =========================================
    9. GAMIFIED MAP LAYOUT
    ========================================= */
@@ -980,10 +986,9 @@ footer {
     padding: 100px 20px 300px;
     display: flex;
     flex-direction: column;
-    gap: 150px; /* Massive spacing between nodes */
+    gap: 150px; 
 }
 
-/* Winding Path Effect */
 .game-map::before {
     content: '';
     position: absolute;
@@ -996,12 +1001,10 @@ footer {
     z-index: 0;
 }
 
-/* Zig-Zag Positioning */
 .node-left { align-self: flex-start; margin-left: 5%; }
 .node-right { align-self: flex-end; margin-right: 5%; }
 .node-center { align-self: center; }
 
-/* Draw connecting lines from cards to the central spine */
 .map-node::after {
     content: '';
     position: absolute;
@@ -1019,7 +1022,7 @@ footer {
 @media (max-width: 768px) {
     .map-node { width: 100%; height: 400px; border-radius: 24px; }
     .map-node .card-content { border-radius: 24px; }
-    .game-map::before, .map-node::after { display: none; } /* Hide lines on mobile */
+    .game-map::before, .map-node::after { display: none; } 
     .node-left, .node-right, .node-center { align-self: center; margin: 0; }
 }
 
@@ -1030,11 +1033,7 @@ footer {
     position: relative;
     z-index: 2;
     border: 4px solid var(--primary);
-    
-    /* The base amoeba shape */
     border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
-    
-    /* The morphing animation (8 seconds, infinite loop) */
     animation: morphAmoeba 8s ease-in-out infinite both;
 }
 
@@ -1046,18 +1045,16 @@ footer {
     justify-content: center;
     align-items: center;
     text-align: center;
-    
-    /* This forces the dark background to perfectly match the morphing amoeba outline */
     border-radius: inherit; 
 }
 
-/* Keyframes for the morphing amoeba effect */
 @keyframes morphAmoeba {
     0%   { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
     33%  { border-radius: 40% 60% 70% 30% / 40% 40% 60% 50%; }
     66%  { border-radius: 70% 30% 50% 50% / 30% 50% 70% 60%; }
     100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
 }
+
 /* =========================================
    10. PROFESSIONAL STATIC AI AGENT
    ========================================= */
@@ -1073,7 +1070,7 @@ footer {
 }
 
 #pro-agent-avatar {
-    width: 75px; /* Smaller, professional size */
+    width: 75px; 
     height: auto;
     cursor: pointer;
     filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));
@@ -1107,7 +1104,6 @@ footer {
     scrollbar-width: thin;
 }
 
-/* Chat Message Bubbles */
 .bot-msg { 
     font-size: 0.9rem; 
     color: var(--text-dark); 
@@ -1174,4 +1170,106 @@ body.dark-mode .bot-msg {
 
 #pro-send-btn:hover {
     transform: scale(1.1);
+}
+
+/* =========================================
+   11. GATEWAY MODAL
+   ========================================= */
+.gateway-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(12, 10, 9, 0.95);
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(15px);
+    transition: opacity 0.5s ease;
+}
+
+.gateway-inner {
+    background: linear-gradient(135deg, #1c1917 0%, #0c0a09 100%);
+    border: 1px solid rgba(251, 191, 36, 0.15);
+    padding: 3.5rem 2.5rem;
+    border-radius: 28px;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+}
+
+.gateway-title {
+    color: #fefce8;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    letter-spacing: -0.5px;
+}
+
+.gateway-title span { color: #673de6; }
+
+.gateway-subtitle {
+    color: #9ca3af;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin-bottom: 2.5rem;
+}
+
+.gateway-btns {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.gateway-btn-primary {
+    background: #673de6;
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(103, 61, 230, 0.4);
+}
+
+.gateway-btn-primary:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+}
+
+.gateway-btn-secondary {
+    background: transparent;
+    color: #9ca3af;
+    border: 2px solid #44403c;
+    padding: 14px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.gateway-btn-secondary:hover {
+    border-color: #9ca3af;
+    color: #fefce8;
+}
+
+/* =========================================
+   12. MISC UTILITIES
+   ========================================= */
+.contact-heading {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    color: var(--text-dark);
+    transition: color 1.5s ease;
+}
+
+.footer-location {
+    font-size: 0.8rem;
+    margin-top: 1rem;
+    opacity: 0.5;
 }
