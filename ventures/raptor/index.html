@@ -473,25 +473,35 @@
 </nav>
 
 <!-- HERO -->
+<!-- HERO SECTION REFRESHED -->
 <div class="hero">
-  <div class="hero-orb"></div>
-  <p class="hero-eyebrow">ShoonyaOrigins · AI Sales Intelligence · v1.0</p>
-  <section class="launch-countdown-section" aria-label="Product status">
-    <div class="lc-orb"></div>
-    <div class="lc-scan"></div>
-    <div class="lc-bracket tl"></div>
-    <div class="lc-bracket tr"></div>
-    <div class="lc-bracket bl"></div>
-    <div class="lc-bracket br"></div>
-
-    <div class="lc-target" style="margin-top: 0; margin-bottom: 2rem;">
-      <div class="lc-target-line"></div>
-      <div class="lc-target-text" style="color: var(--white); font-weight: bold;">
-        SYSTEM <span style="color: #22c55e;">ONLINE</span> // STATUS: HUNTING
-      </div>
-      <div class="lc-target-line"></div>
+    <div class="hero-bg" style="background-image: url('cyber-bg.png');"></div>
+    <div class="hero-overlay"></div>
+    
+    <div class="hero-content">
+        <p class="hero-eyebrow">ShoonyaOrigins · AI Sales Intelligence · v1.0</p>
+        <h1 class="hero-headline">
+            <div class="line"><span>Hunt.</span></div>
+            <div class="line"><span>Capture.</span></div>
+            <div class="line"><span>Scale.</span></div>
+        </h1>
     </div>
 
+    <!-- INTEGRATED AGENT -->
+    <div id="pro-ai-agent">
+        <div id="pro-speech-bubble" style="display: none;">
+            <div id="pro-chat-history">
+                <p class="bot-msg">Raptor Online. Ready to hunt your next deal.</p>
+            </div>
+            <div id="pro-input-area">
+                <input type="text" id="pro-user-input" placeholder="Ask Raptor...">
+                <button id="pro-send-btn">&uarr;</button>
+            </div>
+        </div>
+        <img src="raptor-agent.png" id="pro-agent-avatar" alt="Raptor AI Agent">
+    </div>
+</div>
+<br>
     <div style="margin-bottom: 3rem; opacity: 0; animation: fadeIn 1s ease forwards 0.5s;">
       <div style="display: flex; gap: 1.5rem; justify-content: center; align-items: center; flex-wrap: wrap;">
         <a href="https://github.com/yogeshjathalkar12/raptor/releases/download/v0.1.1/Raptor.Setup.0.1.1.exe"
@@ -521,20 +531,15 @@
     </div>
   </section>
 
-  <div>
-    <h1 class="hero-headline">
-      <div class="line"><span>Hunt.</span></div>
-      <div class="line"><span>Capture.</span></div>
-      <div class="line"><span>Scale.</span></div>
-    </h1>
-  </div>
 
   <div class="hero-bottom">
     <p class="hero-descriptor">
       Not a sales tool.<br>
       <strong>A self-improving brain</strong> that learns your business, hunts your clients, crafts the perfect pitch — and gets smarter with every single deal it closes.
+<br><br>
+
     </p>
-    <div class="hero-tag-list" role="list" aria-label="Key features">
+    <div class="hero-tag-list" role="list" aria-label="Key features ">
       <div class="hero-tag-item" role="listitem">Autonomous Prospecting</div>
       <div class="hero-tag-item" role="listitem">100+ Parameter Scoring</div>
       <div class="hero-tag-item" role="listitem">Live Call Intelligence</div>
@@ -543,6 +548,7 @@
     </div>
   </div>
 </div>
+<br> 
 
 <!-- TICKER -->
 <div class="ticker-wrap" aria-hidden="true">
@@ -1153,6 +1159,70 @@ const staggerObs = new IntersectionObserver(entries => {
   });
 }, { threshold: 0.05 });
 document.querySelectorAll('[data-delay]').forEach(el => staggerObs.observe(el));
+
+// 5. Professional AI Chat Agent - FIXED LOGIC
+document.addEventListener('DOMContentLoaded', () => {
+    const avatar = document.getElementById('pro-agent-avatar');
+    const bubble = document.getElementById('pro-speech-bubble');
+    const chatHistory = document.getElementById('pro-chat-history');
+    const userInput = document.getElementById('pro-user-input');
+    const sendBtn = document.getElementById('pro-send-btn');
+    let knowledgeBase = [];
+
+    // Load Knowledge Base immediately on load
+    fetch('knowledge.json')
+        .then(res => res.json())
+        .then(data => { knowledgeBase = data; })
+        .catch(err => console.error("Knowledge base missing:", err));
+
+    // Toggle Chat
+    avatar.addEventListener('click', () => {
+        const isHidden = bubble.style.display === 'none' || bubble.style.display === '';
+        bubble.style.display = isHidden ? 'flex' : 'none';
+        
+        // Initial Greeting if it's the first time
+        if (isHidden && chatHistory.children.length === 1) { 
+            // Ensures it doesn't double-greet if already populated
+        }
+    });
+
+    function appendMessage(text, sender) {
+        const p = document.createElement('p');
+        p.className = sender === 'user' ? 'user-msg' : 'bot-msg';
+        p.innerText = text;
+        chatHistory.appendChild(p);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+    }
+
+    function handleChat() {
+        const text = userInput.value.trim().toLowerCase();
+        if (!text) return;
+
+        appendMessage(userInput.value, 'user');
+        userInput.value = '';
+
+        // Match logic
+        let finalReply = "I am a local knowledge assistant. Try asking about our ventures like Aura, Construct, or Raptor.";
+        let bestMatchCount = 0;
+
+        knowledgeBase.forEach(record => {
+            let matchCount = 0;
+            record.tags.forEach(tag => {
+                if (text.includes(tag)) matchCount++;
+            });
+            if (matchCount > bestMatchCount) {
+                bestMatchCount = matchCount;
+                finalReply = record.response;
+            }
+        });
+
+        // Small delay for natural feel
+        setTimeout(() => appendMessage(finalReply, 'bot'), 300);
+    }
+
+    sendBtn.addEventListener('click', handleChat);
+    userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleChat(); });
+});
 
 // ── FAQ ACCORDION ──
 function toggleFaq(trigger) {
