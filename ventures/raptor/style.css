@@ -8,6 +8,66 @@
   align-items: center;
   cursor: pointer;
 }
+/* Hero Background & Immersion */
+.hero {
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-bg {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-size: cover;
+    background-position: center;
+    filter: grayscale(30%) brightness(0.4);
+    z-index: 1;
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(3,3,3,0.6), rgba(3,3,3,0.95));
+    z-index: 2;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 3;
+}
+
+/* Agent Styling */
+#pro-ai-agent {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+#pro-agent-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid var(--purple);
+    box-shadow: 0 0 20px rgba(168,85,247,0.4);
+    transition: transform 0.3s ease;
+}
+
+#pro-agent-avatar:hover {
+    transform: scale(1.1);
+}
+
+#pro-speech-bubble {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    width: 280px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+}
 .lamp-wire {
   width: 2px;
   height: 50px;
@@ -40,7 +100,7 @@
 }
 .lamp-knob {
   width: 8px;
-  height: 13px;
+  height: 8px;
   background: #64748b;
   border-radius: 4px;
   position: absolute;
@@ -210,23 +270,6 @@
 
 
 :root {
-  
-  --black: #faf7f4;
-  --surface: #f0ebe4;
-  --surface2: #e8e0d6;
-  --border: rgba(0,0,0,0.08);
-  --purple: #6d28d9;
-  --pink: #be185d;
-  --grad: linear-gradient(135deg, #6d28d9, #be185d);
-  --white: #1c1018;
-  --dim: #6b5f6a;
-  --dim2: #9c8fa0;
-  --bulb-color: #cbd5e1;
-  --bulb-glow: none;}
-
-body.dark-mode {
-  /* LIGHT MODE — default */
-  
   --black: #030303;
   --surface: #0a0a0a;
   --surface2: #0f0f0f;
@@ -237,6 +280,21 @@ body.dark-mode {
   --white: #f4f4f5;
   --dim: #71717a;
   --dim2: #3f3f46;
+  --bulb-color: #cbd5e1;
+  --bulb-glow: none;}
+
+body.dark-mode {
+  /* LIGHT MODE — default */
+  --black: #faf7f4;
+  --surface: #f0ebe4;
+  --surface2: #e8e0d6;
+  --border: rgba(0,0,0,0.08);
+  --purple: #6d28d9;
+  --pink: #be185d;
+  --grad: linear-gradient(135deg, #6d28d9, #be185d);
+  --white: #1c1018;
+  --dim: #6b5f6a;
+  --dim2: #9c8fa0;
   --bulb-color: #ffaa00;
   --bulb-glow: drop-shadow(0 0 15px rgba(255,170,0,0.8));
 
@@ -276,6 +334,74 @@ body {
   transition: all 0.15s ease;
 }
 
+/* Ensure the bubble is hidden by default */
+#pro-speech-bubble {
+    display: none; 
+    flex-direction: column;
+    position: absolute;
+    bottom: 100px;
+    right: 0;
+    background: #e8e2e2; /* Match Shoonya Dark Theme */
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    z-index: 1001;
+}
+
+#pro-chat-history {
+    height: 200px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    font-size: 0.8rem;
+    color: #ccc;
+}
+
+.user-msg { color: #34075e; text-align: right; margin-bottom: 5px; }
+.bot-msg { color: #000000; margin-bottom: 5px; }
+
+#pro-input-area {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.03); /* Subtle dark background */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px; /* Smooth corners */
+    transition: border-color 0.3s ease;
+}
+
+#pro-input-area:focus-within {
+    border-color: var(--purple); /* Purple glow on focus */
+}
+
+#pro-user-input {
+    background: transparent;
+    border: none;
+    color: rgb(6, 6, 6);
+    padding: 0.5rem;
+    flex: 1;
+    outline: none;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.85rem;
+}
+
+#pro-send-btn {
+    background: var(--purple);
+    border: none;
+    color: rgb(17, 16, 16);
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+}
+
+#pro-send-btn:hover {
+    transform: scale(1.05);
+}
 /* NOISE */
 body::after {
   content: '';
@@ -288,7 +414,7 @@ body::after {
 
 /* NAV */
 nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  position: fixed; top: 1; left: 0; right: 0; z-index: 100;
   padding: 1.8rem 4rem;
   display: flex; justify-content: space-between; align-items: center;
   mix-blend-mode: normal;
@@ -302,7 +428,7 @@ nav::after {
 
 .nav-logo {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 1.6rem; letter-spacing: 0.1em;
+  font-size: 2.6rem; letter-spacing: 0.1em;
   background: var(--grad);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
 }
