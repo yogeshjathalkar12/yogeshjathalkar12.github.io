@@ -390,7 +390,7 @@
                     </div>
                     <div class="form-group">
                         <label>Message</label>
-                        <textarea name="message" rows="5" required placeholder="I was going to tell you a joke about a construction site, but I’m still working on it. Would love to hear your thoughts! Tell us how we can contribute ...></textarea>
+                        <textarea name="message" rows="5" required placeholder="I was going to tell you a joke about a construction site, but I’m still working on it. Would love to hear your thoughts! Tell us how we can contribute ..."></textarea>
                     </div>
                     <button type="submit" class="submit-btn">Send Message</button>
                 </form>
@@ -469,29 +469,6 @@
                 isAnimating = false;
             }, 250);
         });
-
-        // =========================================
-        // 3. Gateway Modal
-        // =========================================
-        window.addEventListener('DOMContentLoaded', () => {
-            const modal = document.getElementById('gatewayModal');
-            const savedMode = localStorage.getItem('shoonya_mode');
-            if (savedMode) {
-                modal.style.display = 'none';
-            } else {
-                modal.style.display = 'flex';
-            }
-        });
-
-        function selectSiteMode(mode) {
-            localStorage.setItem('shoonya_mode', mode);
-            const modal = document.getElementById('gatewayModal');
-            modal.style.opacity = '0';
-            setTimeout(() => modal.style.display = 'none', 500);
-            if (mode === 'gamified') {
-                window.location.href = 'tour.html';
-            }
-        }
 
         // =========================================
         // 4. Hidden Game
