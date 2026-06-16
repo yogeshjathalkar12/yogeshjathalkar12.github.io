@@ -31,6 +31,22 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+    <div id="gatewayModal" class="gateway-modal">
+        <div class="gateway-inner">
+            <h2 class="gateway-title">Welcome to <span>Shoonya</span> Origins</h2>
+            <p class="gateway-subtitle">Choose how you wish to explore our deep-tech ecosystem today.</p>
+            <div class="gateway-btns">
+                <button onclick="selectSiteMode('gamified')" class="gateway-btn-primary">
+                    Gamified Exploration (Interactive Tour)
+                </button>
+                <button onclick="selectSiteMode('professional')" class="gateway-btn-secondary">
+                    Standard Professional View
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="lamp-container" id="lightSwitch" title="Pull to toggle">
         <div class="wire"></div>
         <div class="socket"></div>
@@ -49,13 +65,84 @@
         <p class="subtitle" data-aos="fade-up" data-aos-delay="200" data-aos-duration="1200">
             An innovation ecosystem advancing Defense, Health, Infrastructure, Research and Business Intelligence.
         </p>
-    </section>
-    
         <div class="hero-actions" data-aos="fade-up" data-aos-delay="300">
             <a href="tour.html" class="hero-btn btn-gamified">Explore the Game</a>
             <a href="#ecosystem" class="hero-btn btn-professional">Explore Free Tools</a>
         </div>
-        <br><br><br><br>
+    </section>
+    
+    <br><br><br><br>
+
+    <!-- EXPLORE OUR PRODUCTS SECTION -->
+    <section class="explore-products container" id="explore-products">
+        <div class="section-label" data-aos="fade-in">Explore Our Products</div>
+        <h2 class="section-heading" data-aos="fade-up">Deep-Tech in Action</h2>
+
+        <div class="zig-zag-container">
+            
+            <!-- Product 1: Raptor -->
+            <div class="zig-zag-row" data-aos="fade-up">
+                <div class="zig-zag-media">
+                    <video autoplay loop muted playsinline>
+                        <source src="images/raptor-demo.webm" type="video/webm">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                <div class="zig-zag-text">
+                    <h3>Raptor: AI Sales Brain</h3>
+                    <p>Watch the autonomous prospecting engine map markets in real-time. Raptor scores leads across 100+ parameters and crafts precision pitches entirely locally, ensuring total data privacy.</p>
+                    <a href="ventures/raptor/" class="extra-btn">View Documentation</a>
+                </div>
+            </div>
+
+            <!-- Product 2: Construct -->
+            <div class="zig-zag-row" data-aos="fade-up">
+                <div class="zig-zag-media">
+                    <video autoplay loop muted playsinline>
+                        <source src="images/construct-demo.webm" type="video/webm">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                <div class="zig-zag-text">
+                    <h3>Construct: Site Autonomy</h3>
+                    <p>The central nervous system for heavy infrastructure. See the autonomous safety and material management systems in action.no more thefts and accident due to human error.</p>
+                    <a href="ventures/construct/" class="extra-btn">View Documentation</a>
+                </div>
+            </div>
+
+            <!-- Product 3: Basis -->
+            <div class="zig-zag-row" data-aos="fade-up">
+                <div class="zig-zag-media">
+                    <video autoplay loop muted playsinline>
+                        <source src="images/rover-demo.webm" type="video/webm">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                <div class="zig-zag-text">
+                    <h3>Basis: Infrastructure management </h3>
+                    <p>Watch the urban infrastructure management in action, showcasing our innovative solutions for smart city development.currently at prototyping stage , looking for aware citizens to help gather inteliigence </p>
+                    <a href="ventures/basis/" class="extra-btn">View Documentation</a>
+                </div>
+            </div>
+            
+            <!-- Product 4: Aura -->
+            <div class="zig-zag-row" data-aos="fade-up">
+                <div class="zig-zag-media">
+                    <video autoplay loop muted playsinline>
+                        <source src="images/aura-demo.webm" type="video/webm">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                <div class="zig-zag-text">
+                    <h3>Aura: Non invasive Monitoring -- "Alpha test" </h3>
+                    <p>Watch the Aura engine taking vitals and monitoring from distance in action , strictly in testing , we do not claim it to be a medical device,  at prototyping stage so do not use for medical purposes </p>
+                    <a href="ventures/aura/" class="extra-btn">View Documentation</a>
+                </div>
+            </div>
+
+        </div>
+    </section>
+    <br><br>
 
     <div class="container" id="ecosystem">
         <div class="section-label" data-aos="fade-in" data-aos-delay="400">Our Ecosystem</div>
@@ -120,6 +207,32 @@
                 </div>
             </div>
 
+            <!-- Venture: Project Jeeva -->
+            <div class="card bg-jeeva" data-aos="fade-up" data-aos-delay="0">
+                <span class="card-tag">In Silico Medicine</span>
+                <div class="card-content">
+                    <h3 class="card-title">Project Jeeva</h3>
+                    <p class="card-desc">Mapping human biology through pure physics and data science. Constructing highly accurate biological digital twins to simulate complex physiological mechanisms and allopathic pharmacology.</p>
+                    <div class="card-actions">
+                        <a href="ventures/jeeva/tools/" class="extra-btn tools-btn">View Open Tools</a>
+                        <a href="ventures/jeeva/" class="extra-btn main-card-link">Click to Explore</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Venture: Project Charaka -->
+            <div class="card bg-charaka" data-aos="fade-up" data-aos-delay="0">
+                <span class="card-tag">Clinical Intelligence</span>
+                <div class="card-content">
+                    <h3 class="card-title"> Charaka</h3>
+                    <p class="card-desc">Clinical validation initiative building infrastructure to generate peer-reviewed, AI-driven clinical evidence for Ayurveda and alternative medicine.</p>
+                    <div class="card-actions">
+                        <a href="ventures/aura/charaka/tools/" class="extra-btn tools-btn">View Open Tools</a>
+                        <a href="ventures/aura/charaka/" class="extra-btn main-card-link">Click to Explore</a>
+                    </div>
+                </div>
+            </div>
+
             <div class="card bg-aether" data-aos="fade-up" data-aos-delay="100">
                 <span class="card-tag">Deep Tech</span>
                 <div class="card-content">
@@ -168,6 +281,76 @@
         </div>
     </section>
 
+    <!-- ═══ ROVER FLEET SHOWCASE ════════════════════════════════ -->
+    <section class="rover-showcase-section" style="padding: 100px 0;">
+        <div class="container">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;">
+
+                <!-- LEFT: Video Block -->
+                <div id="videoBlock" data-aos="fade-right" data-aos-duration="1000" style="
+                    position: relative;
+                    border-radius: 20px;
+                    overflow: hidden;
+                    border: 1px solid rgba(255, 255, 255, 0.15);
+                    box-shadow: 0 24px 80px rgba(0, 255, 255, 0.05);
+                    cursor: pointer;
+                    background: #0a0a0a;
+                    aspect-ratio: 16/9;
+                ">
+                    <div id="playOverlay" style="
+                        position: absolute; inset: 0;
+                        display: flex; flex-direction: column;
+                        align-items: center; justify-content: center;
+                        gap: 16px;
+                        background: rgba(0, 0, 0, 0.4);
+                        transition: background 0.3s ease;
+                        z-index: 2;
+                    ">
+                        <div style="
+                            width: 64px; height: 64px; border-radius: 50%;
+                            background: #00d4ff;
+                            display: flex; align-items: center; justify-content: center;
+                            box-shadow: 0 0 0 12px rgba(0, 212, 255, 0.15);
+                        ">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#000">
+                                <polygon points="5,3 19,12 5,21"/>
+                            </svg>
+                        </div>
+                        <span style="
+                            font-family: 'Space Mono', monospace; font-size: 11px;
+                            letter-spacing: 3px; text-transform: uppercase;
+                            color: #e2eaf0;
+                        ">Watch The Fleet In Action</span>
+                    </div>
+                    <video id="basisVideo" style="
+                        position: absolute; inset: 0;
+                        width: 100%; height: 100%;
+                        object-fit: cover; display: none;
+                    " controls>
+                        <!-- Ensure the path points to your rover demo -->
+                        <source src="ventures/basis/images/ad-video.webm" type="video/webm" />
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+
+                <!-- RIGHT: Text Block -->
+                <div data-aos="fade-left" data-aos-duration="1000">
+                    <div class="section-label" style="margin-bottom: 12px;">Autonomous Fleet Deployment</div>
+                    
+                    <h2 class="section-heading" style="text-align: left; margin-bottom: 24px; font-size: clamp(32px, 4vw, 48px); line-height: 1.1;">
+                        Intelligence everywhere.<br />
+                        <span class="gradient-text">Rovers where it matters.</span>
+                    </h2>
+                    
+                    <p style="font-size: 1.1rem; color: rgba(0, 0, 0, 0.7); line-height: 1.8; margin-bottom: 0;">
+                        Our ecosystem extends beyond software. The physical autonomous rover programme—acting as the heavy-lifting and ground-level verification layer for <strong>Construct</strong> and <strong>Basis</strong>—begins physical patrols in Mumbai and Pune before scaling into a national network.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
     <div class="declaration-section" data-aos="fade-up" data-aos-duration="1200">
         <div class="container declaration-container">
             <h2 class="declaration-quote">Free Tools On us</h2>
@@ -191,8 +374,8 @@
                     <p class="stat-label">Open Tools</p>
                 </div>
                 <div class="stat-card" data-aos="zoom-in" data-aos-delay="200">
-                    <h2 class="stat-number">0<span>%</span></h2>
-                    <p class="stat-label">Data Shared</p>
+                    <h2 class="stat-number">0</h2>
+                    <p class="stat-label">Data Retention</p>
                 </div>
                 <div class="stat-card" data-aos="zoom-in" data-aos-delay="300">
                     <h2 class="stat-number">100<span>%</span></h2>
@@ -234,15 +417,15 @@
     <footer>
         <div class="logo" style="color: white; margin-bottom: 1rem;">Shoonya<span>Origins</span></div>
         <div class="footer-links">
-            <a href="https://www.linkedin.com/in/yogesh-jathalkar-67b179208/" target="_blank">LinkedIn</a>
+            <a href="https://www.linkedin.com/in/yogesh-jathalkar-67b179208/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
             <a href="/about">About</a>
-            <a href="/about/blogs" target="_blank">Blogs</a>
+            <a href="/about/blogs" target="_blank" rel="noopener noreferrer">Blogs</a>
             <a href="mailto:yogeshjathalkar@gmail.com">Contact Us</a>
             
             <a href="about/privacy.html">Privacy Policy</a>
             <a href="about/terms.html" >Terms of Service</a>
             <a href="about/disclaimer.html" >Legal Disclaimer</a>
-            </div>
+        </div>
         <p>&copy; 2026 Shoonya Origins. All Rights Reserved.</p>
         <p class="footer-location">Pune, India</p>
     </footer>
@@ -281,7 +464,7 @@
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
         // =========================================
-        // 1. AOS Init (FIX: disabled on mobile to prevent jitter)
+        // 1. AOS Init
         // =========================================
         AOS.init({ disable: 'mobile', offset: 100, duration: 800, easing: 'ease-out-cubic', once: true });
 
@@ -304,7 +487,7 @@
         });
 
         // =========================================
-        // 3. Gateway Modal (FIX: Replaced conflicting block)
+        // 3. Gateway Modal
         // =========================================
         window.addEventListener('DOMContentLoaded', () => {
             const modal = document.getElementById('gatewayModal');
@@ -558,6 +741,31 @@
                 if (e.key === 'Enter') handleChat();
             });
         });
+
+        // =========================================
+        // 6. Video Play on Tap (Rover Showcase)
+        // =========================================
+        const videoBlock = document.getElementById('videoBlock');
+        const basisVideo = document.getElementById('basisVideo');
+        const playOverlay = document.getElementById('playOverlay');
+
+        if (videoBlock) {
+            videoBlock.addEventListener('click', function() {
+                basisVideo.style.display = 'block';
+                playOverlay.style.display = 'none';
+                basisVideo.load();
+                const playPromise = basisVideo.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(err => {
+                        console.warn('Autoplay blocked:', err);
+                    });
+                }
+            });
+
+            basisVideo.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        }
     </script>
 </body>
 </html>
