@@ -463,7 +463,49 @@ p.subtitle {
     margin-bottom: 2rem;
     transition: color 1.5s ease;
 }
+/* ─── ZIG-ZAG LAYOUT ─── */
+.zig-zag-container {
+    display: flex;
+    flex-direction: column;
+    gap: 80px;
+    margin-top: 40px;
+}
 
+.zig-zag-row {
+    display: flex;
+    align-items: center;
+    gap: 60px;
+}
+
+/* This is the magic that alternates left/right */
+.zig-zag-row:nth-child(even) {
+    flex-direction: row-reverse;
+}
+
+.zig-zag-media {
+    flex: 1;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Deep tech border */
+}
+
+.zig-zag-media video {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.zig-zag-text {
+    flex: 1;
+}
+
+/* Mobile Fallback: Stack them vertically on phones */
+@media (max-width: 900px) {
+    .zig-zag-row, .zig-zag-row:nth-child(even) {
+        flex-direction: column;
+        gap: 30px;
+    }
+}
 /* Mobile Responsiveness */
 @media (max-width: 900px) {
     .zig-zag-row,
