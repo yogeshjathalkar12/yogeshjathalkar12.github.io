@@ -1165,9 +1165,9 @@ let isSubmitting = false;
 // ════════════════════════════════════════════════════════════════
 
 // ─── SUPABASE CONFIG ──────────────────────────────────────────
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-const SUPABASE_TABLE = 'reports';
+const SUPABASE_URL = 'https://vtxhqqiugnzdnfifykcc.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0eGhxcWl1Z256ZG5maWZ5a2NjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1NzI0NjYsImV4cCI6MjA5MTE0ODQ2Nn0.aKmv8a8uKVotRDZvorF_QZSOuBHER3PywIcxywmONJA';
+const SUPABASE_TABLE = 'basis_reports';
 
 // ─── THEME TOGGLE ─────────────────────────────────────────────
 const themeBtn = document.getElementById('themeToggle');
@@ -1269,6 +1269,35 @@ marker = L.marker([19.0760, 72.8777], {
 marker.on('dragend', function() {
   const pos = marker.getLatLng();
   currentCoords = { lat: pos.lat, lng: pos.lng };
+});
+
+// ─── CITY SELECTOR MAP PANNING ────────────────────────────────
+document.getElementById('citySelect').addEventListener('change', function(e) {
+  const selectedCity = e.target.value;
+  let targetLat, targetLng;
+
+  if (selectedCity === 'Mumbai') {
+    targetLat = 19.0760;
+    targetLng = 72.8777;
+  } else if (selectedCity === 'Pune') {
+    targetLat = 18.5204;
+    targetLng = 73.8567;
+  } else {
+    // If they select "Other City" or empty, don't move the map
+    return; 
+  }
+
+  // 1. Update your global coordinates state
+  currentCoords = { lat: targetLat, lng: targetLng };
+  
+  // 2. Smoothly animate the map to the new city (Zoom level 11)
+  map.flyTo([targetLat, targetLng], 11, {
+    animate: true,
+    duration: 1.5 // 1.5 seconds for a smooth transition
+  });
+  
+  // 3. Move the pin to the new center
+  marker.setLatLng([targetLat, targetLng]);
 });
 
 // ─── LIVE LOCATION BUTTON ─────────────────────────────────────
@@ -1407,13 +1436,19 @@ document.getElementById('submitBtn').addEventListener('click', async function() 
   btn.textContent = 'Transmitting...';
   btn.disabled = true;
 
+  // --- THE FIX: Combine text and GPS into one single string ---
+  let combinedLocation = `GPS: ${currentCoords.lat.toFixed(6)}, ${currentCoords.lng.toFixed(6)}`;
+  if (locationText) {
+    // If they typed a landmark, append the GPS to it
+    combinedLocation = `${locationText} (${combinedLocation})`;
+  }
+
   const formData = new FormData();
   formData.append("image", selectedFile);
   formData.append("city", city);
   formData.append("issueType", issueType);
-  formData.append("location", locationText);
-  formData.append("lat", currentCoords.lat.toFixed(6));
-  formData.append("lng", currentCoords.lng.toFixed(6));
+  // Send the combined string as 'location' so it fits your existing database column perfectly
+  formData.append("location", combinedLocation); 
   formData.append("csrf_token", CSRF_TOKEN); // backend should verify this
 
   try {
