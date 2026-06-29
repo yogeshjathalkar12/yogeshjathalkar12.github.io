@@ -132,6 +132,13 @@
 
 <link rel="stylesheet" href="style.css">
 
+<!-- ═══════════════════════════════════════════════════
+     SUPABASE CLIENT
+     Replace the URL + anon key below with your actual project values
+     (Supabase dashboard → Settings → API)
+     ═══════════════════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
 <style>
 /* ═══════════════════════════════════════════════════
    ADDITIONS: Social Proof, FAQ, Trust Bar, CTA enhancements
@@ -469,7 +476,10 @@
     <li><a href="/about/blogs/">Blog</a></li>
     <li><a href="/about/">About</a></li>
   </ul>
-  <a href="../../index.html" class="nav-exit">Exit ..</a>
+  <div class="nav-auth">
+    <button class="nav-login-btn" id="navLoginBtn" data-open-auth="login">Log In / Sign Up</button>
+    <a href="../../index.html" class="nav-exit">Exit ..</a>
+  </div>
 </nav>
 
 <!-- HERO -->
@@ -520,6 +530,48 @@
         Windows x64 · Stable Release · Free to Start
       </p>
     </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin: 4rem auto; max-width: 1000px;">
+  
+  <!-- Tool Card 1: Email Validator -->
+  <div style="background: var(--surface2); border: 1px solid var(--border); padding: 2.5rem; border-radius: 12px; display: flex; flex-direction: column; transition: transform 0.3s ease, border-color 0.3s ease;" onmouseover="this.style.borderColor='var(--purple)'; this.style.transform='translateY(-5px)';" onmouseout="this.style.borderColor='var(--border)'; this.style.transform='translateY(0)';">
+    <h3 style="font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; color: var(--white); margin-bottom: 1rem; letter-spacing: 0.05em;">Email Validator</h3>
+    
+    <p style="font-size: 0.85rem; color: var(--dim); margin-bottom: 1rem; line-height: 1.6;">
+      <strong style="color: var(--white); font-family: 'DM Mono', monospace;">The Problem:</strong> High bounce rates destroy your domain reputation, sending your cold outreach straight to prospect's spam folders.
+    </p>
+    
+    <ul style="font-size: 0.8rem; color: var(--dim); margin-bottom: 2.5rem; padding-left: 1.2rem; line-height: 1.8;">
+      <li>Instantly ping target mail servers</li>
+      <li>Real-time deliverability checks</li>
+      <li>Protect your sender score</li>
+    </ul>
+    
+    <button data-open-auth="login" style="margin-top: auto; padding: 1rem 2rem; background-color: #9333ea; color: white; border: none; border-radius: 6px; font-family: 'DM Mono', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; transition: opacity 0.3s ease;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+      Log In To Use
+    </button>
+  </div>
+
+  <!-- Tool Card 2: Stealth Tracker -->
+  <div style="background: var(--surface2); border: 1px solid var(--border); padding: 2.5rem; border-radius: 12px; display: flex; flex-direction: column; transition: transform 0.3s ease, border-color 0.3s ease;" onmouseover="this.style.borderColor='var(--purple)'; this.style.transform='translateY(-5px)';" onmouseout="this.style.borderColor='var(--border)'; this.style.transform='translateY(0)';">
+    <h3 style="font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; color: var(--white); margin-bottom: 1rem; letter-spacing: 0.05em;">Stealth Tracker</h3>
+    
+    <p style="font-size: 0.85rem; color: var(--dim); margin-bottom: 1rem; line-height: 1.6;">
+      <strong style="color: var(--white); font-family: 'DM Mono', monospace;">The Problem:</strong> Pitching into the void. You have no idea if high-value prospects are ignoring your emails or simply haven't seen them yet.
+    </p>
+    
+    <ul style="font-size: 0.8rem; color: var(--dim); margin-bottom: 2.5rem; padding-left: 1.2rem; line-height: 1.8;">
+      <li>Invisible 1x1 tracking pixels</li>
+      <li>Exact open-time analytics</li>
+      <li>Follow up at the perfect moment</li>
+    </ul>
+    
+    <button data-open-auth="login" style="margin-top: auto; padding: 1rem 2rem; background-color: #9333ea; color: white; border: none; border-radius: 6px; font-family: 'DM Mono', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; transition: opacity 0.3s ease;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+      Log In To Use
+    </button>
+  </div>
+
+</div>
 
     <div class="lc-free-tier" style="border-color: rgba(34, 197, 94, 0.2); background: rgba(34, 197, 94, 0.02);">
       <div class="lc-badge" style="background: linear-gradient(135deg, #22c55e, #10b981); -webkit-text-fill-color: transparent;">DOMINATE</div>
@@ -1098,7 +1150,177 @@
     </div>
 </footer>
 
+<!-- ═══════════════════════════════════════════════════
+     AUTH MODAL — all views live in the DOM, hidden via CSS,
+     swapped by JS (no page reload except after password reset success)
+     ═══════════════════════════════════════════════════ -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-modal">
+    <button class="auth-close" id="authClose" aria-label="Close">✕</button>
+
+    <!-- ───────── VIEW 1: LOGIN ───────── -->
+    <div class="auth-view active" data-view="login">
+      <div class="auth-eyebrow">ShoonyaOrigins · Raptor</div>
+      <h2 class="auth-title">Welcome Back</h2>
+      <p class="auth-sub">Sign in to access your <strong>sales brain</strong>.</p>
+
+      <div class="auth-error" id="loginError">Invalid email or password.</div>
+
+      <form class="auth-form" id="loginForm">
+        <div class="auth-field">
+          <label class="auth-label" for="loginEmail">Email</label>
+          <input class="auth-input" type="email" id="loginEmail" placeholder="you@company.com" required autocomplete="email">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label" for="loginPassword">Password</label>
+          <input class="auth-input" type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        <div class="auth-row-between">
+          <span></span>
+          <button type="button" class="auth-link accent" data-goto="forgot-email">Forgot password?</button>
+        </div>
+        <button type="submit" class="auth-submit" id="loginSubmitBtn">Log In</button>
+      </form>
+
+      <div class="auth-divider">Or</div>
+
+      <button class="auth-google-btn" id="googleLoginBtn">
+        <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continue with Google
+      </button>
+
+      <p class="auth-switch">New to Raptor? <button type="button" class="auth-link accent" data-goto="signup">Sign up</button></p>
+    </div>
+
+    <!-- ───────── VIEW 2: SIGN UP ───────── -->
+    <div class="auth-view" data-view="signup">
+      <div class="auth-eyebrow">ShoonyaOrigins · Raptor</div>
+      <h2 class="auth-title">Create Account</h2>
+      <p class="auth-sub">Start hunting with your <strong>AI sales brain</strong>.</p>
+
+      <div class="auth-error" id="signupError">Something went wrong. Please try again.</div>
+
+      <form class="auth-form" id="signupForm">
+        <div class="auth-field">
+          <label class="auth-label" for="signupName">Full Name</label>
+          <input class="auth-input" type="text" id="signupName" placeholder="Your name" required autocomplete="name">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label" for="signupEmail">Email</label>
+          <input class="auth-input" type="email" id="signupEmail" placeholder="you@company.com" required autocomplete="email">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label" for="signupPassword">Password</label>
+          <input class="auth-input" type="password" id="signupPassword" placeholder="At least 8 characters" required minlength="8" autocomplete="new-password">
+        </div>
+        <button type="submit" class="auth-submit" id="signupSubmitBtn">Create Account</button>
+      </form>
+
+      <div class="auth-divider">Or</div>
+
+      <button class="auth-google-btn" id="googleSignupBtn">
+        <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continue with Google
+      </button>
+
+      <p class="auth-switch">Already have an account? <button type="button" class="auth-link accent" data-goto="login">Log in</button></p>
+    </div>
+
+    <!-- ───────── VIEW 3: FORGOT PASSWORD — STEP 1: EMAIL ───────── -->
+    <div class="auth-view" data-view="forgot-email">
+      <div class="auth-back-row" data-goto="login">
+        <span>← Back to login</span>
+      </div>
+      <div class="auth-eyebrow">Reset Password</div>
+      <h2 class="auth-title">Forgot Password?</h2>
+      <p class="auth-sub">Enter your email and we'll send a <strong>one-time code</strong> to verify it's you.</p>
+
+      <div class="auth-error" id="forgotEmailError">We couldn't find an account with that email.</div>
+
+      <form class="auth-form" id="forgotEmailForm">
+        <div class="auth-field">
+          <label class="auth-label" for="forgotEmail">Email</label>
+          <input class="auth-input" type="email" id="forgotEmail" placeholder="you@company.com" required autocomplete="email">
+        </div>
+        <button type="submit" class="auth-submit" id="forgotEmailSubmitBtn">Send OTP</button>
+      </form>
+    </div>
+
+    <!-- ───────── VIEW 4: FORGOT PASSWORD — STEP 2: OTP ───────── -->
+    <div class="auth-view" data-view="forgot-otp">
+      <div class="auth-back-row" data-goto="forgot-email">
+        <span>← Back</span>
+      </div>
+      <div class="auth-eyebrow">Reset Password</div>
+      <h2 class="auth-title">Enter Code</h2>
+      <p class="auth-sub">We sent a 6-digit code to <strong id="otpEmailDisplay">your email</strong>.</p>
+
+      <div class="auth-error" id="otpError">Incorrect or expired code. Please try again.</div>
+
+      <form class="auth-form" id="otpForm">
+        <div class="auth-field">
+          <label class="auth-label">One-Time Code</label>
+          <div class="otp-row">
+            <input class="otp-box" type="text" inputmode="numeric" maxlength="1" data-otp-index="0" required>
+            <input class="otp-box" type="text" inputmode="numeric" maxlength="1" data-otp-index="1" required>
+            <input class="otp-box" type="text" inputmode="numeric" maxlength="1" data-otp-index="2" required>
+            <input class="otp-box" type="text" inputmode="numeric" maxlength="1" data-otp-index="3" required>
+            <input class="otp-box" type="text" inputmode="numeric" maxlength="1" data-otp-index="4" required>
+            <input class="otp-box" type="text" inputmode="numeric" maxlength="1" data-otp-index="5" required>
+          </div>
+        </div>
+        <div class="auth-row-between">
+          <span></span>
+          <button type="button" class="auth-link accent" id="resendOtpBtn">Resend code</button>
+        </div>
+        <button type="submit" class="auth-submit" id="otpSubmitBtn">Verify Code</button>
+      </form>
+    </div>
+
+    <!-- ───────── VIEW 5: FORGOT PASSWORD — STEP 3: NEW PASSWORD ───────── -->
+    <div class="auth-view" data-view="forgot-newpass">
+      <div class="auth-eyebrow">Reset Password</div>
+      <h2 class="auth-title">Set New Password</h2>
+      <p class="auth-sub">Code verified. Choose a <strong>new password</strong> for your account.</p>
+
+      <div class="auth-error" id="newPassError">Passwords don't match or are too short.</div>
+
+      <form class="auth-form" id="newPassForm">
+        <div class="auth-field">
+          <label class="auth-label" for="newPassword">New Password</label>
+          <input class="auth-input" type="password" id="newPassword" placeholder="At least 8 characters" required minlength="8" autocomplete="new-password">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label" for="confirmPassword">Confirm Password</label>
+          <input class="auth-input" type="password" id="confirmPassword" placeholder="Re-enter password" required minlength="8" autocomplete="new-password">
+        </div>
+        <button type="submit" class="auth-submit" id="newPassSubmitBtn">Update Password</button>
+      </form>
+    </div>
+
+    <!-- ───────── VIEW 6: SUCCESS ───────── -->
+    <div class="auth-view" data-view="forgot-success">
+      <div style="text-align:center; padding: 1rem 0;">
+        <div class="auth-success-icon">✓</div>
+        <h2 class="auth-title" style="text-align:center;">Password Updated</h2>
+        <p class="auth-sub" style="text-align:center; margin: 0 auto 2rem;">Reloading so you can log in with your <strong>new password</strong>...</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <script>
+// ═══════════════════════════════════════════════════
+// SUPABASE CONFIG — fill these in with your project's values
+// (Supabase dashboard → Settings → API)
+// ═══════════════════════════════════════════════════
+const SUPABASE_URL = 'https://pcdbtcpctlnvdtbrrqoo.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjZGJ0Y3BjdGxudmR0YnJycW9vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI2MjIxMjQsImV4cCI6MjA5ODE5ODEyNH0._y59k8mmSqvkCL9gPBWp5hfp2LwpP_IBvr5h7y3nP7Q';
+const supabaseClient = (SUPABASE_URL.startsWith('http'))
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
+
 // ── LAMP TOGGLE ──
 const lamp = document.getElementById('lightSwitch');
 let isAnimating = false;
@@ -1248,6 +1470,306 @@ function toggleFaq(trigger) {
     trigger.setAttribute('aria-expanded', 'true');
   }
 }
+
+// ═══════════════════════════════════════════════════
+// AUTH MODAL LOGIC
+// All views already exist in the DOM (hidden via CSS display:none).
+// This script only toggles which one is visible — no page navigation,
+// no separate login.html. Supabase calls are marked clearly below.
+// ═══════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  const overlay = document.getElementById('authOverlay');
+  const closeBtn = document.getElementById('authClose');
+  const views = document.querySelectorAll('.auth-view');
+
+  // Keep email between forgot-password steps without re-typing
+  let resetFlowEmail = '';
+
+  // ── Open / close modal ──
+  function openAuth(viewName = 'login') {
+    overlay.classList.add('active');
+    showView(viewName);
+    document.body.style.overflow = 'hidden';
+  }
+  function closeAuth() {
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  // Any element with data-open-auth="login" / "signup" opens the modal on that view
+  document.querySelectorAll('[data-open-auth]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      openAuth(el.dataset.openAuth);
+    });
+  });
+
+  closeBtn.addEventListener('click', closeAuth);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeAuth(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && overlay.classList.contains('active')) closeAuth(); });
+
+  // ── Switch between views inside the modal ──
+  function showView(name) {
+    views.forEach(v => v.classList.toggle('active', v.dataset.view === name));
+    clearErrors();
+  }
+  function clearErrors() {
+    document.querySelectorAll('.auth-error').forEach(e => e.classList.remove('show'));
+  }
+  function showError(id, message) {
+    const el = document.getElementById(id);
+    if (message) el.textContent = message;
+    el.classList.add('show');
+  }
+
+  // Any element with data-goto="viewname" switches views (back links, "Sign up" links, etc.)
+  document.querySelectorAll('[data-goto]').forEach(el => {
+    el.addEventListener('click', () => showView(el.dataset.goto));
+  });
+
+  // ── OTP box behavior: auto-advance + backspace + paste ──
+  const otpBoxes = Array.from(document.querySelectorAll('.otp-box'));
+  otpBoxes.forEach((box, i) => {
+    box.addEventListener('input', () => {
+      box.value = box.value.replace(/[^0-9]/g, '').slice(0, 1);
+      if (box.value && otpBoxes[i + 1]) otpBoxes[i + 1].focus();
+    });
+    box.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !box.value && otpBoxes[i - 1]) otpBoxes[i - 1].focus();
+    });
+    box.addEventListener('paste', (e) => {
+      e.preventDefault();
+      const digits = (e.clipboardData.getData('text') || '').replace(/[^0-9]/g, '').split('');
+      digits.forEach((d, idx) => { if (otpBoxes[i + idx]) otpBoxes[i + idx].value = d; });
+      const next = otpBoxes[i + digits.length] || otpBoxes[otpBoxes.length - 1];
+      next.focus();
+    });
+  });
+  function getOtpValue() {
+    return otpBoxes.map(b => b.value).join('');
+  }
+  function clearOtp() {
+    otpBoxes.forEach(b => b.value = '');
+    otpBoxes[0].focus();
+  }
+
+  // ── LOGIN ──
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearErrors();
+    const btn = document.getElementById('loginSubmitBtn');
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+
+    btn.disabled = true; btn.textContent = 'Logging in...';
+
+    if (!supabaseClient) {
+      setTimeout(() => {
+        btn.disabled = false; btn.textContent = 'Log In';
+        showError('loginError', 'Supabase not configured yet — set SUPABASE_URL and SUPABASE_ANON_KEY at the top of this script.');
+      }, 400);
+      return;
+    }
+
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    btn.disabled = false; btn.textContent = 'Log In';
+    if (error) { showError('loginError', error.message); return; }
+
+    window.location.href = '/ventures/raptor/dashboard.html';
+  });
+
+  // ── SIGN UP ──
+  document.getElementById('signupForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearErrors();
+    const btn = document.getElementById('signupSubmitBtn');
+    const name = document.getElementById('signupName').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value;
+
+    btn.disabled = true; btn.textContent = 'Creating account...';
+
+    if (!supabaseClient) {
+      setTimeout(() => {
+        btn.disabled = false; btn.textContent = 'Create Account';
+        showError('signupError', 'Supabase not configured yet — set SUPABASE_URL and SUPABASE_ANON_KEY at the top of this script.');
+      }, 400);
+      return;
+    }
+
+    const { data, error } = await supabaseClient.auth.signUp({
+      email, password,
+      options: {
+        data: { full_name: name },
+        // Only relevant if email confirmation is ON in Supabase --
+        // this is where Supabase sends the user after they click the
+        // confirmation link in their inbox. Must also be added to
+        // Supabase → Authentication → URL Configuration → Redirect URLs.
+        emailRedirectTo: window.location.origin + '/ventures/raptor/dashboard.html'
+      }
+    });
+    btn.disabled = false; btn.textContent = 'Create Account';
+    if (error) { showError('signupError', error.message); return; }
+
+    // If Supabase returned a live session, email confirmation is OFF
+    // for this project -- the account is immediately usable.
+    if (data.session) {
+      window.location.href = '/ventures/raptor/dashboard.html';
+      return;
+    }
+
+    // Otherwise email confirmation is ON: no session yet, the account
+    // exists but is unusable until the user clicks the link in their
+    // inbox. Do NOT redirect to the dashboard here -- there is no
+    // session, so it would just bounce straight back to login and
+    // look broken. Tell the user to check their inbox instead.
+    showError('signupError', '');
+    document.getElementById('signupError').classList.remove('show');
+    showView('login');
+    showError('loginError', 'Account created — check your inbox to confirm your email before logging in.');
+  });
+
+  // ── GOOGLE OAUTH (login + signup buttons both call this) ──
+  function googleAuth() {
+    if (!supabaseClient) {
+      console.warn('Supabase not configured yet — set SUPABASE_URL and SUPABASE_ANON_KEY at the top of this script.');
+      return;
+    }
+    // redirectTo is explicit so the OAuth flow always lands on the
+    // dashboard, regardless of what Site URL is configured (or
+    // misconfigured) in the Supabase project settings. This must be
+    // added to "Redirect URLs" in Supabase → Authentication → URL
+    // Configuration, or Supabase will refuse the redirect.
+    supabaseClient.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin + '/ventures/raptor/dashboard.html' }
+    });
+  }
+  document.getElementById('googleLoginBtn').addEventListener('click', googleAuth);
+  document.getElementById('googleSignupBtn').addEventListener('click', googleAuth);
+
+  // ── FORGOT PASSWORD — STEP 1: send OTP to email ──
+  document.getElementById('forgotEmailForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearErrors();
+    const btn = document.getElementById('forgotEmailSubmitBtn');
+    const email = document.getElementById('forgotEmail').value.trim();
+
+    btn.disabled = true; btn.textContent = 'Sending...';
+
+    if (!supabaseClient) {
+      setTimeout(() => {
+        resetFlowEmail = email;
+        document.getElementById('otpEmailDisplay').textContent = email;
+        clearOtp();
+        btn.disabled = false; btn.textContent = 'Send OTP';
+        showView('forgot-otp');
+      }, 400);
+      return;
+    }
+
+    // IMPORTANT: signInWithOtp() is a PASSWORDLESS LOGIN mechanism --
+    // verifying that OTP logs the user straight in with full account
+    // access. Using it for "forgot password" means anyone who can read
+    // the OTP from the inbox gets a full login, not a scoped permission
+    // to set a new password. resetPasswordForEmail() is the correct,
+    // narrower call: it issues an OTP whose only valid use is the
+    // password-recovery flow (type: 'recovery' below).
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
+    btn.disabled = false; btn.textContent = 'Send OTP';
+    if (error) { showError('forgotEmailError', error.message); return; }
+
+    resetFlowEmail = email;
+    document.getElementById('otpEmailDisplay').textContent = email;
+    clearOtp();
+    showView('forgot-otp');
+  });
+
+  // ── FORGOT PASSWORD — STEP 2: verify OTP ──
+  document.getElementById('otpForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearErrors();
+    const btn = document.getElementById('otpSubmitBtn');
+    const code = getOtpValue();
+
+    if (code.length < 6) { showError('otpError', 'Please enter all 6 digits.'); return; }
+
+    btn.disabled = true; btn.textContent = 'Verifying...';
+
+    if (!supabaseClient) {
+      setTimeout(() => {
+        btn.disabled = false; btn.textContent = 'Verify Code';
+        showView('forgot-newpass');
+      }, 400);
+      return;
+    }
+
+    const { data, error } = await supabaseClient.auth.verifyOtp({
+      email: resetFlowEmail, token: code, type: 'recovery'
+    });
+    btn.disabled = false; btn.textContent = 'Verify Code';
+    if (error) { showError('otpError', error.message); clearOtp(); return; }
+
+    // data.session now lets the user call supabaseClient.auth.updateUser() below
+    showView('forgot-newpass');
+  });
+
+  let resendCooldownActive = false;
+  document.getElementById('resendOtpBtn').addEventListener('click', () => {
+    if (resendCooldownActive) return; // simple client-side spam guard;
+    // Supabase also rate-limits this server-side regardless.
+    if (!supabaseClient) { console.warn('Supabase not configured yet.'); clearOtp(); return; }
+    supabaseClient.auth.resetPasswordForEmail(resetFlowEmail);
+    clearOtp();
+
+    resendCooldownActive = true;
+    const btn = document.getElementById('resendOtpBtn');
+    const original = btn.textContent;
+    let seconds = 30;
+    btn.textContent = `Resend in ${seconds}s`;
+    const interval = setInterval(() => {
+      seconds--;
+      if (seconds <= 0) {
+        clearInterval(interval);
+        btn.textContent = original;
+        resendCooldownActive = false;
+      } else {
+        btn.textContent = `Resend in ${seconds}s`;
+      }
+    }, 1000);
+  });
+
+  // ── FORGOT PASSWORD — STEP 3: set new password, then reload ──
+  document.getElementById('newPassForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearErrors();
+    const btn = document.getElementById('newPassSubmitBtn');
+    const pass1 = document.getElementById('newPassword').value;
+    const pass2 = document.getElementById('confirmPassword').value;
+
+    if (pass1.length < 8 || pass1 !== pass2) {
+      showError('newPassError', 'Passwords must match and be at least 8 characters.');
+      return;
+    }
+
+    btn.disabled = true; btn.textContent = 'Updating...';
+
+    if (!supabaseClient) {
+      setTimeout(() => {
+        showView('forgot-success');
+        setTimeout(() => { window.location.reload(); }, 1500);
+      }, 400);
+      return;
+    }
+
+    const { error } = await supabaseClient.auth.updateUser({ password: pass1 });
+    btn.disabled = false; btn.textContent = 'Update Password';
+    if (error) { showError('newPassError', error.message); return; }
+
+    showView('forgot-success');
+    setTimeout(() => { window.location.reload(); }, 1500); // reload → user logs in fresh with new password
+  });
+});
 </script>
 </body>
 </html>
