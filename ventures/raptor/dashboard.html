@@ -1,0 +1,1678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raptor Dashboard — ShoonyaOrigins</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+<style>
+/* ─────────────────────────────────────────
+   DESIGN TOKENS — identical to main site
+───────────────────────────────────────── */
+:root {
+  --black: #030303;
+  --surface: #0a0a0a;
+  --surface2: #0f0f0f;
+  --border: rgba(255,255,255,0.06);
+  --purple: #a855f7;
+  --pink: #ec4899;
+  --grad: linear-gradient(135deg, #a855f7, #ec4899);
+  --white: #f4f4f5;
+  --dim: #71717a;
+  --dim2: #3f3f46;
+  --green: #22c55e;
+  --amber: #f59e0b;
+  --red: #ef4444;
+  --bulb-color: #cbd5e1;
+  --bulb-glow: none;
+}
+body.light-mode {
+  --black: #faf7f4;
+  --surface: #f0ebe4;
+  --surface2: #e8e0d6;
+  --border: rgba(0,0,0,0.08);
+  --purple: #6d28d9;
+  --pink: #be185d;
+  --grad: linear-gradient(135deg, #6d28d9, #be185d);
+  --white: #1c1018;
+  --dim: #6b5f6a;
+  --dim2: #9c8fa0;
+  --bulb-color: #ffaa00;
+  --bulb-glow: drop-shadow(0 0 15px rgba(255,170,0,0.8));
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: 'DM Mono', monospace;
+  overflow-x: hidden;
+  cursor: none;
+  min-height: 100vh;
+}
+
+/* NOISE */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 998;
+  opacity: 0.5;
+}
+
+/* CUSTOM CURSOR */
+.cursor {
+  position: fixed;
+  width: 8px; height: 8px;
+  background: var(--purple);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s ease, height 0.3s ease, background 0.3s ease;
+  mix-blend-mode: screen;
+}
+.cursor-ring {
+  position: fixed;
+  width: 32px; height: 32px;
+  border: 1px solid rgba(168,85,247,0.4);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: all 0.15s ease;
+}
+
+/* ─── TOPBAR ─── */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  height: 64px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 2rem;
+  gap: 2rem;
+}
+.topbar-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2rem; letter-spacing: 0.1em;
+  background: var(--grad);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  flex-shrink: 0;
+}
+.topbar-search {
+  flex: 1; max-width: 480px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; gap: 0.8rem;
+  padding: 0.6rem 1.2rem;
+}
+.topbar-search input {
+  background: transparent; border: none; outline: none;
+  color: var(--white); font-family: 'DM Mono', monospace;
+  font-size: 0.7rem; letter-spacing: 0.1em; width: 100%;
+}
+.topbar-search input::placeholder { color: var(--dim2); }
+.topbar-search-icon { color: var(--dim2); font-size: 0.8rem; flex-shrink: 0; }
+
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 1.5rem; }
+
+/* Credits pill */
+.credits-pill {
+  display: flex; align-items: center; gap: 0.8rem;
+  background: var(--surface2);
+  border: 1px solid rgba(168,85,247,0.25);
+  padding: 0.5rem 1.2rem;
+  position: relative; overflow: hidden;
+}
+.credits-pill::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: var(--grad);
+}
+.credits-label {
+  font-size: 0.5rem; letter-spacing: 0.25em;
+  color: var(--dim); text-transform: uppercase;
+}
+.credits-value {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.4rem; line-height: 1;
+  background: var(--grad);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  transition: all 0.4s ease;
+}
+.credits-sub {
+  font-size: 0.45rem; letter-spacing: 0.15em;
+  color: var(--dim2); text-transform: uppercase;
+}
+.credits-refresh-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px rgba(34,197,94,0.6);
+  animation: pulse 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes pulse {
+  0%,100% { opacity:1; box-shadow: 0 0 6px rgba(34,197,94,0.6); }
+  50% { opacity:0.4; box-shadow: 0 0 12px rgba(34,197,94,0.9); }
+}
+
+.topbar-user {
+  display: flex; align-items: center; gap: 0.8rem;
+  cursor: pointer;
+  position: relative;
+}
+.user-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--grad);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; font-family: 'Bebas Neue', sans-serif;
+  color: white; flex-shrink: 0;
+}
+.user-name {
+  font-size: 0.6rem; letter-spacing: 0.15em;
+  color: var(--dim); text-transform: uppercase;
+}
+.user-dropdown {
+  position: absolute; top: calc(100% + 1rem); right: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  min-width: 180px;
+  display: none;
+  z-index: 300;
+}
+.user-dropdown.open { display: block; }
+.user-dropdown-item {
+  padding: 0.9rem 1.2rem;
+  font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--dim); cursor: pointer; border-bottom: 1px solid var(--border);
+  transition: all 0.2s;
+}
+.user-dropdown-item:last-child { border-bottom: none; }
+.user-dropdown-item:hover { color: var(--white); background: rgba(168,85,247,0.05); }
+.user-dropdown-item.danger { color: var(--red); }
+.user-dropdown-item.danger:hover { background: rgba(239,68,68,0.05); }
+
+/* Lamp */
+.lamp-container {
+  display: flex; flex-direction: column; align-items: center; cursor: pointer;
+  flex-shrink: 0;
+}
+.lamp-wire { width: 2px; height: 22px; background: #475569; }
+.lamp-socket { width: 14px; height: 10px; background: #334155; margin: 0 auto -3px; border-radius: 2px; }
+.lamp-bulb { width: 24px; height: 24px; background: var(--bulb-color); border-radius: 50%; border: 2px solid #475569; filter: var(--bulb-glow); transition: background 0.4s, filter 0.4s; }
+.lamp-string { width: 1px; height: 30px; background: #94a3b8; margin: 0 auto; position: relative; top: -2px; transition: height 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.lamp-knob { width: 6px; height: 6px; background: #64748b; border-radius: 3px; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); }
+.lamp-container.pulled .lamp-string { height: 42px; }
+
+/* ─── LAYOUT ─── */
+.dash-layout {
+  display: flex;
+  padding-top: 64px;
+  min-height: 100vh;
+}
+
+/* ─── SIDEBAR ─── */
+.sidebar {
+  width: 220px; flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  position: fixed; left: 0; top: 64px; bottom: 0;
+  overflow-y: auto;
+  display: flex; flex-direction: column;
+  padding: 2rem 0;
+  z-index: 100;
+}
+.sidebar-section-label {
+  font-size: 0.45rem; letter-spacing: 0.3em; color: var(--dim2);
+  text-transform: uppercase;
+  padding: 0 1.5rem; margin-bottom: 0.5rem; margin-top: 1.5rem;
+}
+.sidebar-section-label:first-child { margin-top: 0; }
+.sidebar-item {
+  display: flex; align-items: center; gap: 0.8rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--dim); cursor: pointer;
+  transition: all 0.2s; border-left: 2px solid transparent;
+  text-decoration: none;
+}
+.sidebar-item:hover { color: var(--white); background: rgba(168,85,247,0.04); }
+.sidebar-item.active {
+  color: var(--purple);
+  border-left-color: var(--purple);
+  background: rgba(168,85,247,0.06);
+}
+.sidebar-icon { font-size: 0.8rem; width: 16px; text-align: center; flex-shrink: 0; }
+.sidebar-badge {
+  margin-left: auto;
+  background: var(--purple);
+  color: white; font-size: 0.4rem; letter-spacing: 0.05em;
+  padding: 0.15rem 0.4rem; border-radius: 2px;
+}
+.sidebar-footer {
+  margin-top: auto; padding: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+.plan-badge {
+  font-size: 0.45rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--dim2); margin-bottom: 0.5rem;
+}
+.upgrade-btn {
+  display: block; width: 100%; text-align: center;
+  padding: 0.7rem; font-size: 0.55rem; letter-spacing: 0.15em;
+  text-transform: uppercase;
+  background: var(--grad); color: white; border: none; cursor: pointer;
+  transition: opacity 0.3s;
+  font-family: 'DM Mono', monospace;
+}
+.upgrade-btn:hover { opacity: 0.85; }
+
+/* ─── MAIN CONTENT ─── */
+.dash-main {
+  margin-left: 220px;
+  flex: 1;
+  padding: 2.5rem 3rem;
+  min-height: calc(100vh - 64px);
+}
+
+/* ─── PANELS (tab-switched, no page reload) ─── */
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* ─── SECTION HEADING ─── */
+.section-eyebrow {
+  font-size: 0.5rem; letter-spacing: 0.35em; color: var(--purple);
+  text-transform: uppercase; margin-bottom: 0.4rem;
+}
+.section-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.8rem; letter-spacing: 0.04em;
+  background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-bottom: 2rem;
+}
+
+/* ─── STAT CARDS ─── */
+.stat-row {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem;
+  margin-bottom: 2rem;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1.8rem 1.6rem;
+  position: relative; overflow: hidden;
+  transition: border-color 0.3s, transform 0.3s;
+}
+.stat-card:hover { border-color: rgba(168,85,247,0.2); transform: translateY(-2px); }
+.stat-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: var(--grad); transform: scaleX(0); transform-origin: left;
+  transition: transform 0.4s;
+}
+.stat-card:hover::before { transform: scaleX(1); }
+.sc-label {
+  font-size: 0.5rem; letter-spacing: 0.2em; color: var(--dim2);
+  text-transform: uppercase; margin-bottom: 0.6rem;
+}
+.sc-value {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.6rem; line-height: 1;
+  background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  transition: all 0.4s ease;
+}
+.sc-sub {
+  font-size: 0.5rem; letter-spacing: 0.1em; color: var(--dim);
+  margin-top: 0.4rem;
+}
+.sc-trend {
+  position: absolute; top: 1.2rem; right: 1.2rem;
+  font-size: 0.5rem; letter-spacing: 0.1em;
+}
+.sc-trend.up { color: var(--green); }
+.sc-trend.down { color: var(--red); }
+
+/* ─── TWO-COL GRID ─── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+
+/* ─── CARD ─── */
+.dash-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1.8rem;
+  position: relative; overflow: hidden;
+}
+.dash-card-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 1.4rem;
+}
+.dash-card-title {
+  font-size: 0.6rem; letter-spacing: 0.2em; color: var(--dim);
+  text-transform: uppercase;
+}
+.dash-card-meta { font-size: 0.5rem; letter-spacing: 0.1em; color: var(--dim2); }
+
+/* ─── CREDIT METER ─── */
+.credit-meter-wrap { margin-bottom: 1rem; }
+.credit-meter-bar {
+  height: 4px; background: var(--border); position: relative;
+  margin: 0.8rem 0 0.5rem;
+}
+.credit-meter-fill {
+  position: absolute; left: 0; top: 0; bottom: 0;
+  background: var(--grad);
+  transition: width 0.8s cubic-bezier(0.16,1,0.3,1);
+}
+.credit-meter-label {
+  display: flex; justify-content: space-between;
+  font-size: 0.5rem; letter-spacing: 0.1em; color: var(--dim2);
+}
+.credit-remaining {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 3rem; background: var(--grad);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  line-height: 1; transition: all 0.4s ease;
+}
+.credit-reset-info {
+  font-size: 0.5rem; letter-spacing: 0.15em; color: var(--dim2);
+  text-transform: uppercase; margin-top: 0.4rem;
+}
+
+/* ─── ACTIVITY FEED ─── */
+.activity-list { display: flex; flex-direction: column; gap: 0; }
+.activity-item {
+  display: flex; align-items: flex-start; gap: 1rem;
+  padding: 1rem 0; border-bottom: 1px solid var(--border);
+}
+.activity-item:last-child { border-bottom: none; }
+.activity-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  margin-top: 4px; flex-shrink: 0;
+}
+.activity-dot.verify { background: var(--purple); box-shadow: 0 0 6px rgba(168,85,247,0.5); }
+.activity-dot.track { background: var(--green); box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+.activity-dot.upgrade { background: var(--amber); box-shadow: 0 0 6px rgba(245,158,11,0.5); }
+.activity-dot.warn { background: var(--red); box-shadow: 0 0 6px rgba(239,68,68,0.5); }
+.activity-text { font-size: 0.6rem; line-height: 1.5; color: var(--dim); flex: 1; }
+.activity-text strong { color: var(--white); font-weight: 400; }
+.activity-time { font-size: 0.45rem; letter-spacing: 0.1em; color: var(--dim2); flex-shrink: 0; }
+
+/* ─── TOOL PANELS ─── */
+.tool-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 2rem; position: relative; overflow: hidden;
+  transition: border-color 0.3s, transform 0.3s;
+}
+.tool-card:hover { border-color: rgba(168,85,247,0.2); transform: translateY(-2px); }
+.tool-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: var(--grad); transform: scaleX(0); transform-origin: left;
+  transition: transform 0.4s;
+}
+.tool-card:hover::before { transform: scaleX(1); }
+.tool-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.8rem; letter-spacing: 0.05em;
+  background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-bottom: 0.3rem;
+}
+.tool-desc {
+  font-size: 0.6rem; color: var(--dim); line-height: 1.6; margin-bottom: 1.4rem;
+}
+.tool-credit-cost {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-size: 0.5rem; letter-spacing: 0.15em; color: var(--purple);
+  text-transform: uppercase; margin-bottom: 1rem;
+  border: 1px solid rgba(168,85,247,0.2); padding: 0.3rem 0.7rem;
+}
+
+/* FORM elements */
+.tool-input-wrap { margin-bottom: 1rem; }
+.tool-label { font-size: 0.5rem; letter-spacing: 0.2em; color: var(--dim2); text-transform: uppercase; margin-bottom: 0.5rem; display: block; }
+.tool-input {
+  width: 100%; background: var(--surface2);
+  border: 1px solid var(--border); outline: none;
+  color: var(--white); font-family: 'DM Mono', monospace;
+  font-size: 0.7rem; padding: 0.9rem 1.2rem;
+  transition: border-color 0.3s;
+}
+.tool-input:focus { border-color: var(--purple); }
+.tool-input::placeholder { color: var(--dim2); }
+.tool-btn {
+  width: 100%; padding: 1rem;
+  background: var(--grad); color: white; border: none; cursor: pointer;
+  font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em;
+  text-transform: uppercase; transition: opacity 0.3s;
+}
+.tool-btn:hover { opacity: 0.85; }
+.tool-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* RESULT BOX */
+.result-box {
+  margin-top: 1.2rem;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 1.2rem;
+  display: none;
+}
+.result-box.visible { display: block; }
+.result-status {
+  font-size: 0.55rem; letter-spacing: 0.15em; text-transform: uppercase;
+  margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;
+}
+.result-status.ok { color: var(--green); }
+.result-status.fail { color: var(--red); }
+.result-status.warn { color: var(--amber); }
+.result-detail {
+  font-size: 0.6rem; color: var(--dim); line-height: 1.7;
+}
+.result-detail span { color: var(--white); }
+
+/* TRACKER TABLE */
+.tracker-table { width: 100%; border-collapse: collapse; margin-top: 1.2rem; }
+.tracker-table th {
+  text-align: left; padding: 0.7rem 1rem;
+  font-size: 0.45rem; letter-spacing: 0.2em; color: var(--dim2);
+  text-transform: uppercase; border-bottom: 1px solid var(--border);
+  font-weight: 400;
+}
+.tracker-table td {
+  padding: 0.9rem 1rem; font-size: 0.55rem; color: var(--dim);
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.tracker-table td:first-child { color: var(--white); }
+.tracker-table tr:last-child td { border-bottom: none; }
+.tracker-table tr:hover td { background: rgba(168,85,247,0.02); }
+.open-badge {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  font-size: 0.45rem; letter-spacing: 0.1em; padding: 0.2rem 0.5rem;
+  background: rgba(34,197,94,0.1); color: var(--green); border: 1px solid rgba(34,197,94,0.2);
+}
+.open-badge .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--green); animation: pulse 1.5s infinite; }
+.pending-badge {
+  font-size: 0.45rem; letter-spacing: 0.1em; padding: 0.2rem 0.5rem;
+  background: rgba(245,158,11,0.1); color: var(--amber); border: 1px solid rgba(245,158,11,0.2);
+}
+.copy-pixel-btn {
+  font-size: 0.45rem; letter-spacing: 0.1em; color: var(--purple);
+  background: transparent; border: 1px solid rgba(168,85,247,0.2);
+  padding: 0.2rem 0.6rem; cursor: pointer; font-family: 'DM Mono', monospace;
+  transition: all 0.2s;
+}
+.copy-pixel-btn:hover { background: rgba(168,85,247,0.08); border-color: var(--purple); }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 2rem; right: 2rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--purple);
+  padding: 1rem 1.5rem;
+  font-size: 0.6rem; letter-spacing: 0.1em; color: var(--white);
+  z-index: 9000; transform: translateY(120%);
+  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+  max-width: 320px;
+}
+.toast.show { transform: translateY(0); }
+.toast.success { border-left-color: var(--green); }
+.toast.error { border-left-color: var(--red); }
+.toast.warn { border-left-color: var(--amber); }
+
+/* HISTORY TABLE */
+.history-list { display: flex; flex-direction: column; gap: 0; }
+.history-item {
+  display: flex; align-items: center; gap: 1.5rem;
+  padding: 1.1rem 0; border-bottom: 1px solid var(--border);
+}
+.history-item:last-child { border-bottom: none; }
+.history-type {
+  font-size: 0.45rem; letter-spacing: 0.15em; text-transform: uppercase;
+  padding: 0.2rem 0.6rem; flex-shrink: 0;
+}
+.history-type.verify { background: rgba(168,85,247,0.1); color: var(--purple); border: 1px solid rgba(168,85,247,0.2); }
+.history-type.track { background: rgba(34,197,94,0.1); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
+.history-value { font-size: 0.6rem; color: var(--white); flex: 1; }
+.history-result { font-size: 0.55rem; }
+.history-result.ok { color: var(--green); }
+.history-result.fail { color: var(--red); }
+.history-result.warn { color: var(--amber); }
+.history-time { font-size: 0.45rem; color: var(--dim2); flex-shrink: 0; }
+
+/* EMPTY STATE */
+.empty-state {
+  text-align: center; padding: 4rem 2rem;
+  border: 1px dashed var(--dim2);
+}
+.empty-state-icon { font-size: 2rem; margin-bottom: 1rem; }
+.empty-state-title {
+  font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem;
+  color: var(--dim); letter-spacing: 0.05em; margin-bottom: 0.5rem;
+}
+.empty-state-sub { font-size: 0.55rem; color: var(--dim2); }
+
+/* UPGRADE WALL */
+.upgrade-wall {
+  background: var(--surface);
+  border: 1px solid rgba(168,85,247,0.25);
+  padding: 3rem; text-align: center;
+  position: relative; overflow: hidden;
+  display: none;
+}
+.upgrade-wall.visible { display: block; }
+.upgrade-wall::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--grad);
+}
+.upgrade-wall-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2rem; letter-spacing: 0.05em;
+  background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-bottom: 0.8rem;
+}
+.upgrade-wall-sub { font-size: 0.65rem; color: var(--dim); margin-bottom: 1.5rem; line-height: 1.6; }
+.upgrade-wall-btn {
+  display: inline-block;
+  padding: 0.9rem 2.5rem;
+  background: var(--grad); color: white; border: none; cursor: pointer;
+  font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em;
+  text-transform: uppercase; transition: opacity 0.3s;
+}
+.upgrade-wall-btn:hover { opacity: 0.85; }
+
+/* LOADING SHIMMER */
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.shimmer {
+  background: linear-gradient(90deg, var(--surface2) 25%, rgba(168,85,247,0.05) 50%, var(--surface2) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* CREDIT WARN GLOW on low credits */
+.credits-pill.warn-low { border-color: rgba(239,68,68,0.4); }
+.credits-pill.warn-low .credits-value { background: linear-gradient(135deg, #ef4444, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+/* REALTIME PULSE: when a value updates */
+@keyframes valueFlash {
+  0% { opacity: 1; } 30% { opacity: 0.3; } 100% { opacity: 1; }
+}
+.value-flash { animation: valueFlash 0.5s ease; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--surface); }
+::-webkit-scrollbar-thumb { background: var(--dim2); }
+
+/* RESPONSIVE: collapse sidebar below 900px */
+@media (max-width: 900px) {
+  .sidebar { width: 60px; }
+  .sidebar-item span, .sidebar-section-label, .sidebar-badge, .sidebar-footer { display: none; }
+  .sidebar-item { justify-content: center; padding: 0.9rem; }
+  .dash-main { margin-left: 60px; padding: 1.5rem; }
+  .stat-row { grid-template-columns: repeat(2, 1fr); }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .topbar-search { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- ═══════════ TOAST ═══════════ -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════ TOPBAR ═══════════ -->
+<header class="topbar">
+  <div class="topbar-logo">Raptor</div>
+
+  <div class="topbar-search">
+    <span class="topbar-search-icon">⌕</span>
+    <input type="text" id="globalSearch" placeholder="Search campaigns, emails, actions...">
+  </div>
+
+  <div class="topbar-right">
+    <!-- Live Credit Display -->
+    <div class="credits-pill" id="creditsPill">
+      <div>
+        <div class="credits-label">Available Credits</div>
+        <div class="credits-value" id="topbarCredits">—</div>
+        <div class="credits-sub">Resets monthly</div>
+      </div>
+      <div class="credits-refresh-dot" title="Live sync"></div>
+    </div>
+
+    <!-- Theme Lamp -->
+    <div class="lamp-container" id="lightSwitch" title="Toggle theme">
+      <div class="lamp-wire"></div>
+      <div class="lamp-socket"></div>
+      <div class="lamp-bulb"></div>
+      <div class="lamp-string"><div class="lamp-knob"></div></div>
+    </div>
+
+    <!-- User Menu -->
+    <div class="topbar-user" id="userMenuToggle">
+      <div class="user-avatar" id="userAvatarInitial">Y</div>
+      <div class="user-name" id="userNameDisplay">Yogesh</div>
+      <div class="user-dropdown" id="userDropdown">
+        <div class="user-dropdown-item" onclick="switchPanel('settings')">⚙ Settings</div>
+        <div class="user-dropdown-item" onclick="handleUpgrade()">↑ Upgrade Plan</div>
+        <div class="user-dropdown-item danger" onclick="handleLogout()">→ Log Out</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════ LAYOUT ═══════════ -->
+<div class="dash-layout">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-section-label">Overview</div>
+    <a class="sidebar-item active" data-panel="home" onclick="switchPanel('home')">
+      <span class="sidebar-icon">⊞</span>
+      <span>Dashboard</span>
+    </a>
+    <a class="sidebar-item" data-panel="history" onclick="switchPanel('history')">
+      <span class="sidebar-icon">⊙</span>
+      <span>Activity</span>
+    </a>
+
+    <div class="sidebar-section-label">Tools</div>
+    <a class="sidebar-item" data-panel="validator" onclick="switchPanel('validator')">
+      <span class="sidebar-icon">✓</span>
+      <span>Email Validator</span>
+    </a>
+    <a class="sidebar-item" data-panel="tracker" onclick="switchPanel('tracker')">
+      <span class="sidebar-icon">◎</span>
+      <span>Stealth Tracker</span>
+      <span class="sidebar-badge" id="trackerBadge" style="display:none"></span>
+    </a>
+
+    <div class="sidebar-section-label">Account</div>
+    <a class="sidebar-item" data-panel="billing" onclick="switchPanel('billing')">
+      <span class="sidebar-icon">◇</span>
+      <span>Credits & Plan</span>
+    </a>
+    <a class="sidebar-item" data-panel="settings" onclick="switchPanel('settings')">
+      <span class="sidebar-icon">⚙</span>
+      <span>Settings</span>
+    </a>
+
+    <div class="sidebar-footer">
+      <div class="plan-badge" id="planBadgeLabel">Free Plan · 50 credits/mo</div>
+      <button class="upgrade-btn" onclick="switchPanel('billing')">Upgrade to Pro →</button>
+    </div>
+  </nav>
+
+  <!-- ═══════════════════════════════════
+       MAIN CONTENT
+  ═══════════════════════════════════ -->
+  <main class="dash-main">
+
+    <!-- ───── HOME PANEL ───── -->
+    <div class="panel active" id="panel-home">
+      <div class="section-eyebrow">ShoonyaOrigins · Raptor</div>
+      <div class="section-title" id="homeGreeting">Welcome Back.</div>
+
+      <!-- Stats Row: live-updating DOM nodes -->
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="sc-label">Available Credits</div>
+          <div class="sc-value" id="statCredits">—</div>
+          <div class="sc-sub">This billing cycle</div>
+          <div class="sc-trend up" id="statCreditsTrend"></div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-label">Emails Verified</div>
+          <div class="sc-value" id="statVerified">0</div>
+          <div class="sc-sub">All time</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-label">Emails Tracked</div>
+          <div class="sc-value" id="statTracked">0</div>
+          <div class="sc-sub">Active campaigns</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-label">Opens Detected</div>
+          <div class="sc-value" id="statOpens">0</div>
+          <div class="sc-sub">Total opens logged</div>
+          <div class="sc-trend up" id="statOpensTrend" style="display:none">+New</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Credit Meter -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div class="dash-card-title">Credit Meter</div>
+            <div class="dash-card-meta" id="creditResetDate">Resets —</div>
+          </div>
+          <div class="credit-remaining" id="cardCredits">—</div>
+          <div class="credit-reset-info">credits remaining</div>
+          <div class="credit-meter-wrap">
+            <div class="credit-meter-bar">
+              <div class="credit-meter-fill" id="creditMeterFill" style="width:100%"></div>
+            </div>
+            <div class="credit-meter-label">
+              <span id="creditUsedLabel">0 used</span>
+              <span id="creditTotalLabel">50 total</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div class="dash-card-title">Recent Activity</div>
+            <div class="dash-card-meta" id="activityLiveTag">● Live</div>
+          </div>
+          <div class="activity-list" id="activityFeed">
+            <div class="activity-item">
+              <div class="activity-dot warn"></div>
+              <div class="activity-text">No activity yet. Run your first tool below.</div>
+              <div class="activity-time">now</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Launch -->
+      <div style="font-size:0.5rem; letter-spacing:0.3em; color:var(--dim2); text-transform:uppercase; margin-bottom:1rem;">Quick Launch</div>
+      <div class="grid-2">
+        <div class="tool-card" onclick="switchPanel('validator')" style="cursor:pointer;">
+          <div class="tool-name">Email Validator</div>
+          <div class="tool-desc">Ping-verify any email address without sending a single message. Protect your sender reputation before every campaign.</div>
+          <div class="tool-credit-cost">⬡ 1 credit per check</div>
+          <button class="tool-btn" onclick="event.stopPropagation(); switchPanel('validator')">Open Tool →</button>
+        </div>
+        <div class="tool-card" onclick="switchPanel('tracker')" style="cursor:pointer;">
+          <div class="tool-name">Stealth Tracker</div>
+          <div class="tool-desc">Generate invisible tracking pixels for your email pitches. See exactly when — and where — prospects open your email.</div>
+          <div class="tool-credit-cost">⬡ 1 credit per campaign</div>
+          <button class="tool-btn" onclick="event.stopPropagation(); switchPanel('tracker')">Open Tool →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───── EMAIL VALIDATOR PANEL ───── -->
+    <div class="panel" id="panel-validator">
+      <div class="section-eyebrow">Tool · 1 credit per verification</div>
+      <div class="section-title">Email Validator</div>
+
+      <div class="grid-2">
+        <div>
+          <div class="tool-card">
+            <div class="tool-name">Ping-Verify Engine</div>
+            <div class="tool-desc">Checks DNS/MX records and performs an SMTP handshake with the target mail server — without sending an actual email. Instant deliverability verdict.</div>
+            <div class="tool-credit-cost">⬡ 1 credit per check · <span id="validatorCreditsLeft">—</span> remaining</div>
+
+            <div class="tool-input-wrap">
+              <label class="tool-label" for="emailInput">Target Email Address</label>
+              <input class="tool-input" type="email" id="emailInput" placeholder="ceo@targetcompany.com">
+            </div>
+            <button class="tool-btn" id="verifyBtn" onclick="runEmailVerify()">Verify Email →</button>
+
+            <!-- Result -->
+            <div class="result-box" id="verifyResult">
+              <div class="result-status" id="verifyStatus"></div>
+              <div class="result-detail" id="verifyDetail"></div>
+            </div>
+
+            <!-- Zero credits wall -->
+            <div class="upgrade-wall" id="verifyUpgradeWall">
+              <div class="upgrade-wall-title">Credits Exhausted</div>
+              <div class="upgrade-wall-sub">You've used all your free credits for this cycle.<br>Upgrade to Pro for 500 credits/month.</div>
+              <button class="upgrade-wall-btn" onclick="switchPanel('billing')">Upgrade to Pro →</button>
+            </div>
+          </div>
+
+          <!-- Bulk hint -->
+          <div class="dash-card" style="margin-top:1.2rem;">
+            <div class="dash-card-title" style="margin-bottom:0.8rem;">Pro Tip</div>
+            <div style="font-size:0.6rem; color:var(--dim); line-height:1.7;">
+              Run verifications before any cold outreach campaign. A bounce rate above 3% can permanently damage your domain sender score with Gmail and Outlook.<br><br>
+              <span style="color:var(--white);">✓ Safe to send</span> — mailbox confirmed<br>
+              <span style="color:var(--amber);">⚠ Risky</span> — domain exists, mailbox uncertain<br>
+              <span style="color:var(--red);">✗ Do not send</span> — will hard bounce
+            </div>
+          </div>
+        </div>
+
+        <!-- Verify history -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div class="dash-card-title">Verification History</div>
+            <div class="dash-card-meta" id="verifyHistoryCount">0 checks</div>
+          </div>
+          <div class="history-list" id="verifyHistory">
+            <div class="empty-state">
+              <div class="empty-state-icon">✉</div>
+              <div class="empty-state-title">No checks yet</div>
+              <div class="empty-state-sub">Run your first verification above.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───── STEALTH TRACKER PANEL ───── -->
+    <div class="panel" id="panel-tracker">
+      <div class="section-eyebrow">Tool · 1 credit per campaign</div>
+      <div class="section-title">Stealth Tracker</div>
+
+      <div class="grid-2">
+        <div>
+          <div class="tool-card">
+            <div class="tool-name">Pixel Generator</div>
+            <div class="tool-desc">Creates a unique 1×1 invisible tracking pixel URL. Paste it into any email — when the prospect opens it, you get notified instantly.</div>
+            <div class="tool-credit-cost">⬡ 1 credit per campaign · <span id="trackerCreditsLeft">—</span> remaining</div>
+
+            <div class="tool-input-wrap">
+              <label class="tool-label" for="campaignName">Campaign / Prospect Name</label>
+              <input class="tool-input" type="text" id="campaignName" placeholder="e.g. pitch-acmecorp-ceo">
+            </div>
+            <button class="tool-btn" id="generatePixelBtn" onclick="generatePixel()">Generate Pixel →</button>
+
+            <div class="result-box" id="pixelResult">
+              <div class="result-status ok">⬟ Pixel Ready — embed in your email</div>
+              <div class="result-detail">
+                <div style="margin-bottom:0.6rem;">Pixel URL · <span id="pixelUrl" style="color:var(--purple);">—</span></div>
+                <div style="margin-bottom:0.6rem;">HTML Tag (paste into email signature):</div>
+                <div style="background:var(--surface); padding:0.8rem; font-size:0.55rem; color:var(--dim); word-break:break-all; border:1px solid var(--border);" id="pixelHtml">—</div>
+                <button class="copy-pixel-btn" style="margin-top:0.8rem; width:100%;" onclick="copyPixelHtml()">Copy HTML Tag</button>
+              </div>
+            </div>
+
+            <div class="upgrade-wall" id="trackerUpgradeWall">
+              <div class="upgrade-wall-title">Credits Exhausted</div>
+              <div class="upgrade-wall-sub">Upgrade to Pro for 500 credits/month and real-time open webhooks.</div>
+              <button class="upgrade-wall-btn" onclick="switchPanel('billing')">Upgrade to Pro →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live open log -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div class="dash-card-title">Live Open Log</div>
+            <div class="dash-card-meta" id="openLogLiveTag">● Polling every 30s</div>
+          </div>
+          <div id="noTrackersYet" class="empty-state">
+            <div class="empty-state-icon">◎</div>
+            <div class="empty-state-title">No campaigns yet</div>
+            <div class="empty-state-sub">Generate your first pixel to start tracking.</div>
+          </div>
+          <table class="tracker-table" id="trackerTable" style="display:none;">
+            <thead>
+              <tr>
+                <th>Campaign</th>
+                <th>Status</th>
+                <th>Last Open</th>
+                <th>Opens</th>
+                <th>Pixel</th>
+              </tr>
+            </thead>
+            <tbody id="trackerTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───── ACTIVITY HISTORY PANEL ───── -->
+    <div class="panel" id="panel-history">
+      <div class="section-eyebrow">Account · All Time</div>
+      <div class="section-title">Activity Log</div>
+
+      <div class="dash-card">
+        <div class="dash-card-header">
+          <div class="dash-card-title">All Tool Usage</div>
+          <div class="dash-card-meta" id="historyTotal">0 actions</div>
+        </div>
+        <div id="historyEmpty" class="empty-state" style="border:none;">
+          <div class="empty-state-icon">⊙</div>
+          <div class="empty-state-title">No history yet</div>
+          <div class="empty-state-sub">Your tool usage will appear here in real time.</div>
+        </div>
+        <div class="history-list" id="fullHistoryList" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- ───── BILLING PANEL ───── -->
+    <div class="panel" id="panel-billing">
+      <div class="section-eyebrow">Account</div>
+      <div class="section-title">Credits & Plan</div>
+
+      <div class="grid-2">
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div class="dash-card-title">Current Plan</div>
+            <div class="dash-card-meta" id="billingPlanName">Free</div>
+          </div>
+          <div class="credit-remaining" id="billingCredits">—</div>
+          <div class="credit-reset-info" style="margin-bottom:1.2rem;">credits remaining this cycle</div>
+          <div class="credit-meter-bar">
+            <div class="credit-meter-fill" id="billingMeterFill" style="width:100%"></div>
+          </div>
+          <div class="credit-meter-label" style="margin-top:0.5rem;">
+            <span id="billingUsed">0 used</span>
+            <span id="billingTotal">50 total</span>
+          </div>
+        </div>
+
+        <!-- Upgrade card -->
+        <div class="dash-card" style="border-color:rgba(168,85,247,0.25); position:relative; overflow:hidden;">
+          <div style="position:absolute; top:0; left:0; right:0; height:2px; background:var(--grad);"></div>
+          <div style="font-size:0.5rem; letter-spacing:0.25em; color:var(--purple); text-transform:uppercase; margin-bottom:0.4rem;">Recommended</div>
+          <div style="font-family:'Bebas Neue',sans-serif; font-size:2rem; background:var(--grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:0.8rem;">Pro Plan</div>
+          <ul style="list-style:none; margin-bottom:1.5rem;">
+            <li style="font-size:0.6rem; color:var(--dim); padding:0.3rem 0; border-bottom:1px solid var(--border);">✓ <span style="color:var(--white);">500 credits / month</span></li>
+            <li style="font-size:0.6rem; color:var(--dim); padding:0.3rem 0; border-bottom:1px solid var(--border);">✓ <span style="color:var(--white);">Real-time webhook open alerts</span></li>
+            <li style="font-size:0.6rem; color:var(--dim); padding:0.3rem 0; border-bottom:1px solid var(--border);">✓ <span style="color:var(--white);">Bulk email verify (CSV upload)</span></li>
+            <li style="font-size:0.6rem; color:var(--dim); padding:0.3rem 0;">✓ <span style="color:var(--white);">Priority API access</span></li>
+          </ul>
+          <button class="upgrade-btn" onclick="handleUpgrade()" style="width:100%; display:block; padding:1rem; text-align:center; cursor:pointer;">Upgrade · ₹4,999/mo →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───── SETTINGS PANEL ───── -->
+    <div class="panel" id="panel-settings">
+      <div class="section-eyebrow">Account</div>
+      <div class="section-title">Settings</div>
+
+      <div class="dash-card" style="max-width:600px;">
+        <div class="dash-card-title" style="margin-bottom:1.4rem;">API Configuration</div>
+
+        <div class="tool-input-wrap">
+          <label class="tool-label">Backend API URL (Render)</label>
+          <input class="tool-input" type="text" id="settingsApiUrl" placeholder="https://your-api.onrender.com">
+        </div>
+        <div class="tool-input-wrap">
+          <label class="tool-label">Supabase Project URL</label>
+          <input class="tool-input" type="text" id="settingsSbUrl" placeholder="https://xxxx.supabase.co">
+        </div>
+        <div class="tool-input-wrap">
+          <label class="tool-label">Supabase Anon Key</label>
+          <input class="tool-input" type="text" id="settingsSbKey" placeholder="eyJ...">
+        </div>
+        <button class="tool-btn" style="max-width:200px;" onclick="saveSettings()">Save Settings</button>
+      </div>
+
+      <div class="dash-card" style="max-width:600px; margin-top:1.2rem;">
+        <div class="dash-card-title" style="margin-bottom:1.4rem;">Account</div>
+        <div style="font-size:0.6rem; color:var(--dim); margin-bottom:1rem; line-height:1.7;">
+          Signed in as: <span style="color:var(--white);" id="settingsEmail">—</span><br>
+          Plan: <span style="color:var(--purple);" id="settingsPlan">Free</span>
+        </div>
+        <button class="tool-btn" style="max-width:200px; background:rgba(239,68,68,0.1); color:var(--red);" onclick="handleLogout()">Log Out</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ═══════════ SCRIPTS ═══════════ -->
+<script>
+// ──────────────────────────────────────────────────
+// CONFIG — replace with your actual values
+// These can also be set via the Settings panel
+// ──────────────────────────────────────────────────
+let RAPTOR_API_URL   = localStorage.getItem('raptor_api_url')   || 'https://websites-api-5wmu.onrender.com';
+let SUPABASE_URL_VAL = localStorage.getItem('raptor_sb_url')    || 'https://pcdbtcpctlnvdtbrrqoo.supabase.co';
+let SUPABASE_KEY_VAL = localStorage.getItem('raptor_sb_key')    || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjZGJ0Y3BjdGxudmR0YnJycW9vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI2MjIxMjQsImV4cCI6MjA5ODE5ODEyNH0._y59k8mmSqvkCL9gPBWp5hfp2LwpP_IBvr5h7y3nP7Q';
+
+const supabaseClient = (SUPABASE_URL_VAL.startsWith('http'))
+  ? window.supabase.createClient(SUPABASE_URL_VAL, SUPABASE_KEY_VAL)
+  : null;
+
+// ── STATE ──────────────────────────────────────────
+const state = {
+  user: null,
+  credits: 0,           // live value
+  totalCredits: 50,     // plan cap
+  verifyCount: 0,
+  trackedCount: 0,
+  openCount: 0,
+  verifyHistory: [],    // { email, result, time }
+  campaigns: [],        // { id, name, opens, lastOpen, pixelUrl }
+  activityLog: [],      // { type, text, time }
+  plan: 'Free',
+  pollingInterval: null,
+};
+
+// ── CURSOR ────────────────────────────────────────
+const cursor = document.getElementById('cursor');
+const ring   = document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; cursor.style.left=mx+'px'; cursor.style.top=my+'px'; });
+(function animateRing() { rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(animateRing); })();
+document.querySelectorAll('a, button, .tool-card, .sidebar-item').forEach(el => {
+  el.addEventListener('mouseenter', ()=>{ cursor.style.width='16px'; cursor.style.height='16px'; cursor.style.background='var(--pink)'; ring.style.width='50px'; ring.style.height='50px'; });
+  el.addEventListener('mouseleave', ()=>{ cursor.style.width='8px'; cursor.style.height='8px'; cursor.style.background='var(--purple)'; ring.style.width='32px'; ring.style.height='32px'; });
+});
+
+// ── LAMP ──────────────────────────────────────────
+let isAnimating=false;
+document.getElementById('lightSwitch').addEventListener('click',()=>{
+  if(isAnimating)return; isAnimating=true;
+  document.getElementById('lightSwitch').classList.add('pulled');
+  setTimeout(()=>{ document.body.classList.toggle('light-mode'); document.getElementById('lightSwitch').classList.remove('pulled'); isAnimating=false; },250);
+});
+
+// ── PANEL SWITCHING (zero full-page reloads) ────
+function switchPanel(name) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));
+  const panel = document.getElementById('panel-'+name);
+  if(panel) panel.classList.add('active');
+  const sideItem = document.querySelector(`[data-panel="${name}"]`);
+  if(sideItem) sideItem.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ── TOAST ─────────────────────────────────────────
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+// ── FLASH ANIMATION ───────────────────────────────
+function flashValue(el) {
+  el.classList.remove('value-flash');
+  void el.offsetWidth;
+  el.classList.add('value-flash');
+}
+
+// ── RENDER CREDIT UI ─────────────────────────────
+function renderCredits() {
+  const c = state.credits;
+  const t = state.totalCredits;
+  const used = t - c;
+  const pct = Math.max(0, Math.min(100, (c/t)*100));
+
+  // Topbar
+  const pill = document.getElementById('creditsPill');
+  const tv = document.getElementById('topbarCredits');
+  tv.textContent = c;
+  flashValue(tv);
+  pill.classList.toggle('warn-low', c <= 5);
+
+  // Home stat
+  document.getElementById('statCredits').textContent = c;
+
+  // Home card
+  document.getElementById('cardCredits').textContent = c;
+  document.getElementById('creditMeterFill').style.width = pct+'%';
+  document.getElementById('creditUsedLabel').textContent = used+' used';
+  document.getElementById('creditTotalLabel').textContent = t+' total';
+
+  // Billing
+  document.getElementById('billingCredits').textContent = c;
+  document.getElementById('billingMeterFill').style.width = pct+'%';
+  document.getElementById('billingUsed').textContent = used+' used';
+  document.getElementById('billingTotal').textContent = t+' total';
+
+  // Tool panels
+  document.getElementById('validatorCreditsLeft').textContent = c;
+  document.getElementById('trackerCreditsLeft').textContent = c;
+
+  // Reset date
+  const now=new Date(); const y=now.getFullYear(); const m=now.getMonth()+1;
+  const reset=new Date(y, m, 1).toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+  document.getElementById('creditResetDate').textContent = 'Resets '+reset;
+}
+
+// ── AUTH HEADER HELPER ────────────────────────────
+// Pulls the live Supabase session token. The backend is the
+// only thing allowed to verify identity / spend credits now —
+// the frontend never sends user_id and never writes credits itself.
+async function getAuthHeader() {
+  if (!supabaseClient) return null;
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) {
+    showToast('Session expired — please log in again', 'error');
+    setTimeout(() => { window.location.href = '/ventures/raptor/'; }, 1200);
+    return null;
+  }
+  return { 'Authorization': `Bearer ${session.access_token}`, 'Content-Type': 'application/json' };
+}
+
+// Handles a 401 from the API uniformly: the JWT was rejected
+// (expired / tampered / signed out elsewhere) — never trust
+// local state after this, force a clean re-login.
+function handleUnauthorized() {
+  showToast('Session expired — please log in again', 'error');
+  if (supabaseClient) supabaseClient.auth.signOut();
+  setTimeout(() => { window.location.href = '/ventures/raptor/'; }, 1200);
+}
+
+// Credits are now authoritative from the SERVER response only.
+// The backend deducts atomically in deduct_credit() and returns
+// credits_left — the frontend just reflects that number. No
+// client-side decrement, no client-side Supabase write.
+function syncCreditsFromServer(creditsLeft) {
+  if (typeof creditsLeft === 'number') {
+    state.credits = creditsLeft;
+    renderCredits();
+  }
+}
+
+// ── LOAD USER CREDITS FROM SUPABASE ──────────────
+async function loadUserData() {
+  if (!supabaseClient) {
+    // Nothing is fabricated here. If Supabase isn't configured yet,
+    // the dashboard is unusable -- it says so plainly and stops,
+    // rather than pretending a fake user is logged in with fake credits.
+    showConfigError('Supabase is not configured. Add your project URL and anon key in Settings, then reload.');
+    return;
+  }
+
+  // ── WHY THIS ISN'T A PLAIN getSession() CALL ──
+  // A user arriving here via "Continue with Google" lands on this page
+  // with the auth tokens still sitting in the URL fragment
+  // (#access_token=...&refresh_token=...). The Supabase client parses
+  // that fragment and establishes the session ASYNCHRONOUSLY on page
+  // load -- it is not guaranteed to be done yet on the very first
+  // getSession() call. A plain `if (!session) redirect to login` here
+  // would race that parsing and incorrectly bounce a freshly-authenticated
+  // Google user back to the login page.
+  //
+  // onAuthStateChange fires once synchronously with whatever the SDK
+  // already knows, then again whenever it finishes resolving a pending
+  // redirect. We wait for the first event the SDK gives us before
+  // deciding whether the user is actually logged out, instead of
+  // trusting a getSession() call that might have run too early.
+  const session = await new Promise((resolve) => {
+    const { data: { subscription } } = supabaseClient.auth.onAuthStateChange((event, session) => {
+      subscription.unsubscribe();
+      resolve(session);
+    });
+  });
+
+  if (!session) { window.location.href = '/ventures/raptor/'; return; }
+
+  state.user = session.user;
+
+  const { data, error } = await supabaseClient
+    .from('raptor_users')
+    .select('credits, total_credits, plan')
+    .eq('user_id', state.user.id)
+    .single();
+
+  if (!error && data) {
+    state.credits      = data.credits      ?? 50;
+    state.totalCredits = data.total_credits ?? 50;
+    state.plan         = data.plan          ?? 'Free';
+  } else {
+    // First-time user — insert row.
+    // SECURITY NOTE: this write is only as safe as your Supabase
+    // Row Level Security policy on raptor_users. RLS MUST restrict
+    // both SELECT and UPDATE to `auth.uid() = user_id`, otherwise
+    // any logged-in user could read or modify other users' rows
+    // directly via the exposed anon key. The backend's deduct_credit()
+    // uses the service-role key and bypasses RLS by design — that's
+    // fine. This client-side upsert does NOT bypass RLS, so it's only
+    // safe if RLS is correctly configured. Verify this in the Supabase
+    // dashboard under Authentication > Policies.
+    //
+    // This also covers Google-OAuth first-time signups: Google sign-in
+    // never goes through index_.html's signupForm handler, so this is
+    // the ONLY place a brand-new Google user's raptor_users row gets
+    // created. Without this branch, a first-time Google user would
+    // have no credits row at all.
+    state.credits = 50; state.totalCredits = 50;
+    await supabaseClient.from('raptor_users').upsert({
+      user_id: state.user.id, email: state.user.email,
+      credits: 50, total_credits: 50, plan: 'Free'
+    });
+  }
+
+  applyUserUI();
+  renderCredits();
+  await loadHistoryFromBackend();
+  startPolling();
+
+  // From here on, treat any FUTURE sign-out (in this tab or another
+  // tab sharing the same browser storage) as authoritative -- log the
+  // user out of the dashboard immediately rather than letting them sit
+  // on a page with stale, no-longer-valid local state.
+  supabaseClient.auth.onAuthStateChange((event) => {
+    if (event === 'SIGNED_OUT') {
+      if (state.pollingInterval) clearInterval(state.pollingInterval);
+      window.location.href = '/ventures/raptor/';
+    }
+  });
+}
+
+// Blocking, visible config error -- shown inline instead of a silent
+// console warning, so an unconfigured dashboard can never be mistaken
+// for a working one.
+function showConfigError(message) {
+  const main = document.querySelector('main');
+  const banner = document.createElement('div');
+  banner.style.cssText = 'position:fixed;top:64px;left:0;right:0;z-index:500;background:#7f1d1d;color:#fff;padding:1rem 2rem;font-family:"DM Mono",monospace;font-size:0.75rem;letter-spacing:0.05em;text-align:center;';
+  banner.textContent = '⚠ ' + message;
+  document.body.prepend(banner);
+}
+
+// ── LOAD REAL HISTORY/CAMPAIGNS FROM BACKEND ─────
+// Runs once on login so a page refresh doesn't wipe the dashboard
+// back to empty. Campaign names come from raptor_campaigns.display_name
+// (the human-readable name typed at creation, not the slug); credits
+// and plan already come from raptor_users above.
+async function loadHistoryFromBackend() {
+  const headers = await getAuthHeader();
+  if (!headers) return;
+
+  try {
+    const res = await fetch(`${RAPTOR_API_URL}/api/raptor/campaign-opens`, { method: 'GET', headers });
+    if (!res.ok) return;
+    const json = await res.json();
+    const serverCampaigns = json.campaigns || [];
+
+    // display_name is the human-readable name the user originally typed,
+    // stored server-side in raptor_campaigns -- not just the slug ID.
+    state.campaigns = serverCampaigns.map(c => ({
+      id: c.campaign_id,
+      name: c.display_name || c.campaign_id,
+      opens: c.opens,
+      lastOpen: c.last_open,
+      pixelUrl: `${RAPTOR_API_URL}/api/raptor/track/${c.campaign_id}.png`
+    }));
+    state.trackedCount = state.campaigns.length;
+    state.openCount = state.campaigns.reduce((sum, c) => sum + c.opens, 0);
+
+    document.getElementById('statTracked').textContent = state.trackedCount;
+    document.getElementById('statOpens').textContent = state.openCount;
+    if (state.openCount > 0) document.getElementById('statOpensTrend').style.display = '';
+
+    const badge = document.getElementById('trackerBadge');
+    if (state.campaigns.length) { badge.style.display = ''; badge.textContent = state.campaigns.length; }
+
+    renderTrackerTable();
+  } catch (err) {
+    // Non-fatal -- dashboard still works, just starts with empty history this session
+  }
+}
+
+function applyUserUI() {
+  const name = (state.user?.user_metadata?.full_name || state.user?.email || 'User').split(' ')[0];
+  document.getElementById('homeGreeting').textContent = 'Welcome Back, ' + name + '.';
+  document.getElementById('userNameDisplay').textContent = name;
+  document.getElementById('userAvatarInitial').textContent = name[0].toUpperCase();
+  document.getElementById('settingsEmail').textContent = state.user?.email || '—';
+  document.getElementById('settingsPlan').textContent = state.plan;
+  document.getElementById('planBadgeLabel').textContent = state.plan + ' Plan · ' + state.totalCredits + ' credits/mo';
+  document.getElementById('billingPlanName').textContent = state.plan;
+}
+
+// ── POLLING: refresh credits from DB every 30s ──
+function startPolling() {
+  if (state.pollingInterval) clearInterval(state.pollingInterval);
+  state.pollingInterval = setInterval(async () => {
+    if (!supabaseClient || !state.user) return;
+    const { data } = await supabaseClient
+      .from('raptor_users').select('credits').eq('user_id', state.user.id).single();
+    if (data && data.credits !== state.credits) {
+      state.credits = data.credits;
+      renderCredits();
+    }
+    // Poll for new opens on campaigns
+    await pollCampaignOpens();
+  }, 30000);
+}
+
+// ── ACTIVITY FEED ─────────────────────────────────
+function logActivity(type, text) {
+  const now = new Date().toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+  state.activityLog.unshift({ type, text, time: now });
+  renderActivity();
+  renderFullHistory();
+}
+
+function renderActivity() {
+  const feed = document.getElementById('activityFeed');
+  if (!state.activityLog.length) return;
+  feed.innerHTML = state.activityLog.slice(0,5).map(a => `
+    <div class="activity-item">
+      <div class="activity-dot ${a.type}"></div>
+      <div class="activity-text">${a.text}</div>
+      <div class="activity-time">${a.time}</div>
+    </div>
+  `).join('');
+}
+
+function renderFullHistory() {
+  const list = document.getElementById('fullHistoryList');
+  const empty = document.getElementById('historyEmpty');
+  document.getElementById('historyTotal').textContent = state.activityLog.length + ' actions';
+  if (!state.activityLog.length) { empty.style.display=''; list.style.display='none'; return; }
+  empty.style.display='none'; list.style.display='flex';
+  list.innerHTML = state.activityLog.map(a => `
+    <div class="history-item">
+      <span class="history-type ${a.type}">${a.type}</span>
+      <span class="history-value">${a.text}</span>
+      <span class="history-time">${a.time}</span>
+    </div>
+  `).join('');
+}
+
+// ── EMAIL VALIDATOR ───────────────────────────────
+async function runEmailVerify() {
+  if (state.credits <= 0) {
+    document.getElementById('verifyUpgradeWall').classList.add('visible');
+    return;
+  }
+  const emailVal = document.getElementById('emailInput').value.trim();
+  if (!emailVal || !emailVal.includes('@')) { showToast('Enter a valid email address', 'error'); return; }
+
+  const btn = document.getElementById('verifyBtn');
+  btn.disabled = true; btn.textContent = 'Verifying...';
+
+  let result, statusClass, statusText, detail;
+
+  try {
+    const headers = await getAuthHeader();
+    if (!headers) { btn.disabled=false; btn.textContent='Verify Email →'; return; }
+
+    // Note: user_id is NEVER sent here — the backend derives it
+    // from the verified Bearer token (get_current_user). Credit
+    // deduction happens server-side only, inside deduct_credit().
+    const res = await fetch(`${RAPTOR_API_URL}/api/raptor/verify-email?address=${encodeURIComponent(emailVal)}`, {
+      method: 'GET',
+      headers
+    });
+
+    if (res.status === 401) { handleUnauthorized(); btn.disabled=false; btn.textContent='Verify Email →'; return; }
+    if (res.status === 402) {
+      document.getElementById('verifyUpgradeWall').classList.add('visible');
+      btn.disabled=false; btn.textContent='Verify Email →';
+      return;
+    }
+    if (!res.ok) throw new Error('API error ' + res.status);
+
+    const json = await res.json();
+
+    // Server is the single source of truth for remaining credits.
+    syncCreditsFromServer(json.credits_left);
+
+    if (json.status === 'valid') {
+      result='ok'; statusClass='ok'; statusText='✓ Safe to Send — Mailbox Confirmed';
+      detail = `Domain: <span>${emailVal.split('@')[1]}</span> · MX Records: <span>Found</span> · SMTP Handshake: <span>Accepted</span>`;
+    } else if (json.status === 'unknown') {
+      result='warn'; statusClass='warn'; statusText='⚠ Risky — Domain Exists, Mailbox Uncertain';
+      detail = `Domain: <span>${emailVal.split('@')[1]}</span> · MX Records: <span>Found</span> · SMTP: <span>${json.error || 'Inconclusive'}</span>`;
+    } else {
+      result='fail'; statusClass='fail'; statusText='✗ Do Not Send — Will Hard Bounce';
+      detail = `Domain: <span>${emailVal.split('@')[1]}</span> · Reason: <span>Mailbox rejected by mail server</span>`;
+    }
+  } catch (err) {
+    // No fabricated result here. If the API call fails (network/CORS/
+    // server down), the dashboard says so plainly -- it never invents
+    // a pass/fail verdict, since that would be actively misleading for
+    // a tool whose entire purpose is "can I trust this answer."
+    result='fail'; statusClass='fail'; statusText='✗ Could Not Verify — API Unreachable';
+    detail = `Reason: <span>Could not reach the verification server. Check your connection or try again.</span>`;
+    showToast('API request failed — no credit was charged', 'error');
+    document.getElementById('verifyResult').classList.add('visible');
+    document.getElementById('verifyStatus').className = 'result-status fail';
+    document.getElementById('verifyStatus').textContent = statusText;
+    document.getElementById('verifyDetail').innerHTML = detail;
+    btn.disabled=false; btn.textContent='Verify Email →';
+    return; // do not log this as a real verification -- nothing was actually checked
+  }
+
+  // Update UI
+  const box = document.getElementById('verifyResult');
+  document.getElementById('verifyStatus').className = 'result-status '+statusClass;
+  document.getElementById('verifyStatus').textContent = statusText;
+  document.getElementById('verifyDetail').innerHTML = detail;
+  box.classList.add('visible');
+
+  // History
+  state.verifyCount++;
+  state.verifyHistory.unshift({ email:emailVal, result, time:new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}) });
+  document.getElementById('statVerified').textContent = state.verifyCount;
+  renderVerifyHistory();
+
+  logActivity('verify', `Verified <strong>${emailVal}</strong> → ${statusText.split('—')[0].trim()}`);
+
+  btn.disabled=false; btn.textContent='Verify Email →';
+}
+
+function renderVerifyHistory() {
+  const container = document.getElementById('verifyHistory');
+  document.getElementById('verifyHistoryCount').textContent = state.verifyHistory.length+' checks';
+  if (!state.verifyHistory.length) return;
+  container.innerHTML = state.verifyHistory.map(h => `
+    <div class="history-item">
+      <span class="history-type verify">verify</span>
+      <span class="history-value">${h.email}</span>
+      <span class="history-result ${h.result}">${h.result==='ok'?'✓ Valid':h.result==='warn'?'⚠ Risky':'✗ Invalid'}</span>
+      <span class="history-time">${h.time}</span>
+    </div>
+  `).join('');
+}
+
+// ── STEALTH TRACKER ───────────────────────────────
+async function generatePixel() {
+  if (state.credits <= 0) {
+    document.getElementById('trackerUpgradeWall').classList.add('visible');
+    return;
+  }
+  const nameRaw = document.getElementById('campaignName').value.trim();
+  if (!nameRaw) { showToast('Enter a campaign name', 'error'); return; }
+
+  const btn = document.getElementById('generatePixelBtn');
+  btn.disabled=true; btn.textContent='Generating...';
+
+  const headers = await getAuthHeader();
+  if (!headers) { btn.disabled=false; btn.textContent='Generate Pixel →'; return; }
+
+  // Sanitize to match backend's is_valid_campaign_id (letters, numbers, - and _ only),
+  // then add a random suffix so the public /track/{id}.png endpoint can't be guessed
+  // or used to spam fake opens — per the unguessable-ID requirement from the security review.
+  const slug = nameRaw.toLowerCase().replace(/[^a-z0-9-]/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
+  const randomSuffix = (crypto.getRandomValues(new Uint32Array(1))[0]).toString(36);
+  const campaignIdCandidate = `${slug}-${randomSuffix}`;
+
+  let campaignId, pixelHtml;
+  try {
+    // The backend owns credit deduction (deduct_credit) and returns
+    // the canonical html_tag — we don't construct the tracking URL
+    // ourselves, so it can never drift from the real /track/ route.
+    const res = await fetch(`${RAPTOR_API_URL}/api/raptor/generate-tracker?campaign_id=${encodeURIComponent(campaignIdCandidate)}&display_name=${encodeURIComponent(nameRaw)}`, {
+      method: 'GET',
+      headers
+    });
+
+    if (res.status === 401) { handleUnauthorized(); btn.disabled=false; btn.textContent='Generate Pixel →'; return; }
+    if (res.status === 402) {
+      document.getElementById('trackerUpgradeWall').classList.add('visible');
+      btn.disabled=false; btn.textContent='Generate Pixel →';
+      return;
+    }
+    if (!res.ok) throw new Error('API error ' + res.status);
+
+    const json = await res.json();
+    campaignId = json.campaign_id;
+    pixelHtml  = json.html_tag;
+    syncCreditsFromServer(json.credits_left);
+  } catch (err) {
+    showToast('API not connected — could not generate a real pixel', 'error');
+    btn.disabled=false; btn.textContent='Generate Pixel →';
+    return;
+  }
+
+  const pixelUrl = `${RAPTOR_API_URL}/api/raptor/track/${campaignId}.png`;
+
+  // Show result
+  document.getElementById('pixelUrl').textContent = pixelUrl;
+  document.getElementById('pixelHtml').textContent = pixelHtml;
+  document.getElementById('pixelResult').classList.add('visible');
+
+  // Add to campaigns
+  const campaign = { id: campaignId, name: nameRaw, opens: 0, lastOpen: null, pixelUrl };
+  state.campaigns.unshift(campaign);
+  state.trackedCount++;
+  document.getElementById('statTracked').textContent = state.trackedCount;
+
+  // Badge on sidebar
+  const badge = document.getElementById('trackerBadge');
+  badge.style.display = ''; badge.textContent = state.campaigns.length;
+
+  renderTrackerTable();
+  logActivity('track', `Created pixel for campaign <strong>${nameRaw}</strong> — ID: ${campaignId}`);
+
+  btn.disabled=false; btn.textContent='Generate Pixel →';
+  showToast('Pixel generated! Embed in your email.', 'success');
+}
+
+function renderTrackerTable() {
+  const noYet = document.getElementById('noTrackersYet');
+  const table = document.getElementById('trackerTable');
+  const tbody = document.getElementById('trackerTableBody');
+  if (!state.campaigns.length) { noYet.style.display=''; table.style.display='none'; return; }
+  noYet.style.display='none'; table.style.display='';
+  tbody.innerHTML = state.campaigns.map(c => `
+    <tr>
+      <td>${c.name}</td>
+      <td>${c.opens>0
+        ? `<span class="open-badge"><span class="dot"></span>Opened</span>`
+        : `<span class="pending-badge">Pending</span>`}</td>
+      <td>${c.lastOpen ? new Date(c.lastOpen).toLocaleString('en-IN',{hour:'2-digit',minute:'2-digit',day:'numeric',month:'short'}) : '—'}</td>
+      <td>${c.opens}</td>
+      <td><button class="copy-pixel-btn" onclick="copySpecificPixel('${c.pixelUrl}')">Copy</button></td>
+    </tr>
+  `).join('');
+}
+
+async function pollCampaignOpens() {
+  if (!state.campaigns.length) return;
+
+  // We do NOT query raptor_opens directly from the browser anymore.
+  // That table has no user_id column and no RLS policy scoping it to
+  // "my campaigns only" -- an open client-side read there would leak
+  // every user's campaign opens. Instead we call the backend, which
+  // resolves campaign ownership via raptor_campaigns (service-role key,
+  // bypasses RLS safely since we already verified the JWT ourselves).
+  const headers = await getAuthHeader();
+  if (!headers) return; // getAuthHeader() already redirects on expired session
+
+  let json;
+  try {
+    const res = await fetch(`${RAPTOR_API_URL}/api/raptor/campaign-opens`, {
+      method: 'GET',
+      headers
+    });
+    if (res.status === 401) { handleUnauthorized(); return; }
+    if (!res.ok) throw new Error('API error ' + res.status);
+    json = await res.json();
+  } catch (err) {
+    // API unreachable -- skip this poll cycle silently, try again next interval
+    return;
+  }
+
+  const serverCampaigns = json.campaigns || [];
+  for (const campaign of state.campaigns) {
+    const match = serverCampaigns.find(c => c.campaign_id === campaign.id);
+    if (!match) continue;
+
+    if (match.opens > campaign.opens) {
+      const newOpens = match.opens - campaign.opens;
+      campaign.opens = match.opens;
+      campaign.lastOpen = match.last_open;
+      state.openCount += newOpens;
+      document.getElementById('statOpens').textContent = state.openCount;
+      flashValue(document.getElementById('statOpens'));
+      document.getElementById('statOpensTrend').style.display='';
+      logActivity('track', `📬 <strong>${campaign.name}</strong> opened! ${match.opens} total opens.`);
+      showToast(`📬 Email opened — ${campaign.name}`, 'success');
+      renderTrackerTable();
+    }
+  }
+}
+
+
+function copyPixelHtml() {
+  const text = document.getElementById('pixelHtml').textContent;
+  navigator.clipboard.writeText(text).then(()=>showToast('HTML tag copied!','success'));
+}
+function copySpecificPixel(url) {
+  const html = `<img src="${url}" alt="" width="1" height="1" style="display:none;">`;
+  navigator.clipboard.writeText(html).then(()=>showToast('Pixel HTML copied!','success'));
+}
+
+// ── SETTINGS ──────────────────────────────────────
+function saveSettings() {
+  RAPTOR_API_URL   = document.getElementById('settingsApiUrl').value.trim() || RAPTOR_API_URL;
+  SUPABASE_URL_VAL = document.getElementById('settingsSbUrl').value.trim() || SUPABASE_URL_VAL;
+  SUPABASE_KEY_VAL = document.getElementById('settingsSbKey').value.trim() || SUPABASE_KEY_VAL;
+  localStorage.setItem('raptor_api_url', RAPTOR_API_URL);
+  localStorage.setItem('raptor_sb_url', SUPABASE_URL_VAL);
+  localStorage.setItem('raptor_sb_key', SUPABASE_KEY_VAL);
+  showToast('Settings saved. Reload to apply Supabase changes.','success');
+}
+
+// Pre-fill settings inputs with whatever values are currently active
+// (real defaults set above, or whatever the user previously saved to
+// localStorage) -- no longer compared against placeholder strings,
+// since those defaults have been replaced with real project values.
+document.getElementById('settingsApiUrl').value = RAPTOR_API_URL;
+document.getElementById('settingsSbUrl').value  = SUPABASE_URL_VAL;
+document.getElementById('settingsSbKey').value  = SUPABASE_KEY_VAL;
+
+// ── USER MENU ─────────────────────────────────────
+document.getElementById('userMenuToggle').addEventListener('click', (e)=>{
+  e.stopPropagation();
+  document.getElementById('userDropdown').classList.toggle('open');
+});
+document.addEventListener('click', ()=> document.getElementById('userDropdown').classList.remove('open'));
+
+// ── LOGOUT ────────────────────────────────────────
+async function handleLogout() {
+  if (supabaseClient) await supabaseClient.auth.signOut();
+  if (state.pollingInterval) clearInterval(state.pollingInterval);
+  window.location.href = '/ventures/raptor/';
+}
+
+// ── UPGRADE ───────────────────────────────────────
+function handleUpgrade() {
+  window.open('mailto:yogeshjathalkar@gmail.com?subject=Raptor Pro Upgrade&body=Hi, I would like to upgrade my Raptor account to Pro.', '_blank');
+  showToast('Upgrade request opened in email', 'success');
+}
+
+// ── GLOBAL SEARCH ─────────────────────────────────
+document.getElementById('globalSearch').addEventListener('keydown', (e)=>{
+  if (e.key === 'Enter') {
+    const q = e.target.value.toLowerCase();
+    if (q.includes('valid') || q.includes('email')) { switchPanel('validator'); e.target.value=''; }
+    else if (q.includes('track') || q.includes('pixel')) { switchPanel('tracker'); e.target.value=''; }
+    else if (q.includes('credit') || q.includes('plan') || q.includes('bill')) { switchPanel('billing'); e.target.value=''; }
+    else if (q.includes('setting') || q.includes('api')) { switchPanel('settings'); e.target.value=''; }
+    else if (q.includes('history') || q.includes('activity')) { switchPanel('history'); e.target.value=''; }
+    else { showToast('No result for: '+q, 'warn'); }
+  }
+});
+
+// ── INIT ──────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  loadUserData();
+});
+</script>
+</body>
+</html>
