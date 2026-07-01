@@ -1,0 +1,1860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dashboard — Basis</title>
+
+<!-- ═══ SECURITY: Content Security Policy (matches main site) ═══ -->
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.jsdelivr.net;
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com;
+  font-src 'self' https://fonts.gstatic.com;
+  img-src 'self' data: blob: https://*.tile.openstreetmap.org;
+  connect-src 'self' https://*.supabase.co https://*.onrender.com;
+  frame-ancestors 'none';
+  base-uri 'self';
+  form-action 'self';
+" />
+<meta http-equiv="X-Frame-Options" content="DENY" />
+<meta http-equiv="X-Content-Type-Options" content="nosniff" />
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+<meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), payment=(), usb=()" />
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   DESIGN TOKENS — identical to the Basis main site (try.html)
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  --bg:        #F0F7F9;
+  --surface:   rgba(224, 242, 254, 0.45);
+  --card:      rgba(255, 255, 255, 0.72);
+  --border:    rgba(8, 145, 178, 0.13);
+  --border2:   rgba(8, 145, 178, 0.28);
+
+  --accent:    #0891B2;
+  --steel:     #1E3A5F;
+  --text:      #1E293B;
+  --muted:     #64748B;
+  --dim:       #94A3B8;
+  --safe:      #059669;
+  --warning:   #B45309;
+  --danger:    #9F1239;
+  --heading:       #0F172A;
+  --header-bg:     rgba(240, 247, 249, 0.88);
+  --accent-tint:   rgba(8, 145, 178, 0.05);
+  --accent-tint2:  rgba(8, 145, 178, 0.10);
+
+  --glow-sm:       rgba(8, 145, 178, 0.18);
+  --glow-lg:       rgba(8, 145, 178, 0.32);
+
+  --form-input-bg: rgba(255, 255, 255, 0.7);
+  --form-focus-bg: #ffffff;
+  --form-focus-sh: rgba(8, 145, 178, 0.10);
+
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body:    'Plus Jakarta Sans', sans-serif;
+  --font-mono:    'Space Mono', monospace;
+}
+
+html[data-theme="dark"] {
+  --bg:        #090E1A;
+  --surface:   #0D1626;
+  --card:      rgba(13, 22, 38, 0.85);
+  --border:    rgba(0, 212, 255, 0.10);
+  --border2:   rgba(0, 212, 255, 0.20);
+
+  --accent:    #00D4FF;
+  --steel:     #2C4A6E;
+  --text:      #E2EAF0;
+  --muted:     #6B8EAD;
+  --dim:       #3D5A7A;
+  --safe:      #10B981;
+  --warning:   #F59E0B;
+  --danger:    #EF4444;
+  --heading:       #ffffff;
+  --header-bg:     rgba(9, 14, 26, 0.88);
+  --accent-tint:   rgba(0, 212, 255, 0.04);
+  --accent-tint2:  rgba(0, 212, 255, 0.08);
+
+  --glow-sm:       rgba(0, 212, 255, 0.25);
+  --glow-lg:       rgba(0, 212, 255, 0.45);
+
+  --form-input-bg: rgba(255, 255, 255, 0.04);
+  --form-focus-bg: rgba(0, 212, 255, 0.04);
+  --form-focus-sh: rgba(0, 212, 255, 0.08);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background 0.35s ease, color 0.35s ease;
+}
+a { color: inherit; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+/* ─── TOASt ─────────────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 2rem; right: 2rem; z-index: 9000;
+  background: var(--card); backdrop-filter: blur(16px);
+  border: 1px solid var(--border); border-left: 3px solid var(--accent);
+  border-radius: 10px; padding: 1rem 1.4rem;
+  font-family: var(--font-body); font-size: 0.82rem; color: var(--text);
+  transform: translateY(120%); transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+  max-width: 340px; box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+}
+.toast.show { transform: translateY(0); }
+.toast.success { border-left-color: var(--safe); }
+.toast.error { border-left-color: var(--danger); }
+.toast.warn { border-left-color: var(--warning); }
+
+/* ─── CONFIG ERROR BANNER ─────────────────────────────────────── */
+.config-banner {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 5000;
+  background: var(--danger); color: #fff;
+  font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.05em;
+  text-align: center; padding: 0.9rem 1.5rem;
+}
+
+/* ─── TOPBAR ───────────────────────────────────────────────────── */
+.topbar {
+  position: sticky; top: 0; z-index: 200; height: 68px;
+  background: var(--header-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 1.8rem; gap: 1.6rem;
+}
+.topbar-logo {
+  font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700;
+  letter-spacing: 4px; text-transform: uppercase; color: var(--text); flex-shrink: 0;
+  text-decoration: none;
+}
+.topbar-logo span { color: var(--accent); }
+.topbar-search {
+  flex: 1; max-width: 420px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+  display: flex; align-items: center; gap: 0.7rem; padding: 0.6rem 1.1rem;
+}
+.topbar-search input { background: transparent; border: none; outline: none; color: var(--text); font-family: var(--font-body); font-size: 0.85rem; width: 100%; }
+.topbar-search input::placeholder { color: var(--dim); }
+.topbar-search-icon { color: var(--dim); font-size: 0.85rem; flex-shrink: 0; }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 1.1rem; }
+
+.credits-pill {
+  display: flex; align-items: center; gap: 0.7rem;
+  background: var(--card); border: 1px solid var(--border2); border-radius: 50px;
+  padding: 0.45rem 1.1rem 0.45rem 0.9rem;
+}
+.credits-label { font-family: var(--font-mono); font-size: 0.55rem; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
+.credits-value { font-family: var(--font-display); font-size: 1.35rem; font-weight: 700; color: var(--accent); line-height: 1; transition: all 0.4s ease; }
+.credits-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--safe); box-shadow: 0 0 6px var(--safe); animation: pulseDot 2s ease-in-out infinite; flex-shrink: 0; }
+@keyframes pulseDot { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.theme-toggle {
+  width: 36px; height: 36px; border-radius: 9px;
+  border: 1px solid var(--border); background: var(--card);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: var(--muted); font-size: 0.95rem; transition: all 0.25s ease; flex-shrink: 0;
+}
+.theme-toggle:hover { border-color: var(--accent); background: var(--accent-tint); color: var(--accent); }
+
+.topbar-user { display: flex; align-items: center; gap: 0.7rem; cursor: pointer; position: relative; }
+.user-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--steel));
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-weight: 700; font-size: 0.95rem; color: #fff; flex-shrink: 0;
+}
+.user-name { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.05em; color: var(--muted); }
+.role-chip {
+  font-family: var(--font-mono); font-size: 0.55rem; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.15rem 0.5rem; border-radius: 4px; background: var(--accent-tint2); color: var(--accent);
+  margin-left: 0.3rem;
+}
+.user-dropdown {
+  position: absolute; top: calc(100% + 0.9rem); right: 0;
+  background: var(--card); backdrop-filter: blur(16px);
+  border: 1px solid var(--border); border-radius: 12px;
+  min-width: 190px; display: none; z-index: 300; overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+}
+.user-dropdown.open { display: block; }
+.user-dropdown-item { padding: 0.85rem 1.1rem; font-size: 0.8rem; font-weight: 600; color: var(--muted); cursor: pointer; transition: all 0.2s; }
+.user-dropdown-item:hover { color: var(--accent); background: var(--accent-tint); }
+.user-dropdown-item.danger { color: var(--danger); }
+
+/* ─── LAYOUT ───────────────────────────────────────────────────── */
+.dash-layout { display: flex; min-height: calc(100vh - 68px); }
+
+.sidebar {
+  width: 236px; flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 1.8rem 0.9rem;
+  display: flex; flex-direction: column; gap: 0.2rem;
+  position: sticky; top: 68px; height: calc(100vh - 68px); overflow-y: auto;
+}
+.sidebar-section-label {
+  font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.2em; color: var(--dim);
+  text-transform: uppercase; padding: 0 0.9rem; margin: 1.2rem 0 0.5rem; opacity: 0.85;
+}
+.sidebar-section-label:first-child { margin-top: 0; }
+.sidebar-item {
+  display: flex; align-items: center; gap: 0.7rem;
+  padding: 0.7rem 0.9rem; border-radius: 10px;
+  font-size: 0.84rem; font-weight: 600; color: var(--muted);
+  cursor: pointer; transition: all 0.2s; text-decoration: none;
+}
+.sidebar-item:hover { background: var(--card); color: var(--text); }
+.sidebar-item.active { background: var(--card); color: var(--accent); border: 1px solid var(--border2); box-shadow: 0 4px 16px var(--accent-tint2); }
+.sidebar-icon { font-size: 0.95rem; width: 18px; text-align: center; flex-shrink: 0; }
+.sidebar-badge { margin-left: auto; background: var(--accent); color: #fff; font-size: 0.6rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 10px; }
+
+.sidebar-footer { margin-top: auto; padding-top: 1rem; }
+.role-switch-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1rem; }
+.role-switch-title { font-family: var(--font-mono); font-size: 0.62rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+.role-switch-sub { font-size: 0.76rem; color: var(--muted); line-height: 1.5; margin-bottom: 0.8rem; }
+.role-switch-btn {
+  width: 100%; padding: 0.6rem; border-radius: 8px; border: none;
+  background: var(--accent); color: #fff; font-weight: 700; font-size: 0.76rem;
+  cursor: pointer; transition: 0.3s; font-family: var(--font-body);
+}
+.role-switch-btn:hover { opacity: 0.88; }
+
+.dash-main { flex: 1; padding: 2.4rem 3rem; max-width: 1180px; }
+
+.panel { display: none; }
+.panel.active { display: block; animation: fadein 0.3s ease; }
+@keyframes fadein { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+.page-eyebrow { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.2em; color: var(--accent); text-transform: uppercase; font-weight: 700; margin-bottom: 0.4rem; }
+.page-title { font-family: var(--font-display); font-size: 2.4rem; font-weight: 700; color: var(--heading); margin-bottom: 1.8rem; letter-spacing: -0.5px; }
+
+/* ─── STAT ROW ─────────────────────────────────────────────────── */
+.stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.1rem; margin-bottom: 2rem; }
+.stat-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+  padding: 1.6rem 1.5rem; position: relative; overflow: hidden; transition: all 0.3s ease;
+}
+.stat-card:hover { border-color: var(--border2); transform: translateY(-3px); box-shadow: 0 16px 36px var(--accent-tint2); }
+.sc-label { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.15em; color: var(--muted); text-transform: uppercase; margin-bottom: 0.6rem; }
+.sc-value { font-family: var(--font-display); font-size: 2.3rem; font-weight: 700; color: var(--accent); line-height: 1; transition: all 0.4s ease; }
+.sc-sub { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.05em; color: var(--dim); margin-top: 0.5rem; }
+
+.grid-2 { display: grid; grid-template-columns: 1.15fr 1fr; gap: 1.4rem; margin-bottom: 1.4rem; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; }
+@media (max-width: 1050px) { .grid-2 { grid-template-columns: 1fr; } .grid-3 { grid-template-columns: 1fr 1fr; } .stat-row { grid-template-columns: 1fr 1fr; } }
+
+/* ─── GLASS / DASH CARD ────────────────────────────────────────── */
+.dash-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 1.7rem; position: relative; }
+.dash-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.2rem; gap: 1rem; }
+.dash-card-title { font-family: var(--font-display); font-size: 1.2rem; font-weight: 700; color: var(--heading); }
+.dash-card-meta { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.05em; color: var(--dim); white-space: nowrap; }
+
+/* ─── WALLET METER ─────────────────────────────────────────────── */
+.wallet-balance { font-family: var(--font-display); font-size: 3rem; font-weight: 700; color: var(--accent); line-height: 1; transition: all 0.4s ease; }
+.wallet-sub { font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; margin-top: 0.4rem; margin-bottom: 1.2rem; }
+.wallet-split { display: flex; gap: 1.2rem; }
+.wallet-split-item { flex: 1; }
+.wallet-split-label { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.08em; color: var(--dim); text-transform: uppercase; margin-bottom: 0.3rem; }
+.wallet-split-value { font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; color: var(--text); }
+
+/* ─── ACTIVITY FEED ────────────────────────────────────────────── */
+.activity-list { display: flex; flex-direction: column; }
+.activity-item { display: flex; align-items: flex-start; gap: 0.9rem; padding: 0.85rem 0; border-bottom: 1px solid var(--border); }
+.activity-item:last-child { border-bottom: none; }
+.activity-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+.activity-dot.report { background: var(--accent); box-shadow: 0 0 6px var(--accent-tint2); }
+.activity-dot.disposal { background: var(--safe); box-shadow: 0 0 6px rgba(5,150,105,0.4); }
+.activity-dot.redeem { background: var(--warning); box-shadow: 0 0 6px rgba(180,83,9,0.35); }
+.activity-dot.shop { background: var(--steel); }
+.activity-text { font-size: 0.82rem; line-height: 1.5; color: var(--muted); flex: 1; }
+.activity-text strong { color: var(--text); font-weight: 700; }
+.activity-time { font-family: var(--font-mono); font-size: 0.6rem; color: var(--dim); flex-shrink: 0; }
+
+/* ─── QUICK ACTION TILES ───────────────────────────────────────── */
+.quick-tile {
+  background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+  padding: 1.5rem; cursor: pointer; transition: all 0.3s ease; display: flex; flex-direction: column; gap: 0.5rem;
+}
+.quick-tile:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 16px 36px var(--accent-tint2); }
+.quick-tile-icon { font-size: 1.3rem; color: var(--accent); }
+.quick-tile-title { font-family: var(--font-display); font-size: 1.15rem; font-weight: 700; color: var(--heading); }
+.quick-tile-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
+.quick-tile-cost { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.06em; color: var(--safe); text-transform: uppercase; margin-top: 0.2rem; }
+
+/* ─── FORM ─────────────────────────────────────────────────────── */
+.form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.form-label { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
+.form-control {
+  background: var(--form-input-bg); border: 1px solid var(--border); color: var(--text);
+  font-family: var(--font-body); font-size: 0.86rem; padding: 0.75rem 1rem; width: 100%;
+  border-radius: 9px; transition: all 0.3s ease; outline: none;
+}
+.form-control:focus { border-color: var(--accent); background: var(--form-focus-bg); box-shadow: 0 0 0 4px var(--form-focus-sh); }
+.form-control option { background: var(--surface); color: var(--text); }
+textarea.form-control { resize: vertical; min-height: 84px; }
+.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+.btn-primary {
+  font-family: var(--font-body); font-size: 0.85rem; font-weight: 700;
+  padding: 0.85rem 1.6rem; border-radius: 9px; background: var(--accent); color: #fff;
+  border: none; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 0 20px var(--glow-sm);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 32px var(--glow-lg); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.btn-primary.full { width: 100%; text-align: center; }
+.btn-ghost {
+  font-family: var(--font-body); font-size: 0.82rem; font-weight: 600;
+  padding: 0.8rem 1.5rem; border-radius: 9px; background: transparent; color: var(--text);
+  border: 1px solid var(--border2); cursor: pointer; transition: all 0.3s ease;
+}
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+.btn-danger-ghost { color: var(--danger); border-color: rgba(159,18,57,0.3); background: rgba(159,18,57,0.05); }
+.btn-danger-ghost:hover { border-color: var(--danger); background: rgba(159,18,57,0.1); }
+
+/* Credit cost tag */
+.credit-tag {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.1em; color: var(--safe);
+  text-transform: uppercase; margin-bottom: 1rem; border: 1px solid rgba(5,150,105,0.25);
+  background: rgba(5,150,105,0.06); padding: 0.35rem 0.8rem; border-radius: 20px;
+}
+.credit-tag.spend { color: var(--warning); border-color: rgba(180,83,9,0.25); background: rgba(180,83,9,0.06); }
+
+/* ─── MAP + UPLOAD (report / disposal forms) ─────────────────── */
+#reportMap, #disposalMap { height: 240px; width: 100%; border-radius: 12px; border: 1px solid var(--border2); z-index: 1; margin-bottom: 0.9rem; }
+.leaflet-container { background: var(--surface) !important; font-family: var(--font-body); }
+.btn-locate {
+  font-family: var(--font-body); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.03em;
+  padding: 0.65rem 1rem; border-radius: 8px; background: var(--accent-tint2); color: var(--accent);
+  border: 1px solid var(--border2); cursor: pointer; transition: all 0.25s ease;
+  display: inline-flex; align-items: center; gap: 0.5rem; width: 100%; justify-content: center; margin-bottom: 1rem;
+}
+.btn-locate:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+.upload-area {
+  border: 1px dashed var(--border2); border-radius: 12px; padding: 1.8rem; text-align: center;
+  cursor: pointer; transition: all 0.3s ease; margin-bottom: 1rem; background: var(--accent-tint);
+}
+.upload-area:hover { border-color: var(--accent); background: var(--accent-tint2); }
+.upload-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+.upload-text { font-size: 0.8rem; color: var(--muted); }
+.upload-text strong { color: var(--text); }
+.upload-preview { width: 100%; border-radius: 10px; margin-top: 0.6rem; max-height: 160px; object-fit: cover; }
+
+/* ─── MARKETPLACE / VOUCHER GRID ───────────────────────────────── */
+.market-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 1.2rem; }
+.market-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
+  display: flex; flex-direction: column; transition: all 0.3s ease;
+}
+.market-card:hover { border-color: var(--border2); transform: translateY(-4px); box-shadow: 0 16px 36px var(--accent-tint2); }
+.market-img { height: 130px; width: 100%; object-fit: cover; background: var(--surface); }
+.market-img-fallback { height: 130px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: var(--dim); background: var(--surface); }
+.market-body { padding: 1.1rem 1.2rem 1.3rem; display: flex; flex-direction: column; gap: 0.4rem; flex: 1; }
+.market-shop { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.08em; color: var(--dim); text-transform: uppercase; }
+.market-title { font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: var(--heading); line-height: 1.25; }
+.market-desc { font-size: 0.76rem; color: var(--muted); line-height: 1.5; flex: 1; }
+.market-price-row { display: flex; align-items: baseline; justify-content: space-between; margin-top: 0.4rem; }
+.market-price-original { font-family: var(--font-mono); font-size: 0.7rem; color: var(--dim); text-decoration: line-through; }
+.market-price-credits { font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; color: var(--accent); }
+.market-stock { font-family: var(--font-mono); font-size: 0.58rem; color: var(--dim); text-transform: uppercase; margin-top: 0.2rem; }
+.market-btn {
+  margin-top: 0.7rem; width: 100%; padding: 0.65rem; border-radius: 8px; border: none;
+  background: var(--accent); color: #fff; font-weight: 700; font-size: 0.76rem; cursor: pointer; transition: 0.3s;
+}
+.market-btn:hover { opacity: 0.88; }
+.market-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ─── TABS ─────────────────────────────────────────────────────── */
+.tab-row { display: flex; gap: 0.5rem; margin-bottom: 1.4rem; border-bottom: 1px solid var(--border); }
+.tab-item {
+  font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--muted); padding: 0.7rem 1.1rem; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s;
+}
+.tab-item:hover { color: var(--text); }
+.tab-item.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ─── LIST ROWS (reports / disposals / redemptions / vouchers) ─── */
+.data-list { display: flex; flex-direction: column; }
+.data-row {
+  display: flex; align-items: center; gap: 1rem; padding: 0.95rem 0; border-bottom: 1px solid var(--border);
+}
+.data-row:last-child { border-bottom: none; }
+.data-row-icon {
+  width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 0.95rem;
+  background: var(--accent-tint2); color: var(--accent);
+}
+.data-row-main { flex: 1; min-width: 0; }
+.data-row-title { font-size: 0.85rem; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.data-row-sub { font-family: var(--font-mono); font-size: 0.64rem; color: var(--dim); margin-top: 0.15rem; }
+.data-row-value { font-family: var(--font-display); font-size: 1rem; font-weight: 700; flex-shrink: 0; }
+.data-row-value.plus { color: var(--safe); }
+.data-row-value.minus { color: var(--danger); }
+.status-pill { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.2rem 0.55rem; border-radius: 5px; flex-shrink: 0; }
+.status-pill.active { background: rgba(5,150,105,0.1); color: var(--safe); }
+.status-pill.pending { background: rgba(180,83,9,0.1); color: var(--warning); }
+.status-pill.expired { background: rgba(159,18,57,0.08); color: var(--danger); }
+
+/* ─── EMPTY STATE ──────────────────────────────────────────────── */
+.empty-state { text-align: center; padding: 3rem 1.5rem; border: 1px dashed var(--border2); border-radius: 14px; }
+.empty-state-icon { font-size: 1.8rem; margin-bottom: 0.8rem; color: var(--dim); }
+.empty-state-title { font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; color: var(--muted); margin-bottom: 0.4rem; }
+.empty-state-sub { font-size: 0.78rem; color: var(--dim); }
+
+/* ─── SHOP CARD ────────────────────────────────────────────────── */
+.shop-hero { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.4rem; }
+.shop-hero-icon { width: 56px; height: 56px; border-radius: 14px; background: linear-gradient(135deg, var(--accent), var(--steel)); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #fff; flex-shrink: 0; }
+.shop-hero-name { font-family: var(--font-display); font-size: 1.6rem; font-weight: 700; color: var(--heading); }
+.shop-hero-meta { font-family: var(--font-mono); font-size: 0.66rem; color: var(--dim); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.2rem; }
+
+/* ─── BADGE (dev-note flag on endpoints not yet in backend) ──── */
+.dev-flag {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.05em;
+  color: var(--warning); background: rgba(180,83,9,0.08); border: 1px solid rgba(180,83,9,0.2);
+  padding: 0.3rem 0.7rem; border-radius: 6px; margin-bottom: 1rem;
+}
+
+/* ─── AUTH GATE (shown briefly before redirect if not logged in) ── */
+.auth-gate { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70vh; text-align: center; padding: 2rem; }
+.auth-gate h2 { font-family: var(--font-display); font-size: 1.8rem; margin-bottom: 0.6rem; }
+.auth-gate p { color: var(--muted); font-size: 0.9rem; }
+
+/* ─── RESPONSIVE ───────────────────────────────────────────────── */
+@media (max-width: 980px) {
+  .sidebar { width: 68px; padding: 1.4rem 0.5rem; }
+  .sidebar-item span:not(.sidebar-icon), .sidebar-section-label, .sidebar-badge, .sidebar-footer { display: none; }
+  .sidebar-item { justify-content: center; padding: 0.8rem; }
+  .dash-main { padding: 1.6rem 1.4rem; }
+  .stat-row { grid-template-columns: 1fr 1fr; }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .topbar-search { display: none; }
+  .form-row-2 { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ TOAST ═══════════ -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════ TOPBAR ═══════════ -->
+<header class="topbar">
+  <a href="/index.html" class="topbar-logo">BA<span>S</span>IS</a>
+
+  <div class="topbar-search">
+    <span class="topbar-search-icon">⌕</span>
+    <input type="text" id="globalSearch" placeholder="Search reports, vouchers, products…">
+  </div>
+
+  <div class="topbar-right">
+    <div class="credits-pill" id="creditsPill">
+      <div>
+        <div class="credits-label">Wallet</div>
+        <div class="credits-value" id="topbarCredits">—</div>
+      </div>
+      <div class="credits-dot" title="Live sync"></div>
+    </div>
+
+    <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+
+    <div class="topbar-user" id="userMenuToggle">
+      <div class="user-avatar" id="userAvatarInitial">?</div>
+      <div class="user-name" id="userNameDisplay">—<span class="role-chip" id="roleChip" style="display:none;">Shop</span></div>
+      <div class="user-dropdown" id="userDropdown">
+        <div class="user-dropdown-item" onclick="switchPanel('settings')">⚙ Settings</div>
+        <div class="user-dropdown-item" onclick="switchPanel('shop')">⌂ Business panel</div>
+        <div class="user-dropdown-item danger" onclick="handleLogout()">→ Log out</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════ LAYOUT ═══════════ -->
+<div class="dash-layout">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-section-label">Citizen</div>
+    <a class="sidebar-item active" data-panel="home" onclick="switchPanel('home')">
+      <span class="sidebar-icon">⊞</span><span>Overview</span>
+    </a>
+    <a class="sidebar-item" data-panel="report" onclick="switchPanel('report')">
+      <span class="sidebar-icon">⚑</span><span>Report an issue</span>
+    </a>
+    <a class="sidebar-item" data-panel="disposal" onclick="switchPanel('disposal')">
+      <span class="sidebar-icon">♻</span><span>Log a disposal</span>
+    </a>
+    <a class="sidebar-item" data-panel="marketplace" onclick="switchPanel('marketplace')">
+      <span class="sidebar-icon">⛁</span><span>Marketplace</span>
+    </a>
+    <a class="sidebar-item" data-panel="vouchers" onclick="switchPanel('vouchers')">
+      <span class="sidebar-icon">🎟</span><span>Vouchers</span>
+    </a>
+    <a class="sidebar-item" data-panel="activity" onclick="switchPanel('activity')">
+      <span class="sidebar-icon">⊙</span><span>My activity</span>
+    </a>
+
+    <div class="sidebar-section-label">Business</div>
+    <a class="sidebar-item" data-panel="shop" onclick="switchPanel('shop')">
+      <span class="sidebar-icon">⌂</span><span>My shop</span>
+    </a>
+    <a class="sidebar-item" data-panel="myvouchers" onclick="switchPanel('myvouchers')">
+      <span class="sidebar-icon">🏷</span><span>Vouchers I issue</span>
+    </a>
+    <a class="sidebar-item" data-panel="myproducts" onclick="switchPanel('myproducts')">
+      <span class="sidebar-icon">⊡</span><span>Products I list</span>
+    </a>
+
+    <div class="sidebar-section-label">Account</div>
+    <a class="sidebar-item" data-panel="settings" onclick="switchPanel('settings')">
+      <span class="sidebar-icon">⚙</span><span>Settings</span>
+    </a>
+
+    <div class="sidebar-footer">
+      <div class="role-switch-card">
+        <div class="role-switch-title">Wallet balance</div>
+        <div class="role-switch-sub" id="sidebarWalletLine">— credits available</div>
+        <button class="role-switch-btn" onclick="switchPanel('marketplace')">Spend credits →</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══════════════════════════════════
+       MAIN CONTENT
+  ═══════════════════════════════════ -->
+  <main class="dash-main">
+
+    <!-- ───── HOME / OVERVIEW ───── -->
+    <div class="panel active" id="panel-home">
+      <div class="page-eyebrow">Basis · Citizen wallet</div>
+      <div class="page-title" id="homeGreeting">Welcome back.</div>
+
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="sc-label">Wallet credits</div>
+          <div class="sc-value" id="statCredits">—</div>
+          <div class="sc-sub">Available to spend</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-label">Reports filed</div>
+          <div class="sc-value" id="statReports">0</div>
+          <div class="sc-sub">All time</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-label">Disposals verified</div>
+          <div class="sc-value" id="statDisposals">0</div>
+          <div class="sc-sub">All time</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-label">Redemptions</div>
+          <div class="sc-value" id="statRedemptions">0</div>
+          <div class="sc-sub">Vouchers &amp; products</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div class="dash-card-title">Your wallet</div>
+            <div class="dash-card-meta" id="walletUpdatedTag">● Live</div>
+          </div>
+          <div class="wallet-balance" id="cardCredits">—</div>
+          <div class="wallet-sub">credits available</div>
+          <div class="wallet-split">
+            <div class="wallet-split-item">
+              <div class="wallet-split-label">Reports</div>
+              <div class="wallet-split-value" id="walletReportCount">0</div>
+            </div>
+            <div class="wallet-split-item">
+              <div class="wallet-split-label">Disposals</div>
+              <div class="wallet-split-value" id="walletDisposalCount">0</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div class="dash-card-title">Recent activity</div>
+            <div class="dash-card-meta" id="activityLiveTag">● Live</div>
+          </div>
+          <div class="activity-list" id="activityFeed">
+            <div class="activity-item">
+              <div class="activity-dot report"></div>
+              <div class="activity-text">No activity yet. File your first report below.</div>
+              <div class="activity-time">now</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-family: var(--font-mono); font-size: 0.64rem; letter-spacing: 0.15em; color: var(--dim); text-transform: uppercase; margin-bottom: 1rem;">Quick actions</div>
+      <div class="grid-3">
+        <div class="quick-tile" onclick="switchPanel('report')">
+          <div class="quick-tile-icon">⚑</div>
+          <div class="quick-tile-title">Report an issue</div>
+          <div class="quick-tile-desc">Pin a civic problem on the map — potholes, garbage, broken streetlights.</div>
+          <div class="quick-tile-cost">⬡ earns 3–10 credits</div>
+        </div>
+        <div class="quick-tile" onclick="switchPanel('disposal')">
+          <div class="quick-tile-icon">♻</div>
+          <div class="quick-tile-title">Log a disposal</div>
+          <div class="quick-tile-desc">Verify waste disposal at a partner shop and earn credits instantly.</div>
+          <div class="quick-tile-cost">⬡ earns 2–6 credits</div>
+        </div>
+        <div class="quick-tile" onclick="switchPanel('marketplace')">
+          <div class="quick-tile-icon">⛁</div>
+          <div class="quick-tile-title">Browse marketplace</div>
+          <div class="quick-tile-desc">Spend credits on sustainable goods listed by local shops.</div>
+          <div class="quick-tile-cost">⬡ spend credits</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───── REPORT AN ISSUE ───── -->
+    <div class="panel" id="panel-report">
+      <div class="page-eyebrow">Citizen · Earn credits</div>
+      <div class="page-title">Report an issue.</div>
+
+      <div class="grid-2">
+        <div class="dash-card">
+          <div class="credit-tag" id="reportCreditTag">⬡ Earns 3 credits</div>
+
+          <div class="form-group">
+            <label class="form-label">What did you spot?</label>
+            <select class="form-control" id="reportCategory" onchange="updateReportCredit()">
+              <option value="Pothole / Road Damage" data-credits="8">Pothole / Road Damage</option>
+              <option value="Garbage / Illegal Dumping" data-credits="10">Garbage / Illegal Dumping</option>
+              <option value="Sewage / Drainage Problem" data-credits="10">Sewage / Drainage Problem</option>
+              <option value="Broken Infrastructure" data-credits="6">Broken Infrastructure</option>
+              <option value="Traffic Law Violation" data-credits="5">Traffic Law Violation</option>
+              <option value="Littering" data-credits="3">Littering</option>
+              <option value="Streetlight Failure" data-credits="5">Streetlight Failure</option>
+              <option value="Other" data-credits="3">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Description (optional)</label>
+            <textarea class="form-control" id="reportDescription" placeholder="A short note on what's wrong and how severe it is…"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Location — drag the pin or use your live location</label>
+            <div id="reportMap"></div>
+            <button class="btn-locate" id="reportLocateBtn" type="button">📍 Use my live location</button>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Photo evidence</label>
+            <div class="upload-area" id="reportUploadArea">
+              <div class="upload-icon">📷</div>
+              <p class="upload-text"><strong>Click to upload</strong> a photo of the issue</p>
+            </div>
+          </div>
+
+          <button class="btn-primary full" id="reportSubmitBtn" onclick="submitReport()">Submit report →</button>
+        </div>
+
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div class="dash-card-title">Your reports</div>
+            <div class="dash-card-meta" id="reportHistoryCount">0 filed</div>
+          </div>
+          <div id="reportHistoryList" class="data-list">
+            <div class="empty-state">
+              <div class="empty-state-icon">⚑</div>
+              <div class="empty-state-title">No reports yet</div>
+              <div class="empty-state-sub">File your first report to start earning credits.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───── LOG A DISPOSAL ───── -->
+    <div class="panel" id="panel-disposal">
+      <div class="page-eyebrow">Citizen · Earn credits</div>
+      <div class="page-title">Log a disposal.</div>
+
+      <div class="grid-2">
+        <div class="dash-card">
+          <div class="credit-tag" id="disposalCreditTag">⬡ Earns 3 credits</div>
+
+          <div class="form-group">
+            <label class="form-label">Partner shop</label>
+            <select class="form-control" id="disposalShopSelect">
+              <option value="">Loading nearby shops…</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">What did you dispose of?</label>
+            <select class="form-control" id="disposalType" onchange="updateDisposalCredit()">
+              <option value="Plastic" data-credits="4">Plastic</option>
+              <option value="E-Waste" data-credits="6">E-Waste</option>
+              <option value="Organic / Compost" data-credits="3">Organic / Compost</option>
+              <option value="Paper" data-credits="2">Paper</option>
+              <option value="Metal" data-credits="4">Metal</option>
+              <option value="Glass" data-credits="3">Glass</option>
+              <option value="Other" data-credits="2">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Photo proof (shown at the counter)</label>
+            <div class="upload-area" id="disposalUploadArea">
+              <div class="upload-icon">📷</div>
+              <p class="upload-text"><strong>Click to upload</strong> a photo of the disposal</p>
+            </div>
+          </div>
+
+          <button class="btn-primary full" id="disposalSubmitBtn" onclick="submitDisposal()">Log disposal →</button>
+        </div>
+
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div class="dash-card-title">Your disposals</div>
+            <div class="dash-card-meta" id="disposalHistoryCount">0 logged</div>
+          </div>
+          <div id="disposalHistoryList" class="data-list">
+            <div class="empty-state">
+              <div class="empty-state-icon">♻</div>
+              <div class="empty-state-title">No disposals yet</div>
+              <div class="empty-state-sub">Log your first verified disposal above.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───── MARKETPLACE ───── -->
+    <div class="panel" id="panel-marketplace">
+      <div class="page-eyebrow">Citizen · Spend credits</div>
+      <div class="page-title">Marketplace.</div>
+
+      <div class="dash-card" style="margin-bottom: 1.4rem;">
+        <div class="dash-card-header">
+          <div class="dash-card-title">Sustainable goods, from local shops</div>
+          <div class="dash-card-meta" id="marketCount">0 listings</div>
+        </div>
+        <div class="market-grid" id="marketGrid">
+          <div class="empty-state" style="grid-column: 1/-1;">
+            <div class="empty-state-icon">⛁</div>
+            <div class="empty-state-title">Marketplace loading…</div>
+            <div class="empty-state-sub">Products from partner shops will appear here.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───── VOUCHERS ───── -->
+    <div class="panel" id="panel-vouchers">
+      <div class="page-eyebrow">Citizen · Spend credits</div>
+      <div class="page-title">Vouchers.</div>
+
+      <div class="dash-card">
+        <div class="dash-card-header">
+          <div class="dash-card-title">Available vouchers</div>
+          <div class="dash-card-meta" id="voucherCount">0 available</div>
+        </div>
+        <div class="market-grid" id="voucherGrid">
+          <div class="empty-state" style="grid-column: 1/-1;">
+            <div class="empty-state-icon">🎟</div>
+            <div class="empty-state-title">No vouchers yet</div>
+            <div class="empty-state-sub">Partner shops haven't issued any vouchers yet.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───── MY ACTIVITY ───── -->
+    <div class="panel" id="panel-activity">
+      <div class="page-eyebrow">Citizen · All time</div>
+      <div class="page-title">My activity.</div>
+
+      <div class="tab-row">
+        <div class="tab-item active" data-tab="all" onclick="switchActivityTab('all')">All</div>
+        <div class="tab-item" data-tab="reports" onclick="switchActivityTab('reports')">Reports</div>
+        <div class="tab-item" data-tab="disposals" onclick="switchActivityTab('disposals')">Disposals</div>
+        <div class="tab-item" data-tab="redemptions" onclick="switchActivityTab('redemptions')">Redemptions</div>
+      </div>
+
+      <div class="dash-card">
+        <div id="activityAll" class="tab-panel active data-list">
+          <div class="empty-state">
+            <div class="empty-state-icon">⊙</div>
+            <div class="empty-state-title">Nothing here yet</div>
+            <div class="empty-state-sub">Your reports, disposals and redemptions will show up here.</div>
+          </div>
+        </div>
+        <div id="activityReportsTab" class="tab-panel data-list"></div>
+        <div id="activityDisposalsTab" class="tab-panel data-list"></div>
+        <div id="activityRedemptionsTab" class="tab-panel data-list"></div>
+      </div>
+    </div>
+
+    <!-- ───── MY SHOP (business) ───── -->
+    <div class="panel" id="panel-shop">
+      <div class="page-eyebrow">Business · Partner account</div>
+      <div class="page-title">My shop.</div>
+
+      <!-- Shown when no shop is registered yet -->
+      <div id="shopRegisterCard" class="dash-card" style="max-width: 620px;">
+        <div class="dash-card-title" style="margin-bottom: 0.5rem;">Register your shop</div>
+        <div style="font-size: 0.82rem; color: var(--muted); margin-bottom: 1.4rem; line-height: 1.6;">
+          Once registered, you can issue vouchers, list sustainable products, and accept verified waste disposals for credits.
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Shop name</label>
+          <input class="form-control" type="text" id="shopName" placeholder="e.g. Green Basket Store">
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select class="form-control" id="shopCategory">
+              <option value="Kirana / General Store">Kirana / General Store</option>
+              <option value="Recycling Center">Recycling Center</option>
+              <option value="Eco Store">Eco Store</option>
+              <option value="Cafe / Restaurant">Cafe / Restaurant</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Contact number</label>
+            <input class="form-control" type="text" id="shopContact" placeholder="+91 …">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Address</label>
+          <input class="form-control" type="text" id="shopAddress" placeholder="Street, area, city">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Location — drag the pin to your shop</label>
+          <div id="shopMap"></div>
+        </div>
+        <button class="btn-primary full" id="shopSubmitBtn" onclick="submitShop()">Register shop →</button>
+      </div>
+
+      <!-- Shown once a shop exists (populated from state.shop) -->
+      <div id="shopProfileCard" style="display:none;">
+        <div class="dash-card" style="margin-bottom: 1.4rem;">
+          <div class="shop-hero">
+            <div class="shop-hero-icon">⌂</div>
+            <div>
+              <div class="shop-hero-name" id="shopProfileName">—</div>
+              <div class="shop-hero-meta" id="shopProfileMeta">—</div>
+            </div>
+          </div>
+          <div class="grid-3">
+            <div class="stat-card">
+              <div class="sc-label">Vouchers issued</div>
+              <div class="sc-value" id="shopVoucherCount">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="sc-label">Products listed</div>
+              <div class="sc-value" id="shopProductCount">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="sc-label">Disposals verified</div>
+              <div class="sc-value" id="shopDisposalCount">0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───── VOUCHERS I ISSUE (business) ───── -->
+    <div class="panel" id="panel-myvouchers">
+      <div class="page-eyebrow">Business · Local economy</div>
+      <div class="page-title">Vouchers I issue.</div>
+
+      <div class="grid-2">
+        <div class="dash-card">
+          <div class="dash-card-title" style="margin-bottom: 1.2rem;">Create a voucher</div>
+
+          <div class="form-group">
+            <label class="form-label">Title</label>
+            <input class="form-control" type="text" id="voucherTitle" placeholder="e.g. ₹100 off your next bill">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" id="voucherDescription" placeholder="Terms, validity, what it covers…"></textarea>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Cost in credits</label>
+              <input class="form-control" type="number" min="1" id="voucherCredits" placeholder="e.g. 20">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Stock available</label>
+              <input class="form-control" type="number" min="1" id="voucherStock" placeholder="e.g. 50">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Expires on</label>
+            <input class="form-control" type="date" id="voucherExpiry">
+          </div>
+          <button class="btn-primary full" id="voucherSubmitBtn" onclick="submitVoucher()">Publish voucher →</button>
+        </div>
+
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div class="dash-card-title">Your issued vouchers</div>
+            <div class="dash-card-meta" id="myVoucherCount">0 issued</div>
+          </div>
+          <div id="myVoucherList" class="data-list">
+            <div class="empty-state">
+              <div class="empty-state-icon">🏷</div>
+              <div class="empty-state-title">No vouchers yet</div>
+              <div class="empty-state-sub">Publish your first voucher to appear in the citizen marketplace.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───── PRODUCTS I LIST (business) ───── -->
+    <div class="panel" id="panel-myproducts">
+      <div class="page-eyebrow">Business · Marketplace listings</div>
+      <div class="page-title">Products I list.</div>
+
+      <div class="grid-2">
+        <div class="dash-card">
+          <div class="dash-card-title" style="margin-bottom: 1.2rem;">List a product</div>
+
+          <div class="form-group">
+            <label class="form-label">Title</label>
+            <input class="form-control" type="text" id="productTitle" placeholder="e.g. Bamboo cutlery set">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" id="productDescription" placeholder="What it is, materials, why it's sustainable…"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select class="form-control" id="productCategory">
+              <option value="Household">Household</option>
+              <option value="Personal Care">Personal Care</option>
+              <option value="Food & Grocery">Food &amp; Grocery</option>
+              <option value="Stationery">Stationery</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Original price (₹)</label>
+              <input class="form-control" type="number" min="0" id="productOriginalPrice" placeholder="e.g. 299">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Price in credits</label>
+              <input class="form-control" type="number" min="1" id="productCreditsPrice" placeholder="e.g. 30">
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Stock</label>
+              <input class="form-control" type="number" min="0" id="productStock" placeholder="e.g. 25">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Image URL (optional)</label>
+              <input class="form-control" type="text" id="productImageUrl" placeholder="https://…">
+            </div>
+          </div>
+          <button class="btn-primary full" id="productSubmitBtn" onclick="submitProduct()">Publish product →</button>
+        </div>
+
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div class="dash-card-title">Your listed products</div>
+            <div class="dash-card-meta" id="myProductCount">0 listed</div>
+          </div>
+          <div id="myProductList" class="data-list">
+            <div class="empty-state">
+              <div class="empty-state-icon">⊡</div>
+              <div class="empty-state-title">No products yet</div>
+              <div class="empty-state-sub">Publish your first product to appear in the citizen marketplace.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───── SETTINGS ───── -->
+    <div class="panel" id="panel-settings">
+      <div class="page-eyebrow">Account</div>
+      <div class="page-title">Settings.</div>
+
+      <div class="dash-card" style="max-width: 560px; margin-bottom: 1.4rem;">
+        <div class="dash-card-title" style="margin-bottom: 1.2rem;">API configuration</div>
+        <div class="form-group">
+          <label class="form-label">Backend API URL</label>
+          <input class="form-control" type="text" id="settingsApiUrl" placeholder="https://your-api.onrender.com/api/basis">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Supabase project URL</label>
+          <input class="form-control" type="text" id="settingsSbUrl" placeholder="https://xxxx.supabase.co">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Supabase anon key</label>
+          <input class="form-control" type="text" id="settingsSbKey" placeholder="eyJ...">
+        </div>
+        <button class="btn-primary" onclick="saveSettings()">Save settings</button>
+      </div>
+
+      <div class="dash-card" style="max-width: 560px;">
+        <div class="dash-card-title" style="margin-bottom: 1rem;">Account</div>
+        <div style="font-size: 0.82rem; color: var(--muted); margin-bottom: 1.2rem; line-height: 1.7;">
+          Signed in as <span style="color: var(--text); font-weight: 700;" id="settingsEmail">—</span>
+        </div>
+        <button class="btn-ghost btn-danger-ghost" onclick="handleLogout()">Log out</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// CONFIG — Basis's own project. Defaults to the real Supabase
+// project already wired into the main site (try.html / index.html)
+// so login works out of the box. BASIS_API_URL is a placeholder —
+// point it at wherever basis_router.py is deployed (e.g. Render).
+// All three are overridable from the Settings panel, stored in
+// localStorage so they persist across reloads.
+// ═══════════════════════════════════════════════════════════════
+let BASIS_API_URL    = localStorage.getItem('basis_api_url') || 'https://your-api.onrender.com/api/basis';
+let SUPABASE_URL_VAL = localStorage.getItem('basis_sb_url')  || 'https://vtxhqqiugnzdnfifykcc.supabase.co';
+let SUPABASE_KEY_VAL = localStorage.getItem('basis_sb_key')  || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0eGhxcWl1Z256ZG5maWZ5a2NjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1NzI0NjYsImV4cCI6MjA5MTE0ODQ2Nn0.aKmv8a8uKVotRDZvorF_QZSOuBHER3PywIcxywmONJA';
+
+const supabaseClient = (SUPABASE_URL_VAL.startsWith('http'))
+  ? window.supabase.createClient(SUPABASE_URL_VAL, SUPABASE_KEY_VAL)
+  : null;
+
+// ── STATE ──────────────────────────────────────────
+const state = {
+  user: null,
+  credits: 0,
+  reportCount: 0,
+  disposalCount: 0,
+  redemptionCount: 0,
+  reports: [],
+  disposals: [],
+  redemptions: [],
+  products: [],
+  vouchers: [],
+  shops: [],
+  shop: null,        // the citizen's own shop, if registered
+  myVouchers: [],
+  myProducts: [],
+  activityLog: [],
+};
+
+// ── THEME ───────────────────────────────────────────
+const html = document.documentElement;
+const themeBtn = document.getElementById('themeToggle');
+if (localStorage.getItem('basis-theme') === 'dark') {
+  html.setAttribute('data-theme', 'dark');
+  themeBtn.textContent = '☀️';
+}
+themeBtn.addEventListener('click', () => {
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  themeBtn.textContent = isDark ? '🌙' : '☀️';
+  localStorage.setItem('basis-theme', isDark ? 'light' : 'dark');
+});
+
+// ── PANEL SWITCHING ─────────────────────────────────
+function switchPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+  document.getElementById('panel-' + name)?.classList.add('active');
+  document.querySelector(`[data-panel="${name}"]`)?.classList.add('active');
+  window.scrollTo(0, 0);
+
+  if (name === 'marketplace' && !state.products.length) loadProducts();
+  if (name === 'vouchers' && !state.vouchers.length) loadVouchers();
+  if (name === 'disposal' && !state.shops.length) loadShopsForDisposal();
+  if (name === 'activity') renderActivityTabs();
+  if (name === 'shop') loadShopProfile();
+  if (name === 'myvouchers') loadMyVouchers();
+  if (name === 'myproducts') loadMyProducts();
+}
+
+function switchActivityTab(name) {
+  document.querySelectorAll('.tab-item').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  document.getElementById('activityAll').classList.toggle('active', name === 'all');
+  document.getElementById('activityReportsTab').classList.toggle('active', name === 'reports');
+  document.getElementById('activityDisposalsTab').classList.toggle('active', name === 'disposals');
+  document.getElementById('activityRedemptionsTab').classList.toggle('active', name === 'redemptions');
+}
+
+// ── TOAST ───────────────────────────────────────────
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+function showConfigError(message) {
+  const banner = document.createElement('div');
+  banner.className = 'config-banner';
+  banner.textContent = '⚠ ' + message;
+  document.body.prepend(banner);
+}
+
+// ── AUTH HEADER HELPER ──────────────────────────────
+async function getAuthHeader() {
+  if (!supabaseClient) return null;
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) {
+    showToast('Session expired — please log in again', 'error');
+    setTimeout(() => { window.location.href = '/index.html'; }, 1200);
+    return null;
+  }
+  return { 'Authorization': `Bearer ${session.access_token}`, 'Content-Type': 'application/json' };
+}
+
+// Generic API wrapper. Any endpoint that isn't implemented yet in
+// basis_router.py (the GET/list endpoints — see NOTE at bottom of
+// this script) fails silently here and the UI falls back to an
+// empty state instead of breaking, matching the demo-mode pattern
+// used across the other Shoonya ventures.
+async function apiCall(path, options = {}) {
+  const headers = await getAuthHeader();
+  if (!headers && supabaseClient) return null;
+  try {
+    const res = await fetch(`${BASIS_API_URL}${path}`, { ...options, headers: { ...headers, ...(options.headers || {}) } });
+    if (res.status === 401) { handleUnauthorized(); return null; }
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Request failed' }));
+      throw new Error(err.detail || 'Request failed');
+    }
+    return await res.json();
+  } catch (e) {
+    return null; // non-fatal — caller falls back to empty/demo state
+  }
+}
+
+function handleUnauthorized() {
+  showToast('Session expired — please log in again', 'error');
+  if (supabaseClient) supabaseClient.auth.signOut();
+  setTimeout(() => { window.location.href = '/index.html'; }, 1200);
+}
+
+// ── INIT / LOAD USER ────────────────────────────────
+async function loadUserData() {
+  if (!supabaseClient) {
+    showConfigError('Supabase is not configured. Add your project URL and anon key in Settings, then reload.');
+    return;
+  }
+
+  // Same race-condition guard as the Raptor/Aura dashboards: a user
+  // arriving via Google OAuth lands here with tokens still resolving
+  // in the URL fragment. Wait for the first onAuthStateChange event
+  // instead of trusting an immediate getSession() call.
+  const session = await new Promise((resolve) => {
+    const { data: { subscription } } = supabaseClient.auth.onAuthStateChange((event, session) => {
+      subscription.unsubscribe();
+      resolve(session);
+    });
+  });
+
+  if (!session) { window.location.href = '/index.html'; return; }
+
+  state.user = session.user;
+  applyUserUI();
+
+  // Ensure a basis_citizens wallet row exists (idempotent — the
+  // backend returns the existing row if the citizen already signed up).
+  await apiCall('/citizens/signup', {
+    method: 'POST',
+    body: JSON.stringify({ email: state.user.email })
+  });
+
+  await loadWallet();
+  logActivity('report', 'Signed in to your Basis wallet.', true);
+
+  supabaseClient.auth.onAuthStateChange((event) => {
+    if (event === 'SIGNED_OUT') window.location.href = '/index.html';
+  });
+}
+
+function applyUserUI() {
+  const name = (state.user?.user_metadata?.full_name || state.user?.email || 'Citizen').split(' ')[0];
+  document.getElementById('homeGreeting').textContent = 'Welcome back, ' + name + '.';
+  document.getElementById('userNameDisplay').firstChild.textContent = name;
+  document.getElementById('userAvatarInitial').textContent = name[0].toUpperCase();
+  document.getElementById('settingsEmail').textContent = state.user?.email || '—';
+}
+
+// ── WALLET ──────────────────────────────────────────
+async function loadWallet() {
+  const data = await apiCall('/citizens/wallet');
+  if (data) {
+    state.credits = data.credits ?? 0;
+    state.reportCount = data.report_count ?? 0;
+    state.disposalCount = data.disposal_count ?? 0;
+  }
+  renderWallet();
+}
+
+function renderWallet() {
+  document.getElementById('topbarCredits').textContent = state.credits;
+  document.getElementById('statCredits').textContent = state.credits;
+  document.getElementById('cardCredits').textContent = state.credits;
+  document.getElementById('statReports').textContent = state.reportCount;
+  document.getElementById('statDisposals').textContent = state.disposalCount;
+  document.getElementById('statRedemptions').textContent = state.redemptionCount;
+  document.getElementById('walletReportCount').textContent = state.reportCount;
+  document.getElementById('walletDisposalCount').textContent = state.disposalCount;
+  document.getElementById('sidebarWalletLine').textContent = state.credits + ' credits available';
+}
+
+// ── ACTIVITY FEED ───────────────────────────────────
+function logActivity(type, text, skipToast) {
+  const now = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+  state.activityLog.unshift({ type, text, time: now });
+  renderActivity();
+}
+
+function renderActivity() {
+  const feed = document.getElementById('activityFeed');
+  if (!state.activityLog.length) return;
+  feed.innerHTML = state.activityLog.slice(0, 6).map(a => `
+    <div class="activity-item">
+      <div class="activity-dot ${a.type}"></div>
+      <div class="activity-text">${a.text}</div>
+      <div class="activity-time">${a.time}</div>
+    </div>
+  `).join('');
+}
+
+function renderActivityTabs() {
+  const all = document.getElementById('activityAll');
+  const reportsTab = document.getElementById('activityReportsTab');
+  const disposalsTab = document.getElementById('activityDisposalsTab');
+  const redemptionsTab = document.getElementById('activityRedemptionsTab');
+
+  if (!state.activityLog.length) {
+    all.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⊙</div><div class="empty-state-title">Nothing here yet</div><div class="empty-state-sub">Your reports, disposals and redemptions will show up here.</div></div>`;
+  } else {
+    all.innerHTML = state.activityLog.map(a => `
+      <div class="data-row">
+        <div class="data-row-icon">${a.type === 'report' ? '⚑' : a.type === 'disposal' ? '♻' : a.type === 'redeem' ? '🎟' : '⌂'}</div>
+        <div class="data-row-main">
+          <div class="data-row-title">${a.text}</div>
+        </div>
+        <div class="data-row-value">${a.time}</div>
+      </div>
+    `).join('');
+  }
+
+  renderListInto(reportsTab, state.reports, r => ({
+    icon: '⚑', title: r.category || r.report_type || 'Report', sub: new Date(r.created_at || Date.now()).toLocaleDateString('en-IN'),
+    value: '+' + (r.credits_to_award ?? r.credits ?? 0), valueClass: 'plus'
+  }), 'No reports filed yet.');
+
+  renderListInto(disposalsTab, state.disposals, d => ({
+    icon: '♻', title: d.waste_type || 'Disposal', sub: d.shop_name || 'Verified disposal',
+    value: '+' + (d.credits_awarded ?? 0), valueClass: 'plus'
+  }), 'No disposals logged yet.');
+
+  renderListInto(redemptionsTab, state.redemptions, r => ({
+    icon: '🎟', title: r.type === 'voucher' ? 'Voucher redeemed' : 'Product purchased', sub: r.redemption_code || '',
+    value: '-' + (r.credits_spent ?? 0), valueClass: 'minus'
+  }), 'No redemptions yet.');
+}
+
+function renderListInto(container, items, mapFn, emptyText) {
+  if (!items.length) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⊙</div><div class="empty-state-title">${emptyText}</div></div>`;
+    return;
+  }
+  container.innerHTML = items.map(item => {
+    const m = mapFn(item);
+    return `
+      <div class="data-row">
+        <div class="data-row-icon">${m.icon}</div>
+        <div class="data-row-main">
+          <div class="data-row-title">${escapeHtml(m.title)}</div>
+          <div class="data-row-sub">${escapeHtml(m.sub)}</div>
+        </div>
+        <div class="data-row-value ${m.valueClass}">${m.value}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str ?? '';
+  return div.innerHTML;
+}
+
+// ── REPORT AN ISSUE ─────────────────────────────────
+let reportCoords = { lat: 18.5204, lng: 73.8567 };
+let reportPhotoUrl = null;
+
+function initReportMap() {
+  const map = L.map('reportMap').setView([reportCoords.lat, reportCoords.lng], 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+  const pinIcon = L.divIcon({
+    html: `<svg viewBox="0 0 24 24" width="34" height="34" xmlns="http://www.w3.org/2000/svg"><path fill="#0891B2" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`,
+    className: '', iconSize: [34, 34], iconAnchor: [17, 34]
+  });
+  const marker = L.marker([reportCoords.lat, reportCoords.lng], { draggable: true, icon: pinIcon }).addTo(map);
+  marker.on('dragend', () => { const p = marker.getLatLng(); reportCoords = { lat: p.lat, lng: p.lng }; });
+
+  document.getElementById('reportLocateBtn').addEventListener('click', function () {
+    const btn = this;
+    btn.textContent = 'Locating…'; btn.disabled = true;
+    if (!navigator.geolocation) { btn.textContent = '📍 Location not supported — drag pin'; btn.disabled = false; return; }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        reportCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        map.setView([reportCoords.lat, reportCoords.lng], 16);
+        marker.setLatLng([reportCoords.lat, reportCoords.lng]);
+        btn.textContent = '✓ Location found — drag to adjust'; btn.disabled = false;
+      },
+      () => { btn.textContent = '📍 Could not locate — drag pin manually'; btn.disabled = false; },
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
+  });
+}
+
+function updateReportCredit() {
+  const sel = document.getElementById('reportCategory');
+  const credits = sel.options[sel.selectedIndex].dataset.credits;
+  document.getElementById('reportCreditTag').textContent = `⬡ Earns ${credits} credits`;
+}
+
+function wireUploadArea(areaId, onFile) {
+  const area = document.getElementById(areaId);
+  area.addEventListener('click', () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/jpeg,image/png,image/heic,image/webp';
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (file.size > 8 * 1024 * 1024) { showToast('Image too large — max 8MB', 'error'); return; }
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        area.innerHTML = `<img class="upload-preview" src="${ev.target.result}" alt="Preview"><p class="upload-text" style="margin-top:0.5rem;"><strong>${escapeHtml(file.name)}</strong> — click to replace</p>`;
+        onFile(file, ev.target.result);
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  });
+}
+
+async function submitReport() {
+  const btn = document.getElementById('reportSubmitBtn');
+  const category = document.getElementById('reportCategory').value;
+  const credits = parseInt(document.getElementById('reportCategory').selectedOptions[0].dataset.credits, 10);
+  const description = document.getElementById('reportDescription').value.trim();
+
+  btn.disabled = true; btn.textContent = 'Submitting…';
+
+  const payload = {
+    category,
+    description: description || null,
+    latitude: reportCoords.lat,
+    longitude: reportCoords.lng,
+    photo_url: reportPhotoUrl,
+    credits_to_award: credits
+  };
+
+  const result = supabaseClient
+    ? await apiCall('/reports', { method: 'POST', body: JSON.stringify(payload) })
+    : simulateReport(payload);
+
+  btn.disabled = false; btn.textContent = 'Submit report →';
+
+  if (result) {
+    state.reports.unshift(result);
+    state.reportCount++;
+    state.credits += credits;
+    renderWallet();
+    document.getElementById('reportHistoryCount').textContent = state.reports.length + ' filed';
+    renderListInto(document.getElementById('reportHistoryList'), state.reports, r => ({
+      icon: '⚑', title: r.category, sub: new Date(r.created_at || Date.now()).toLocaleDateString('en-IN'),
+      value: '+' + (r.credits_to_award ?? credits), valueClass: 'plus'
+    }), 'No reports yet.');
+    logActivity('report', `Reported <strong>${escapeHtml(category)}</strong> — earned ${credits} credits.`);
+    document.getElementById('reportDescription').value = '';
+    showToast(`Report submitted — +${credits} credits`, 'success');
+  } else if (supabaseClient) {
+    showToast('Could not submit — check your API URL in Settings', 'error');
+  }
+}
+
+function simulateReport(payload) {
+  return { id: crypto.randomUUID(), ...payload, created_at: new Date().toISOString() };
+}
+
+// ── LOG A DISPOSAL ──────────────────────────────────
+async function loadShopsForDisposal() {
+  const select = document.getElementById('disposalShopSelect');
+  const data = await apiCall('/shops'); // NOTE: not in basis_router.py yet — see summary
+  if (data && data.length) {
+    state.shops = data;
+    select.innerHTML = data.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
+  } else {
+    select.innerHTML = `<option value="">No partner shops loaded — enter Shop ID manually below</option>`;
+    // Fallback: let the citizen paste a shop ID directly until GET /shops exists.
+    const manualWrap = document.createElement('div');
+    manualWrap.className = 'form-group';
+    manualWrap.style.marginTop = '0.6rem';
+    manualWrap.innerHTML = `<label class="form-label">Or enter Shop ID manually</label><input class="form-control" type="text" id="disposalShopManual" placeholder="shop UUID">`;
+    select.parentElement.appendChild(manualWrap);
+  }
+}
+
+function updateDisposalCredit() {
+  const sel = document.getElementById('disposalType');
+  const credits = sel.options[sel.selectedIndex].dataset.credits;
+  document.getElementById('disposalCreditTag').textContent = `⬡ Earns ${credits} credits`;
+}
+
+async function submitDisposal() {
+  const btn = document.getElementById('disposalSubmitBtn');
+  const shopSelect = document.getElementById('disposalShopSelect');
+  const manualShopInput = document.getElementById('disposalShopManual');
+  const shopId = shopSelect.value || (manualShopInput ? manualShopInput.value.trim() : '');
+  const wasteType = document.getElementById('disposalType').value;
+  const credits = parseInt(document.getElementById('disposalType').selectedOptions[0].dataset.credits, 10);
+
+  if (!shopId) { showToast('Select or enter a shop first', 'error'); return; }
+
+  btn.disabled = true; btn.textContent = 'Logging…';
+
+  const payload = { shop_id: shopId, waste_type: wasteType, credits_to_award: credits };
+
+  const result = supabaseClient
+    ? await apiCall('/shops/disposal', { method: 'POST', body: JSON.stringify(payload) })
+    : { id: crypto.randomUUID(), ...payload, credits_awarded: credits, shop_name: 'Demo Shop', created_at: new Date().toISOString() };
+
+  btn.disabled = false; btn.textContent = 'Log disposal →';
+
+  if (result) {
+    state.disposals.unshift(result);
+    state.disposalCount++;
+    state.credits += credits;
+    renderWallet();
+    document.getElementById('disposalHistoryCount').textContent = state.disposals.length + ' logged';
+    renderListInto(document.getElementById('disposalHistoryList'), state.disposals, d => ({
+      icon: '♻', title: d.waste_type, sub: d.shop_name || 'Verified disposal',
+      value: '+' + (d.credits_awarded ?? credits), valueClass: 'plus'
+    }), 'No disposals yet.');
+    logActivity('disposal', `Logged <strong>${escapeHtml(wasteType)}</strong> disposal — earned ${credits} credits.`);
+    showToast(`Disposal logged — +${credits} credits`, 'success');
+  } else if (supabaseClient) {
+    showToast('Could not log disposal — check your API URL in Settings', 'error');
+  }
+}
+
+// ── MARKETPLACE (products) ──────────────────────────
+async function loadProducts() {
+  const grid = document.getElementById('marketGrid');
+  const data = await apiCall('/products'); // NOTE: not in basis_router.py yet — see summary
+  state.products = data || [];
+  document.getElementById('marketCount').textContent = state.products.length + ' listings';
+
+  if (!state.products.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
+      <div class="empty-state-icon">⛁</div>
+      <div class="empty-state-title">No products listed yet</div>
+      <div class="empty-state-sub">Once partner shops list products, they'll appear here.</div>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = state.products.map(p => `
+    <div class="market-card">
+      ${p.image_url ? `<img class="market-img" src="${p.image_url}" alt="${escapeHtml(p.title)}">` : `<div class="market-img-fallback">⊡</div>`}
+      <div class="market-body">
+        <div class="market-shop">${escapeHtml(p.shop_name || 'Partner shop')}</div>
+        <div class="market-title">${escapeHtml(p.title)}</div>
+        <div class="market-desc">${escapeHtml(p.description || '')}</div>
+        <div class="market-price-row">
+          <span class="market-price-original">${p.original_price ? '₹' + p.original_price : ''}</span>
+          <span class="market-price-credits">${p.credits_price} cr</span>
+        </div>
+        <div class="market-stock">${p.stock != null ? p.stock + ' in stock' : ''}</div>
+        <button class="market-btn" onclick="purchaseProduct('${p.id}', ${p.credits_price})" ${p.stock === 0 ? 'disabled' : ''}>
+          ${p.stock === 0 ? 'Out of stock' : 'Redeem for ' + p.credits_price + ' credits'}
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function purchaseProduct(productId, creditsPrice) {
+  if (state.credits < creditsPrice) { showToast('Not enough credits', 'error'); return; }
+
+  const result = supabaseClient
+    ? await apiCall('/redemptions/product', { method: 'POST', body: JSON.stringify({ product_id: productId }) })
+    : { id: crypto.randomUUID(), type: 'product', reference_id: productId, credits_spent: creditsPrice, redemption_code: 'ITEM-DEMO', redeemed_at: new Date().toISOString() };
+
+  if (result) {
+    state.credits -= result.credits_spent ?? creditsPrice;
+    state.redemptionCount++;
+    state.redemptions.unshift(result);
+    renderWallet();
+    logActivity('redeem', `Redeemed a product for ${result.credits_spent ?? creditsPrice} credits.`);
+    showToast(`Redeemed — code ${result.redemption_code || '—'}`, 'success');
+  } else if (supabaseClient) {
+    showToast('Could not redeem — check your API URL in Settings', 'error');
+  }
+}
+
+// ── VOUCHERS (citizen-facing) ────────────────────────
+async function loadVouchers() {
+  const grid = document.getElementById('voucherGrid');
+  const data = await apiCall('/vouchers'); // NOTE: not in basis_router.py yet — see summary
+  state.vouchers = data || [];
+  document.getElementById('voucherCount').textContent = state.vouchers.length + ' available';
+
+  if (!state.vouchers.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
+      <div class="empty-state-icon">🎟</div>
+      <div class="empty-state-title">No vouchers available</div>
+      <div class="empty-state-sub">Partner shops haven't issued any vouchers yet.</div>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = state.vouchers.map(v => `
+    <div class="market-card">
+      <div class="market-img-fallback">🎟</div>
+      <div class="market-body">
+        <div class="market-shop">${escapeHtml(v.shop_name || 'Partner shop')}</div>
+        <div class="market-title">${escapeHtml(v.title || v.description || 'Voucher')}</div>
+        <div class="market-desc">${escapeHtml(v.description || '')}</div>
+        <div class="market-price-row">
+          <span></span>
+          <span class="market-price-credits">${v.credits_price} cr</span>
+        </div>
+        <div class="market-stock">${v.stock != null ? v.stock + ' left' : ''}</div>
+        <button class="market-btn" onclick="redeemVoucher('${v.id}', ${v.credits_price})" ${v.stock === 0 ? 'disabled' : ''}>
+          ${v.stock === 0 ? 'Out of stock' : 'Redeem for ' + v.credits_price + ' credits'}
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function redeemVoucher(voucherId, creditsPrice) {
+  if (state.credits < creditsPrice) { showToast('Not enough credits', 'error'); return; }
+
+  const result = supabaseClient
+    ? await apiCall('/redemptions/voucher', { method: 'POST', body: JSON.stringify({ voucher_id: voucherId }) })
+    : { id: crypto.randomUUID(), type: 'voucher', reference_id: voucherId, credits_spent: creditsPrice, redemption_code: 'BASIS-DEMO', redeemed_at: new Date().toISOString() };
+
+  if (result) {
+    state.credits -= result.credits_spent ?? creditsPrice;
+    state.redemptionCount++;
+    state.redemptions.unshift(result);
+    renderWallet();
+    logActivity('redeem', `Redeemed a voucher for ${result.credits_spent ?? creditsPrice} credits.`);
+    showToast(`Voucher redeemed — code ${result.redemption_code || '—'}`, 'success');
+  } else if (supabaseClient) {
+    showToast('Could not redeem — check your API URL in Settings', 'error');
+  }
+}
+
+// ── MY SHOP (business — register / profile) ──────────
+let shopCoords = { lat: 18.5204, lng: 73.8567 };
+let shopMapInitialized = false;
+
+function initShopMap() {
+  if (shopMapInitialized) return;
+  shopMapInitialized = true;
+  const map = L.map('shopMap').setView([shopCoords.lat, shopCoords.lng], 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+  const pinIcon = L.divIcon({
+    html: `<svg viewBox="0 0 24 24" width="34" height="34" xmlns="http://www.w3.org/2000/svg"><path fill="#0891B2" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`,
+    className: '', iconSize: [34, 34], iconAnchor: [17, 34]
+  });
+  const marker = L.marker([shopCoords.lat, shopCoords.lng], { draggable: true, icon: pinIcon }).addTo(map);
+  marker.on('dragend', () => { const p = marker.getLatLng(); shopCoords = { lat: p.lat, lng: p.lng }; });
+}
+
+async function loadShopProfile() {
+  initShopMap();
+  const data = await apiCall('/shops/mine'); // NOTE: not in basis_router.py yet — see summary
+  if (data) {
+    state.shop = data;
+    document.getElementById('shopRegisterCard').style.display = 'none';
+    document.getElementById('shopProfileCard').style.display = 'block';
+    document.getElementById('shopProfileName').textContent = data.name;
+    document.getElementById('shopProfileMeta').textContent = (data.category || 'Shop') + ' · ' + (data.address || '');
+    document.getElementById('roleChip').style.display = '';
+    document.getElementById('roleChip').textContent = 'Shop';
+  }
+}
+
+async function submitShop() {
+  const btn = document.getElementById('shopSubmitBtn');
+  const name = document.getElementById('shopName').value.trim();
+  const category = document.getElementById('shopCategory').value;
+  const contact = document.getElementById('shopContact').value.trim();
+  const address = document.getElementById('shopAddress').value.trim();
+
+  if (!name || !address) { showToast('Enter a shop name and address', 'error'); return; }
+
+  btn.disabled = true; btn.textContent = 'Registering…';
+
+  const payload = { name, category, contact: contact || null, address, latitude: shopCoords.lat, longitude: shopCoords.lng };
+
+  const result = supabaseClient
+    ? await apiCall('/shops', { method: 'POST', body: JSON.stringify(payload) })
+    : { id: crypto.randomUUID(), ...payload, created_at: new Date().toISOString() };
+
+  btn.disabled = false; btn.textContent = 'Register shop →';
+
+  if (result) {
+    state.shop = result;
+    document.getElementById('shopRegisterCard').style.display = 'none';
+    document.getElementById('shopProfileCard').style.display = 'block';
+    document.getElementById('shopProfileName').textContent = result.name;
+    document.getElementById('shopProfileMeta').textContent = (result.category || 'Shop') + ' · ' + (result.address || '');
+    document.getElementById('roleChip').style.display = '';
+    document.getElementById('roleChip').textContent = 'Shop';
+    logActivity('shop', `Registered shop <strong>${escapeHtml(result.name)}</strong>.`);
+    showToast('Shop registered!', 'success');
+  } else if (supabaseClient) {
+    showToast('Could not register shop — check your API URL in Settings', 'error');
+  }
+}
+
+// ── VOUCHERS I ISSUE (business) ──────────────────────
+async function loadMyVouchers() {
+  const data = await apiCall('/vouchers/mine'); // NOTE: not in basis_router.py yet — see summary
+  state.myVouchers = data || [];
+  document.getElementById('myVoucherCount').textContent = state.myVouchers.length + ' issued';
+  document.getElementById('shopVoucherCount').textContent = state.myVouchers.length;
+
+  const list = document.getElementById('myVoucherList');
+  if (!state.myVouchers.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🏷</div><div class="empty-state-title">No vouchers yet</div><div class="empty-state-sub">Publish your first voucher.</div></div>`;
+    return;
+  }
+  list.innerHTML = state.myVouchers.map(v => `
+    <div class="data-row">
+      <div class="data-row-icon">🏷</div>
+      <div class="data-row-main">
+        <div class="data-row-title">${escapeHtml(v.title || v.description)}</div>
+        <div class="data-row-sub">${v.stock ?? 0} left · expires ${v.expires_at ? new Date(v.expires_at).toLocaleDateString('en-IN') : '—'}</div>
+      </div>
+      <div class="data-row-value">${v.credits_price} cr</div>
+    </div>
+  `).join('');
+}
+
+async function submitVoucher() {
+  const btn = document.getElementById('voucherSubmitBtn');
+  const title = document.getElementById('voucherTitle').value.trim();
+  const description = document.getElementById('voucherDescription').value.trim();
+  const creditsPrice = parseInt(document.getElementById('voucherCredits').value, 10);
+  const stock = parseInt(document.getElementById('voucherStock').value, 10);
+  const expiry = document.getElementById('voucherExpiry').value;
+
+  if (!title || !creditsPrice || !stock) { showToast('Fill in title, credit cost and stock', 'error'); return; }
+  if (!state.shop) { showToast('Register your shop first', 'error'); switchPanel('shop'); return; }
+
+  btn.disabled = true; btn.textContent = 'Publishing…';
+
+  const payload = { shop_id: state.shop.id, title, description: description || null, credits_price: creditsPrice, stock, expires_at: expiry || null };
+
+  const result = supabaseClient
+    ? await apiCall('/vouchers', { method: 'POST', body: JSON.stringify(payload) })
+    : { id: crypto.randomUUID(), ...payload, shop_name: state.shop.name, created_at: new Date().toISOString() };
+
+  btn.disabled = false; btn.textContent = 'Publish voucher →';
+
+  if (result) {
+    state.myVouchers.unshift(result);
+    document.getElementById('voucherTitle').value = '';
+    document.getElementById('voucherDescription').value = '';
+    document.getElementById('voucherCredits').value = '';
+    document.getElementById('voucherStock').value = '';
+    document.getElementById('voucherExpiry').value = '';
+    loadMyVouchers();
+    logActivity('shop', `Published voucher <strong>${escapeHtml(title)}</strong>.`);
+    showToast('Voucher published', 'success');
+  } else if (supabaseClient) {
+    showToast('Could not publish — check your API URL in Settings', 'error');
+  }
+}
+
+// ── PRODUCTS I LIST (business) ───────────────────────
+async function loadMyProducts() {
+  const data = await apiCall('/products/mine'); // NOTE: not in basis_router.py yet — see summary
+  state.myProducts = data || [];
+  document.getElementById('myProductCount').textContent = state.myProducts.length + ' listed';
+  document.getElementById('shopProductCount').textContent = state.myProducts.length;
+
+  const list = document.getElementById('myProductList');
+  if (!state.myProducts.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⊡</div><div class="empty-state-title">No products yet</div><div class="empty-state-sub">Publish your first product.</div></div>`;
+    return;
+  }
+  list.innerHTML = state.myProducts.map(p => `
+    <div class="data-row">
+      <div class="data-row-icon">⊡</div>
+      <div class="data-row-main">
+        <div class="data-row-title">${escapeHtml(p.title)}</div>
+        <div class="data-row-sub">${p.stock ?? 0} in stock</div>
+      </div>
+      <div class="data-row-value">${p.credits_price} cr</div>
+    </div>
+  `).join('');
+}
+
+async function submitProduct() {
+  const btn = document.getElementById('productSubmitBtn');
+  const title = document.getElementById('productTitle').value.trim();
+  const description = document.getElementById('productDescription').value.trim();
+  const category = document.getElementById('productCategory').value;
+  const originalPrice = parseFloat(document.getElementById('productOriginalPrice').value) || null;
+  const creditsPrice = parseInt(document.getElementById('productCreditsPrice').value, 10);
+  const stock = parseInt(document.getElementById('productStock').value, 10);
+  const imageUrl = document.getElementById('productImageUrl').value.trim() || null;
+
+  if (!title || !creditsPrice) { showToast('Fill in title and price in credits', 'error'); return; }
+  if (!state.shop) { showToast('Register your shop first', 'error'); switchPanel('shop'); return; }
+
+  btn.disabled = true; btn.textContent = 'Publishing…';
+
+  const payload = { title, description: description || null, category, original_price: originalPrice, credits_price: creditsPrice, stock: stock || 0, image_url: imageUrl };
+
+  const result = supabaseClient
+    ? await apiCall('/products', { method: 'POST', body: JSON.stringify(payload) })
+    : { id: crypto.randomUUID(), ...payload, shop_name: state.shop.name, created_at: new Date().toISOString() };
+
+  btn.disabled = false; btn.textContent = 'Publish product →';
+
+  if (result) {
+    state.myProducts.unshift(result);
+    document.getElementById('productTitle').value = '';
+    document.getElementById('productDescription').value = '';
+    document.getElementById('productOriginalPrice').value = '';
+    document.getElementById('productCreditsPrice').value = '';
+    document.getElementById('productStock').value = '';
+    document.getElementById('productImageUrl').value = '';
+    loadMyProducts();
+    logActivity('shop', `Listed product <strong>${escapeHtml(title)}</strong>.`);
+    showToast('Product published', 'success');
+  } else if (supabaseClient) {
+    showToast('Could not publish — check your API URL in Settings', 'error');
+  }
+}
+
+// ── SETTINGS ─────────────────────────────────────────
+function saveSettings() {
+  BASIS_API_URL = document.getElementById('settingsApiUrl').value.trim() || BASIS_API_URL;
+  SUPABASE_URL_VAL = document.getElementById('settingsSbUrl').value.trim() || SUPABASE_URL_VAL;
+  SUPABASE_KEY_VAL = document.getElementById('settingsSbKey').value.trim() || SUPABASE_KEY_VAL;
+  localStorage.setItem('basis_api_url', BASIS_API_URL);
+  localStorage.setItem('basis_sb_url', SUPABASE_URL_VAL);
+  localStorage.setItem('basis_sb_key', SUPABASE_KEY_VAL);
+  showToast('Settings saved. Reload to apply.', 'success');
+}
+document.getElementById('settingsApiUrl').value = BASIS_API_URL.includes('your-api') ? '' : BASIS_API_URL;
+document.getElementById('settingsSbUrl').value = SUPABASE_URL_VAL;
+document.getElementById('settingsSbKey').value = SUPABASE_KEY_VAL;
+
+// ── USER MENU ────────────────────────────────────────
+document.getElementById('userMenuToggle').addEventListener('click', (e) => {
+  e.stopPropagation();
+  document.getElementById('userDropdown').classList.toggle('open');
+});
+document.addEventListener('click', () => document.getElementById('userDropdown').classList.remove('open'));
+
+async function handleLogout() {
+  if (supabaseClient) await supabaseClient.auth.signOut();
+  window.location.href = '/index.html';
+}
+
+// ── GLOBAL SEARCH ────────────────────────────────────
+document.getElementById('globalSearch').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    const q = e.target.value.toLowerCase();
+    if (q.includes('report')) switchPanel('report');
+    else if (q.includes('dispos')) switchPanel('disposal');
+    else if (q.includes('voucher')) switchPanel('vouchers');
+    else if (q.includes('product') || q.includes('market')) switchPanel('marketplace');
+    else if (q.includes('shop')) switchPanel('shop');
+    else if (q.includes('setting')) switchPanel('settings');
+    else switchPanel('activity');
+    e.target.value = '';
+  }
+});
+
+// ── FILE UPLOAD WIRING ───────────────────────────────
+wireUploadArea('reportUploadArea', (file, dataUrl) => { reportPhotoUrl = dataUrl; /* NOTE: swap for real Storage upload before going live */ });
+wireUploadArea('disposalUploadArea', (file, dataUrl) => { /* stored as proof only for this MVP pass */ });
+
+// ── INIT ─────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+  initReportMap();
+  await loadUserData();
+});
+</script>
+
+<!--
+  ═══════════════════════════════════════════════════════════════
+  BACKEND NOTE FOR YOGESH — read this before wiring the API URL.
+
+  basis_router.py (as given) only defines WRITE endpoints:
+    POST /citizens/signup, GET /citizens/wallet, POST /reports,
+    POST /shops/disposal, POST /shops, POST /vouchers,
+    POST /products, POST /redemptions/voucher, POST /redemptions/product
+
+  This dashboard also calls several READ/list endpoints that
+  aren't in the router yet, all marked with a "NOTE:" comment
+  above wherever they're called:
+    GET /shops                — populate the disposal shop picker
+    GET /shops/mine           — load the citizen's own shop profile
+    GET /products             — marketplace grid
+    GET /products/mine        — "Products I list" panel
+    GET /vouchers              — citizen voucher grid
+    GET /vouchers/mine         — "Vouchers I issue" panel
+
+  Until those exist, every one of those calls fails silently and
+  the UI falls back to an empty state (never a broken page) — same
+  demo-mode pattern as the Aura and Raptor dashboards. Add them
+  to basis_router.py (simple `select` queries scoped to the
+  authenticated user via get_current_user, same as the existing
+  POST handlers) and the dashboard will start showing real data
+  with no frontend changes needed.
+  ═══════════════════════════════════════════════════════════════
+-->
+
+</body>
+</html>
