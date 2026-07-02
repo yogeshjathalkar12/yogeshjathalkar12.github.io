@@ -1142,8 +1142,8 @@
     // localStorage keys as the dashboard's Settings panel,
     // so a key saved there is picked up here too.
     // ═══════════════════════════════════════════════════
-    const SUPABASE_URL = localStorage.getItem('aura_sb_url') || 'YOUR_AURA_SUPABASE_PROJECT_URL';
-    const SUPABASE_ANON_KEY = localStorage.getItem('aura_sb_key') || 'YOUR_AURA_SUPABASE_ANON_KEY';
+    const SUPABASE_URL = localStorage.getItem('aura_sb_url') || 'https://wguodgtcgyarugivowyl.supabase.co';
+    const SUPABASE_ANON_KEY = localStorage.getItem('aura_sb_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndndW9kZ3RjZ3lhcnVnaXZvd3lsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4MjIzNjgsImV4cCI6MjA5ODM5ODM2OH0.UVBFAcGGNKQYBHLKJCDOcJ7NkgNbF23bkMpihIgJfvg';
     const supabaseClient = (SUPABASE_URL.startsWith('http'))
       ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
       : null;
