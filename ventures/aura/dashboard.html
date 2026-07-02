@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aura Vault | Shoonya Origins</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+<style>
+:root {
+  --primary: #059669;
+  --primary-light: #34d399;
+  --primary-dark: #064e3b;
+  --accent: #f97316;
+
+  --bg-main: #f0fdf4;
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(5, 150, 105, 0.2);
+  --glass-hover: rgba(255, 255, 255, 0.85);
+
+  --text-main: #022c22;
+  --text-muted: #374151;
+
+  --blob-1: rgba(52, 211, 153, 0.4);
+  --blob-2: rgba(249, 115, 22, 0.15);
+
+  --red: #dc2626;
+  --red-bg: rgba(220, 38, 38, 0.1);
+  --amber: #d97706;
+  --amber-bg: rgba(217, 119, 6, 0.1);
+
+  --transition-speed: 0.4s;
+}
+
+[data-theme="dark"] {
+  --bg-main: #020617;
+  --glass-bg: rgba(15, 23, 42, 0.6);
+  --glass-border: rgba(52, 211, 153, 0.15);
+  --glass-hover: rgba(30, 41, 59, 0.8);
+
+  --text-main: #ecfdf5;
+  --text-muted: #94a3b8;
+  --primary-dark: #6ee7b7;
+
+  --blob-1: rgba(5, 150, 105, 0.25);
+  --blob-2: rgba(249, 115, 22, 0.1);
+
+  --red-bg: rgba(220, 38, 38, 0.15);
+  --amber-bg: rgba(217, 119, 6, 0.15);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  overflow-x: hidden;
+  min-height: 100vh;
+  transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+.ambient-flow {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+  background:
+    radial-gradient(at 0% 0%, var(--blob-1) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, var(--blob-2) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, var(--blob-1) 0px, transparent 50%),
+    radial-gradient(at 0% 50%, var(--blob-2) 0px, transparent 50%);
+  filter: blur(80px);
+  animation: breathe 10s ease-in-out infinite alternate;
+  transition: background 1s ease;
+}
+@keyframes breathe { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
+
+/* ── NAV ── */
+nav {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 15px 4%;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--glass-border);
+  position: sticky; top: 0; z-index: 1000;
+  transition: background var(--transition-speed), border-color var(--transition-speed);
+  gap: 1.5rem;
+}
+.logo { font-size: 1.6rem; font-weight: 800; letter-spacing: -1px; color: var(--text-main); text-decoration: none; flex-shrink: 0; }
+.logo span { color: var(--primary); }
+
+.nav-search {
+  flex: 1; max-width: 420px;
+  background: rgba(255,255,255,0.3);
+  border: 1px solid var(--glass-border);
+  border-radius: 50px;
+  display: flex; align-items: center; gap: 0.6rem;
+  padding: 0.55rem 1.1rem;
+}
+[data-theme="dark"] .nav-search { background: rgba(0,0,0,0.2); }
+.nav-search input { background: transparent; border: none; outline: none; color: var(--text-main); font-size: 0.85rem; width: 100%; }
+.nav-search input::placeholder { color: var(--text-muted); }
+.nav-search-icon { color: var(--text-muted); font-size: 0.85rem; }
+
+.nav-right { display: flex; align-items: center; gap: 1rem; flex-shrink: 0; }
+
+.credits-pill {
+  display: flex; align-items: center; gap: 0.6rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 50px;
+  padding: 0.4rem 1rem;
+}
+.credits-label { font-size: 0.6rem; letter-spacing: 0.1em; color: var(--text-muted); text-transform: uppercase; }
+.credits-value { font-size: 1.1rem; font-weight: 800; color: var(--primary); line-height: 1; transition: all 0.4s ease; }
+.credits-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); box-shadow: 0 0 6px rgba(5,150,105,0.6); animation: pulse 2s ease-in-out infinite; flex-shrink: 0; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.theme-toggle {
+  cursor: pointer; background: transparent; border: 1px solid var(--glass-border);
+  padding: 6px 14px; border-radius: 20px;
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.75rem; font-weight: 600; color: var(--text-muted);
+  transition: 0.3s;
+}
+.theme-toggle:hover { background: var(--glass-hover); color: var(--primary); border-color: var(--primary); }
+
+.user-avatar {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; color: white; cursor: pointer; flex-shrink: 0;
+  position: relative;
+}
+.user-dropdown {
+  position: absolute; top: calc(100% + 0.8rem); right: 0;
+  background: var(--glass-bg); backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border); border-radius: 14px;
+  min-width: 200px; display: none; z-index: 300; overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+}
+.user-dropdown.open { display: block; }
+.user-dropdown-item {
+  padding: 0.9rem 1.2rem; font-size: 0.8rem; font-weight: 600;
+  color: var(--text-muted); cursor: pointer; transition: all 0.2s;
+}
+.user-dropdown-item:hover { color: var(--primary); background: var(--glass-hover); }
+.user-dropdown-item.danger { color: var(--red); }
+
+/* ── LAYOUT ── */
+.dash-layout { display: flex; min-height: calc(100vh - 70px); }
+
+.sidebar {
+  width: 230px; flex-shrink: 0;
+  padding: 2rem 1rem;
+  display: flex; flex-direction: column; gap: 0.3rem;
+  position: sticky; top: 70px; height: calc(100vh - 70px);
+}
+.sidebar-label { font-size: 0.65rem; letter-spacing: 0.2em; color: var(--text-muted); text-transform: uppercase; padding: 0 1rem; margin: 1.2rem 0 0.5rem; opacity: 0.7; }
+.sidebar-label:first-child { margin-top: 0; }
+.sidebar-item {
+  display: flex; align-items: center; gap: 0.7rem;
+  padding: 0.75rem 1rem; border-radius: 14px;
+  font-size: 0.85rem; font-weight: 600; color: var(--text-muted);
+  cursor: pointer; transition: all 0.2s; text-decoration: none;
+}
+.sidebar-item:hover { background: var(--glass-bg); color: var(--text-main); }
+.sidebar-item.active { background: var(--glass-bg); color: var(--primary); border: 1px solid var(--glass-border); box-shadow: 0 4px 16px rgba(5,150,105,0.1); }
+.sidebar-icon { font-size: 1rem; width: 18px; text-align: center; flex-shrink: 0; }
+.sidebar-badge { margin-left: auto; background: var(--primary); color: white; font-size: 0.6rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 10px; }
+
+.sidebar-footer { margin-top: auto; padding: 1rem; }
+.delegate-card {
+  background: var(--glass-bg); border: 1px solid var(--glass-border);
+  border-radius: 16px; padding: 1rem;
+}
+.delegate-card-title { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+.delegate-card-sub { font-size: 0.75rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 0.8rem; }
+.delegate-card-btn {
+  width: 100%; padding: 0.6rem; border-radius: 10px; border: none;
+  background: var(--primary); color: white; font-weight: 700; font-size: 0.75rem;
+  cursor: pointer; transition: 0.3s;
+}
+.delegate-card-btn:hover { background: var(--primary-light); }
+
+.dash-main { flex: 1; padding: 2.5rem 3rem; max-width: 1100px; }
+
+.panel { display: none; }
+.panel.active { display: block; animation: fadein 0.3s ease; }
+@keyframes fadein { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+.page-eyebrow { font-size: 0.7rem; letter-spacing: 0.2em; color: var(--primary); text-transform: uppercase; font-weight: 700; margin-bottom: 0.4rem; }
+.page-title { font-size: 2.2rem; font-weight: 800; color: var(--text-main); margin-bottom: 1.8rem; letter-spacing: -0.5px; }
+
+/* ── GLASS CARD ── */
+.glass-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  padding: 1.8rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  backdrop-filter: blur(16px);
+  transition: all 0.3s cubic-bezier(0.25,0.8,0.25,1);
+}
+.glass-card:hover { border-color: var(--primary); box-shadow: 0 15px 30px rgba(5,150,105,0.1); }
+
+.card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.2rem; }
+.card-title { font-size: 1rem; font-weight: 700; color: var(--text-main); }
+.card-meta { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; }
+
+/* ── TWO COL LAYOUT (Timeline + Logger panel) ── */
+.timeline-layout { display: grid; grid-template-columns: 1fr 340px; gap: 1.5rem; align-items: start; }
+@media (max-width: 1000px) { .timeline-layout { grid-template-columns: 1fr; } }
+
+/* ── TIMELINE ── */
+.session-group { margin-bottom: 1.6rem; }
+.session-group:last-child { margin-bottom: 0; }
+.session-header {
+  display: flex; align-items: center; gap: 0.7rem;
+  margin-bottom: 0.8rem; padding-left: 0.2rem;
+}
+.session-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary); box-shadow: 0 0 6px rgba(5,150,105,0.5); flex-shrink: 0; }
+.session-dot.closed { background: var(--text-muted); box-shadow: none; opacity: 0.5; }
+.session-title { font-size: 0.75rem; font-weight: 700; color: var(--text-main); }
+.session-range { font-size: 0.7rem; color: var(--text-muted); }
+
+.entry-card {
+  background: rgba(255,255,255,0.4);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 0.7rem;
+  margin-left: 1.1rem;
+  border-left: 2px solid var(--primary);
+  position: relative;
+}
+[data-theme="dark"] .entry-card { background: rgba(255,255,255,0.03); }
+.entry-card:last-child { margin-bottom: 0; }
+.entry-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 0.4rem; }
+.entry-text { font-size: 0.88rem; color: var(--text-main); line-height: 1.55; flex: 1; }
+.entry-time { font-size: 0.68rem; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; padding-top: 0.1rem; }
+.entry-meta { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+.severity-pill {
+  font-size: 0.65rem; font-weight: 700; padding: 0.15rem 0.55rem; border-radius: 10px;
+}
+.severity-low { background: rgba(5,150,105,0.12); color: var(--primary); }
+.severity-mid { background: var(--amber-bg); color: var(--amber); }
+.severity-high { background: var(--red-bg); color: var(--red); }
+.tag-pill { font-size: 0.65rem; font-weight: 600; padding: 0.15rem 0.55rem; border-radius: 10px; background: rgba(0,0,0,0.05); color: var(--text-muted); }
+[data-theme="dark"] .tag-pill { background: rgba(255,255,255,0.06); }
+.logged-by-tag { font-size: 0.65rem; color: var(--text-muted); font-style: italic; }
+
+.empty-timeline { text-align: center; padding: 3.5rem 1.5rem; }
+.empty-timeline-icon { font-size: 1.8rem; margin-bottom: 0.8rem; opacity: 0.5; }
+.empty-timeline-title { font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.4rem; }
+.empty-timeline-sub { font-size: 0.8rem; color: var(--text-muted); }
+
+/* ── SIDE LOGGER PANEL ── */
+.logger-panel { position: sticky; top: 90px; }
+.logger-textarea {
+  width: 100%; min-height: 110px; resize: vertical;
+  background: rgba(255,255,255,0.4);
+  border: 1px solid var(--glass-border); border-radius: 14px;
+  padding: 0.9rem 1rem; color: var(--text-main); font-family: inherit;
+  font-size: 0.85rem; line-height: 1.5; outline: none; transition: 0.3s;
+}
+[data-theme="dark"] .logger-textarea { background: rgba(0,0,0,0.2); }
+.logger-textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(5,150,105,0.1); }
+.logger-textarea::placeholder { color: var(--text-muted); }
+
+.logger-label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin: 1rem 0 0.5rem; display: block; }
+
+.severity-selector { display: flex; gap: 0.4rem; }
+.severity-btn {
+  flex: 1; padding: 0.5rem 0; border-radius: 10px; border: 1px solid var(--glass-border);
+  background: transparent; color: var(--text-muted); font-weight: 700; font-size: 0.8rem;
+  cursor: pointer; transition: 0.2s;
+}
+.severity-btn:hover { border-color: var(--primary); }
+.severity-btn.selected { background: var(--primary); border-color: var(--primary); color: white; }
+
+.log-submit-btn {
+  width: 100%; margin-top: 1.3rem; padding: 0.9rem;
+  background: var(--primary); color: white; border: none; border-radius: 14px;
+  font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: 0.3s;
+}
+.log-submit-btn:hover { background: var(--primary-light); transform: translateY(-1px); box-shadow: 0 10px 20px rgba(5,150,105,0.2); }
+.log-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.logger-hint { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.8rem; line-height: 1.5; text-align: center; }
+
+/* ── DOCUMENT GRID ── */
+.doc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; margin-top: 1.4rem; }
+.doc-card {
+  background: rgba(255,255,255,0.4); border: 1px solid var(--glass-border); border-radius: 16px;
+  padding: 1.2rem; transition: 0.3s;
+}
+[data-theme="dark"] .doc-card { background: rgba(255,255,255,0.03); }
+.doc-card:hover { border-color: var(--primary); transform: translateY(-3px); }
+.doc-type-badge { display: inline-block; font-size: 0.6rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 8px; background: rgba(5,150,105,0.12); color: var(--primary); text-transform: uppercase; margin-bottom: 0.7rem; }
+.doc-name { font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.3rem; }
+.doc-date { font-size: 0.7rem; color: var(--text-muted); }
+
+/* ── MEDICATION LIST ── */
+.med-row { display: flex; align-items: center; gap: 1rem; padding: 0.9rem 0; border-bottom: 1px solid var(--glass-border); }
+.med-row:last-child { border-bottom: none; }
+.med-check {
+  width: 24px; height: 24px; border-radius: 8px; border: 2px solid var(--glass-border);
+  cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  transition: 0.2s; background: transparent;
+}
+.med-check.checked { background: var(--primary); border-color: var(--primary); color: white; font-size: 0.8rem; }
+.med-info { flex: 1; }
+.med-name { font-size: 0.88rem; font-weight: 700; color: var(--text-main); }
+.med-dose { font-size: 0.72rem; color: var(--text-muted); }
+
+/* ── DELEGATE LIST ── */
+.delegate-row { display: flex; align-items: center; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid var(--glass-border); }
+.delegate-row:last-child { border-bottom: none; }
+.delegate-avatar { width: 36px; height: 36px; border-radius: 50%; background: rgba(5,150,105,0.12); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0; }
+.delegate-info { flex: 1; }
+.delegate-email { font-size: 0.85rem; font-weight: 700; color: var(--text-main); }
+.delegate-level { font-size: 0.7rem; color: var(--text-muted); }
+.delegate-revoke { font-size: 0.7rem; font-weight: 700; color: var(--red); background: var(--red-bg); border: none; padding: 0.4rem 0.8rem; border-radius: 10px; cursor: pointer; }
+
+/* ── SHARE LINK CARD ── */
+.share-link-box {
+  background: rgba(5,150,105,0.06); border: 1px solid var(--glass-border); border-radius: 16px;
+  padding: 1.2rem; margin-top: 1rem; display: none;
+}
+.share-link-box.visible { display: block; }
+.share-url { font-size: 0.78rem; color: var(--primary); font-weight: 600; word-break: break-all; margin-bottom: 0.8rem; }
+.share-copy-btn { font-size: 0.72rem; font-weight: 700; color: var(--primary); background: transparent; border: 1px solid var(--glass-border); padding: 0.4rem 1rem; border-radius: 10px; cursor: pointer; }
+
+/* ── FORM CONTROLS (reused from main site style) ── */
+.form-group { margin-bottom: 1.1rem; }
+.form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.8rem; color: var(--text-muted); }
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%; padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid var(--glass-border);
+  background: rgba(255,255,255,0.4); color: var(--text-main); font-family: inherit; font-size: 0.85rem; transition: 0.3s; outline: none;
+}
+[data-theme="dark"] .form-group input, [data-theme="dark"] .form-group select { background: rgba(0,0,0,0.2); }
+.form-group input:focus, .form-group select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(5,150,105,0.1); }
+
+.primary-btn {
+  background: var(--primary); color: white; border: none; padding: 0.8rem 1.6rem;
+  border-radius: 50px; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 0.85rem;
+}
+.primary-btn:hover { background: var(--primary-light); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(5,150,105,0.2); }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 2rem; right: 2rem;
+  background: var(--glass-bg); backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border); border-left: 3px solid var(--primary);
+  border-radius: 14px; padding: 1rem 1.5rem;
+  font-size: 0.82rem; font-weight: 600; color: var(--text-main);
+  z-index: 9000; transform: translateY(140%);
+  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+  max-width: 320px; box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+}
+.toast.show { transform: translateY(0); }
+.toast.error { border-left-color: var(--red); }
+.toast.warn { border-left-color: var(--amber); }
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 4px; }
+
+@media (max-width: 900px) {
+  .sidebar { display: none; }
+  .dash-main { padding: 1.5rem; }
+  .nav-search { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="ambient-flow"></div>
+<div class="toast" id="toast"></div>
+
+<!-- ═══ NAV ═══ -->
+<nav>
+  <a href="#" class="logo">Aura<span>.</span></a>
+
+  <div class="nav-search">
+    <span class="nav-search-icon">⌕</span>
+    <input type="text" id="globalSearch" placeholder="Search your vault...">
+  </div>
+
+  <div class="nav-right">
+    <div class="credits-pill" title="Free share credits remaining">
+      <div class="credits-dot"></div>
+      <div>
+        <div class="credits-label">Share credits</div>
+        <div class="credits-value" id="navCredits">—</div>
+      </div>
+    </div>
+
+    <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">
+      <span id="themeIcon">🌙</span><span>Mode</span>
+    </button>
+
+    <div class="user-avatar" id="userMenuToggle">
+      <span id="userInitial">P</span>
+      <div class="user-dropdown" id="userDropdown">
+        <div class="user-dropdown-item" onclick="switchPanel('delegates')">Manage access</div>
+        <div class="user-dropdown-item" onclick="switchPanel('settings')">Settings</div>
+        <div class="user-dropdown-item danger" onclick="handleLogout()">Log out</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="dash-layout">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <nav class="sidebar">
+    <div class="sidebar-label">Vault</div>
+    <a class="sidebar-item active" data-panel="timeline" onclick="switchPanel('timeline')">
+      <span class="sidebar-icon">◷</span><span>Timeline</span>
+    </a>
+    <a class="sidebar-item" data-panel="documents" onclick="switchPanel('documents')">
+      <span class="sidebar-icon">⊡</span><span>Medical cabinet</span>
+    </a>
+    <a class="sidebar-item" data-panel="medications" onclick="switchPanel('medications')">
+      <span class="sidebar-icon">⊕</span><span>Medications</span>
+    </a>
+
+    <div class="sidebar-label">Sharing</div>
+    <a class="sidebar-item" data-panel="delegates" onclick="switchPanel('delegates')">
+      <span class="sidebar-icon">⚿</span><span>Trusted access</span>
+      <span class="sidebar-badge" id="delegateBadge" style="display:none"></span>
+    </a>
+    <a class="sidebar-item" data-panel="share" onclick="switchPanel('share')">
+      <span class="sidebar-icon">↗</span><span>Share with doctor</span>
+    </a>
+
+    <div class="sidebar-footer">
+      <div class="delegate-card">
+        <div class="delegate-card-title">Single source of truth</div>
+        <div class="delegate-card-sub">Every entry you log here becomes part of your lifetime medical record.</div>
+        <button class="delegate-card-btn" onclick="switchPanel('timeline')">Log an update</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══ MAIN ═══ -->
+  <main class="dash-main">
+
+    <!-- ───── TIMELINE PANEL ───── -->
+    <div class="panel active" id="panel-timeline">
+      <div class="page-eyebrow">Aura · Lifetime vault</div>
+      <div class="page-title" id="timelineGreeting">Your health timeline.</div>
+
+      <div class="timeline-layout">
+        <!-- Timeline feed -->
+        <div class="glass-card">
+          <div class="card-header">
+            <div class="card-title">Reverse chronological log</div>
+            <div class="card-meta" id="entryCount">0 entries</div>
+          </div>
+          <div id="timelineFeed">
+            <div class="empty-timeline">
+              <div class="empty-timeline-icon">◷</div>
+              <div class="empty-timeline-title">Nothing logged yet</div>
+              <div class="empty-timeline-sub">Use the panel on the right to log how you're feeling. Everything you write builds your lifetime record.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Side logger panel -->
+        <div class="logger-panel">
+          <div class="glass-card">
+            <div class="card-title" style="margin-bottom: 0.3rem;">Log an update</div>
+            <div class="card-meta" style="margin-bottom: 1rem;">What are you feeling right now?</div>
+
+            <textarea class="logger-textarea" id="symptomInput" placeholder="e.g. Mild headache since this morning, started after lunch, feels worse in bright light..."></textarea>
+
+            <label class="logger-label">Severity (optional)</label>
+            <div class="severity-selector" id="severitySelector">
+              <button class="severity-btn" data-val="3" onclick="selectSeverity(3)">Mild</button>
+              <button class="severity-btn" data-val="6" onclick="selectSeverity(6)">Moderate</button>
+              <button class="severity-btn" data-val="9" onclick="selectSeverity(9)">Severe</button>
+            </div>
+
+            <button class="log-submit-btn" id="logSubmitBtn" onclick="submitLogEntry()">Add to timeline →</button>
+            <div class="logger-hint">Logging is always free. This entry is timestamped and added to your vault instantly.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───── DOCUMENTS PANEL ───── -->
+    <div class="panel" id="panel-documents">
+      <div class="page-eyebrow">Aura · Medical cabinet</div>
+      <div class="page-title">Your document vault.</div>
+
+      <div class="glass-card">
+        <div class="card-header">
+          <div class="card-title">Upload a document</div>
+          <div class="card-meta">Prescriptions, lab reports, discharge summaries</div>
+        </div>
+        <div class="form-group">
+          <label>Document type</label>
+          <select id="docTypeSelect">
+            <option value="prescription">Prescription</option>
+            <option value="lab_report">Lab report</option>
+            <option value="discharge_summary">Discharge summary</option>
+            <option value="scan">Scan / imaging</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>File</label>
+          <input type="file" id="docFileInput">
+        </div>
+        <div class="form-group">
+          <label>Notes (optional)</label>
+          <input type="text" id="docNotesInput" placeholder="e.g. From Dr. Mehta, follow-up visit">
+        </div>
+        <button class="primary-btn" onclick="uploadDocument()">Add to cabinet →</button>
+      </div>
+
+      <div class="doc-grid" id="docGrid">
+        <div class="empty-timeline" style="grid-column: 1/-1;">
+          <div class="empty-timeline-icon">⊡</div>
+          <div class="empty-timeline-title">Your cabinet is empty</div>
+          <div class="empty-timeline-sub">Upload your first prescription or report above.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───── MEDICATIONS PANEL ───── -->
+    <div class="panel" id="panel-medications">
+      <div class="page-eyebrow">Aura · Adherence</div>
+      <div class="page-title">Medication tracker.</div>
+
+      <div class="glass-card" style="margin-bottom: 1.5rem;">
+        <div class="card-title" style="margin-bottom: 1rem;">Add a medication</div>
+        <div class="form-group">
+          <label>Medicine name</label>
+          <input type="text" id="medNameInput" placeholder="e.g. Metformin">
+        </div>
+        <div class="form-group">
+          <label>Dosage</label>
+          <input type="text" id="medDosageInput" placeholder="e.g. 500mg, twice daily">
+        </div>
+        <button class="primary-btn" onclick="addMedication()">Add medication →</button>
+      </div>
+
+      <div class="glass-card">
+        <div class="card-header">
+          <div class="card-title">Today's schedule</div>
+          <div class="card-meta" id="medCount">0 medications</div>
+        </div>
+        <div id="medList">
+          <div class="empty-timeline">
+            <div class="empty-timeline-icon">⊕</div>
+            <div class="empty-timeline-title">No medications tracked</div>
+            <div class="empty-timeline-sub">Add what your doctor prescribed above.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───── DELEGATES PANEL ───── -->
+    <div class="panel" id="panel-delegates">
+      <div class="page-eyebrow">Aura · Trusted access</div>
+      <div class="page-title">Who can log on your behalf.</div>
+
+      <div class="glass-card" style="margin-bottom: 1.5rem;">
+        <div class="card-title" style="margin-bottom: 1rem;">Grant access to someone you trust</div>
+        <div class="form-group">
+          <label>Their email</label>
+          <input type="email" id="delegateEmailInput" placeholder="spouse@example.com">
+        </div>
+        <div class="form-group">
+          <label>Permission level</label>
+          <select id="delegatePermSelect">
+            <option value="log_only">Log only — can add entries, can't view history</option>
+            <option value="log_and_view">Log & view — can also read the full timeline</option>
+            <option value="manage_delegates">Full access — can also manage other delegates</option>
+          </select>
+        </div>
+        <button class="primary-btn" onclick="createDelegateInvite()">Generate access key →</button>
+        <div class="share-link-box" id="inviteLinkBox">
+          <div class="share-url" id="inviteLinkUrl">—</div>
+          <button class="share-copy-btn" onclick="copyInviteLink()">Copy invite link</button>
+        </div>
+      </div>
+
+      <div class="glass-card">
+        <div class="card-header">
+          <div class="card-title">Active delegates</div>
+          <div class="card-meta" id="delegateListCount">0 people</div>
+        </div>
+        <div id="delegateList">
+          <div class="empty-timeline">
+            <div class="empty-timeline-icon">⚿</div>
+            <div class="empty-timeline-title">No one else has access</div>
+            <div class="empty-timeline-sub">Only you can log and view this vault right now.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───── SHARE PANEL ───── -->
+    <div class="panel" id="panel-share">
+      <div class="page-eyebrow">Aura · Physician bridge</div>
+      <div class="page-title">Share with a doctor.</div>
+
+      <div class="glass-card" style="margin-bottom: 1.5rem;">
+        <div class="card-title" style="margin-bottom: 0.4rem;">Generate a secure share link</div>
+        <div class="card-meta" style="margin-bottom: 1.2rem;" id="shareCreditsLine">Uses 1 share credit · <span id="shareCreditsLeft">—</span> remaining</div>
+
+        <div class="form-group">
+          <label>Recipient (optional label)</label>
+          <input type="text" id="shareRecipientInput" placeholder="e.g. Dr. Mehta — Cardiologist">
+        </div>
+        <div class="form-group">
+          <label>Link expires in</label>
+          <select id="shareExpirySelect">
+            <option value="24">24 hours</option>
+            <option value="48" selected>48 hours</option>
+            <option value="168">7 days</option>
+          </select>
+        </div>
+        <button class="primary-btn" onclick="generateShareLink()">Generate share link →</button>
+
+        <div class="share-link-box" id="shareLinkBox">
+          <div class="share-url" id="shareLinkUrl">—</div>
+          <button class="share-copy-btn" onclick="copyShareLink()">Copy link</button>
+        </div>
+      </div>
+
+      <div class="glass-card">
+        <div class="card-header">
+          <div class="card-title">Share history</div>
+          <div class="card-meta" id="shareHistoryCount">0 links generated</div>
+        </div>
+        <div id="shareHistoryList">
+          <div class="empty-timeline">
+            <div class="empty-timeline-icon">↗</div>
+            <div class="empty-timeline-title">No links generated yet</div>
+            <div class="empty-timeline-sub">Generate your first share link above.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───── SETTINGS PANEL ───── -->
+    <div class="panel" id="panel-settings">
+      <div class="page-eyebrow">Aura · Account</div>
+      <div class="page-title">Settings.</div>
+
+      <div class="glass-card" style="max-width: 560px; margin-bottom: 1.5rem;">
+        <div class="card-title" style="margin-bottom: 1.2rem;">API configuration</div>
+        <div class="form-group">
+          <label>Backend API URL</label>
+          <input type="text" id="settingsApiUrl" placeholder="https://your-api.onrender.com">
+        </div>
+        <div class="form-group">
+          <label>Supabase project URL</label>
+          <input type="text" id="settingsSbUrl" placeholder="https://xxxx.supabase.co">
+        </div>
+        <div class="form-group">
+          <label>Supabase anon key</label>
+          <input type="text" id="settingsSbKey" placeholder="eyJ...">
+        </div>
+        <button class="primary-btn" onclick="saveSettings()">Save settings</button>
+      </div>
+
+      <div class="glass-card" style="max-width: 560px;">
+        <div class="card-title" style="margin-bottom: 1rem;">Account</div>
+        <div style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1.2rem; line-height: 1.7;">
+          Signed in as <span style="color: var(--text-main); font-weight: 700;" id="settingsEmail">—</span>
+        </div>
+        <button class="primary-btn" style="background: var(--red-bg); color: var(--red);" onclick="handleLogout()">Log out</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────
+let AURA_API_URL    = localStorage.getItem('aura_api_url')    || 'https://your-api.onrender.com/api/aura';
+let SUPABASE_URL_VAL = localStorage.getItem('aura_sb_url')    || 'YOUR_AURA_SUPABASE_PROJECT_URL';
+let SUPABASE_KEY_VAL = localStorage.getItem('aura_sb_key')    || 'YOUR_AURA_SUPABASE_ANON_KEY';
+
+const supabaseClient = (SUPABASE_URL_VAL.startsWith('http'))
+  ? window.supabase.createClient(SUPABASE_URL_VAL, SUPABASE_KEY_VAL)
+  : null;
+
+// ── STATE ───────────────────────────────────────
+const state = {
+  user: null,
+  patientId: null,
+  credits: 0,
+  selectedSeverity: null,
+  entries: [],
+  documents: [],
+  medications: [],
+  delegates: [],
+  shareLinks: [],
+};
+
+// ── THEME ───────────────────────────────────────
+const html = document.documentElement;
+if (localStorage.getItem('aura_theme') === 'dark') {
+  html.setAttribute('data-theme', 'dark');
+  document.getElementById('themeIcon').innerText = '☀️';
+}
+function toggleTheme() {
+  if (html.getAttribute('data-theme') === 'dark') {
+    html.removeAttribute('data-theme');
+    document.getElementById('themeIcon').innerText = '🌙';
+    localStorage.setItem('aura_theme', 'light');
+  } else {
+    html.setAttribute('data-theme', 'dark');
+    document.getElementById('themeIcon').innerText = '☀️';
+    localStorage.setItem('aura_theme', 'dark');
+  }
+}
+
+// ── PANEL SWITCHING ─────────────────────────────
+function switchPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+  document.getElementById('panel-' + name)?.classList.add('active');
+  document.querySelector(`[data-panel="${name}"]`)?.classList.add('active');
+  window.scrollTo(0, 0);
+
+  if (name === 'documents' && !state.documents.length) loadDocuments();
+  if (name === 'medications' && !state.medications.length) loadMedications();
+  if (name === 'delegates' && !state.delegates.length) loadDelegates();
+  if (name === 'share') { loadShareHistory(); document.getElementById('shareCreditsLeft').textContent = state.credits; }
+}
+
+// ── TOAST ───────────────────────────────────────
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ── AUTH HELPERS ────────────────────────────────
+async function getAuthHeaders() {
+  if (!supabaseClient) return null;
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) { showToast('Session expired. Please log in again.', 'error'); return null; }
+  return { 'Authorization': `Bearer ${session.access_token}`, 'Content-Type': 'application/json' };
+}
+
+async function apiCall(path, options = {}) {
+  const headers = await getAuthHeaders();
+  if (!headers && supabaseClient) return null;
+  try {
+    const res = await fetch(`${AURA_API_URL}${path}`, { ...options, headers: { ...headers, ...(options.headers||{}) } });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Request failed' }));
+      throw new Error(err.detail || 'Request failed');
+    }
+    return await res.json();
+  } catch (e) {
+    if (!supabaseClient) return null; // demo mode — fall through silently
+    showToast(e.message, 'error');
+    return null;
+  }
+}
+
+// ── INIT / LOAD USER ────────────────────────────
+async function loadUserData() {
+  if (!supabaseClient) {
+    state.user = { id: 'demo-patient', email: 'patient@example.com' };
+    state.patientId = state.user.id;
+    state.credits = 10;
+    applyUserUI();
+    renderCredits();
+    showToast('Demo mode — connect Supabase in Settings', 'warn');
+    return;
+  }
+
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) { window.location.href = '/ventures/aura/'; return; }
+
+  state.user = session.user;
+  state.patientId = session.user.id;
+
+  applyUserUI();
+  renderCredits();
+}
+
+function applyUserUI() {
+  const email = state.user?.email || 'patient@example.com';
+  const initial = email[0].toUpperCase();
+  document.getElementById('userInitial').textContent = initial;
+  document.getElementById('settingsEmail').textContent = email;
+  document.getElementById('timelineGreeting').textContent = 'Your health timeline.';
+}
+
+function renderCredits() {
+  document.getElementById('navCredits').textContent = state.credits;
+  const left = document.getElementById('shareCreditsLeft');
+  if (left) left.textContent = state.credits;
+}
+
+// ── SEVERITY SELECTOR ───────────────────────────
+function selectSeverity(val) {
+  state.selectedSeverity = (state.selectedSeverity === val) ? null : val;
+  document.querySelectorAll('.severity-btn').forEach(b => {
+    b.classList.toggle('selected', parseInt(b.dataset.val) === state.selectedSeverity);
+  });
+}
+
+// ── TIMELINE ─────────────────────────────────────
+async function loadTimeline() {
+  const data = await apiCall(`/timeline?patient_id=${state.patientId}&limit=100`);
+  if (data) { state.entries = data; renderTimeline(); }
+}
+
+function severityClass(sev) {
+  if (!sev) return '';
+  if (sev <= 3) return 'severity-low';
+  if (sev <= 6) return 'severity-mid';
+  return 'severity-high';
+}
+function severityLabel(sev) {
+  if (!sev) return '';
+  if (sev <= 3) return 'Mild';
+  if (sev <= 6) return 'Moderate';
+  return 'Severe';
+}
+
+function groupBySession(entries) {
+  const groups = {};
+  const order = [];
+  entries.forEach(e => {
+    if (!groups[e.session_id]) { groups[e.session_id] = []; order.push(e.session_id); }
+    groups[e.session_id].push(e);
+  });
+  return order.map(sid => ({ session_id: sid, entries: groups[sid] }));
+}
+
+function renderTimeline() {
+  const feed = document.getElementById('timelineFeed');
+  document.getElementById('entryCount').textContent = state.entries.length + ' entries';
+
+  if (!state.entries.length) {
+    feed.innerHTML = `<div class="empty-timeline">
+      <div class="empty-timeline-icon">◷</div>
+      <div class="empty-timeline-title">Nothing logged yet</div>
+      <div class="empty-timeline-sub">Use the panel on the right to log how you're feeling. Everything you write builds your lifetime record.</div>
+    </div>`;
+    return;
+  }
+
+  const groups = groupBySession(state.entries);
+  const now = Date.now();
+
+  feed.innerHTML = groups.map(g => {
+    const latest = new Date(g.entries[0].logged_at);
+    const isClosed = (now - latest.getTime()) > (15 * 24 * 60 * 60 * 1000);
+    const first = new Date(g.entries[g.entries.length - 1].logged_at);
+    const rangeLabel = first.toDateString() === latest.toDateString()
+      ? latest.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+      : `${first.toLocaleDateString('en-IN',{day:'numeric',month:'short'})} – ${latest.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}`;
+
+    return `
+      <div class="session-group">
+        <div class="session-header">
+          <div class="session-dot ${isClosed ? 'closed' : ''}"></div>
+          <div class="session-title">${rangeLabel}</div>
+          <div class="session-range">${g.entries.length} ${g.entries.length===1?'entry':'entries'}${isClosed ? ' · closed' : ' · active'}</div>
+        </div>
+        ${g.entries.map(e => `
+          <div class="entry-card">
+            <div class="entry-top">
+              <div class="entry-text">${escapeHtml(e.symptom_text)}</div>
+              <div class="entry-time">${new Date(e.logged_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</div>
+            </div>
+            <div class="entry-meta">
+              ${e.severity ? `<span class="severity-pill ${severityClass(e.severity)}">${severityLabel(e.severity)}</span>` : ''}
+              ${(e.tags||[]).map(t => `<span class="tag-pill">${escapeHtml(t)}</span>`).join('')}
+              ${e.logged_by !== state.patientId ? `<span class="logged-by-tag">logged by delegate</span>` : ''}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }).join('');
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+async function submitLogEntry() {
+  const text = document.getElementById('symptomInput').value.trim();
+  if (!text) { showToast('Write something before logging', 'error'); return; }
+
+  const btn = document.getElementById('logSubmitBtn');
+  btn.disabled = true; btn.textContent = 'Logging...';
+
+  const payload = { patient_id: state.patientId, symptom_text: text, severity: state.selectedSeverity };
+
+  const result = supabaseClient
+    ? await apiCall('/timeline/log', { method: 'POST', body: JSON.stringify(payload) })
+    : simulateLocalEntry(payload);
+
+  if (result) {
+    state.entries.unshift(result);
+    renderTimeline();
+    document.getElementById('symptomInput').value = '';
+    state.selectedSeverity = null;
+    document.querySelectorAll('.severity-btn').forEach(b => b.classList.remove('selected'));
+    showToast('Added to your timeline', 'success');
+  }
+
+  btn.disabled = false; btn.textContent = 'Add to timeline →';
+}
+
+function simulateLocalEntry(payload) {
+  // Demo-mode fallback: replicate the 15-day session-gap logic client-side
+  const lastEntry = state.entries[0];
+  let sessionId;
+  if (lastEntry) {
+    const gapDays = (Date.now() - new Date(lastEntry.logged_at).getTime()) / 86400000;
+    sessionId = gapDays < 15 ? lastEntry.session_id : crypto.randomUUID();
+  } else {
+    sessionId = crypto.randomUUID();
+  }
+  return {
+    id: crypto.randomUUID(),
+    patient_id: payload.patient_id,
+    logged_by: state.patientId,
+    symptom_text: payload.symptom_text,
+    severity: payload.severity,
+    tags: null,
+    session_id: sessionId,
+    logged_at: new Date().toISOString(),
+  };
+}
+
+// ── DOCUMENTS ────────────────────────────────────
+async function loadDocuments() {
+  const data = await apiCall(`/documents?patient_id=${state.patientId}`);
+  if (data) { state.documents = data; renderDocuments(); }
+}
+
+function renderDocuments() {
+  const grid = document.getElementById('docGrid');
+  if (!state.documents.length) {
+    grid.innerHTML = `<div class="empty-timeline" style="grid-column:1/-1;">
+      <div class="empty-timeline-icon">⊡</div>
+      <div class="empty-timeline-title">Your cabinet is empty</div>
+      <div class="empty-timeline-sub">Upload your first prescription or report above.</div>
+    </div>`;
+    return;
+  }
+  grid.innerHTML = state.documents.map(d => `
+    <div class="doc-card">
+      <span class="doc-type-badge">${d.doc_type.replace('_',' ')}</span>
+      <div class="doc-name">${escapeHtml(d.notes || 'Document')}</div>
+      <div class="doc-date">${new Date(d.uploaded_at).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</div>
+    </div>
+  `).join('');
+}
+
+async function uploadDocument() {
+  const fileInput = document.getElementById('docFileInput');
+  const docType = document.getElementById('docTypeSelect').value;
+  const notes = document.getElementById('docNotesInput').value.trim();
+
+  if (!fileInput.files.length && supabaseClient) { showToast('Choose a file first', 'error'); return; }
+
+  // NOTE: actual file upload to Supabase Storage happens here in production —
+  // this demo assumes the frontend pushes to storage and gets back a public URL
+  // before calling /documents/upload with that file_url.
+  const fakeUrl = `https://storage.example.com/${state.patientId}/${Date.now()}.pdf`;
+
+  const payload = { patient_id: state.patientId, file_url: fakeUrl, doc_type: docType, notes: notes || null };
+  const result = supabaseClient
+    ? await apiCall('/documents/upload', { method: 'POST', body: JSON.stringify(payload) })
+    : { id: crypto.randomUUID(), ...payload, logged_by: state.patientId, uploaded_at: new Date().toISOString() };
+
+  if (result) {
+    state.documents.unshift(result);
+    renderDocuments();
+    document.getElementById('docNotesInput').value = '';
+    fileInput.value = '';
+    showToast('Document added to cabinet', 'success');
+  }
+}
+
+// ── MEDICATIONS ──────────────────────────────────
+async function loadMedications() {
+  const data = await apiCall(`/medications?patient_id=${state.patientId}`);
+  if (data) { state.medications = data; renderMedications(); }
+}
+
+function renderMedications() {
+  const list = document.getElementById('medList');
+  document.getElementById('medCount').textContent = state.medications.length + ' medications';
+
+  if (!state.medications.length) {
+    list.innerHTML = `<div class="empty-timeline">
+      <div class="empty-timeline-icon">⊕</div>
+      <div class="empty-timeline-title">No medications tracked</div>
+      <div class="empty-timeline-sub">Add what your doctor prescribed above.</div>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = state.medications.map(m => `
+    <div class="med-row">
+      <div class="med-check ${m.taken_today ? 'checked' : ''}" onclick="toggleMedTaken('${m.id}', ${!m.taken_today})">${m.taken_today ? '✓' : ''}</div>
+      <div class="med-info">
+        <div class="med-name">${escapeHtml(m.name)}</div>
+        <div class="med-dose">${escapeHtml(m.dosage || 'No dosage specified')}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function addMedication() {
+  const name = document.getElementById('medNameInput').value.trim();
+  const dosage = document.getElementById('medDosageInput').value.trim();
+  if (!name) { showToast('Enter a medicine name', 'error'); return; }
+
+  const payload = { patient_id: state.patientId, name, dosage: dosage || null };
+  const result = supabaseClient
+    ? await apiCall('/medications', { method: 'POST', body: JSON.stringify(payload) })
+    : { id: crypto.randomUUID(), ...payload, taken_today: false, created_at: new Date().toISOString() };
+
+  if (result) {
+    state.medications.unshift(result);
+    renderMedications();
+    document.getElementById('medNameInput').value = '';
+    document.getElementById('medDosageInput').value = '';
+    showToast('Medication added', 'success');
+  }
+}
+
+async function toggleMedTaken(id, newVal) {
+  const med = state.medications.find(m => m.id === id);
+  if (!med) return;
+  med.taken_today = newVal;
+  renderMedications();
+
+  if (supabaseClient) {
+    await apiCall(`/medications/mark-taken?patient_id=${state.patientId}`, {
+      method: 'PATCH', body: JSON.stringify({ medication_id: id, taken_today: newVal })
+    });
+  }
+}
+
+// ── DELEGATES ────────────────────────────────────
+async function loadDelegates() {
+  const data = await apiCall(`/delegates?patient_id=${state.patientId}`);
+  if (data) { state.delegates = data.filter(d => !d.revoked); renderDelegates(); }
+}
+
+function renderDelegates() {
+  const list = document.getElementById('delegateList');
+  document.getElementById('delegateListCount').textContent = state.delegates.length + ' people';
+  const badge = document.getElementById('delegateBadge');
+  if (state.delegates.length) { badge.style.display = ''; badge.textContent = state.delegates.length; }
+
+  if (!state.delegates.length) {
+    list.innerHTML = `<div class="empty-timeline">
+      <div class="empty-timeline-icon">⚿</div>
+      <div class="empty-timeline-title">No one else has access</div>
+      <div class="empty-timeline-sub">Only you can log and view this vault right now.</div>
+    </div>`;
+    return;
+  }
+
+  const levelLabels = { log_only: 'Log only', log_and_view: 'Log & view', manage_delegates: 'Full access' };
+
+  list.innerHTML = state.delegates.map(d => `
+    <div class="delegate-row">
+      <div class="delegate-avatar">${(d.delegate_user_id||'?')[0].toUpperCase()}</div>
+      <div class="delegate-info">
+        <div class="delegate-email">Delegate ${d.delegate_user_id.slice(0,8)}</div>
+        <div class="delegate-level">${levelLabels[d.permission_level] || d.permission_level}</div>
+      </div>
+      <button class="delegate-revoke" onclick="revokeDelegate('${d.id}')">Revoke</button>
+    </div>
+  `).join('');
+}
+
+async function createDelegateInvite() {
+  const email = document.getElementById('delegateEmailInput').value.trim();
+  const perm = document.getElementById('delegatePermSelect').value;
+  if (!email || !email.includes('@')) { showToast('Enter a valid email', 'error'); return; }
+
+  const payload = { patient_id: state.patientId, delegate_email: email, permission_level: perm };
+  const result = supabaseClient
+    ? await apiCall('/delegates/invite', { method: 'POST', body: JSON.stringify(payload) })
+    : { invite_token: 'demo-token-' + Date.now() };
+
+  if (result) {
+    const url = `https://shoonyaorigins.com/ventures/aura/accept-invite?token=${result.invite_token}`;
+    document.getElementById('inviteLinkUrl').textContent = url;
+    document.getElementById('inviteLinkBox').classList.add('visible');
+    document.getElementById('delegateEmailInput').value = '';
+    showToast('Invite link generated', 'success');
+  }
+}
+
+function copyInviteLink() {
+  const text = document.getElementById('inviteLinkUrl').textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('Invite link copied', 'success'));
+}
+
+async function revokeDelegate(id) {
+  if (supabaseClient) {
+    await apiCall(`/delegates/${id}?patient_id=${state.patientId}`, { method: 'DELETE' });
+  }
+  state.delegates = state.delegates.filter(d => d.id !== id);
+  renderDelegates();
+  showToast('Access revoked', 'success');
+}
+
+// ── SHARE LINKS ──────────────────────────────────
+async function loadShareHistory() {
+  const data = await apiCall(`/share?patient_id=${state.patientId}`);
+  if (data) { state.shareLinks = data; renderShareHistory(); }
+}
+
+function renderShareHistory() {
+  const list = document.getElementById('shareHistoryList');
+  document.getElementById('shareHistoryCount').textContent = state.shareLinks.length + ' links generated';
+
+  if (!state.shareLinks.length) {
+    list.innerHTML = `<div class="empty-timeline">
+      <div class="empty-timeline-icon">↗</div>
+      <div class="empty-timeline-title">No links generated yet</div>
+      <div class="empty-timeline-sub">Generate your first share link above.</div>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = state.shareLinks.map(s => {
+    const expired = new Date(s.expires_at) < new Date();
+    return `
+    <div class="delegate-row">
+      <div class="delegate-avatar">↗</div>
+      <div class="delegate-info">
+        <div class="delegate-email">${escapeHtml(s.recipient_label || 'Unlabeled share')}</div>
+        <div class="delegate-level">${expired ? 'Expired' : 'Active'} · expires ${new Date(s.expires_at).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function generateShareLink() {
+  if (state.credits <= 0) { showToast('Out of share credits', 'error'); return; }
+
+  const recipient = document.getElementById('shareRecipientInput').value.trim();
+  const expiry = parseInt(document.getElementById('shareExpirySelect').value);
+
+  const payload = {
+    patient_id: state.patientId,
+    recipient_label: recipient || null,
+    expires_in_hours: expiry,
+    include_documents: true, include_timeline: true, include_medications: true
+  };
+
+  const result = supabaseClient
+    ? await apiCall('/share/generate', { method: 'POST', body: JSON.stringify(payload) })
+    : { share_url: `https://shoonyaorigins.com/ventures/aura/shared/demo-${Date.now()}`, expires_at: new Date(Date.now()+expiry*3600000).toISOString() };
+
+  if (result) {
+    state.credits--;
+    renderCredits();
+    document.getElementById('shareLinkUrl').textContent = result.share_url;
+    document.getElementById('shareLinkBox').classList.add('visible');
+    document.getElementById('shareRecipientInput').value = '';
+    state.shareLinks.unshift({ recipient_label: recipient, expires_at: result.expires_at });
+    renderShareHistory();
+    showToast('Share link generated', 'success');
+  }
+}
+
+function copyShareLink() {
+  const text = document.getElementById('shareLinkUrl').textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('Link copied', 'success'));
+}
+
+// ── SETTINGS ─────────────────────────────────────
+function saveSettings() {
+  AURA_API_URL = document.getElementById('settingsApiUrl').value.trim() || AURA_API_URL;
+  SUPABASE_URL_VAL = document.getElementById('settingsSbUrl').value.trim() || SUPABASE_URL_VAL;
+  SUPABASE_KEY_VAL = document.getElementById('settingsSbKey').value.trim() || SUPABASE_KEY_VAL;
+  localStorage.setItem('aura_api_url', AURA_API_URL);
+  localStorage.setItem('aura_sb_url', SUPABASE_URL_VAL);
+  localStorage.setItem('aura_sb_key', SUPABASE_KEY_VAL);
+  showToast('Settings saved. Reload to apply.', 'success');
+}
+document.getElementById('settingsApiUrl').value = AURA_API_URL.includes('your-api') ? '' : AURA_API_URL;
+document.getElementById('settingsSbUrl').value = SUPABASE_URL_VAL.includes('YOUR_AURA') ? '' : SUPABASE_URL_VAL;
+document.getElementById('settingsSbKey').value = SUPABASE_KEY_VAL.includes('YOUR_AURA') ? '' : SUPABASE_KEY_VAL;
+
+// ── USER MENU ────────────────────────────────────
+document.getElementById('userMenuToggle').addEventListener('click', (e) => {
+  e.stopPropagation();
+  document.getElementById('userDropdown').classList.toggle('open');
+});
+document.addEventListener('click', () => document.getElementById('userDropdown').classList.remove('open'));
+
+async function handleLogout() {
+  if (supabaseClient) await supabaseClient.auth.signOut();
+  window.location.href = '/ventures/aura/';
+}
+
+// ── GLOBAL SEARCH ────────────────────────────────
+document.getElementById('globalSearch').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    const q = e.target.value.toLowerCase();
+    if (q.includes('doc') || q.includes('prescription') || q.includes('report')) switchPanel('documents');
+    else if (q.includes('med')) switchPanel('medications');
+    else if (q.includes('share') || q.includes('doctor')) switchPanel('share');
+    else if (q.includes('delegate') || q.includes('access') || q.includes('trust')) switchPanel('delegates');
+    else if (q.includes('setting')) switchPanel('settings');
+    else switchPanel('timeline');
+    e.target.value = '';
+  }
+});
+
+// ── INIT ─────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadUserData();
+  await loadTimeline();
+});
+</script>
+</body>
+</html>
