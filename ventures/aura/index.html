@@ -7,15 +7,16 @@
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-XV0W5ZV0RQ');
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura | Shoonya Origins</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Aura — Your Lifetime Health Vault | Shoonya Origins</title>
+    <meta name="description" content="Aura is a lifetime personal health vault — one place for every symptom, prescription and scan, sharpened by predictive AI, and shared only with who you choose. Built for patients, doctors and researchers.">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
     <style>
         :root {
             /* --- LIGHT THEME (DEFAULT) --- */
@@ -23,46 +24,38 @@
             --primary-light: #34d399;  /* Bright Mint */
             --primary-dark: #064e3b;   /* Deep Green Text */
             --accent: #f97316;         /* Safety Orange */
-            
-            /* Backgrounds */
-            --bg-main: #f0fdf4;        /* Very Light Mint Tint */
+
+            --bg-main: #f0fdf4;
             --glass-bg: rgba(255, 255, 255, 0.65);
             --glass-border: rgba(5, 150, 105, 0.2);
             --glass-hover: rgba(255, 255, 255, 0.85);
-            
-            /* Text */
+
             --text-main: #022c22;
             --text-muted: #374151;
-            
-            /* Blob Colors */
+
             --blob-1: rgba(52, 211, 153, 0.4);
             --blob-2: rgba(249, 115, 22, 0.15);
-            
-            /* Transitions */
+
             --transition-speed: 0.4s;
         }
 
-        /* --- DARK THEME OVERRIDES --- */
         [data-theme="dark"] {
-            --bg-main: #020617;        /* Deep Space Black/Green */
-            --glass-bg: rgba(15, 23, 42, 0.6); /* Dark Glass */
+            --bg-main: #020617;
+            --glass-bg: rgba(15, 23, 42, 0.6);
             --glass-border: rgba(52, 211, 153, 0.15);
             --glass-hover: rgba(30, 41, 59, 0.8);
-            
-            --text-main: #ecfdf5;      /* Mint White */
-            --text-muted: #94a3b8;     /* Slate Grey */
-            --primary-dark: #6ee7b7;   /* Light Emerald */
-            
+
+            --text-main: #ecfdf5;
+            --text-muted: #94a3b8;
+            --primary-dark: #6ee7b7;
+
             --blob-1: rgba(5, 150, 105, 0.25);
             --blob-2: rgba(249, 115, 22, 0.1);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        html { scroll-behavior: smooth; }
 
         body {
             background-color: var(--bg-main);
@@ -72,12 +65,14 @@
             transition: background-color var(--transition-speed), color var(--transition-speed);
         }
 
+        em, .serif { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; }
+
         /* --- ANIMATED AMBIENT FLOW --- */
         .ambient-flow {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1;
-            background: 
+            background:
                 radial-gradient(at 0% 0%, var(--blob-1) 0px, transparent 50%),
                 radial-gradient(at 100% 0%, var(--blob-2) 0px, transparent 50%),
                 radial-gradient(at 100% 100%, var(--blob-1) 0px, transparent 50%),
@@ -86,18 +81,14 @@
             animation: breathe 10s ease-in-out infinite alternate;
             transition: background 1s ease;
         }
-
-        @keyframes breathe {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.1); }
-        }
+        @keyframes breathe { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
 
         /* --- NAVIGATION --- */
         nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 8%; /* Slightly tighter padding */
+            padding: 15px 6%;
             background: var(--glass-bg);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
@@ -106,16 +97,8 @@
             top: 0;
             z-index: 1000;
             transition: background var(--transition-speed), border-color var(--transition-speed);
+            gap: 1rem;
         }
-
-        .action-bar {
-           display: flex;
-           justify-content: center;
-           gap: 15px;
-           margin-bottom: 40px;
-           padding: 0 5%;
-           font-family: 'Courier New', Courier, monospace;
-          }
 
         .logo {
             font-size: 1.6rem;
@@ -124,36 +107,33 @@
             color: var(--text-main);
             text-decoration: none;
             transition: color var(--transition-speed);
+            flex-shrink: 0;
         }
         .logo span { color: var(--primary); }
 
-        /* NAV RIGHT CONTAINER (Stacks text and button) */
-        .nav-right {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 4px;
-        }
+        .nav-right { display: flex; align-items: center; gap: 0.9rem; flex-shrink: 0; }
 
         .brand-sub {
-            font-size: 0.85rem; 
-            font-weight: 700; 
-            color: var(--text-muted); 
-            opacity: 0.8;
-            letter-spacing: 0.5px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            opacity: 0.75;
+            letter-spacing: 0.4px;
+            text-decoration: none;
+            display: none;
         }
+        @media (min-width: 860px) { .brand-sub { display: inline; } }
 
-        /* COMPACT THEME TOGGLE */
         .theme-toggle {
             cursor: pointer;
             background: transparent;
             border: 1px solid var(--glass-border);
-            padding: 4px 12px;
+            padding: 8px 14px;
             border-radius: 20px;
             display: flex;
             align-items: center;
             gap: 6px;
-            font-size: 0.75rem; /* Smaller font */
+            font-size: 0.75rem;
             font-weight: 600;
             color: var(--text-muted);
             transition: 0.3s;
@@ -164,223 +144,422 @@
             border-color: var(--primary);
         }
 
+        .nav-link-btn {
+            background: transparent;
+            border: none;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 8px 6px;
+            transition: color 0.3s;
+        }
+        .nav-link-btn:hover { color: var(--primary); }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: #fff;
+            border: none;
+            padding: 11px 22px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 8px 20px rgba(5,150,105,0.25);
+            white-space: nowrap;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(5,150,105,0.35); }
+
+        .btn-ghost {
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            padding: 11px 22px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-ghost:hover { border-color: var(--primary); color: var(--primary); background: var(--glass-hover); }
+
         /* --- HERO --- */
         .hero {
             text-align: center;
-            padding: 80px 5% 60px;
+            padding: 90px 5% 40px;
+            max-width: 900px;
+            margin: 0 auto;
         }
-
-        .hero h1 {
-            font-size: clamp(2.5rem, 5vw, 4.5rem);
+        .eyebrow {
+            font-size: 0.7rem;
             font-weight: 800;
-            line-height: 1.1;
-            margin-bottom: 1.5rem;
-            color: var(--text-main);
-            transition: color var(--transition-speed);
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 1.2rem;
         }
-
-        .hero p {
+        .hero h1 {
+            font-size: clamp(2.4rem, 5.4vw, 4.2rem);
+            font-weight: 800;
+            line-height: 1.08;
+            margin-bottom: 1.4rem;
+            color: var(--text-main);
+            letter-spacing: -1px;
+        }
+        .hero p.lead {
             font-size: 1.2rem;
             color: var(--text-muted);
-            max-width: 650px;
-            margin: 0 auto;
-            transition: color var(--transition-speed);
+            max-width: 640px;
+            margin: 0 auto 2.2rem;
+            line-height: 1.6;
         }
+        .hero-ctas {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 1.4rem;
+        }
+        .hero-ctas .btn-primary { padding: 15px 30px; font-size: 0.9rem; }
+        .hero-ctas .btn-ghost { padding: 15px 30px; font-size: 0.9rem; }
+        .hero-micro {
+            display: flex;
+            justify-content: center;
+            gap: 1.6rem;
+            flex-wrap: wrap;
+            font-size: 0.7rem;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        .hero-micro span::before { content: '✓ '; color: var(--primary); }
+
+        /* --- ORBIT SIGNATURE VISUAL --- */
+        .orbit-wrap { display: flex; justify-content: center; padding: 40px 5% 10px; }
+        .orbit-stage {
+            position: relative;
+            width: 480px;
+            height: 480px;
+            max-width: 92vw;
+            max-height: 92vw;
+        }
+        .orbit-core {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 132px; height: 132px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            display: flex; align-items: center; justify-content: center;
+            flex-direction: column;
+            color: #fff; text-align: center;
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.15) inset, 0 20px 50px rgba(5,150,105,0.35);
+            z-index: 5;
+            animation: corePulse 4s ease-in-out infinite;
+        }
+        @keyframes corePulse {
+            0%,100% { box-shadow: 0 0 0 1px rgba(255,255,255,0.15) inset, 0 20px 50px rgba(5,150,105,0.35); }
+            50% { box-shadow: 0 0 0 1px rgba(255,255,255,0.15) inset, 0 20px 65px rgba(5,150,105,0.5); }
+        }
+        .orbit-core-label { font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase; opacity: 0.85; }
+        .orbit-core-title { font-size: 1.05rem; font-weight: 800; margin-top: 2px; }
+
+        .orbit-ring {
+            position: absolute; top: 50%; left: 50%;
+            border: 1px dashed var(--glass-border);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .orbit-ring.inner { width: 300px; height: 300px; animation: spinCW 34s linear infinite; }
+        .orbit-ring.outer { width: 480px; height: 480px; animation: spinCCW 60s linear infinite; border-style: dotted; opacity: 0.7; }
+        @keyframes spinCW { from { transform: translate(-50%,-50%) rotate(0deg); } to { transform: translate(-50%,-50%) rotate(360deg); } }
+        @keyframes spinCCW { from { transform: translate(-50%,-50%) rotate(0deg); } to { transform: translate(-50%,-50%) rotate(-360deg); } }
+
+        .orbit-item {
+            position: absolute; top: 50%; left: 50%;
+            width: 0; height: 0;
+        }
+        .orbit-chip {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            padding: 6px 13px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--text-main);
+            white-space: nowrap;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+        }
+        .inner .orbit-chip { animation: spinCCW 34s linear infinite; color: var(--primary-dark); }
+        .outer .orbit-chip { animation: spinCW 60s linear infinite; font-size: 0.6rem; opacity: 0.85; }
+
+        @media (max-width: 620px) {
+            .orbit-ring.outer, .outer .orbit-chip { display: none; }
+            .orbit-stage { width: 320px; height: 320px; }
+            .orbit-ring.inner { width: 220px; height: 220px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .orbit-ring, .orbit-chip, .orbit-core { animation: none !important; }
+        }
+
+        /* --- SECTION SCAFFOLDING --- */
+        section.block { padding: 6.5rem 6% 5.5rem; }
+        .block-inner { max-width: 1200px; margin: 0 auto; }
+        .block-header { max-width: 680px; margin: 0 auto 3.2rem; text-align: center; }
+        .block-header .eyebrow { margin-bottom: 0.9rem; }
+        .block-title { font-size: clamp(1.9rem, 3.6vw, 2.6rem); font-weight: 800; letter-spacing: -0.5px; margin-bottom: 1rem; }
+        .block-sub { color: var(--text-muted); font-size: 1.02rem; line-height: 1.65; }
+        .divider-line { border-top: 1px solid var(--glass-border); }
 
         /* --- GRID SYSTEM --- */
         .grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 24px;
-            padding: 0 8% 100px;
-            max-width: 1400px;
-            margin: 0 auto;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 22px;
         }
+        .grid-5 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
 
         /* --- GLASS CARDS --- */
         .card {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 30px;
+            border-radius: 22px;
+            padding: 28px;
             text-decoration: none;
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 260px;
+            min-height: 230px;
             position: relative;
             overflow: hidden;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            color: inherit;
         }
-
         .card:hover {
             transform: translateY(-8px);
             background: var(--glass-hover);
             border-color: var(--primary);
             box-shadow: 0 15px 30px rgba(5, 150, 105, 0.15);
         }
-
-        .card h3 {
-            font-size: 1.4rem;
-            color: var(--text-main);
-            margin-bottom: 10px;
-            font-weight: 700;
-            transition: color var(--transition-speed);
-        }
-
-        .card p {
-            font-size: 0.95rem;
-            color: var(--text-muted);
-            line-height: 1.5;
-            transition: color var(--transition-speed);
-        }
-
+        .card-icon { font-size: 1.6rem; color: var(--primary); margin-bottom: 0.9rem; }
+        .card h3 { font-size: 1.28rem; color: var(--text-main); margin-bottom: 10px; font-weight: 700; }
+        .card p { font-size: 0.92rem; color: var(--text-muted); line-height: 1.55; }
         .card-num {
-            position: absolute;
-            bottom: -15px;
-            right: 15px;
-            font-size: 5rem;
-            font-weight: 900;
-            color: var(--primary);
-            opacity: 0.08;
-            pointer-events: none;
+            position: absolute; bottom: -15px; right: 15px;
+            font-size: 4.6rem; font-weight: 900; color: var(--primary);
+            opacity: 0.07; pointer-events: none;
         }
-
         .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 50px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            margin-bottom: 12px;
+            display: inline-block; padding: 4px 12px; border-radius: 50px;
+            font-size: 0.66rem; font-weight: 700; text-transform: uppercase; margin-bottom: 12px;
         }
-        .badge-beta {
-            background: rgba(249, 115, 22, 0.1);
-            color: var(--accent);
-            border: 1px solid rgba(249, 115, 22, 0.3);
-        }
-        .badge-live {
-            background: rgba(5, 150, 105, 0.1);
-            color: var(--primary);
-            border: 1px solid rgba(5, 150, 105, 0.3);
-        }
-
+        .badge-beta { background: rgba(249, 115, 22, 0.1); color: var(--accent); border: 1px solid rgba(249, 115, 22, 0.3); }
+        .badge-live { background: rgba(5, 150, 105, 0.1); color: var(--primary); border: 1px solid rgba(5, 150, 105, 0.3); }
         .link-text {
-            margin-top: 20px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: gap 0.2s;
+            margin-top: 18px; font-size: 0.86rem; font-weight: 700; color: var(--primary);
+            display: flex; align-items: center; gap: 6px; transition: gap 0.2s;
         }
         .card:hover .link-text { gap: 10px; }
 
-        /* --- CONTACT FORM SECTION --- */
-        .contact-section {
-            padding: 40px 8% 80px;
-            max-width: 800px;
-            margin: 0 auto;
+        /* --- STATEMENT / BRIDGE --- */
+        .statement-section { padding: 6rem 6%; }
+        .statement-inner {
+            max-width: 980px; margin: 0 auto;
+            display: grid; grid-template-columns: 200px 1fr; gap: 3rem; align-items: start;
         }
+        .statement-left .eyebrow { margin-bottom: 0.6rem; }
+        .statement-text { font-family: 'Instrument Serif', serif; font-size: clamp(1.5rem, 2.6vw, 2.1rem); line-height: 1.5; color: var(--text-main); }
+        .statement-text strong { color: var(--primary); font-weight: 600; }
+        @media (max-width: 760px) { .statement-inner { grid-template-columns: 1fr; gap: 1.2rem; } }
 
-        .form-card {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 40px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+        /* --- AUDIENCE CARDS --- */
+        .audience-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+        .audience-card {
+            background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 22px;
+            padding: 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); transition: 0.3s;
         }
+        .audience-card:hover { transform: translateY(-6px); border-color: var(--primary); }
+        .audience-tag { font-size: 0.66rem; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 800; color: var(--accent); margin-bottom: 0.7rem; }
+        .audience-card h3 { font-size: 1.35rem; margin-bottom: 0.7rem; font-weight: 700; }
+        .audience-card ul { list-style: none; margin-top: 1rem; }
+        .audience-card li { font-size: 0.88rem; color: var(--text-muted); padding: 6px 0 6px 22px; position: relative; line-height: 1.5; }
+        .audience-card li::before { content: '→'; position: absolute; left: 0; color: var(--primary); font-weight: 700; }
 
-        .form-card h2 {
-            color: var(--text-main);
-            margin-bottom: 10px;
-            font-size: 2rem;
+        /* --- SECURITY GRID --- */
+        .security-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+        .security-card {
+            background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 18px;
+            padding: 24px; transition: 0.3s;
         }
+        .security-card:hover { border-color: var(--primary); background: var(--glass-hover); }
+        .security-icon { font-size: 1.4rem; margin-bottom: 0.7rem; color: var(--primary); }
+        .security-card h4 { font-size: 1.02rem; margin-bottom: 0.5rem; font-weight: 700; }
+        .security-card p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.55; }
 
-        .form-group { margin-bottom: 20px; }
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--text-muted);
+        /* --- PRICING --- */
+        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
+        .price-card {
+            background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 22px;
+            padding: 32px; display: flex; flex-direction: column; transition: 0.3s;
         }
-        .form-group input, .form-group textarea, .form-group select {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid var(--glass-border);
-            background: rgba(255, 255, 255, 0.5);
-            color: var(--text-main);
-            font-family: inherit;
-            transition: 0.3s;
+        .price-card.highlight { border-color: var(--primary); box-shadow: 0 15px 40px rgba(5,150,105,0.15); position: relative; }
+        .price-card.highlight::before {
+            content: 'Most patients start here'; position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+            background: var(--primary); color: #fff; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.05em;
+            text-transform: uppercase; padding: 5px 14px; border-radius: 50px; white-space: nowrap;
         }
-        [data-theme="dark"] .form-group input, 
-        [data-theme="dark"] .form-group textarea, 
-        [data-theme="dark"] .form-group select {
-            background: rgba(0, 0, 0, 0.2);
+        .price-tier { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--primary); margin-bottom: 0.6rem; }
+        .price-card h3 { font-size: 1.7rem; font-weight: 800; margin-bottom: 0.3rem; }
+        .price-card .price-note { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.2rem; }
+        .price-card ul { list-style: none; flex: 1; margin-bottom: 1.4rem; }
+        .price-card li { font-size: 0.85rem; color: var(--text-muted); padding: 6px 0 6px 22px; position: relative; line-height: 1.5; }
+        .price-card li::before { content: '✓'; position: absolute; left: 0; color: var(--primary); font-weight: 700; }
+        .price-how {
+            margin-top: 2.5rem; background: var(--glass-bg); border: 1px solid var(--glass-border);
+            border-radius: 18px; padding: 24px 28px; font-size: 0.88rem; color: var(--text-muted); line-height: 1.7;
         }
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
-        }
+        .price-how strong { color: var(--text-main); }
 
-        .submit-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 14px 28px;
-            border-radius: 50px;
-            font-weight: 700;
-            cursor: pointer;
-            width: 100%;
-            transition: 0.3s;
-            font-size: 1rem;
+        /* --- FINAL CTA BAND --- */
+        .cta-band {
+            margin: 2rem 6% 6rem; padding: 4rem 3rem; text-align: center;
+            background: linear-gradient(135deg, rgba(5,150,105,0.08), rgba(52,211,153,0.05));
+            border: 1px solid var(--glass-border); border-radius: 32px;
         }
-        .submit-btn:hover {
-            background: var(--primary-light);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(5, 150, 105, 0.2);
-        }
+        .cta-band h2 { font-size: clamp(1.8rem, 3.4vw, 2.4rem); font-weight: 800; margin-bottom: 0.8rem; }
+        .cta-band p { color: var(--text-muted); margin-bottom: 1.8rem; max-width: 480px; margin-left: auto; margin-right: auto; }
 
         /* --- FOOTER --- */
-        footer {
-            text-align: center;
-            padding: 60px 8%;
-            border-top: 1px solid var(--glass-border);
-            background: rgba(255,255,255,0.02);
-        }
-
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-
-        .social-link {
-            text-decoration: none;
-            color: var(--text-muted);
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: color 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+        footer { text-align: center; padding: 60px 8%; border-top: 1px solid var(--glass-border); background: rgba(255,255,255,0.02); }
+        .social-links { display: flex; justify-content: center; gap: 30px; margin-bottom: 30px; }
+        .social-link { text-decoration: none; color: var(--text-muted); font-weight: 600; font-size: 0.9rem; transition: color 0.3s; text-transform: uppercase; letter-spacing: 1px; }
         .social-link:hover { color: var(--primary); }
-
-        .copyright {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            opacity: 0.7;
-        }
+        .copyright { color: var(--text-muted); font-size: 0.85rem; opacity: 0.7; }
 
         @media (max-width: 768px) {
-            .hero h1 { font-size: 2.5rem; }
+            .hero h1 { font-size: 2.3rem; }
+            .statement-section { padding: 4rem 6%; }
+            section.block { padding: 4.5rem 6% 4rem; }
+        }
+
+        /* ═══════════════════════════════════════════════
+           AUTH MODAL — Aura emerald-glass restyle of the
+           Raptor auth flow (login / signup / forgot / OTP)
+           ═══════════════════════════════════════════════ */
+        .auth-overlay {
+            position: fixed; inset: 0; z-index: 3000;
+            background: rgba(2, 44, 34, 0.55);
+            backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease;
+            padding: 20px;
+        }
+        .auth-overlay.active { opacity: 1; visibility: visible; }
+        .auth-modal {
+            width: 100%; max-width: 420px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 2.6rem 2.2rem 2.2rem;
+            position: relative;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.25);
+            max-height: 90vh; overflow-y: auto;
+            transform: translateY(16px) scale(0.98); transition: transform 0.3s ease;
+        }
+        .auth-overlay.active .auth-modal { transform: translateY(0) scale(1); }
+        [data-theme="dark"] .auth-modal { background: rgba(15, 23, 42, 0.85); }
+        .auth-close {
+            position: absolute; top: 1.2rem; right: 1.2rem;
+            width: 32px; height: 32px; border-radius: 50%;
+            border: 1px solid var(--glass-border); background: transparent;
+            color: var(--text-muted); cursor: pointer; font-size: 0.9rem;
+            display: flex; align-items: center; justify-content: center; transition: 0.3s;
+        }
+        .auth-close:hover { color: var(--primary); border-color: var(--primary); }
+
+        .auth-view { display: none; }
+        .auth-view.active { display: block; animation: fadeIn 0.35s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+        .auth-eyebrow { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: var(--primary); margin-bottom: 0.6rem; }
+        .auth-title { font-size: 1.7rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 0.5rem; color: var(--text-main); }
+        .auth-sub { font-size: 0.88rem; color: var(--text-muted); line-height: 1.55; margin-bottom: 1.6rem; }
+        .auth-sub strong { color: var(--text-main); }
+
+        .auth-error {
+            display: none; background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.25);
+            color: #dc2626; font-size: 0.8rem; padding: 10px 14px; border-radius: 12px; margin-bottom: 1.1rem; line-height: 1.4;
+        }
+        .auth-error.show { display: block; }
+
+        .auth-form { display: flex; flex-direction: column; gap: 1rem; }
+        .auth-field { display: flex; flex-direction: column; gap: 6px; }
+        .auth-label { font-size: 0.76rem; font-weight: 700; color: var(--text-muted); }
+        .auth-input {
+            padding: 12px 14px; border-radius: 12px; border: 1px solid var(--glass-border);
+            background: rgba(255,255,255,0.5); color: var(--text-main); font-family: inherit; font-size: 0.9rem;
+            transition: 0.3s; outline: none;
+        }
+        [data-theme="dark"] .auth-input { background: rgba(0,0,0,0.25); }
+        .auth-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(5,150,105,0.12); }
+        .auth-input::placeholder { color: var(--text-muted); opacity: 0.6; }
+
+        .auth-row-between { display: flex; justify-content: space-between; align-items: center; margin-top: -0.3rem; }
+        .auth-link { background: none; border: none; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); cursor: pointer; padding: 0; }
+        .auth-link.accent { color: var(--primary); }
+        .auth-link:hover { text-decoration: underline; }
+
+        .auth-submit {
+            margin-top: 0.4rem; background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: #fff; border: none; padding: 13px; border-radius: 12px; font-weight: 700; font-size: 0.9rem;
+            cursor: pointer; transition: 0.3s; box-shadow: 0 8px 20px rgba(5,150,105,0.25);
+        }
+        .auth-submit:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(5,150,105,0.35); }
+        .auth-submit:disabled { opacity: 0.6; cursor: default; transform: none; }
+
+        .auth-divider {
+            display: flex; align-items: center; gap: 12px; margin: 1.4rem 0;
+            font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;
+        }
+        .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--glass-border); }
+
+        .auth-google-btn {
+            width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;
+            padding: 12px; border-radius: 12px; border: 1px solid var(--glass-border);
+            background: rgba(255,255,255,0.4); color: var(--text-main); font-weight: 700; font-size: 0.86rem;
+            cursor: pointer; transition: 0.3s;
+        }
+        [data-theme="dark"] .auth-google-btn { background: rgba(255,255,255,0.04); }
+        .auth-google-btn:hover { border-color: var(--primary); background: var(--glass-hover); }
+        .auth-google-btn svg { width: 18px; height: 18px; }
+
+        .auth-switch { text-align: center; margin-top: 1.4rem; font-size: 0.84rem; color: var(--text-muted); }
+
+        .auth-back-row { display: flex; align-items: center; gap: 6px; margin-bottom: 1.2rem; cursor: pointer; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); transition: 0.2s; }
+        .auth-back-row:hover { color: var(--primary); }
+
+        .otp-row { display: flex; gap: 8px; justify-content: space-between; }
+        .otp-box {
+            width: 44px; height: 52px; text-align: center; font-size: 1.2rem; font-weight: 800;
+            border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.5);
+            color: var(--text-main); outline: none; transition: 0.3s;
+        }
+        [data-theme="dark"] .otp-box { background: rgba(0,0,0,0.25); }
+        .otp-box:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(5,150,105,0.12); }
+
+        .auth-success-icon {
+            width: 60px; height: 60px; border-radius: 50%; background: rgba(5,150,105,0.12);
+            color: var(--primary); font-size: 1.6rem; font-weight: 800;
+            display: flex; align-items: center; justify-content: center; margin: 0 auto 1.2rem;
         }
     </style>
 </head>
@@ -390,148 +569,545 @@
 
     <nav data-aos="fade-down" data-aos-duration="800">
         <a href="#" class="logo">Aura<span>.</span></a>
-        
+
         <div class="nav-right">
             <a href="https://shoonyaorigins.com/" class="brand-sub" target="_blank">Shoonya Origins</a>
+            <button class="nav-link-btn" data-open-auth="login">Log in</button>
+            <button class="btn-primary" data-open-auth="signup">Create your vault</button>
+            <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">
+                <span id="themeIcon">🌙</span>
+            </button>
         </div>
     </nav>
 
+    <!-- ═══════════════ HERO ═══════════════ -->
     <header class="hero" data-aos="fade-up" data-aos-duration="1000">
-        <h1>Making the <span style="color: var(--primary)">Invisible</span>, Visible.</h1>
-        <p>A unified health ecosystem powered by Data Science  and innovative techniques .</p>
+        <div class="eyebrow">Shoonya Origins · Aura</div>
+        <h1>Your health has a story.<br>Now it has a <span style="color: var(--primary)">home</span>.</h1>
+        <p class="lead">
+            Aura is a lifetime vault for every symptom, prescription, and scan — logged once,
+            kept forever, and read by <em>only</em> the people you choose. AI watches over it
+            quietly in the background, turning raw entries into <em>early warning</em>, not just archive.
+        </p>
+        <div class="hero-ctas">
+            <button class="btn-primary" data-open-auth="signup">Create your vault →</button>
+            <a href="#vault" class="btn-ghost">See how it works</a>
+        </div>
+        <div class="hero-micro">
+            <span>Free to start</span>
+            <span>Encrypted at rest &amp; in transit</span>
+            <span>You approve every share</span>
+        </div>
     </header>
 
-    <div class="action-bar" data-aos="fade-up" data-aos-delay="200">
-       <a href="tools/"  class ="theme-toggle" style="border-color: var(--accent); color: var(--accent);" target="_blank" , font-family: 'Courier New', Courier, monospace;>
-        <span style="font-size: large;">Free Diagnostics </span>
-       </a>
-   </div>
-    <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">
-                <span id="themeIcon">🌙</span> <span>Mode</span>
-            </button>
-
-    <section class="grid-container">
-
-        <a href="https://shoonyaorigins.com/ventures/aura/services/EVM.html" class="card" data-aos="fade-up" data-aos-delay="0">
-            <div class="card-num">01</div>
-            <div>
-                <span class="badge badge-beta">Beta &bull; In Prod</span>
-                <h3>EVM Technology</h3>
-                <p>Eulerian Video Magnification. Amplifying micro-movements to detect vitals from standard video.</p>
+    <!-- ═══════════════ ORBIT SIGNATURE VISUAL ═══════════════ -->
+    <div class="orbit-wrap" data-aos="zoom-in" data-aos-delay="200">
+        <div class="orbit-stage">
+            <div class="orbit-core">
+                <div class="orbit-core-label">The</div>
+                <div class="orbit-core-title">Vault</div>
             </div>
-            <div class="link-text">View Tech →</div>
-        </a>
-
-        <a href="https://shoonyaorigins.com/ventures/aura/services/prediction.html" class="card" data-aos="fade-up" data-aos-delay="100">
-            <div class="card-num">02</div>
-            <div>
-                <span class="badge badge-live">Live Models</span>
-                <h3>Predictive Health</h3>
-                <p>AI forecasting that identifies health risks and anomalies before they become physical symptoms.</p>
+            <div class="orbit-ring inner">
+                <!-- 5 pillar chips, 72° apart, radius 150px -->
+                <div class="orbit-item"><span class="orbit-chip" style="transform: rotate(0deg) translate(150px) translate(-50%,-50%);">◷ Timeline</span></div>
+                <div class="orbit-item"><span class="orbit-chip" style="transform: rotate(72deg) translate(150px) translate(-50%,-50%);">⊡ Documents</span></div>
+                <div class="orbit-item"><span class="orbit-chip" style="transform: rotate(144deg) translate(150px) translate(-50%,-50%);">⊕ Medications</span></div>
+                <div class="orbit-item"><span class="orbit-chip" style="transform: rotate(216deg) translate(150px) translate(-50%,-50%);">⚿ Delegates</span></div>
+                <div class="orbit-item"><span class="orbit-chip" style="transform: rotate(288deg) translate(150px) translate(-50%,-50%);">↗ Share</span></div>
             </div>
-            <div class="link-text">Explore Models →</div>
-        </a>
-
-        <a href="https://shoonyaorigins.com/ventures/aura/services/environment.html" class="card" data-aos="fade-up" data-aos-delay="200">
-            <div class="card-num">03</div>
-            <div>
-                <span class="badge badge-live">Live Data</span>
-                <h3>Environmental Intel</h3>
-                <p>Real-time AQI, pollution tracking, and surrounding hazard analysis.</p>
+            <div class="orbit-ring outer">
+                <!-- 8 intelligence tags, 45° apart, radius 240px -->
+                <div class="orbit-item"><span class="orbit-chip" style="transform: rotate(0deg) translate(240px) translate(-50%,-50%);">EVM Vitals</span></div>
+                <div class="orbit-item"><span class="orbit-chip" style="transform: rotate(45deg) translate(240px) translate(-50%,-50%);">Predictive Health</span></div>
+                <div class="orbit-item"><span class="orbit-chip" style="transform: rotate(90deg) translate(240px) translate(-50%,-50%);">Environmental Intel</span></div>
+                <div class="orbit-item"><span class="orbit-chip" style="transform: rotate(135deg) translate(240px) translate(-50%,-50%);">Nutrition AI</span></div>
+                <div class="orbit-item"><span class="orbit-chip" style="transform: rotate(180deg) translate(240px) translate(-50%,-50%);">Trainer AI</span></div>
+                <div class="orbit-item"><span class="orbit-chip" style="transform: rotate(225deg) translate(240px) translate(-50%,-50%);">Neonatal Care</span></div>
+                <div class="orbit-item"><span class="orbit-chip" style="transform: rotate(270deg) translate(240px) translate(-50%,-50%);">Elderly Care</span></div>
+                <div class="orbit-item"><span class="orbit-chip" style="transform: rotate(315deg) translate(240px) translate(-50%,-50%);">Mobile App</span></div>
             </div>
-            <div class="link-text">Check Surroundings →</div>
-        </a>
+        </div>
+    </div>
 
-        <a href="https://shoonyaorigins.com/ventures/aura/services/mobile.html" class="card" data-aos="fade-up" data-aos-delay="0">
-            <div class="card-num">04</div>
-            <div>
-                <h3>Aura Mobile App</h3>
-                <p>The central command hub. Monitor family health and receive alerts instantly.</p>
+    <!-- ═══════════════ TRUST MICRO-BAR ═══════════════ -->
+    <div class="divider-line" style="max-width:1200px; margin: 3rem auto 0;"></div>
+
+    <!-- ═══════════════ THE VAULT ═══════════════ -->
+    <section class="block" id="vault">
+        <div class="block-inner">
+            <div class="block-header" data-aos="fade-up">
+                <div class="eyebrow">The Foundation</div>
+                <h2 class="block-title">One vault. Everything that matters.</h2>
+                <p class="block-sub">Every visit, every prescription, every "it's probably nothing" moment — logged once, kept forever, and accessible to exactly the people who need it. No more repeating your history to a new doctor, or digging through old WhatsApp photos of reports.</p>
             </div>
-            <div class="link-text">Download →</div>
-        </a>
-
-        <a href="https://shoonyaorigins.com/ventures/aura/services/nutrition.html" class="card" data-aos="fade-up" data-aos-delay="100">
-            <div class="card-num">05</div>
-            <div>
-                <h3>Nutrition Analytics</h3>
-                <p>Calorie and micro-nutrient tracking via computer vision food recognition.</p>
-            </div>
-            <div class="link-text">Start Tracking →</div>
-        </a>
-
-        <a href="https://shoonyaorigins.com/ventures/aura/services/trainer.html" class="card" data-aos="fade-up" data-aos-delay="200">
-            <div class="card-num">06</div>
-            <div>
-                <h3>Personalized Trainer</h3>
-                <p>Real-time form correction and rep counting using camera-based pose estimation.</p>
-            </div>
-            <div class="link-text">Start Workout →</div>
-        </a>
-
-        <a href="https://shoonyaorigins.com/ventures/aura/services/neonatal.html" class="card" data-aos="fade-up" data-aos-delay="0">
-            <div class="card-num">07</div>
-            <div>
-                <span class="badge badge-live" style="border-color: var(--accent); color: var(--accent); background: rgba(249,115,22,0.1);">Sensor Fusion</span>
-                <h3>Neonatal Care</h3>
-                <p>Non-invasive monitoring for NICU. Combining thermal and optical sensors for zero-contact baby care.</p>
-            </div>
-            <div class="link-text">View Solutions →</div>
-        </a>
-
-        <a href="https://shoonyaorigins.com/ventures/aura/services/Elderly.html" class="card" data-aos="fade-up" data-aos-delay="100">
-            <div class="card-num">08</div>
-            <div>
-                <h3>Elderly Care</h3>
-                <p>Dedicated monitoring for Sleep Apnea, fall detection, and cardiac irregularities.</p>
-            </div>
-            <div class="link-text">View Solutions →</div>
-        </a>
-
-    </section>
-
-    <div class="action-bar" data-aos="fade-up" data-aos-delay="200">
-       <a href="https://shoonyaorigins.com/ventures/aura/charaka/"  class ="theme-toggle" style="border-color: var(--accent); color: var(--accent);" target="_blank" , font-family: 'Courier New', Courier, monospace;>
-        <span style="font-size: large;">Charaka  </span>
-       </a>
-   </div>
-
-    <section class="contact-section" data-aos="fade-up">
-        <div class="form-card">
-            <h2>Join the Health Revolution</h2>
-            <p style="color: var(--text-muted); margin-bottom: 30px;">Interested in piloting Aura technology? Get in touch.</p>
-            
-            <form>
-                <div class="form-group">
-                    <label>Name / Organization</label>
-                    <input type="text" placeholder="e.g. Acme Health or Dr. Smith" required>
+            <div class="grid-container grid-5">
+                <div class="card" data-aos="fade-up" data-aos-delay="0">
+                    <div>
+                        <div class="card-icon">◷</div>
+                        <h3>Timeline</h3>
+                        <p>A running log of symptoms and how they feel, grouped automatically into sessions so patterns are easy to spot.</p>
+                    </div>
+                    <div class="link-text">Log an entry →</div>
                 </div>
-                <div class="form-group">
-                    <label>Email Address</label>
-                    <input type="email" placeholder="you@domain.com" required>
+                <div class="card" data-aos="fade-up" data-aos-delay="80">
+                    <div>
+                        <div class="card-icon">⊡</div>
+                        <h3>Documents</h3>
+                        <p>Prescriptions, lab reports and scans — one cabinet instead of a dozen folders and screenshots.</p>
+                    </div>
+                    <div class="link-text">Upload a document →</div>
                 </div>
-                <div class="form-group">
-                    <label>Interest Area</label>
-                    <select>
-                        <option>General Inquiry</option>
-                        <option>EVM Licensing</option>
-                        <option>Hospital Partnership</option>
-                        <option>App Beta Access</option>
-                    </select>
+                <div class="card" data-aos="fade-up" data-aos-delay="160">
+                    <div>
+                        <div class="card-icon">⊕</div>
+                        <h3>Medications</h3>
+                        <p>Track what you're taking and whether you took it today — simple adherence, no missed doses.</p>
+                    </div>
+                    <div class="link-text">Add a medication →</div>
                 </div>
-                <button type="submit" class="submit-btn">Request Access</button>
-            </form>
+                <div class="card" data-aos="fade-up" data-aos-delay="240">
+                    <div>
+                        <div class="card-icon">⚿</div>
+                        <h3>Delegates</h3>
+                        <p>Give a parent, spouse or caregiver permission to log or view on your behalf — nothing more than they need.</p>
+                    </div>
+                    <div class="link-text">Invite a delegate →</div>
+                </div>
+                <div class="card" data-aos="fade-up" data-aos-delay="320">
+                    <div>
+                        <div class="card-icon">↗</div>
+                        <h3>Share</h3>
+                        <p>Generate a time-boxed, secure link so a doctor sees exactly what they need — nothing lives in their inbox forever.</p>
+                    </div>
+                    <div class="link-text">Generate a link →</div>
+                </div>
+            </div>
         </div>
     </section>
+
+    <!-- ═══════════════ STATEMENT / BRIDGE ═══════════════ -->
+    <div class="statement-section" data-aos="fade-up">
+        <div class="statement-inner">
+            <div class="statement-left">
+                <div class="eyebrow">The Difference</div>
+            </div>
+            <div>
+                <p class="statement-text">
+                    The Vault <strong>remembers</strong>. The Intelligence <strong>notices</strong>.
+                    <br><br>
+                    Every symptom you log, every scan you upload, every dose you mark taken — becomes
+                    raw material for models built to catch what a single visit would miss. The record
+                    gets richer with use, and the insight feeds straight back into the same timeline
+                    where it started.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ INTELLIGENCE LAYER ═══════════════ -->
+    <section class="block" style="background: var(--glass-bg); border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border);">
+        <div class="block-inner">
+            <div class="block-header" data-aos="fade-up">
+                <div class="eyebrow">Reading &amp; Writing To The Vault</div>
+                <h2 class="block-title">The Intelligence Layer</h2>
+                <p class="block-sub">A set of AI modules that watch, measure and predict — every reading writes straight into your vault, so nothing you learn about your body is ever a one-off.</p>
+            </div>
+
+            <div class="grid-container">
+                <a href="https://shoonyaorigins.com/ventures/aura/services/EVM.html" class="card" data-aos="fade-up" data-aos-delay="0">
+                    <div class="card-num">01</div>
+                    <div>
+                        <span class="badge badge-beta">Beta · In Prod</span>
+                        <h3>EVM Technology</h3>
+                        <p>Eulerian Video Magnification amplifies micro-movements to read vitals from standard video — every reading logs to your timeline automatically.</p>
+                    </div>
+                    <div class="link-text">View tech →</div>
+                </a>
+
+                <a href="https://shoonyaorigins.com/ventures/aura/services/prediction.html" class="card" data-aos="fade-up" data-aos-delay="80">
+                    <div class="card-num">02</div>
+                    <div>
+                        <span class="badge badge-live">Live Models</span>
+                        <h3>Predictive Health</h3>
+                        <p>AI forecasting that scans your vault history for risks and anomalies before they turn into symptoms worth logging.</p>
+                    </div>
+                    <div class="link-text">Explore models →</div>
+                </a>
+
+                <a href="https://shoonyaorigins.com/ventures/aura/services/environment.html" class="card" data-aos="fade-up" data-aos-delay="160">
+                    <div class="card-num">03</div>
+                    <div>
+                        <span class="badge badge-live">Live Data</span>
+                        <h3>Environmental Intel</h3>
+                        <p>Real-time AQI, pollution and hazard tracking, correlated against your own symptom timeline.</p>
+                    </div>
+                    <div class="link-text">Check surroundings →</div>
+                </a>
+
+                <a href="https://shoonyaorigins.com/ventures/aura/services/mobile.html" class="card" data-aos="fade-up" data-aos-delay="0">
+                    <div class="card-num">04</div>
+                    <div>
+                        <h3>Aura Mobile App</h3>
+                        <p>The central command hub — monitor family health, get alerts, and log entries the moment something happens.</p>
+                    </div>
+                    <div class="link-text">Download →</div>
+                </a>
+
+                <a href="https://shoonyaorigins.com/ventures/aura/services/nutrition.html" class="card" data-aos="fade-up" data-aos-delay="80">
+                    <div class="card-num">05</div>
+                    <div>
+                        <h3>Nutrition Analytics</h3>
+                        <p>Calorie and micro-nutrient tracking via computer-vision food recognition, feeding straight into your health record.</p>
+                    </div>
+                    <div class="link-text">Start tracking →</div>
+                </a>
+
+                <a href="https://shoonyaorigins.com/ventures/aura/services/trainer.html" class="card" data-aos="fade-up" data-aos-delay="160">
+                    <div class="card-num">06</div>
+                    <div>
+                        <h3>Personalized Trainer</h3>
+                        <p>Real-time form correction and rep counting via camera-based pose estimation — logged as part of your activity history.</p>
+                    </div>
+                    <div class="link-text">Start workout →</div>
+                </a>
+
+                <a href="https://shoonyaorigins.com/ventures/aura/services/neonatal.html" class="card" data-aos="fade-up" data-aos-delay="0">
+                    <div class="card-num">07</div>
+                    <div>
+                        <span class="badge badge-live" style="border-color: var(--accent); color: var(--accent); background: rgba(249,115,22,0.1);">Sensor Fusion</span>
+                        <h3>Neonatal Care</h3>
+                        <p>Non-invasive NICU monitoring combining thermal and optical sensors for zero-contact baby care, streamed into the family vault.</p>
+                    </div>
+                    <div class="link-text">View solutions →</div>
+                </a>
+
+                <a href="https://shoonyaorigins.com/ventures/aura/services/Elderly.html" class="card" data-aos="fade-up" data-aos-delay="80">
+                    <div class="card-num">08</div>
+                    <div>
+                        <h3>Elderly Care</h3>
+                        <p>Dedicated monitoring for sleep apnea, fall detection and cardiac irregularities, with alerts routed to trusted delegates.</p>
+                    </div>
+                    <div class="link-text">View solutions →</div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════ WHO IT'S FOR ═══════════════ -->
+    <section class="block">
+        <div class="block-inner">
+            <div class="block-header" data-aos="fade-up">
+                <div class="eyebrow">Built For Three Sides Of Care</div>
+                <h2 class="block-title">Patients. Doctors. Researchers.</h2>
+                <p class="block-sub">One vault, three very different ways in — each with only the access it needs.</p>
+            </div>
+            <div class="audience-grid">
+                <div class="audience-card" data-aos="fade-up" data-aos-delay="0">
+                    <div class="audience-tag">For Patients &amp; Families</div>
+                    <h3>Own your story.</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">Your history stops living across five different apps and a folder of loose PDFs.</p>
+                    <ul>
+                        <li>Log symptoms and severity in seconds</li>
+                        <li>Keep every prescription and report in one cabinet</li>
+                        <li>Give family caregivers scoped, revocable access</li>
+                    </ul>
+                </div>
+                <div class="audience-card" data-aos="fade-up" data-aos-delay="120">
+                    <div class="audience-tag">For Doctors &amp; Clinicians</div>
+                    <h3>See the whole picture, fast.</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">No portal login, no waiting on a WhatsApp forward.</p>
+                    <ul>
+                        <li>Open a secure, time-boxed share link — no account needed</li>
+                        <li>Review a full timeline instead of a single visit's context</li>
+                        <li>Access expires automatically, nothing lingers in your inbox</li>
+                    </ul>
+                </div>
+                <div class="audience-card" data-aos="fade-up" data-aos-delay="240">
+                    <div class="audience-tag">For Researchers &amp; Institutions</div>
+                    <h3>Signal, not spreadsheets.</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">Built around explicit, opt-in consent from day one.</p>
+                    <ul>
+                        <li>Aggregated, anonymised cohort insights — opt-in only</li>
+                        <li>Structured symptom and adherence data, not free-text notes</li>
+                        <li>No identifiable record leaves the vault without consent</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════ SECURITY & PRIVACY ═══════════════ -->
+    <section class="block" style="background: var(--glass-bg); border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border);">
+        <div class="block-inner">
+            <div class="block-header" data-aos="fade-up">
+                <div class="eyebrow">Trust, By Design</div>
+                <h2 class="block-title">Nothing leaves the vault without you.</h2>
+                <p class="block-sub">Aura is built on the same principle every time: the vault owner decides who sees what, and for how long.</p>
+            </div>
+            <div class="security-grid">
+                <div class="security-card" data-aos="fade-up" data-aos-delay="0">
+                    <div class="security-icon">🔒</div>
+                    <h4>Encrypted end to end</h4>
+                    <p>Data is encrypted both at rest and in transit, so a record in motion is as protected as one sitting in storage.</p>
+                </div>
+                <div class="security-card" data-aos="fade-up" data-aos-delay="60">
+                    <div class="security-icon">🧩</div>
+                    <h4>Row-level access control</h4>
+                    <p>Every record is scoped at the database level to its owner — not just hidden in the interface, but unreachable without permission.</p>
+                </div>
+                <div class="security-card" data-aos="fade-up" data-aos-delay="120">
+                    <div class="security-icon">⚿</div>
+                    <h4>Granular delegate permissions</h4>
+                    <p>Log-only, log &amp; view, or full access — you choose exactly how much a caregiver can see or do, and revoke it anytime.</p>
+                </div>
+                <div class="security-card" data-aos="fade-up" data-aos-delay="180">
+                    <div class="security-icon">↗</div>
+                    <h4>Time-boxed, credit-gated sharing</h4>
+                    <p>Doctor share links expire on their own and require a deliberate action to create — nothing is shared by default.</p>
+                </div>
+                <div class="security-card" data-aos="fade-up" data-aos-delay="240">
+                    <div class="security-icon">🛰️</div>
+                    <h4>Isolated by design</h4>
+                    <p>Aura runs on its own dedicated infrastructure, kept separate from every other Shoonya Origins venture — no shared data, no pooling.</p>
+                </div>
+                <div class="security-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="security-icon">🗂️</div>
+                    <h4>Anonymised by default for research</h4>
+                    <p>Any data used for aggregate insight is stripped of identity first, and only with your explicit opt-in.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════ PRICING / CREDITS ═══════════════ -->
+    <section class="block">
+        <div class="block-inner">
+            <div class="block-header" data-aos="fade-up">
+                <div class="eyebrow">Simple, Credit-Based</div>
+                <h2 class="block-title">Free to keep. Pay only to share.</h2>
+                <p class="block-sub">Building and maintaining your vault costs nothing. You spend credits only on the moment that actually leaves the vault — a secure share link to a doctor.</p>
+            </div>
+
+            <div class="pricing-grid">
+                <div class="price-card" data-aos="fade-up" data-aos-delay="0">
+                    <div class="price-tier">Vault</div>
+                    <h3>Free</h3>
+                    <div class="price-note">Forever, for your own record</div>
+                    <ul>
+                        <li>Unlimited timeline entries</li>
+                        <li>Unlimited document storage</li>
+                        <li>Medication tracking</li>
+                        <li>Add trusted delegates</li>
+                    </ul>
+                    <button class="btn-ghost" data-open-auth="signup">Create your vault</button>
+                </div>
+                <div class="price-card highlight" data-aos="fade-up" data-aos-delay="100">
+                    <div class="price-tier">Share Credits</div>
+                    <h3>Pay per share</h3>
+                    <div class="price-note">A starter grant, then top up as needed</div>
+                    <ul>
+                        <li>Each doctor share link uses 1 credit</li>
+                        <li>New vaults start with a free credit grant</li>
+                        <li>Set your own expiry — 24h, 48h or 7 days</li>
+                        <li>Revoke or let a link expire anytime</li>
+                    </ul>
+                    <button class="btn-primary" data-open-auth="signup">Get started</button>
+                </div>
+                <div class="price-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="price-tier">Family &amp; Clinic</div>
+                    <h3>Talk to us</h3>
+                    <div class="price-note">For multi-patient or institutional use</div>
+                    <ul>
+                        <li>Bulk credits for families and caregivers</li>
+                        <li>Institutional research partnerships</li>
+                        <li>Dedicated onboarding support</li>
+                    </ul>
+                    <a href="mailto:contact@shoonyaorigins.com" class="btn-ghost" style="text-align:center;">Contact us</a>
+                </div>
+            </div>
+
+            <div class="price-how" data-aos="fade-up">
+                <strong>How credits work:</strong> logging symptoms, uploading documents, tracking medications and inviting delegates are always free — that's your record, and it should never be metered. A credit is only spent the moment you generate a share link that hands a scoped view of your vault to someone outside it, like a doctor. That keeps the incentive honest: Aura earns from the act of sharing, never from the act of remembering.
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════ FINAL CTA ═══════════════ -->
+    <div class="cta-band" data-aos="fade-up">
+        <h2>Start your vault today.</h2>
+        <p>Two minutes to create. A lifetime to fill.</p>
+        <button class="btn-primary" data-open-auth="signup" style="padding: 16px 34px; font-size: 0.92rem;">Create your vault →</button>
+    </div>
+
+    <div class="block" style="padding: 0 6% 3rem; text-align:center;" data-aos="fade-up">
+        <a href="https://shoonyaorigins.com/ventures/aura/charaka/" class="btn-ghost" target="_blank" style="border-color: var(--accent); color: var(--accent);">Charaka</a>
+    </div>
 
     <footer>
         <div class="social-links">
             <a href="#" class="social-link">LinkedIn</a>
             <a href="#" class="social-link">Twitter / X</a>
-            <a href="#" class="social-link">Email Us</a>
+            <a href="mailto:contact@shoonyaorigins.com" class="social-link">Email Us</a>
         </div>
         <p class="copyright">&copy; 2026 Shoonya Origins. All systems operational.</p>
     </footer>
+
+    <!-- ═══════════════════════════════════════════════════
+         AUTH MODAL — all views live in the DOM, hidden via CSS,
+         swapped by JS (no page reload except after password reset)
+         Ported from the Raptor auth flow, restyled for Aura.
+         ═══════════════════════════════════════════════════ -->
+    <div class="auth-overlay" id="authOverlay">
+      <div class="auth-modal">
+        <button class="auth-close" id="authClose" aria-label="Close">✕</button>
+
+        <!-- VIEW 1: LOGIN -->
+        <div class="auth-view active" data-view="login">
+          <div class="auth-eyebrow">Shoonya Origins · Aura</div>
+          <h2 class="auth-title">Welcome back</h2>
+          <p class="auth-sub">Sign in to open your <strong>health vault</strong>.</p>
+
+          <div class="auth-error" id="loginError">Invalid email or password.</div>
+
+          <form class="auth-form" id="loginForm">
+            <div class="auth-field">
+              <label class="auth-label" for="loginEmail">Email</label>
+              <input class="auth-input" type="email" id="loginEmail" placeholder="you@example.com" required autocomplete="email">
+            </div>
+            <div class="auth-field">
+              <label class="auth-label" for="loginPassword">Password</label>
+              <input class="auth-input" type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+            </div>
+            <div class="auth-row-between">
+              <span></span>
+              <button type="button" class="auth-link accent" data-goto="forgot-email">Forgot password?</button>
+            </div>
+            <button type="submit" class="auth-submit" id="loginSubmitBtn">Log in</button>
+          </form>
+
+          <div class="auth-divider">Or</div>
+
+          <button class="auth-google-btn" id="googleLoginBtn">
+            <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+            Continue with Google
+          </button>
+
+          <p class="auth-switch">New to Aura? <button type="button" class="auth-link accent" data-goto="signup">Create your vault</button></p>
+        </div>
+
+        <!-- VIEW 2: SIGN UP -->
+        <div class="auth-view" data-view="signup">
+          <div class="auth-eyebrow">Shoonya Origins · Aura</div>
+          <h2 class="auth-title">Create your vault</h2>
+          <p class="auth-sub">Start your <strong>lifetime health record</strong> — free, forever.</p>
+
+          <div class="auth-error" id="signupError">Something went wrong. Please try again.</div>
+
+          <form class="auth-form" id="signupForm">
+            <div class="auth-field">
+              <label class="auth-label" for="signupName">Full name</label>
+              <input class="auth-input" type="text" id="signupName" placeholder="Your name" required autocomplete="name">
+            </div>
+            <div class="auth-field">
+              <label class="auth-label" for="signupEmail">Email</label>
+              <input class="auth-input" type="email" id="signupEmail" placeholder="you@example.com" required autocomplete="email">
+            </div>
+            <div class="auth-field">
+              <label class="auth-label" for="signupPassword">Password</label>
+              <input class="auth-input" type="password" id="signupPassword" placeholder="At least 8 characters" required minlength="8" autocomplete="new-password">
+            </div>
+            <button type="submit" class="auth-submit" id="signupSubmitBtn">Create account</button>
+          </form>
+
+          <div class="auth-divider">Or</div>
+
+          <button class="auth-google-btn" id="googleSignupBtn">
+            <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+            Continue with Google
+          </button>
+
+          <p class="auth-switch">Already have a vault? <button type="button" class="auth-link accent" data-goto="login">Log in</button></p>
+        </div>
+
+        <!-- VIEW 3: FORGOT PASSWORD — STEP 1: EMAIL -->
+        <div class="auth-view" data-view="forgot-email">
+          <div class="auth-back-row" data-goto="login"><span>← Back to login</span></div>
+          <div class="auth-eyebrow">Reset password</div>
+          <h2 class="auth-title">Forgot password?</h2>
+          <p class="auth-sub">Enter your email and we'll send a <strong>one-time code</strong> to verify it's you.</p>
+
+          <div class="auth-error" id="forgotEmailError">We couldn't find an account with that email.</div>
+
+          <form class="auth-form" id="forgotEmailForm">
+            <div class="auth-field">
+              <label class="auth-label" for="forgotEmail">Email</label>
+              <input class="auth-input" type="email" id="forgotEmail" placeholder="you@example.com" required autocomplete="email">
+            </div>
+            <button type="submit" class="auth-submit" id="forgotEmailSubmitBtn">Send OTP</button>
+          </form>
+        </div>
+
+        <!-- VIEW 4: FORGOT PASSWORD — STEP 2: OTP -->
+        <div class="auth-view" data-view="forgot-otp">
+          <div class="auth-back-row" data-goto="forgot-email"><span>← Back</span></div>
+          <div class="auth-eyebrow">Reset password</div>
+          <h2 class="auth-title">Enter code</h2>
+          <p class="auth-sub">We sent a 6-digit code to <strong id="otpEmailDisplay">your email</strong>.</p>
+
+          <div class="auth-error" id="otpError">Incorrect or expired code. Please try again.</div>
+
+          <form class="auth-form" id="otpForm">
+            <div class="auth-field">
+              <label class="auth-label">One-time code</label>
+              <div class="otp-row">
+                <input class="otp-box" type="text" inputmode="numeric" maxlength="1" data-otp-index="0" required>
+                <input class="otp-box" type="text" inputmode="numeric" maxlength="1" data-otp-index="1" required>
+                <input class="otp-box" type="text" inputmode="numeric" maxlength="1" data-otp-index="2" required>
+                <input class="otp-box" type="text" inputmode="numeric" maxlength="1" data-otp-index="3" required>
+                <input class="otp-box" type="text" inputmode="numeric" maxlength="1" data-otp-index="4" required>
+                <input class="otp-box" type="text" inputmode="numeric" maxlength="1" data-otp-index="5" required>
+              </div>
+            </div>
+            <div class="auth-row-between">
+              <span></span>
+              <button type="button" class="auth-link accent" id="resendOtpBtn">Resend code</button>
+            </div>
+            <button type="submit" class="auth-submit" id="otpSubmitBtn">Verify code</button>
+          </form>
+        </div>
+
+        <!-- VIEW 5: FORGOT PASSWORD — STEP 3: NEW PASSWORD -->
+        <div class="auth-view" data-view="forgot-newpass">
+          <div class="auth-eyebrow">Reset password</div>
+          <h2 class="auth-title">Set new password</h2>
+          <p class="auth-sub">Code verified. Choose a <strong>new password</strong> for your account.</p>
+
+          <div class="auth-error" id="newPassError">Passwords don't match or are too short.</div>
+
+          <form class="auth-form" id="newPassForm">
+            <div class="auth-field">
+              <label class="auth-label" for="newPassword">New password</label>
+              <input class="auth-input" type="password" id="newPassword" placeholder="At least 8 characters" required minlength="8" autocomplete="new-password">
+            </div>
+            <div class="auth-field">
+              <label class="auth-label" for="confirmPassword">Confirm password</label>
+              <input class="auth-input" type="password" id="confirmPassword" placeholder="Re-enter password" required minlength="8" autocomplete="new-password">
+            </div>
+            <button type="submit" class="auth-submit" id="newPassSubmitBtn">Update password</button>
+          </form>
+        </div>
+
+        <!-- VIEW 6: SUCCESS -->
+        <div class="auth-view" data-view="forgot-success">
+          <div style="text-align:center; padding: 1rem 0;">
+            <div class="auth-success-icon">✓</div>
+            <h2 class="auth-title" style="text-align:center;">Password updated</h2>
+            <p class="auth-sub" style="text-align:center; margin: 0 auto 2rem;">Reloading so you can log in with your <strong>new password</strong>...</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
@@ -541,7 +1117,7 @@
         const themeIcon = document.getElementById('themeIcon');
         const html = document.documentElement;
 
-        if (localStorage.getItem('theme') === 'dark') {
+        if (localStorage.getItem('aura_theme') === 'dark') {
             html.setAttribute('data-theme', 'dark');
             themeIcon.innerText = '☀️';
         }
@@ -550,13 +1126,312 @@
             if (html.getAttribute('data-theme') === 'dark') {
                 html.removeAttribute('data-theme');
                 themeIcon.innerText = '🌙';
-                localStorage.setItem('theme', 'light');
+                localStorage.setItem('aura_theme', 'light');
             } else {
                 html.setAttribute('data-theme', 'dark');
                 themeIcon.innerText = '☀️';
-                localStorage.setItem('theme', 'dark');
+                localStorage.setItem('aura_theme', 'dark');
             }
         }
+    </script>
+
+    <script>
+    // ═══════════════════════════════════════════════════
+    // SUPABASE CONFIG — Aura's own project (separate from
+    // every other Shoonya Origins venture). Shares the same
+    // localStorage keys as the dashboard's Settings panel,
+    // so a key saved there is picked up here too.
+    // ═══════════════════════════════════════════════════
+    const SUPABASE_URL = localStorage.getItem('aura_sb_url') || 'YOUR_AURA_SUPABASE_PROJECT_URL';
+    const SUPABASE_ANON_KEY = localStorage.getItem('aura_sb_key') || 'YOUR_AURA_SUPABASE_ANON_KEY';
+    const supabaseClient = (SUPABASE_URL.startsWith('http'))
+      ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+      : null;
+
+    // ═══════════════════════════════════════════════════
+    // AUTH MODAL LOGIC — ported from the Raptor auth flow.
+    // All views already exist in the DOM (hidden via CSS).
+    // This script only toggles which one is visible — no
+    // separate login.html, no page navigation.
+    // ═══════════════════════════════════════════════════
+    document.addEventListener('DOMContentLoaded', () => {
+      const overlay = document.getElementById('authOverlay');
+      const closeBtn = document.getElementById('authClose');
+      const views = document.querySelectorAll('.auth-view');
+
+      // Keep email between forgot-password steps without re-typing
+      let resetFlowEmail = '';
+
+      // ── Open / close modal ──
+      function openAuth(viewName = 'login') {
+        overlay.classList.add('active');
+        showView(viewName);
+        document.body.style.overflow = 'hidden';
+      }
+      function closeAuth() {
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+
+      // Any element with data-open-auth="login" / "signup" opens the modal on that view
+      document.querySelectorAll('[data-open-auth]').forEach(el => {
+        el.addEventListener('click', (e) => {
+          e.preventDefault();
+          openAuth(el.dataset.openAuth);
+        });
+      });
+
+      closeBtn.addEventListener('click', closeAuth);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) closeAuth(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && overlay.classList.contains('active')) closeAuth(); });
+
+      // ── Switch between views inside the modal ──
+      function showView(name) {
+        views.forEach(v => v.classList.toggle('active', v.dataset.view === name));
+        clearErrors();
+      }
+      function clearErrors() {
+        document.querySelectorAll('.auth-error').forEach(e => e.classList.remove('show'));
+      }
+      function showError(id, message) {
+        const el = document.getElementById(id);
+        if (message) el.textContent = message;
+        el.classList.add('show');
+      }
+
+      // Any element with data-goto="viewname" switches views (back links, switch links, etc.)
+      document.querySelectorAll('[data-goto]').forEach(el => {
+        el.addEventListener('click', () => showView(el.dataset.goto));
+      });
+
+      // ── OTP box behavior: auto-advance + backspace + paste ──
+      const otpBoxes = Array.from(document.querySelectorAll('.otp-box'));
+      otpBoxes.forEach((box, i) => {
+        box.addEventListener('input', () => {
+          box.value = box.value.replace(/[^0-9]/g, '').slice(0, 1);
+          if (box.value && otpBoxes[i + 1]) otpBoxes[i + 1].focus();
+        });
+        box.addEventListener('keydown', (e) => {
+          if (e.key === 'Backspace' && !box.value && otpBoxes[i - 1]) otpBoxes[i - 1].focus();
+        });
+        box.addEventListener('paste', (e) => {
+          e.preventDefault();
+          const digits = (e.clipboardData.getData('text') || '').replace(/[^0-9]/g, '').split('');
+          digits.forEach((d, idx) => { if (otpBoxes[i + idx]) otpBoxes[i + idx].value = d; });
+          const next = otpBoxes[i + digits.length] || otpBoxes[otpBoxes.length - 1];
+          next.focus();
+        });
+      });
+      function getOtpValue() {
+        return otpBoxes.map(b => b.value).join('');
+      }
+      function clearOtp() {
+        otpBoxes.forEach(b => b.value = '');
+        otpBoxes[0].focus();
+      }
+
+      // ── LOGIN ──
+      document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearErrors();
+        const btn = document.getElementById('loginSubmitBtn');
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+
+        btn.disabled = true; btn.textContent = 'Logging in...';
+
+        if (!supabaseClient) {
+          setTimeout(() => {
+            btn.disabled = false; btn.textContent = 'Log in';
+            showError('loginError', 'Supabase not configured yet — set SUPABASE_URL and SUPABASE_ANON_KEY (via Settings or localStorage) at the top of this script.');
+          }, 400);
+          return;
+        }
+
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        btn.disabled = false; btn.textContent = 'Log in';
+        if (error) { showError('loginError', error.message); return; }
+
+        window.location.href = 'dashboard.html';
+      });
+
+      // ── SIGN UP ──
+      document.getElementById('signupForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearErrors();
+        const btn = document.getElementById('signupSubmitBtn');
+        const name = document.getElementById('signupName').value.trim();
+        const email = document.getElementById('signupEmail').value.trim();
+        const password = document.getElementById('signupPassword').value;
+
+        btn.disabled = true; btn.textContent = 'Creating vault...';
+
+        if (!supabaseClient) {
+          setTimeout(() => {
+            btn.disabled = false; btn.textContent = 'Create account';
+            showError('signupError', 'Supabase not configured yet — set SUPABASE_URL and SUPABASE_ANON_KEY (via Settings or localStorage) at the top of this script.');
+          }, 400);
+          return;
+        }
+
+        const { data, error } = await supabaseClient.auth.signUp({
+          email, password,
+          options: {
+            data: { full_name: name },
+            // Only relevant if email confirmation is ON in Supabase --
+            // this is where Supabase sends the user after they click the
+            // confirmation link in their inbox. Must also be added to
+            // Supabase → Authentication → URL Configuration → Redirect URLs.
+            emailRedirectTo: window.location.origin + '/ventures/aura/dashboard.html'
+          }
+        });
+        btn.disabled = false; btn.textContent = 'Create account';
+        if (error) { showError('signupError', error.message); return; }
+
+        // If Supabase returned a live session, email confirmation is OFF
+        // for this project -- the account is immediately usable.
+        if (data.session) {
+          window.location.href = 'dashboard.html';
+          return;
+        }
+
+        // Otherwise email confirmation is ON: no session yet. Tell the
+        // user to check their inbox instead of bouncing to the dashboard.
+        showView('login');
+        showError('loginError', 'Vault created — check your inbox to confirm your email before logging in.');
+      });
+
+      // ── GOOGLE OAUTH (login + signup buttons both call this) ──
+      function googleAuth() {
+        if (!supabaseClient) {
+          console.warn('Supabase not configured yet — set SUPABASE_URL and SUPABASE_ANON_KEY at the top of this script.');
+          return;
+        }
+        supabaseClient.auth.signInWithOAuth({
+          provider: 'google',
+          options: { redirectTo: window.location.origin + '/ventures/aura/dashboard.html' }
+        });
+      }
+      document.getElementById('googleLoginBtn').addEventListener('click', googleAuth);
+      document.getElementById('googleSignupBtn').addEventListener('click', googleAuth);
+
+      // ── FORGOT PASSWORD — STEP 1: send OTP to email ──
+      document.getElementById('forgotEmailForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearErrors();
+        const btn = document.getElementById('forgotEmailSubmitBtn');
+        const email = document.getElementById('forgotEmail').value.trim();
+
+        btn.disabled = true; btn.textContent = 'Sending...';
+
+        if (!supabaseClient) {
+          setTimeout(() => {
+            resetFlowEmail = email;
+            document.getElementById('otpEmailDisplay').textContent = email;
+            clearOtp();
+            btn.disabled = false; btn.textContent = 'Send OTP';
+            showView('forgot-otp');
+          }, 400);
+          return;
+        }
+
+        // resetPasswordForEmail() is the correct, narrow call here: it
+        // issues an OTP whose only valid use is password recovery
+        // (type: 'recovery' below) — unlike signInWithOtp(), which would
+        // log the user straight in with full account access.
+        const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
+        btn.disabled = false; btn.textContent = 'Send OTP';
+        if (error) { showError('forgotEmailError', error.message); return; }
+
+        resetFlowEmail = email;
+        document.getElementById('otpEmailDisplay').textContent = email;
+        clearOtp();
+        showView('forgot-otp');
+      });
+
+      // ── FORGOT PASSWORD — STEP 2: verify OTP ──
+      document.getElementById('otpForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearErrors();
+        const btn = document.getElementById('otpSubmitBtn');
+        const code = getOtpValue();
+
+        if (code.length < 6) { showError('otpError', 'Please enter all 6 digits.'); return; }
+
+        btn.disabled = true; btn.textContent = 'Verifying...';
+
+        if (!supabaseClient) {
+          setTimeout(() => {
+            btn.disabled = false; btn.textContent = 'Verify code';
+            showView('forgot-newpass');
+          }, 400);
+          return;
+        }
+
+        const { data, error } = await supabaseClient.auth.verifyOtp({
+          email: resetFlowEmail, token: code, type: 'recovery'
+        });
+        btn.disabled = false; btn.textContent = 'Verify code';
+        if (error) { showError('otpError', error.message); clearOtp(); return; }
+
+        showView('forgot-newpass');
+      });
+
+      let resendCooldownActive = false;
+      document.getElementById('resendOtpBtn').addEventListener('click', () => {
+        if (resendCooldownActive) return;
+        if (!supabaseClient) { console.warn('Supabase not configured yet.'); clearOtp(); return; }
+        supabaseClient.auth.resetPasswordForEmail(resetFlowEmail);
+        clearOtp();
+
+        resendCooldownActive = true;
+        const btn = document.getElementById('resendOtpBtn');
+        const original = btn.textContent;
+        let seconds = 30;
+        btn.textContent = `Resend in ${seconds}s`;
+        const interval = setInterval(() => {
+          seconds--;
+          if (seconds <= 0) {
+            clearInterval(interval);
+            btn.textContent = original;
+            resendCooldownActive = false;
+          } else {
+            btn.textContent = `Resend in ${seconds}s`;
+          }
+        }, 1000);
+      });
+
+      // ── FORGOT PASSWORD — STEP 3: set new password, then reload ──
+      document.getElementById('newPassForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearErrors();
+        const btn = document.getElementById('newPassSubmitBtn');
+        const pass1 = document.getElementById('newPassword').value;
+        const pass2 = document.getElementById('confirmPassword').value;
+
+        if (pass1.length < 8 || pass1 !== pass2) {
+          showError('newPassError', 'Passwords must match and be at least 8 characters.');
+          return;
+        }
+
+        btn.disabled = true; btn.textContent = 'Updating...';
+
+        if (!supabaseClient) {
+          setTimeout(() => {
+            showView('forgot-success');
+            setTimeout(() => { window.location.reload(); }, 1500);
+          }, 400);
+          return;
+        }
+
+        const { error } = await supabaseClient.auth.updateUser({ password: pass1 });
+        btn.disabled = false; btn.textContent = 'Update password';
+        if (error) { showError('newPassError', error.message); return; }
+
+        showView('forgot-success');
+        setTimeout(() => { window.location.reload(); }, 1500);
+      });
+    });
     </script>
 
 </body>
