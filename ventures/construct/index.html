@@ -407,8 +407,8 @@
 // project exists. Replace both before going live; everything
 // below safely no-ops with a console warning until then.
 // ═══════════════════════════════════════════════════
-const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const SUPABASE_URL = 'https://gcebaoinxjqfuzqudubp.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjZWJhb2lueGpxZnV6cXVkdWJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4MjIyMTAsImV4cCI6MjA5ODM5ODIxMH0.pJm__HfJuOAzTl-m5J739mXNlLaPKaCeZdYmbFEs87o';
 const supabaseClient = (SUPABASE_URL.startsWith('http'))
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
   : null;
