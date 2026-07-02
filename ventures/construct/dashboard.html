@@ -356,9 +356,9 @@ body.dark-mode .db-tool-input { background: rgba(15,23,42,0.5); border-color: #3
 // CONFIG — placeholders until Construct's own Supabase
 // project + Render deployment exist. Matches index.html.
 // ═══════════════════════════════════════════════════
-let CONSTRUCT_API_URL = localStorage.getItem('construct_api_url') || 'https://your-construct-api.onrender.com';
-let SUPABASE_URL_VAL  = localStorage.getItem('construct_sb_url')  || 'YOUR_SUPABASE_PROJECT_URL';
-let SUPABASE_KEY_VAL  = localStorage.getItem('construct_sb_key')  || 'YOUR_SUPABASE_ANON_KEY';
+let CONSTRUCT_API_URL = localStorage.getItem('construct_api_url') || 'https://construct-backend-nkx2.onrender.com';
+let SUPABASE_URL_VAL  = localStorage.getItem('construct_sb_url')  || 'https://gcebaoinxjqfuzqudubp.supabase.co';
+let SUPABASE_KEY_VAL  = localStorage.getItem('construct_sb_key')  || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjZWJhb2lueGpxZnV6cXVkdWJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4MjIyMTAsImV4cCI6MjA5ODM5ODIxMH0.pJm__HfJuOAzTl-m5J739mXNlLaPKaCeZdYmbFEs87o';
 
 const supabaseClient = (SUPABASE_URL_VAL.startsWith('http'))
   ? window.supabase.createClient(SUPABASE_URL_VAL, SUPABASE_KEY_VAL)
