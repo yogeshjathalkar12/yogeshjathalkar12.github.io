@@ -684,8 +684,8 @@ nav {
 <script>
 // ── CONFIG ──────────────────────────────────────
 let AURA_API_URL    = localStorage.getItem('aura_api_url')    || 'https://your-api.onrender.com/api/aura';
-let SUPABASE_URL_VAL = localStorage.getItem('aura_sb_url')    || 'YOUR_AURA_SUPABASE_PROJECT_URL';
-let SUPABASE_KEY_VAL = localStorage.getItem('aura_sb_key')    || 'YOUR_AURA_SUPABASE_ANON_KEY';
+let SUPABASE_URL_VAL = localStorage.getItem('aura_sb_url')    || 'https://wguodgtcgyarugivowyl.supabase.co';
+let SUPABASE_KEY_VAL = localStorage.getItem('aura_sb_key')    || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndndW9kZ3RjZ3lhcnVnaXZvd3lsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4MjIzNjgsImV4cCI6MjA5ODM5ODM2OH0.UVBFAcGGNKQYBHLKJCDOcJ7NkgNbF23bkMpihIgJfvg';
 
 const supabaseClient = (SUPABASE_URL_VAL.startsWith('http'))
   ? window.supabase.createClient(SUPABASE_URL_VAL, SUPABASE_KEY_VAL)
