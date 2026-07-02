@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Construct Dashboard — Site Command Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════
+   DASHBOARD LAYOUT — reuses the exact :root tokens and
+   dark-mode variables already defined in style.css
+   ═══════════════════════════════════════════════════ */
+body.dashboard-body {
+  display: flex;
+  min-height: 100vh;
+  cursor: default;
+}
+
+.db-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--panel-bg);
+  border-right: 1px solid var(--glass-border);
+  padding: 2rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  overflow-y: auto;
+}
+.db-logo {
+  font-weight: 800;
+  font-size: 1.1rem;
+  letter-spacing: 0.02em;
+  color: var(--text-dark);
+  margin-bottom: 2.5rem;
+}
+.db-logo span { color: var(--safety-yellow); }
+
+.db-nav-group { margin-bottom: 2rem; }
+.db-nav-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  color: var(--text-light);
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+  padding: 0 0.6rem;
+}
+.db-nav-item {
+  display: flex; align-items: center; gap: 0.7rem;
+  padding: 0.7rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: var(--text-light);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 0.2rem;
+}
+.db-nav-item:hover { background: rgba(251,191,36,0.06); color: var(--text-dark); }
+.db-nav-item.active { background: rgba(251,191,36,0.1); color: var(--text-dark); font-weight: 700; }
+
+.db-plan-card {
+  margin-top: auto;
+  padding: 1rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  font-size: 0.7rem;
+}
+.db-plan-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+}
+.db-upgrade-btn {
+  width: 100%; margin-top: 0.8rem;
+  padding: 0.7rem; border: none; border-radius: 6px;
+  background: var(--safety-yellow); color: #000;
+  font-weight: 800; font-size: 0.65rem; letter-spacing: 0.1em;
+  text-transform: uppercase; cursor: pointer;
+}
+
+.db-main {
+  margin-left: 240px;
+  flex: 1;
+  padding: 2.5rem 3rem;
+  max-width: 1400px;
+}
+
+.db-topbar {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 2.5rem;
+}
+.db-greeting-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem; letter-spacing: 0.2em;
+  color: var(--safety-yellow); text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+.db-greeting { font-size: 1.8rem; font-weight: 800; color: var(--text-dark); }
+
+.db-credit-pill {
+  display: flex; align-items: center; gap: 0.8rem;
+  padding: 0.6rem 1.2rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 30px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+}
+.db-credit-pill .num { font-weight: 800; color: var(--safety-yellow); font-size: 1rem; }
+
+.db-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+.db-stat-card {
+  background: var(--panel-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  padding: 1.4rem;
+}
+.db-stat-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem; letter-spacing: 0.15em;
+  color: var(--text-light); text-transform: uppercase;
+  margin-bottom: 0.6rem;
+}
+.db-stat-value { font-size: 2rem; font-weight: 800; color: var(--text-dark); }
+
+.db-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem;
+}
+.db-tool-card {
+  background: var(--panel-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  padding: 1.8rem;
+}
+.db-tool-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.8rem; }
+.db-tool-title { font-size: 1.1rem; font-weight: 800; color: var(--text-dark); }
+.db-tool-cost {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--safety-yellow);
+  border: 1px solid rgba(251,191,36,0.3);
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.db-tool-desc { font-size: 0.78rem; color: var(--text-light); margin-bottom: 1.2rem; line-height: 1.6; }
+
+.db-tool-input {
+  width: 100%;
+  background: rgba(255,255,255,0.6);
+  border: 1px solid #ddd;
+  color: var(--text-dark);
+  padding: 0.7rem 0.9rem;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  margin-bottom: 0.7rem;
+  outline: none;
+}
+body.dark-mode .db-tool-input { background: rgba(15,23,42,0.5); border-color: #334155; color: white; }
+.db-tool-input:focus { border-color: var(--safety-yellow); }
+
+.db-file-input {
+  width: 100%;
+  border: 1px dashed var(--glass-border);
+  border-radius: 6px;
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--text-light);
+  margin-bottom: 0.7rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+  display: block;
+}
+.db-file-input:hover { border-color: var(--safety-yellow); }
+.db-file-input input[type="file"] { display: none; }
+.db-file-input.has-file { border-color: var(--safety-yellow); color: var(--text-dark); }
+
+.db-tool-btn {
+  width: 100%;
+  padding: 0.8rem;
+  background: var(--safety-yellow);
+  color: #000; font-weight: 800;
+  font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+  border: none; border-radius: 6px; cursor: pointer;
+  transition: all 0.2s ease;
+}
+.db-tool-btn:hover { background: #eab308; }
+.db-tool-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.db-tool-result {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  display: none;
+  white-space: pre-wrap;
+}
+.db-tool-result.show { display: block; }
+.db-tool-result.ok { background: rgba(16,185,129,0.07); border: 1px solid rgba(16,185,129,0.25); color: var(--text-dark); }
+.db-tool-result.error { background: rgba(220,38,38,0.06); border: 1px solid rgba(220,38,38,0.25); color: #dc2626; }
+
+.db-config-error {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+  background: #7f1d1d; color: #fff;
+  padding: 1rem 2rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem; letter-spacing: 0.05em;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .db-sidebar { display: none; }
+  .db-main { margin-left: 0; padding: 1.5rem; }
+  .db-stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .db-tools-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body class="dashboard-body">
+
+<aside class="db-sidebar">
+  <div class="db-logo">THE <span>CONSTRUCT</span></div>
+
+  <div class="db-nav-group">
+    <div class="db-nav-label">Overview</div>
+    <div class="db-nav-item active">Dashboard</div>
+    <div class="db-nav-item">Activity</div>
+  </div>
+
+  <div class="db-nav-group">
+    <div class="db-nav-label">Tools</div>
+    <div class="db-nav-item">SpecDiver</div>
+    <div class="db-nav-item">RiskRadar</div>
+    <div class="db-nav-item">OSHA Checklist</div>
+    <div class="db-nav-item">SiteLog Pro</div>
+  </div>
+
+  <div class="db-nav-group">
+    <div class="db-nav-label">Account</div>
+    <div class="db-nav-item">Credits & Plan</div>
+    <div class="db-nav-item">Settings</div>
+  </div>
+
+  <div class="db-plan-card">
+    <div class="db-plan-label">Free Plan</div>
+    <div style="color: var(--text-dark); font-weight: 700;">50 credits/mo</div>
+    <button class="db-upgrade-btn" id="upgradeBtn">Upgrade to Pro →</button>
+  </div>
+</aside>
+
+<main class="db-main">
+  <div class="db-topbar">
+    <div>
+      <div class="db-greeting-eyebrow">Shoonya Origins · The Construct</div>
+      <div class="db-greeting" id="dbGreeting">Welcome back.</div>
+    </div>
+    <div class="db-credit-pill">
+      <span>Available Credits</span>
+      <span class="num" id="statCredits">—</span>
+    </div>
+  </div>
+
+  <div class="db-stats-grid">
+    <div class="db-stat-card">
+      <div class="db-stat-label">Available Credits</div>
+      <div class="db-stat-value" id="cardCredits">—</div>
+    </div>
+    <div class="db-stat-card">
+      <div class="db-stat-label">Specs Analyzed</div>
+      <div class="db-stat-value" id="statSpecs">0</div>
+    </div>
+    <div class="db-stat-card">
+      <div class="db-stat-label">Contracts Scanned</div>
+      <div class="db-stat-value" id="statContracts">0</div>
+    </div>
+    <div class="db-stat-card">
+      <div class="db-stat-label">Reports Generated</div>
+      <div class="db-stat-value" id="statReports">0</div>
+    </div>
+  </div>
+
+  <div class="db-tools-grid">
+
+    <div class="db-tool-card">
+      <div class="db-tool-header">
+        <div class="db-tool-title">SpecDiver</div>
+        <div class="db-tool-cost">2 credits</div>
+      </div>
+      <div class="db-tool-desc">Upload a spec PDF and ask a question. SpecDiver finds the exact clause and page reference.</div>
+      <input type="text" class="db-tool-input" id="specQuestion" placeholder="e.g. What's the required fire rating for stairwell doors?">
+      <label class="db-file-input" id="specFileLabel">
+        <span id="specFileText">Click to upload PDF</span>
+        <input type="file" id="specFile" accept=".pdf">
+      </label>
+      <button class="db-tool-btn" id="specBtn">Run SpecDiver</button>
+      <div class="db-tool-result" id="specResult"></div>
+    </div>
+
+    <div class="db-tool-card">
+      <div class="db-tool-header">
+        <div class="db-tool-title">RiskRadar</div>
+        <div class="db-tool-cost">1 credit</div>
+      </div>
+      <div class="db-tool-desc">Scan a contract (PDF, DOCX, or TXT) for high-risk clauses — liquidated damages, indemnification, and more.</div>
+      <label class="db-file-input" id="riskFileLabel">
+        <span id="riskFileText">Click to upload contract</span>
+        <input type="file" id="riskFile" accept=".pdf,.docx,.txt">
+      </label>
+      <button class="db-tool-btn" id="riskBtn">Run RiskRadar</button>
+      <div class="db-tool-result" id="riskResult"></div>
+    </div>
+
+    <div class="db-tool-card">
+      <div class="db-tool-header">
+        <div class="db-tool-title">OSHA Checklist</div>
+        <div class="db-tool-cost">1 credit</div>
+      </div>
+      <div class="db-tool-desc">Describe a task and get a generated safety protocol checklist.</div>
+      <input type="text" class="db-tool-input" id="oshaTask" placeholder="e.g. Excavating a 6ft trench near a gas line">
+      <button class="db-tool-btn" id="oshaBtn">Generate Checklist</button>
+      <div class="db-tool-result" id="oshaResult"></div>
+    </div>
+
+    <div class="db-tool-card">
+      <div class="db-tool-header">
+        <div class="db-tool-title">SiteLog Pro</div>
+        <div class="db-tool-cost">1 credit</div>
+      </div>
+      <div class="db-tool-desc">Paste rough site notes — get back a professional daily log report.</div>
+      <input type="text" class="db-tool-input" id="sitelogNotes" placeholder="e.g. rain 2pm, electrician no-show, poured 50yd concrete north side">
+      <button class="db-tool-btn" id="sitelogBtn">Generate Report</button>
+      <div class="db-tool-result" id="sitelogResult"></div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+// ═══════════════════════════════════════════════════
+// CONFIG — placeholders until Construct's own Supabase
+// project + Render deployment exist. Matches index.html.
+// ═══════════════════════════════════════════════════
+let CONSTRUCT_API_URL = localStorage.getItem('construct_api_url') || 'https://your-construct-api.onrender.com';
+let SUPABASE_URL_VAL  = localStorage.getItem('construct_sb_url')  || 'YOUR_SUPABASE_PROJECT_URL';
+let SUPABASE_KEY_VAL  = localStorage.getItem('construct_sb_key')  || 'YOUR_SUPABASE_ANON_KEY';
+
+const supabaseClient = (SUPABASE_URL_VAL.startsWith('http'))
+  ? window.supabase.createClient(SUPABASE_URL_VAL, SUPABASE_KEY_VAL)
+  : null;
+
+const state = { user: null, credits: 0 };
+
+function showConfigError(message) {
+  const banner = document.createElement('div');
+  banner.className = 'db-config-error';
+  banner.textContent = '⚠ ' + message;
+  document.body.prepend(banner);
+}
+
+// Same pattern proven correct on Raptor: never fabricate a logged-in
+// user or fake credits if Supabase isn't configured -- fail visibly.
+async function loadUserData() {
+  if (!supabaseClient) {
+    showConfigError('Supabase is not configured. Set SUPABASE_URL_VAL / SUPABASE_KEY_VAL, then reload.');
+    return;
+  }
+
+  // Same fix as Raptor: wait for onAuthStateChange instead of a single
+  // getSession() call, so a user arriving via Google OAuth redirect
+  // (tokens still being parsed from the URL fragment) isn't wrongly
+  // bounced back to login by a premature null check.
+  const session = await new Promise((resolve) => {
+    const { data: { subscription } } = supabaseClient.auth.onAuthStateChange((event, session) => {
+      subscription.unsubscribe();
+      resolve(session);
+    });
+  });
+
+  if (!session) { window.location.href = '/ventures/construct/'; return; }
+  state.user = session.user;
+
+  const { data, error } = await supabaseClient
+    .from('construct_users')
+    .select('credits, total_credits, plan')
+    .eq('user_id', state.user.id)
+    .single();
+
+  if (!error && data) {
+    state.credits = data.credits ?? 50;
+  } else {
+    // First-time user row. SECURITY NOTE: only safe if construct_users
+    // RLS restricts INSERT/SELECT to auth.uid() = user_id -- verify
+    // this in Supabase before relying on it, same as Raptor's setup.
+    state.credits = 50;
+    await supabaseClient.from('construct_users').upsert({
+      user_id: state.user.id, email: state.user.email,
+      credits: 50, total_credits: 50, plan: 'Free'
+    });
+  }
+
+  const name = state.user.user_metadata?.full_name || state.user.email.split('@')[0];
+  document.getElementById('dbGreeting').textContent = 'Welcome back, ' + name + '.';
+  renderCredits();
+
+  supabaseClient.auth.onAuthStateChange((event) => {
+    if (event === 'SIGNED_OUT') window.location.href = '/ventures/construct/';
+  });
+}
+
+function renderCredits() {
+  document.getElementById('statCredits').textContent = state.credits;
+  document.getElementById('cardCredits').textContent = state.credits;
+}
+
+function syncCreditsFromServer(creditsLeft) {
+  if (typeof creditsLeft === 'number') { state.credits = creditsLeft; renderCredits(); }
+}
+
+async function getAuthHeader() {
+  if (!supabaseClient) return null;
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) {
+    window.location.href = '/ventures/construct/';
+    return null;
+  }
+  return { 'Authorization': `Bearer ${session.access_token}` };
+  // NOTE: deliberately no 'Content-Type' here -- tools using FormData
+  // (SpecDiver, RiskRadar) need the browser to set the multipart
+  // boundary itself. Tool calls using JSON bodies add their own
+  // Content-Type at the call site instead.
+}
+
+function handleUnauthorized() {
+  if (supabaseClient) supabaseClient.auth.signOut();
+  window.location.href = '/ventures/construct/';
+}
+
+// ── File input UX: show selected filename ──
+function wireFileInput(inputId, labelId, textId, defaultText) {
+  const input = document.getElementById(inputId);
+  const label = document.getElementById(labelId);
+  const text = document.getElementById(textId);
+  input.addEventListener('change', () => {
+    if (input.files[0]) {
+      text.textContent = input.files[0].name;
+      label.classList.add('has-file');
+    } else {
+      text.textContent = defaultText;
+      label.classList.remove('has-file');
+    }
+  });
+}
+wireFileInput('specFile', 'specFileLabel', 'specFileText', 'Click to upload PDF');
+wireFileInput('riskFile', 'riskFileLabel', 'riskFileText', 'Click to upload contract');
+
+function showResult(id, text, isError) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = 'db-tool-result show ' + (isError ? 'error' : 'ok');
+}
+
+// ── SpecDiver ──
+document.getElementById('specBtn').addEventListener('click', async () => {
+  const question = document.getElementById('specQuestion').value.trim();
+  const file = document.getElementById('specFile').files[0];
+  if (!question) { showResult('specResult', 'Enter a question first.', true); return; }
+  if (!file) { showResult('specResult', 'Upload a PDF first.', true); return; }
+
+  const btn = document.getElementById('specBtn');
+  btn.disabled = true; btn.textContent = 'Analyzing...';
+
+  const headers = await getAuthHeader();
+  if (!headers) { btn.disabled = false; btn.textContent = 'Run SpecDiver'; return; }
+
+  const formData = new FormData();
+  formData.append('question', question);
+  formData.append('file', file);
+
+  try {
+    const res = await fetch(`${CONSTRUCT_API_URL}/api/construct/spec-diver`, {
+      method: 'POST', headers, body: formData
+    });
+    if (res.status === 401) { handleUnauthorized(); return; }
+    if (res.status === 402) { showResult('specResult', 'Out of credits. Upgrade to Pro to continue.', true); btn.disabled=false; btn.textContent='Run SpecDiver'; return; }
+    if (!res.ok) { const err = await res.json().catch(()=>({})); throw new Error(err.detail || 'Request failed'); }
+
+    const json = await res.json();
+    syncCreditsFromServer(json.credits_left);
+    showResult('specResult', `${json.answer}\n\nReference: ${json.page_reference}`, false);
+    document.getElementById('statSpecs').textContent = (parseInt(document.getElementById('statSpecs').textContent) || 0) + 1;
+  } catch (err) {
+    showResult('specResult', 'Could not reach the server: ' + err.message, true);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Run SpecDiver';
+  }
+});
+
+// ── RiskRadar ──
+document.getElementById('riskBtn').addEventListener('click', async () => {
+  const file = document.getElementById('riskFile').files[0];
+  if (!file) { showResult('riskResult', 'Upload a contract first.', true); return; }
+
+  const btn = document.getElementById('riskBtn');
+  btn.disabled = true; btn.textContent = 'Scanning...';
+
+  const headers = await getAuthHeader();
+  if (!headers) { btn.disabled = false; btn.textContent = 'Run RiskRadar'; return; }
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const res = await fetch(`${CONSTRUCT_API_URL}/api/construct/risk-radar`, {
+      method: 'POST', headers, body: formData
+    });
+    if (res.status === 401) { handleUnauthorized(); return; }
+    if (res.status === 402) { showResult('riskResult', 'Out of credits. Upgrade to Pro to continue.', true); btn.disabled=false; btn.textContent='Run RiskRadar'; return; }
+    if (!res.ok) { const err = await res.json().catch(()=>({})); throw new Error(err.detail || 'Request failed'); }
+
+    const json = await res.json();
+    syncCreditsFromServer(json.credits_left);
+    const risksText = json.risks_found.map(r => `[${r.severity}] ${r.type}: ${r.description}`).join('\n');
+    showResult('riskResult', risksText, false);
+    document.getElementById('statContracts').textContent = (parseInt(document.getElementById('statContracts').textContent) || 0) + 1;
+  } catch (err) {
+    showResult('riskResult', 'Could not reach the server: ' + err.message, true);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Run RiskRadar';
+  }
+});
+
+// ── OSHA Checklist ──
+document.getElementById('oshaBtn').addEventListener('click', async () => {
+  const task = document.getElementById('oshaTask').value.trim();
+  if (!task) { showResult('oshaResult', 'Describe a task first.', true); return; }
+
+  const btn = document.getElementById('oshaBtn');
+  btn.disabled = true; btn.textContent = 'Generating...';
+
+  const headers = await getAuthHeader();
+  if (!headers) { btn.disabled = false; btn.textContent = 'Generate Checklist'; return; }
+  headers['Content-Type'] = 'application/json';
+
+  try {
+    const res = await fetch(`${CONSTRUCT_API_URL}/api/construct/osha-checklist`, {
+      method: 'POST', headers, body: JSON.stringify({ task_description: task })
+    });
+    if (res.status === 401) { handleUnauthorized(); return; }
+    if (res.status === 402) { showResult('oshaResult', 'Out of credits. Upgrade to Pro to continue.', true); btn.disabled=false; btn.textContent='Generate Checklist'; return; }
+    if (!res.ok) { const err = await res.json().catch(()=>({})); throw new Error(err.detail || 'Request failed'); }
+
+    const json = await res.json();
+    syncCreditsFromServer(json.credits_left);
+    showResult('oshaResult', json.checklist.map(c => '• ' + c).join('\n'), false);
+  } catch (err) {
+    showResult('oshaResult', 'Could not reach the server: ' + err.message, true);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Generate Checklist';
+  }
+});
+
+// ── SiteLog Pro ──
+document.getElementById('sitelogBtn').addEventListener('click', async () => {
+  const notes = document.getElementById('sitelogNotes').value.trim();
+  if (!notes) { showResult('sitelogResult', 'Enter some notes first.', true); return; }
+
+  const btn = document.getElementById('sitelogBtn');
+  btn.disabled = true; btn.textContent = 'Generating...';
+
+  const headers = await getAuthHeader();
+  if (!headers) { btn.disabled = false; btn.textContent = 'Generate Report'; return; }
+  headers['Content-Type'] = 'application/json';
+
+  try {
+    const res = await fetch(`${CONSTRUCT_API_URL}/api/construct/sitelog-pro`, {
+      method: 'POST', headers, body: JSON.stringify({ notes })
+    });
+    if (res.status === 401) { handleUnauthorized(); return; }
+    if (res.status === 402) { showResult('sitelogResult', 'Out of credits. Upgrade to Pro to continue.', true); btn.disabled=false; btn.textContent='Generate Report'; return; }
+    if (!res.ok) { const err = await res.json().catch(()=>({})); throw new Error(err.detail || 'Request failed'); }
+
+    const json = await res.json();
+    syncCreditsFromServer(json.credits_left);
+    showResult('sitelogResult', json.formatted_report, false);
+    document.getElementById('statReports').textContent = (parseInt(document.getElementById('statReports').textContent) || 0) + 1;
+  } catch (err) {
+    showResult('sitelogResult', 'Could not reach the server: ' + err.message, true);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Generate Report';
+  }
+});
+
+document.getElementById('upgradeBtn').addEventListener('click', () => {
+  alert('Upgrade flow not wired yet — Razorpay integration pending.');
+});
+
+loadUserData();
+</script>
+</body>
+</html>
