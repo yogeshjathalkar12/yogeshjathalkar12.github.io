@@ -1136,11 +1136,9 @@ async function getAuthHeader() {
   return { 'Authorization': `Bearer ${session.access_token}`, 'Content-Type': 'application/json' };
 }
 
-// Generic API wrapper. Any endpoint that isn't implemented yet in
-// basis_router.py (the GET/list endpoints — see NOTE at bottom of
-// this script) fails silently here and the UI falls back to an
-// empty state instead of breaking, matching the demo-mode pattern
-// used across the other Shoonya ventures.
+// Generic API wrapper. Network/auth failures fail silently here and
+// the UI falls back to an empty state instead of breaking, matching
+// the demo-mode pattern used across the other Shoonya ventures.
 async function apiCall(path, options = {}) {
   const headers = await getAuthHeader();
   if (!headers && supabaseClient) return null;
@@ -1419,7 +1417,7 @@ function simulateReport(payload) {
 // ── LOG A DISPOSAL ──────────────────────────────────
 async function loadShopsForDisposal() {
   const select = document.getElementById('disposalShopSelect');
-  const data = await apiCall('/shops'); // NOTE: not in basis_router.py yet — see summary
+  const data = await apiCall('/shops');
   if (data && data.length) {
     state.shops = data;
     select.innerHTML = data.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
@@ -1480,7 +1478,7 @@ async function submitDisposal() {
 // ── MARKETPLACE (products) ──────────────────────────
 async function loadProducts() {
   const grid = document.getElementById('marketGrid');
-  const data = await apiCall('/products'); // NOTE: not in basis_router.py yet — see summary
+  const data = await apiCall('/products');
   state.products = data || [];
   document.getElementById('marketCount').textContent = state.products.length + ' listings';
 
@@ -1535,7 +1533,7 @@ async function purchaseProduct(productId, creditsPrice) {
 // ── VOUCHERS (citizen-facing) ────────────────────────
 async function loadVouchers() {
   const grid = document.getElementById('voucherGrid');
-  const data = await apiCall('/vouchers'); // NOTE: not in basis_router.py yet — see summary
+  const data = await apiCall('/vouchers');
   state.vouchers = data || [];
   document.getElementById('voucherCount').textContent = state.vouchers.length + ' available';
 
@@ -1606,7 +1604,7 @@ function initShopMap() {
 
 async function loadShopProfile() {
   initShopMap();
-  const data = await apiCall('/shops/mine'); // NOTE: not in basis_router.py yet — see summary
+  const data = await apiCall('/shops/mine');
   if (data) {
     state.shop = data;
     document.getElementById('shopRegisterCard').style.display = 'none';
@@ -1654,7 +1652,7 @@ async function submitShop() {
 
 // ── VOUCHERS I ISSUE (business) ──────────────────────
 async function loadMyVouchers() {
-  const data = await apiCall('/vouchers/mine'); // NOTE: not in basis_router.py yet — see summary
+  const data = await apiCall('/vouchers/mine');
   state.myVouchers = data || [];
   document.getElementById('myVoucherCount').textContent = state.myVouchers.length + ' issued';
   document.getElementById('shopVoucherCount').textContent = state.myVouchers.length;
@@ -1714,7 +1712,7 @@ async function submitVoucher() {
 
 // ── PRODUCTS I LIST (business) ───────────────────────
 async function loadMyProducts() {
-  const data = await apiCall('/products/mine'); // NOTE: not in basis_router.py yet — see summary
+  const data = await apiCall('/products/mine');
   state.myProducts = data || [];
   document.getElementById('myProductCount').textContent = state.myProducts.length + ' listed';
   document.getElementById('shopProductCount').textContent = state.myProducts.length;
@@ -1826,35 +1824,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadUserData();
 });
 </script>
-
-<!--
-  ═══════════════════════════════════════════════════════════════
-  BACKEND NOTE FOR YOGESH — read this before wiring the API URL.
-
-  basis_router.py (as given) only defines WRITE endpoints:
-    POST /citizens/signup, GET /citizens/wallet, POST /reports,
-    POST /shops/disposal, POST /shops, POST /vouchers,
-    POST /products, POST /redemptions/voucher, POST /redemptions/product
-
-  This dashboard also calls several READ/list endpoints that
-  aren't in the router yet, all marked with a "NOTE:" comment
-  above wherever they're called:
-    GET /shops                — populate the disposal shop picker
-    GET /shops/mine           — load the citizen's own shop profile
-    GET /products             — marketplace grid
-    GET /products/mine        — "Products I list" panel
-    GET /vouchers              — citizen voucher grid
-    GET /vouchers/mine         — "Vouchers I issue" panel
-
-  Until those exist, every one of those calls fails silently and
-  the UI falls back to an empty state (never a broken page) — same
-  demo-mode pattern as the Aura and Raptor dashboards. Add them
-  to basis_router.py (simple `select` queries scoped to the
-  authenticated user via get_current_user, same as the existing
-  POST handlers) and the dashboard will start showing real data
-  with no frontend changes needed.
-  ═══════════════════════════════════════════════════════════════
--->
 
 </body>
 </html>
