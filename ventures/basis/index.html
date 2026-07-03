@@ -2033,11 +2033,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-    btn.disabled = false; btn.textContent = 'Log In';
-    if (error) { showError('loginError', error.message); return; }
+    if (error) {
+      btn.disabled = false; btn.textContent = 'Log In';
+      showError('loginError', error.message);
+      return;
+    }
 
-    closeAuth();
-    setLoggedInUI(data.user);
+    btn.textContent = 'Redirecting...';
+    window.location.href = DASHBOARD_URL;
   });
 
   // ── SIGN UP ──
@@ -2069,8 +2072,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (error) { showError('signupError', error.message); return; }
 
     if (data.session) {
-      closeAuth();
-      setLoggedInUI(data.user);
+      btn.textContent = 'Redirecting...';
+      window.location.href = DASHBOARD_URL;
       return;
     }
 
