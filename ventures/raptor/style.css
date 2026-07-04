@@ -392,7 +392,7 @@ body::after {
 
 /* NAV */
 nav {
-  position: fixed; top: 1; left: 0; right: 0; z-index: 100;
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
   padding: 1.8rem 4rem;
   display: flex; justify-content: space-between; align-items: center;
   mix-blend-mode: normal;
@@ -413,7 +413,7 @@ nav::after {
 
 .nav-links { display: flex; gap: 3rem; list-style: none; }
 .nav-links a {
-  font-size: 0.65rem; letter-spacing: 0.2em; color: var(--dim);
+  font-size: 0.95rem; letter-spacing: 0.2em; color: var(--dim);color: rgb(246, 246, 175);
   text-decoration: none; text-transform: uppercase;
   transition: color 0.3s;
 }
