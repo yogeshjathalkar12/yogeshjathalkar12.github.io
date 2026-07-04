@@ -315,7 +315,6 @@
   justify-content: space-between;
   align-items: center;
   padding: 2rem 0;
-  cursor: pointer;
   user-select: none;
   gap: 2rem;
   transition: all 0.3s ease;
@@ -446,12 +445,9 @@
 </head>
 <body>
 
-<div class="cursor" id="cursor"></div>
-<div class="cursor-ring" id="cursorRing"></div>
-
 <!-- TRUST BAR: crawlable, conversion-boosting signal -->
 <div class="trust-bar">
-  <div class="trust-item"><span class="trust-dot"></span>System Online · v1.0 Stable</div>
+  <div class="trust-item"><span class="trust-dot"></span>System Online · Stable</div>
   <div class="trust-item">Built in Pune, India</div>
   <div class="trust-item">Windows x64 · Free to Download</div>
   <div class="trust-item">B2B Sales Intelligence</div>
@@ -478,6 +474,14 @@
   </ul>
   <div class="nav-auth">
     <button class="nav-login-btn" id="navLoginBtn" data-open-auth="login">Log In / Sign Up</button>
+    <div style="display: flex; gap: 1.5rem; justify-content: center; align-items: center; flex-wrap: wrap;">
+        <a href="https://github.com/yogeshjathalkar12/raptor/releases/download/v0.1.1/Raptor.Setup.0.1.1.exe"
+           class="btn-main"
+           style="padding: 1.5rem 3rem; font-size: 0.9rem; box-shadow: 0 0 30px rgba(168,85,247,0.3);"
+           aria-label="Download Raptor v1.0 for Windows">
+          Download Raptor for windows
+        </a>
+      </div>
     <a href="../../index.html" class="nav-exit">Exit ..</a>
   </div>
 </nav>
@@ -489,7 +493,7 @@
     <div class="hero-overlay"></div>
     
     <div class="hero-content">
-        <p class="hero-eyebrow">ShoonyaOrigins · AI Sales Intelligence · v1.0</p>
+        <p class="hero-eyebrow">ShoonyaOrigins · AI Sales Intelligence ·</p>
         <h1 class="hero-headline">
             <div class="line"><span>Hunt.</span></div>
             <div class="line"><span>Capture.</span></div>
@@ -518,7 +522,7 @@
            class="btn-main"
            style="padding: 1.5rem 3rem; font-size: 0.9rem; box-shadow: 0 0 30px rgba(168,85,247,0.3);"
            aria-label="Download Raptor v1.0 for Windows">
-          Download Raptor v1.0.0
+          Download Raptor
         </a>
         <a href="https://shoonyaorigins.com/ventures/raptor/pricing/"
            class="btn-ghost"
@@ -547,7 +551,7 @@
       <li>Protect your sender score</li>
     </ul>
     
-    <button data-open-auth="login" style="margin-top: auto; padding: 1rem 2rem; background-color: #9333ea; color: white; border: none; border-radius: 6px; font-family: 'DM Mono', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; transition: opacity 0.3s ease;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+    <button data-open-auth="login" style="margin-top: auto; padding: 1rem 2rem; background-color: #9333ea; color: white; border: none; border-radius: 6px; font-family: 'DM Mono', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; transition: opacity 0.3s ease;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
       Log In To Use
     </button>
   </div>
@@ -566,7 +570,7 @@
       <li>Follow up at the perfect moment</li>
     </ul>
     
-    <button data-open-auth="login" style="margin-top: auto; padding: 1rem 2rem; background-color: #9333ea; color: white; border: none; border-radius: 6px; font-family: 'DM Mono', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; transition: opacity 0.3s ease;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+    <button data-open-auth="login" style="margin-top: auto; padding: 1rem 2rem; background-color: #9333ea; color: white; border: none; border-radius: 6px; font-family: 'DM Mono', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; transition: opacity 0.3s ease;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
       Log In To Use
     </button>
   </div>
@@ -991,37 +995,6 @@
       </div>
     </div>
 
-    <div class="proof-cards">
-      <div class="proof-card reveal">
-        <div class="proof-quote">
-          Finally — a system that doesn't just find leads, it tells me exactly why they'll buy. The scoring alone saves my team three hours a day.
-        </div>
-        <div class="proof-author">
-          <div class="proof-name">Vikram S.</div>
-          <div class="proof-role">Founder · B2B SaaS · Bangalore</div>
-        </div>
-      </div>
-      <div class="proof-card reveal">
-        <div class="proof-quote">
-          We were running Apollo, HubSpot, and Gong. Raptor replaced all three. The live call guidance alone changed how our entire team closes.
-        </div>
-        <div class="proof-author">
-          <div class="proof-name">Priya M.</div>
-          <div class="proof-role">Sales Head · Consultancy · Pune</div>
-        </div>
-      </div>
-      <div class="proof-card reveal">
-        <div class="proof-quote">
-          In month three, Raptor started predicting which prospects would convert before we even reached out. That's not a tool. That's an unfair advantage.
-        </div>
-        <div class="proof-author">
-          <div class="proof-name">Arjun T.</div>
-          <div class="proof-role">CRO · Mid-Market Enterprise · Mumbai</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- FAQ (schema-indexed, keyword-rich) -->
 <div class="faq-section" id="faq">
@@ -1333,36 +1306,6 @@ lamp.addEventListener('click', () => {
     lamp.classList.remove('pulled');
     isAnimating = false;
   }, 250);
-});
-
-// ── CUSTOM CURSOR ──
-const cursor = document.getElementById('cursor');
-const ring = document.getElementById('cursorRing');
-let mx = 0, my = 0, rx = 0, ry = 0;
-document.addEventListener('mousemove', e => {
-  mx = e.clientX; my = e.clientY;
-  cursor.style.left = mx + 'px';
-  cursor.style.top = my + 'px';
-});
-function animateRing() {
-  rx += (mx - rx) * 0.12;
-  ry += (my - ry) * 0.12;
-  ring.style.left = rx + 'px';
-  ring.style.top = ry + 'px';
-  requestAnimationFrame(animateRing);
-}
-animateRing();
-document.querySelectorAll('a, button').forEach(el => {
-  el.addEventListener('mouseenter', () => {
-    cursor.style.width = '16px'; cursor.style.height = '16px';
-    cursor.style.background = 'var(--pink)';
-    ring.style.width = '50px'; ring.style.height = '50px';
-  });
-  el.addEventListener('mouseleave', () => {
-    cursor.style.width = '8px'; cursor.style.height = '8px';
-    cursor.style.background = 'var(--purple)';
-    ring.style.width = '32px'; ring.style.height = '32px';
-  });
 });
 
 // ── SCROLL REVEAL ──
