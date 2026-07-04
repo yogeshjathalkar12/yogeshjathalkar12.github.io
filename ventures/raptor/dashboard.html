@@ -63,30 +63,6 @@ body::after {
   z-index: 998;
   opacity: 0.5;
 }
-
-/* CUSTOM CURSOR */
-.cursor {
-  position: fixed;
-  width: 8px; height: 8px;
-  background: var(--purple);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9999;
-  transform: translate(-50%, -50%);
-  transition: width 0.3s ease, height 0.3s ease, background 0.3s ease;
-  mix-blend-mode: screen;
-}
-.cursor-ring {
-  position: fixed;
-  width: 32px; height: 32px;
-  border: 1px solid rgba(168,85,247,0.4);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9998;
-  transform: translate(-50%, -50%);
-  transition: all 0.15s ease;
-}
-
 /* ─── TOPBAR ─── */
 .topbar {
   position: fixed; top: 0; left: 0; right: 0; z-index: 200;
@@ -626,9 +602,6 @@ body::after {
 </head>
 <body>
 
-<div class="cursor" id="cursor"></div>
-<div class="cursor-ring" id="cursorRing"></div>
-
 <!-- ═══════════ TOAST ═══════════ -->
 <div class="toast" id="toast"></div>
 
@@ -1050,17 +1023,6 @@ const state = {
   plan: 'Free',
   pollingInterval: null,
 };
-
-// ── CURSOR ────────────────────────────────────────
-const cursor = document.getElementById('cursor');
-const ring   = document.getElementById('cursorRing');
-let mx=0,my=0,rx=0,ry=0;
-document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; cursor.style.left=mx+'px'; cursor.style.top=my+'px'; });
-(function animateRing() { rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(animateRing); })();
-document.querySelectorAll('a, button, .tool-card, .sidebar-item').forEach(el => {
-  el.addEventListener('mouseenter', ()=>{ cursor.style.width='16px'; cursor.style.height='16px'; cursor.style.background='var(--pink)'; ring.style.width='50px'; ring.style.height='50px'; });
-  el.addEventListener('mouseleave', ()=>{ cursor.style.width='8px'; cursor.style.height='8px'; cursor.style.background='var(--purple)'; ring.style.width='32px'; ring.style.height='32px'; });
-});
 
 // ── LAMP ──────────────────────────────────────────
 let isAnimating=false;
