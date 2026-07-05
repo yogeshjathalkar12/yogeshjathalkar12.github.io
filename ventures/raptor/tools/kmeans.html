@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>K-Means ICP Clustering — Raptor Arsenal</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body class="arsenal-body" data-tool="kmeans">
+<div class="arsenal-toast-stack" id="toastStack"></div>
+
+<header class="arsenal-topbar">
+  <a href="/dashboard.html" class="arsenal-back">← Dashboard</a>
+  <div class="arsenal-tool-badge"><span class="dot"></span>K-MEANS ICP CLUSTERING</div>
+  <div class="arsenal-topbar-right">
+    <div class="arsenal-credits-pill"><div><div class="arsenal-credits-label">Credits</div><div class="arsenal-credits-value" id="topbarCredits">—</div></div></div>
+  </div>
+</header>
+
+<main class="arsenal-main">
+  <section class="arsenal-hero">
+    <div class="arsenal-hero-eyebrow">Tool 07 / Ideal Customer Profiling</div>
+    <h1 class="arsenal-hero-title">K-Means ICP<br>Clustering Engine</h1>
+    <p class="arsenal-hero-desc">Segments your customer list by numeric traits (ARR, headcount, engagement) using real k-means++ initialization — Z-score normalized, Euclidean distance, converged to stable centroids or iteration cap. Identifies your best-fit customer cohorts.</p>
+    <div class="arsenal-hero-meta">
+      <div class="arsenal-hero-meta-item">Cost <strong>1 credit / clustering run</strong></div>
+      <div class="arsenal-hero-meta-item">Engine <strong>k-means++ seeding + itertools</strong></div>
+    </div>
+  </section>
+
+  <div class="arsenal-grid">
+    <div class="arsenal-card">
+      <div class="arsenal-card-header"><span class="arsenal-card-title">Upload Customer Data</span></div>
+      <div class="arsenal-card-body">
+        <div class="arsenal-field">
+          <label class="arsenal-label">Paste CSV (one header row)</label>
+          <textarea class="arsenal-textarea" id="csvInput" style="min-height:180px" placeholder="company,revenue,employees&#10;Acme Corp,4200000,80&#10;TechVentures Inc,8500000,120"></textarea>
+          <div class="arsenal-hint">Paste rows with numeric and text columns. Select numeric columns below to cluster on.</div>
+        </div>
+        <div class="arsenal-field-row">
+          <div class="arsenal-field"><label class="arsenal-label">Fields to Cluster (comma-sep)</label><input class="arsenal-input" id="clusterFields" placeholder="revenue,employees"></div>
+          <div class="arsenal-field" style="max-width:100px"><label class="arsenal-label">k (clusters)</label><input class="arsenal-input" type="number" id="kValue" value="3" min="2" max="10"></div>
+        </div>
+        <div class="arsenal-field">
+          <label class="arsenal-label">Label Field (optional)</label>
+          <input class="arsenal-input" id="labelField" placeholder="company">
+          <div class="arsenal-hint">Column to use as readable identifier for each row.</div>
+        </div>
+        <button class="arsenal-btn" id="clusterBtn" onclick="runCluster()">Cluster &amp; Segment →</button>
+      </div>
+    </div>
+    <div class="arsenal-card">
+      <div class="arsenal-card-header"><span class="arsenal-card-title">Result</span></div>
+      <div class="arsenal-card-body" id="resultWrap">
+        <div class="arsenal-empty"><div class="arsenal-empty-icon">◌</div><div class="arsenal-empty-text">Upload CSV data to see clusters.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arsenal-card" style="margin-top:1.5rem">
+    <div class="arsenal-card-header"><span class="arsenal-card-title">Clustering History</span></div>
+    <div class="arsenal-card-body" id="historyWrap"><div class="arsenal-empty"><div class="arsenal-empty-text">Loading…</div></div></div>
+  </div>
+</main>
+
+<script>
+let RAPTOR_API_URL   = localStorage.getItem('raptor_api_url')   || 'https://websites-api-5wmu.onrender.com';
+let SUPABASE_URL_VAL = localStorage.getItem('raptor_sb_url')    || 'https://pcdbtcpctlnvdtbrrqoo.supabase.co';
+let SUPABASE_KEY_VAL = localStorage.getItem('raptor_sb_key')    || '';
+const supabaseClient = SUPABASE_URL_VAL.startsWith('http') ? window.supabase.createClient(SUPABASE_URL_VAL, SUPABASE_KEY_VAL) : null;
+const TOOL_BASE = `${RAPTOR_API_URL}/api/kmeans`;
+
+function showToast(msg, type='') {
+  const stack = document.getElementById('toastStack');
+  const t = document.createElement('div'); t.className='arsenal-toast '+type; t.textContent=msg;
+  stack.appendChild(t); setTimeout(()=>t.remove(), 3500);
+}
+async function getAuthHeader() {
+  if (!supabaseClient) { showToast('Supabase not configured','error'); return null; }
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) { showToast('Session expired — please log in again','error'); setTimeout(()=>window.location.href='/ventures/raptor/',1200); return null; }
+  return { 'Authorization': `Bearer ${session.access_token}`, 'Content-Type': 'application/json' };
+}
+function handleUnauthorized() { showToast('Session expired — please log in again','error'); if(supabaseClient) supabaseClient.auth.signOut(); setTimeout(()=>window.location.href='/ventures/raptor/',1200); }
+function syncCredits(c) { if (typeof c === 'number') document.getElementById('topbarCredits').textContent = c; }
+
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  if (lines.length < 2) throw new Error('CSV must have header + at least one data row');
+  const headers = lines[0].split(',').map(h => h.trim());
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cells = lines[i].split(',').map(c => c.trim());
+    const row = {};
+    headers.forEach((h, idx) => {
+      const val = cells[idx];
+      const numVal = parseFloat(val);
+      row[h] = isNaN(numVal) ? val : numVal;
+    });
+    rows.push(row);
+  }
+  return rows;
+}
+
+async function runCluster() {
+  const csvText = document.getElementById('csvInput').value.trim();
+  const fieldsStr = document.getElementById('clusterFields').value.trim();
+  const kVal = parseInt(document.getElementById('kValue').value) || 3;
+  const labelField = document.getElementById('labelField').value.trim() || null;
+
+  if (!csvText) return showToast('Paste CSV data', 'error');
+  if (!fieldsStr) return showToast('Specify fields to cluster on', 'error');
+
+  let rows;
+  try { rows = parseCSV(csvText); }
+  catch (e) { return showToast(e.message, 'error'); }
+
+  const fields = fieldsStr.split(',').map(f => f.trim());
+  for (let f of fields) {
+    if (!rows[0].hasOwnProperty(f)) return showToast(`Field "${f}" not found in CSV`, 'error');
+  }
+
+  const btn = document.getElementById('clusterBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="arsenal-spinner"></span> Computing k-means…';
+
+  const headers = await getAuthHeader();
+  if (!headers) { btn.disabled=false; btn.textContent='Cluster & Segment →'; return; }
+
+  try {
+    const res = await fetch(`${TOOL_BASE}/cluster`, { method:'POST', headers, body: JSON.stringify({ rows, fields, k: kVal, label_field: labelField }) });
+    if (res.status === 401) return handleUnauthorized();
+    if (res.status === 402) return showToast('Out of credits', 'error');
+    if (!res.ok) { const err = await res.json(); throw new Error(err.detail || 'Clustering failed'); }
+    const json = await res.json();
+    syncCredits(json.credits_left);
+    renderClusters(json);
+    loadHistory();
+    showToast('Clustering complete', 'success');
+  } catch (e) { showToast(e.message || 'Clustering failed', 'error'); }
+  finally { btn.disabled=false; btn.textContent='Cluster & Segment →'; }
+}
+
+function renderClusters(json) {
+  const clusters = json.clusters || [];
+  let html = '';
+  clusters.forEach((cluster, idx) => {
+    const centroid = cluster.centroid || {};
+    let centroidStr = Object.entries(centroid).map(([k,v]) => `${k}: ${v}`).join(', ');
+    html += `
+      <div style="margin-bottom:2rem;padding:1.5rem;border:1px solid var(--border);background:rgba(168,85,247,0.03)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--purple)">Cluster ${cluster.cluster_id + 1}</div>
+          <div style="font-size:0.7rem;color:var(--dim2)">Size: <strong>${cluster.size}</strong></div>
+        </div>
+        <div style="font-size:0.65rem;color:var(--dim);margin-bottom:1rem"><strong>Centroid:</strong> ${centroidStr}</div>
+        <div style="font-size:0.6rem;color:var(--dim2)">
+          ${cluster.members.slice(0,5).map(m => `<div>• ${m.label || JSON.stringify(m.row).substring(0,40)}</div>`).join('')}
+          ${cluster.size > 5 ? `<div style="color:var(--dim)">... and ${cluster.size - 5} more</div>` : ''}
+        </div>
+      </div>
+    `;
+  });
+  document.getElementById('resultWrap').innerHTML = html || '<div class="arsenal-empty">No clusters found</div>';
+}
+
+async function loadHistory() {
+  const headers = await getAuthHeader();
+  if (!headers) return;
+  try {
+    const res = await fetch(`${TOOL_BASE}/history`, { headers });
+    if (res.status === 401) return handleUnauthorized();
+    const json = await res.json();
+    const wrap = document.getElementById('historyWrap');
+    if (!json.runs || !json.runs.length) { wrap.innerHTML = '<div class="arsenal-empty"><div class="arsenal-empty-text">No clustering runs yet.</div></div>'; return; }
+    wrap.innerHTML = `<table class="arsenal-table"><thead><tr><th>K</th><th>Fields</th><th>Rows</th><th>Date</th></tr></thead><tbody>
+      ${json.runs.map(r => `<tr><td>${r.k}</td><td>${(r.fields || []).join(', ')}</td><td>${r.row_count}</td><td>${new Date(r.created_at).toLocaleString('en-IN')}</td></tr>`).join('')}
+    </tbody></table>`;
+  } catch (e) { showToast('Could not load history', 'error'); }
+}
+document.addEventListener('DOMContentLoaded', loadHistory);
+</script>
+</body>
+</html>
