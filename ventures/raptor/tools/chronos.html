@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chronos Engine — Raptor Arsenal</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body class="arsenal-body" data-tool="chronos">
+<div class="arsenal-toast-stack" id="toastStack"></div>
+
+<header class="arsenal-topbar">
+  <a href="/dashboard.html" class="arsenal-back">← Dashboard</a>
+  <div class="arsenal-tool-badge"><span class="dot"></span>CHRONOS ENGINE</div>
+  <div class="arsenal-topbar-right">
+    <div class="arsenal-credits-pill"><div><div class="arsenal-credits-label">Credits</div><div class="arsenal-credits-value" id="topbarCredits">—</div></div></div>
+  </div>
+</header>
+
+<main class="arsenal-main">
+  <section class="arsenal-hero">
+    <div class="arsenal-hero-eyebrow">Tool 05 / Send-Time Optimization</div>
+    <h1 class="arsenal-hero-title">Chronos Timezone<br>Optimization Engine</h1>
+    <p class="arsenal-hero-desc">Turns "Pune, India" or "Austin, Texas" into the exact UTC moment to schedule a send — geocoded, point-in-polygon timezone matched, and DST-corrected for that specific date.</p>
+    <div class="arsenal-hero-meta">
+      <div class="arsenal-hero-meta-item">Cost <strong>1 credit / resolve</strong></div>
+      <div class="arsenal-hero-meta-item">Engine <strong>Nominatim + timezonefinder + zoneinfo</strong></div>
+    </div>
+  </section>
+
+  <div class="arsenal-grid">
+    <div class="arsenal-card">
+      <div class="arsenal-card-header"><span class="arsenal-card-title">Schedule a Send</span></div>
+      <div class="arsenal-card-body">
+        <div class="arsenal-field"><label class="arsenal-label">Prospect Location</label><input class="arsenal-input" id="place" placeholder="Austin, Texas"></div>
+        <div class="arsenal-field-row">
+          <div class="arsenal-field"><label class="arsenal-label">Local Send Time</label><input class="arsenal-input" type="time" id="localTime" value="08:45"></div>
+          <div class="arsenal-field"><label class="arsenal-label">Date</label><input class="arsenal-input" type="date" id="sendDate"></div>
+        </div>
+        <button class="arsenal-btn" id="resolveBtn" onclick="runResolve()">Resolve Send Time →</button>
+      </div>
+    </div>
+    <div class="arsenal-card">
+      <div class="arsenal-card-header"><span class="arsenal-card-title">Result</span></div>
+      <div class="arsenal-card-body" id="resultWrap">
+        <div class="arsenal-empty"><div class="arsenal-empty-icon">◌</div><div class="arsenal-empty-text">Resolve a location to see the exact UTC send time.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arsenal-card" style="margin-top:1.5rem">
+    <div class="arsenal-card-header"><span class="arsenal-card-title">Upcoming Scheduled Sends</span></div>
+    <div class="arsenal-card-body" id="scheduledWrap"><div class="arsenal-empty"><div class="arsenal-empty-text">Loading…</div></div></div>
+  </div>
+</main>
+
+<script>
+let RAPTOR_API_URL   = localStorage.getItem('raptor_api_url')   || 'https://websites-api-5wmu.onrender.com';
+let SUPABASE_URL_VAL = localStorage.getItem('raptor_sb_url')    || 'https://pcdbtcpctlnvdtbrrqoo.supabase.co';
+let SUPABASE_KEY_VAL = localStorage.getItem('raptor_sb_key')    || '';
+const supabaseClient = SUPABASE_URL_VAL.startsWith('http') ? window.supabase.createClient(SUPABASE_URL_VAL, SUPABASE_KEY_VAL) : null;
+const TOOL_BASE = `${RAPTOR_API_URL}/api/chronos`;
+
+document.getElementById('sendDate').valueAsDate = new Date(Date.now() + 86400000);
+
+function showToast(msg, type='') {
+  const stack = document.getElementById('toastStack');
+  const t = document.createElement('div'); t.className='arsenal-toast '+type; t.textContent=msg;
+  stack.appendChild(t); setTimeout(()=>t.remove(), 3500);
+}
+async function getAuthHeader() {
+  if (!supabaseClient) { showToast('Supabase not configured','error'); return null; }
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) { showToast('Session expired — please log in again','error'); setTimeout(()=>window.location.href='/ventures/raptor/',1200); return null; }
+  return { 'Authorization': `Bearer ${session.access_token}`, 'Content-Type': 'application/json' };
+}
+function handleUnauthorized() { showToast('Session expired — please log in again','error'); if(supabaseClient) supabaseClient.auth.signOut(); setTimeout(()=>window.location.href='/ventures/raptor/',1200); }
+function syncCredits(c) { if (typeof c === 'number') document.getElementById('topbarCredits').textContent = c; }
+
+async function runResolve() {
+  const place = document.getElementById('place').value.trim();
+  const target_local_time = document.getElementById('localTime').value || '08:45';
+  const target_date = document.getElementById('sendDate').value;
+  if (!place) return showToast('Enter a location', 'error');
+
+  const btn = document.getElementById('resolveBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="arsenal-spinner"></span> Geocoding + resolving timezone…';
+  const headers = await getAuthHeader();
+  if (!headers) { btn.disabled=false; btn.textContent='Resolve Send Time →'; return; }
+
+  try {
+    const res = await fetch(`${TOOL_BASE}/resolve`, { method:'POST', headers, body: JSON.stringify({ place, target_local_time, target_date }) });
+    if (res.status === 401) return handleUnauthorized();
+    if (res.status === 402) return showToast('Out of credits', 'error');
+    if (!res.ok) { const err = await res.json(); throw new Error(err.detail || 'Resolve failed'); }
+    const json = await res.json();
+    syncCredits(json.credits_left);
+    renderResult(json);
+    loadScheduled();
+  } catch (e) { showToast(e.message || 'Resolve failed', 'error'); }
+  finally { btn.disabled=false; btn.textContent='Resolve Send Time →'; }
+}
+
+function renderResult(json) {
+  document.getElementById('resultWrap').innerHTML = `
+    <div class="arsenal-stats" style="margin-bottom:1.2rem">
+      <div class="arsenal-stat"><div class="arsenal-stat-label">Timezone</div><div class="arsenal-stat-value accent" style="font-size:1.2rem">${json.timezone}</div></div>
+      <div class="arsenal-stat"><div class="arsenal-stat-label">UTC Offset</div><div class="arsenal-stat-value">${json.utc_offset_hours >= 0 ? '+' : ''}${json.utc_offset_hours}h</div></div>
+    </div>
+    <div class="arsenal-field"><label class="arsenal-label">Resolved Location</label><div class="arsenal-code-block" style="color:var(--white)">${json.resolved_name}</div></div>
+    <div class="arsenal-field"><label class="arsenal-label">Local Send Time</label><div class="arsenal-code-block" style="color:var(--white)">${json.local_send_time}</div></div>
+    <div class="arsenal-field"><label class="arsenal-label">Schedule In Your Queue As (UTC)</label><div class="arsenal-code-block" id="utcCode">${json.send_after_utc}<button class="arsenal-copy-btn" onclick="copyUtc()">Copy</button></div></div>
+  `;
+  window._lastUtc = json.send_after_utc;
+}
+function copyUtc() { navigator.clipboard.writeText(window._lastUtc || ''); showToast('UTC timestamp copied', 'success'); }
+
+async function loadScheduled() {
+  const headers = await getAuthHeader();
+  if (!headers) return;
+  try {
+    const res = await fetch(`${TOOL_BASE}/scheduled`, { headers });
+    if (res.status === 401) return handleUnauthorized();
+    const json = await res.json();
+    const wrap = document.getElementById('scheduledWrap');
+    if (!json.scheduled.length) { wrap.innerHTML = '<div class="arsenal-empty"><div class="arsenal-empty-text">No sends scheduled yet.</div></div>'; return; }
+    wrap.innerHTML = `<table class="arsenal-table"><thead><tr><th>Place</th><th>Timezone</th><th>Local Time</th><th>Send After (UTC)</th></tr></thead><tbody>
+      ${json.scheduled.map(s => `<tr><td style="color:var(--white)">${s.place}</td><td>${s.timezone}</td><td>${new Date(s.local_send_time).toLocaleString('en-IN')}</td><td>${new Date(s.send_after_utc).toISOString()}</td></tr>`).join('')}
+    </tbody></table>`;
+  } catch (e) { showToast('Could not load scheduled sends', 'error'); }
+}
+document.addEventListener('DOMContentLoaded', loadScheduled);
+</script>
+</body>
+</html>
