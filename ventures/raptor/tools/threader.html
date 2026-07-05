@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IMAP Pitch Threader — Raptor Arsenal</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body class="arsenal-body" data-tool="threader">
+<div class="arsenal-toast-stack" id="toastStack"></div>
+
+<header class="arsenal-topbar">
+  <a href="/dashboard.html" class="arsenal-back">← Dashboard</a>
+  <div class="arsenal-tool-badge"><span class="dot"></span>IMAP PITCH THREADER</div>
+  <div class="arsenal-topbar-right">
+    <div class="arsenal-credits-pill"><div><div class="arsenal-credits-label">Credits</div><div class="arsenal-credits-value" id="topbarCredits">—</div></div></div>
+  </div>
+</header>
+
+<main class="arsenal-main">
+  <section class="arsenal-hero">
+    <div class="arsenal-hero-eyebrow">Tool 02 / Mail Intelligence</div>
+    <h1 class="arsenal-hero-title">IMAP Pitch<br>Threader</h1>
+    <p class="arsenal-hero-desc">Maps the true conversation tree of cold outreach via Message-ID / In-Reply-To / References headers — not fragile "Re:" subject matching — and filters out autoresponders before they hit your CRM.</p>
+    <div class="arsenal-hero-meta">
+      <div class="arsenal-hero-meta-item">Cost <strong>1 credit / scan</strong></div>
+      <div class="arsenal-hero-meta-item">Engine <strong>imaplib + RFC 5322</strong></div>
+    </div>
+  </section>
+
+  <div class="arsenal-tabs">
+    <div class="arsenal-tab active" data-tab="scan">Scan Mailbox</div>
+    <div class="arsenal-tab" data-tab="history">Scan History</div>
+  </div>
+
+  <div class="arsenal-tab-panel active" id="panel-scan">
+    <div class="arsenal-grid">
+      <div class="arsenal-card">
+        <div class="arsenal-card-header"><span class="arsenal-card-title">Mailbox Connection</span></div>
+        <div class="arsenal-card-body">
+          <div class="arsenal-field-row">
+            <div class="arsenal-field"><label class="arsenal-label">IMAP Host</label><input class="arsenal-input" id="imapHost" placeholder="imap.gmail.com"></div>
+            <div class="arsenal-field" style="max-width:110px"><label class="arsenal-label">Port</label><input class="arsenal-input" id="imapPort" value="993"></div>
+          </div>
+          <div class="arsenal-field"><label class="arsenal-label">Username</label><input class="arsenal-input" id="imapUser" placeholder="hello@shoonyaorigins.com"></div>
+          <div class="arsenal-field">
+            <label class="arsenal-label">App Password</label>
+            <input class="arsenal-input" type="password" id="imapPass" placeholder="••••••••••••••••">
+            <div class="arsenal-hint">Never stored — used once to open the connection, then discarded. Use an app-specific password, not your real login.</div>
+          </div>
+          <div class="arsenal-field-row">
+            <div class="arsenal-field"><label class="arsenal-label">Mailbox</label><input class="arsenal-input" id="imapMailbox" value="INBOX"></div>
+            <div class="arsenal-field" style="max-width:110px"><label class="arsenal-label">Limit</label><input class="arsenal-input" id="imapLimit" value="200"></div>
+          </div>
+          <button class="arsenal-btn" id="scanBtn" onclick="runScan()">Scan Threads →</button>
+        </div>
+      </div>
+      <div class="arsenal-card">
+        <div class="arsenal-card-header"><span class="arsenal-card-title">Reply Tree</span><span class="arsenal-card-sub" id="scanSummary"></span></div>
+        <div class="arsenal-card-body" id="scanResultsWrap">
+          <div class="arsenal-empty"><div class="arsenal-empty-icon">◌</div><div class="arsenal-empty-text">Connect a mailbox to build the reply tree.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arsenal-tab-panel" id="panel-history">
+    <div class="arsenal-card">
+      <div class="arsenal-card-header"><span class="arsenal-card-title">Past Scans</span></div>
+      <div class="arsenal-card-body" id="historyWrap">
+        <div class="arsenal-empty"><div class="arsenal-empty-text">Loading…</div></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+let RAPTOR_API_URL   = localStorage.getItem('raptor_api_url')   || 'https://websites-api-5wmu.onrender.com';
+let SUPABASE_URL_VAL = localStorage.getItem('raptor_sb_url')    || 'https://pcdbtcpctlnvdtbrrqoo.supabase.co';
+let SUPABASE_KEY_VAL = localStorage.getItem('raptor_sb_key')    || '';
+const supabaseClient = SUPABASE_URL_VAL.startsWith('http') ? window.supabase.createClient(SUPABASE_URL_VAL, SUPABASE_KEY_VAL) : null;
+const TOOL_BASE = `${RAPTOR_API_URL}/api/threader`;
+
+function showToast(msg, type='') {
+  const stack = document.getElementById('toastStack');
+  const t = document.createElement('div'); t.className='arsenal-toast '+type; t.textContent=msg;
+  stack.appendChild(t); setTimeout(()=>t.remove(), 3500);
+}
+async function getAuthHeader() {
+  if (!supabaseClient) { showToast('Supabase not configured','error'); return null; }
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) { showToast('Session expired — please log in again','error'); setTimeout(()=>window.location.href='/ventures/raptor/',1200); return null; }
+  return { 'Authorization': `Bearer ${session.access_token}`, 'Content-Type': 'application/json' };
+}
+function handleUnauthorized() { showToast('Session expired — please log in again','error'); if(supabaseClient) supabaseClient.auth.signOut(); setTimeout(()=>window.location.href='/ventures/raptor/',1200); }
+function syncCredits(c) { if (typeof c === 'number') document.getElementById('topbarCredits').textContent = c; }
+
+document.querySelectorAll('.arsenal-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.arsenal-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.arsenal-tab-panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-'+tab.dataset.tab).classList.add('active');
+    if (tab.dataset.tab === 'history') loadHistory();
+  });
+});
+
+async function runScan() {
+  const imap_host = document.getElementById('imapHost').value.trim();
+  const imap_port = parseInt(document.getElementById('imapPort').value) || 993;
+  const username = document.getElementById('imapUser').value.trim();
+  const app_password = document.getElementById('imapPass').value;
+  const mailbox = document.getElementById('imapMailbox').value.trim() || 'INBOX';
+  const limit = parseInt(document.getElementById('imapLimit').value) || 200;
+
+  if (!imap_host || !username || !app_password) return showToast('Host, username, and app password are required', 'error');
+
+  const btn = document.getElementById('scanBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="arsenal-spinner"></span> Connecting to mailbox…';
+
+  const headers = await getAuthHeader();
+  if (!headers) { btn.disabled=false; btn.textContent='Scan Threads →'; return; }
+
+  try {
+    const res = await fetch(`${TOOL_BASE}/scan-threads`, { method:'POST', headers, body: JSON.stringify({ imap_host, imap_port, username, app_password, mailbox, limit }) });
+    if (res.status === 401) return handleUnauthorized();
+    if (res.status === 402) return showToast('Out of credits', 'error');
+    if (!res.ok) { const err = await res.json(); throw new Error(err.detail || 'Scan failed'); }
+    const json = await res.json();
+    syncCredits(json.credits_left);
+    renderScan(json);
+    showToast('Mailbox scanned successfully', 'success');
+  } catch (e) {
+    showToast(e.message || 'Scan failed', 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Scan Threads →';
+  }
+}
+
+function renderScan(json) {
+  document.getElementById('scanSummary').textContent = `${json.scanned} messages`;
+  const wrap = document.getElementById('scanResultsWrap');
+
+  const rootNodes = json.roots.map(id => json.nodes[id]).filter(Boolean);
+
+  function renderNode(node, depth=0) {
+    const badge = node.is_bot ? '<span class="arsenal-badge fail" style="margin-left:0.6rem"><span class="dot"></span>Bot</span>'
+                : node.parent_id ? '<span class="arsenal-badge ok" style="margin-left:0.6rem"><span class="dot"></span>Human Reply</span>' : '';
+    let html = `<div style="padding-left:${depth*1.4}rem;padding-bottom:0.8rem;border-left:${depth>0?'1px solid var(--border)':'none'};margin-left:${depth>0?'0.4rem':'0'}">
+      <div style="font-size:0.68rem;color:var(--white)">${(node.subject||'(no subject)')}${badge}</div>
+      <div style="font-size:0.58rem;color:var(--dim2)">${node.from||''} ${node.date?'· '+new Date(node.date).toLocaleString('en-IN'):''}</div>
+    </div>`;
+    (node.children||[]).forEach(childId => { const child = json.nodes[childId]; if (child) html += renderNode(child, depth+1); });
+    return html;
+  }
+
+  wrap.innerHTML = `
+    <div class="arsenal-stats" style="margin-bottom:1.2rem">
+      <div class="arsenal-stat"><div class="arsenal-stat-label">Human Replies</div><div class="arsenal-stat-value accent">${json.human_replies}</div></div>
+      <div class="arsenal-stat"><div class="arsenal-stat-label">Bot Replies Filtered</div><div class="arsenal-stat-value">${json.bot_replies}</div></div>
+      <div class="arsenal-stat"><div class="arsenal-stat-label">Threads</div><div class="arsenal-stat-value">${json.roots.length}</div></div>
+    </div>
+    <div class="arsenal-console" style="max-height:420px">${rootNodes.map(n=>renderNode(n)).join('') || '<div class="arsenal-console-empty">No threads found.</div>'}</div>
+  `;
+}
+
+async function loadHistory() {
+  const headers = await getAuthHeader();
+  if (!headers) return;
+  try {
+    const res = await fetch(`${TOOL_BASE}/history`, { headers });
+    if (res.status === 401) return handleUnauthorized();
+    const json = await res.json();
+    const wrap = document.getElementById('historyWrap');
+    if (!json.scans.length) { wrap.innerHTML = '<div class="arsenal-empty"><div class="arsenal-empty-text">No scans yet.</div></div>'; return; }
+    wrap.innerHTML = `<table class="arsenal-table"><thead><tr><th>Mailbox</th><th>Messages</th><th>Human Replies</th><th>Date</th></tr></thead><tbody>
+      ${json.scans.map(s => `<tr><td style="color:var(--white)">${s.mailbox}</td><td>${s.message_count}</td><td>${s.human_reply_count}</td><td>${new Date(s.created_at).toLocaleString('en-IN')}</td></tr>`).join('')}
+    </tbody></table>`;
+  } catch (e) { showToast('Could not load history', 'error'); }
+}
+</script>
+</body>
+</html>
