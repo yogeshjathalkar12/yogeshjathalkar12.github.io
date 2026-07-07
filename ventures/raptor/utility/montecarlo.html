@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monte Carlo Simulator — Raptor Arsenal</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body class="arsenal-body" data-tool="montecarlo">
+<div class="arsenal-toast-stack" id="toastStack"></div>
+
+<header class="arsenal-topbar">
+  <a href="/dashboard.html" class="arsenal-back">← Dashboard</a>
+  <div class="arsenal-tool-badge"><span class="dot"></span>MONTE CARLO SIMULATOR</div>
+  <div class="arsenal-topbar-right">
+    <div class="arsenal-credits-pill"><div><div class="arsenal-credits-label">Credits</div><div class="arsenal-credits-value" id="topbarCredits">—</div></div></div>
+  </div>
+</header>
+
+<main class="arsenal-main">
+  <section class="arsenal-hero">
+    <div class="arsenal-hero-eyebrow">Tool 09 / Pipeline Forecasting</div>
+    <h1 class="arsenal-hero-title">Monte Carlo<br>Pipeline Simulator</h1>
+    <p class="arsenal-hero-desc">Runs stochastic simulations (default 10,000 iterations) across your sales pipeline — each deal won/lost via its stated close probability, producing an empirical P10/P50/P90 distribution that shows true downside/upside risk without assuming a Gaussian curve.</p>
+    <div class="arsenal-hero-meta">
+      <div class="arsenal-hero-meta-item">Cost <strong>1 credit / simulation</strong></div>
+      <div class="arsenal-hero-meta-item">Engine <strong>random.random() + percentile (real stochastic)</strong></div>
+    </div>
+  </section>
+
+  <div class="arsenal-grid">
+    <div class="arsenal-card">
+      <div class="arsenal-card-header"><span class="arsenal-card-title">Pipeline</span></div>
+      <div class="arsenal-card-body">
+        <div class="arsenal-field">
+          <label class="arsenal-label">Deals (JSON format)</label>
+          <textarea class="arsenal-textarea" id="dealsInput" style="min-height:200px" placeholder='[{"name":"Panchshil Realty","value":400000,"probability":0.4},{"name":"TechCorp","value":650000,"probability":0.65}]'>[{"name":"Acme Corp","value":400000,"probability":0.4},{"name":"BigRetail Ltd","value":850000,"probability":0.55},{"name":"CloudTech Inc","value":500000,"probability":0.75}]</textarea>
+          <div class="arsenal-hint">Each deal needs: name (string), value (number), probability (0-1 float).</div>
+        </div>
+        <div class="arsenal-field-row">
+          <div class="arsenal-field"><label class="arsenal-label">Iterations</label><input class="arsenal-input" type="number" id="iterations" value="10000" min="100" max="50000"></div>
+          <div class="arsenal-field" style="max-width:120px"><label class="arsenal-label">Histogram Buckets</label><input class="arsenal-input" type="number" id="buckets" value="20" min="5" max="50"></div>
+        </div>
+        <button class="arsenal-btn" id="simulateBtn" onclick="runSimulate()">Simulate Pipeline →</button>
+      </div>
+    </div>
+    <div class="arsenal-card">
+      <div class="arsenal-card-header"><span class="arsenal-card-title">Distribution</span></div>
+      <div class="arsenal-card-body" id="resultWrap">
+        <div class="arsenal-empty"><div class="arsenal-empty-icon">◌</div><div class="arsenal-empty-text">Run a simulation to see P10/P50/P90.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arsenal-card" style="margin-top:1.5rem">
+    <div class="arsenal-card-header"><span class="arsenal-card-title">Past Simulations</span></div>
+    <div class="arsenal-card-body" id="historyWrap"><div class="arsenal-empty"><div class="arsenal-empty-text">Loading…</div></div></div>
+  </div>
+</main>
+
+<script>
+let RAPTOR_API_URL   = localStorage.getItem('raptor_api_url')   || 'https://websites-api-5wmu.onrender.com';
+let SUPABASE_URL_VAL = localStorage.getItem('raptor_sb_url')    || 'https://pcdbtcpctlnvdtbrrqoo.supabase.co';
+let SUPABASE_KEY_VAL = localStorage.getItem('raptor_sb_key')    || '';
+const supabaseClient = SUPABASE_URL_VAL.startsWith('http') ? window.supabase.createClient(SUPABASE_URL_VAL, SUPABASE_KEY_VAL) : null;
+const TOOL_BASE = `${RAPTOR_API_URL}/api/montecarlo`;
+
+function showToast(msg, type='') {
+  const stack = document.getElementById('toastStack');
+  const t = document.createElement('div'); t.className='arsenal-toast '+type; t.textContent=msg;
+  stack.appendChild(t); setTimeout(()=>t.remove(), 3500);
+}
+async function getAuthHeader() {
+  if (!supabaseClient) { showToast('Supabase not configured','error'); return null; }
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) { showToast('Session expired — please log in again','error'); setTimeout(()=>window.location.href='/ventures/raptor/',1200); return null; }
+  return { 'Authorization': `Bearer ${session.access_token}`, 'Content-Type': 'application/json' };
+}
+function handleUnauthorized() { showToast('Session expired — please log in again','error'); if(supabaseClient) supabaseClient.auth.signOut(); setTimeout(()=>window.location.href='/ventures/raptor/',1200); }
+function syncCredits(c) { if (typeof c === 'number') document.getElementById('topbarCredits').textContent = c; }
+
+async function runSimulate() {
+  const dealsStr = document.getElementById('dealsInput').value.trim();
+  const iterations = parseInt(document.getElementById('iterations').value) || 10000;
+  const bucket_count = parseInt(document.getElementById('buckets').value) || 20;
+
+  if (!dealsStr) return showToast('Enter deals', 'error');
+  
+  let deals;
+  try { deals = JSON.parse(dealsStr); }
+  catch (e) { return showToast('Invalid JSON format', 'error'); }
+
+  if (!Array.isArray(deals) || !deals.length) return showToast('Deals must be a non-empty array', 'error');
+
+  const btn = document.getElementById('simulateBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="arsenal-spinner"></span> Running iterations…';
+
+  const headers = await getAuthHeader();
+  if (!headers) { btn.disabled=false; btn.textContent='Simulate Pipeline →'; return; }
+
+  try {
+    const res = await fetch(`${TOOL_BASE}/simulate`, { method:'POST', headers, body: JSON.stringify({ deals, iterations, bucket_count }) });
+    if (res.status === 401) return handleUnauthorized();
+    if (res.status === 402) return showToast('Out of credits', 'error');
+    if (!res.ok) { const err = await res.json(); throw new Error(err.detail || 'Simulation failed'); }
+    const json = await res.json();
+    syncCredits(json.credits_left);
+    renderResult(json);
+    loadHistory();
+    showToast('Simulation complete', 'success');
+  } catch (e) { showToast(e.message || 'Simulation failed', 'error'); }
+  finally { btn.disabled=false; btn.textContent='Simulate Pipeline →'; }
+}
+
+function renderResult(json) {
+  const histogram = (json.histogram || []).map(b => b.count);
+  const maxHeight = Math.max(...histogram, 1);
+  
+  let html = `
+    <div class="arsenal-stats" style="margin-bottom:1.5rem">
+      <div class="arsenal-stat"><div class="arsenal-stat-label">P10 (Worst)</div><div class="arsenal-stat-value">$${(json.p10_worst_case || 0).toLocaleString()}</div></div>
+      <div class="arsenal-stat"><div class="arsenal-stat-label">P50 (Expected)</div><div class="arsenal-stat-value accent">$${(json.p50_expected || 0).toLocaleString()}</div></div>
+      <div class="arsenal-stat"><div class="arsenal-stat-label">P90 (Best)</div><div class="arsenal-stat-value">$${(json.p90_best_case || 0).toLocaleString()}</div></div>
+    </div>
+    <div style="margin-bottom:1.5rem">
+      <div style="font-size:0.7rem;color:var(--dim2);margin-bottom:0.5rem">Simulated Histogram (${json.iterations} iterations)</div>
+      <div style="display:flex;align-items:flex-end;gap:2px;height:120px">
+  `;
+  
+  (json.histogram || []).forEach(b => {
+    const barHeight = maxHeight > 0 ? (b.count / maxHeight) * 100 : 0;
+    html += `<div style="flex:1;height:${barHeight}%;background:linear-gradient(to top,var(--purple),var(--pink));opacity:0.7;border-radius:2px;min-height:2px" title="${b.count} outcomes"></div>`;
+  });
+  
+  html += `
+      </div>
+    </div>
+    <div class="arsenal-console" style="font-size:0.65rem">
+      <div class="arsenal-console-line"><span class="ts">Deals</span><span class="msg">${json.deal_count}</span></div>
+      <div class="arsenal-console-line ok"><span class="ts">Expected (naive)</span><span class="msg">$${(json.expected_value_naive || 0).toLocaleString()}</span></div>
+      <div class="arsenal-console-line ok"><span class="ts">Simulated Mean</span><span class="msg">$${(json.simulated_mean || 0).toLocaleString()}</span></div>
+      <div class="arsenal-console-line"><span class="ts">Absolute Worst</span><span class="msg">$${(json.absolute_worst || 0).toLocaleString()}</span></div>
+      <div class="arsenal-console-line"><span class="ts">Absolute Best</span><span class="msg">$${(json.absolute_best || 0).toLocaleString()}</span></div>
+    </div>
+  `;
+  
+  document.getElementById('resultWrap').innerHTML = html;
+}
+
+async function loadHistory() {
+  const headers = await getAuthHeader();
+  if (!headers) return;
+  try {
+    const res = await fetch(`${TOOL_BASE}/history`, { headers });
+    if (res.status === 401) return handleUnauthorized();
+    const json = await res.json();
+    const wrap = document.getElementById('historyWrap');
+    if (!json.runs || !json.runs.length) { wrap.innerHTML = '<div class="arsenal-empty"><div class="arsenal-empty-text">No simulations run yet.</div></div>'; return; }
+    wrap.innerHTML = `<table class="arsenal-table"><thead><tr><th>Deals</th><th>P10</th><th>P50</th><th>P90</th><th>Date</th></tr></thead><tbody>
+      ${json.runs.map(r => `<tr><td>${r.deal_count}</td><td>$${(r.p10 || 0).toLocaleString()}</td><td style="color:var(--purple)"><strong>$${(r.p50 || 0).toLocaleString()}</strong></td><td>$${(r.p90 || 0).toLocaleString()}</td><td>${new Date(r.created_at).toLocaleString('en-IN')}</td></tr>`).join('')}
+    </tbody></table>`;
+  } catch (e) { showToast('Could not load history', 'error'); }
+}
+document.addEventListener('DOMContentLoaded', loadHistory);
+</script>
+</body>
+</html>

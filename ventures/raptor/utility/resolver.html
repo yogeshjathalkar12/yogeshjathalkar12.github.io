@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reverse-IP Resolver — Raptor Arsenal</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body class="arsenal-body" data-tool="resolver">
+<div class="arsenal-toast-stack" id="toastStack"></div>
+
+<header class="arsenal-topbar">
+  <a href="/dashboard.html" class="arsenal-back">← Dashboard</a>
+  <div class="arsenal-tool-badge"><span class="dot"></span>REVERSE-IP RESOLVER</div>
+  <div class="arsenal-topbar-right">
+    <div class="arsenal-credits-pill"><div><div class="arsenal-credits-label">Credits</div><div class="arsenal-credits-value" id="topbarCredits">—</div></div></div>
+  </div>
+</header>
+
+<main class="arsenal-main">
+  <section class="arsenal-hero">
+    <div class="arsenal-hero-eyebrow">Tool 04 / The Deanonymizer</div>
+    <h1 class="arsenal-hero-title">B2B Reverse-IP<br>Resolver</h1>
+    <p class="arsenal-hero-desc">Resolves an anonymous website visitor's IP to a specific corporate network by matching it against your own CIDR range table, using prefix-length-ordered matching for sub-millisecond, most-specific-first lookups.</p>
+    <div class="arsenal-hero-meta">
+      <div class="arsenal-hero-meta-item">Cost <strong>1 credit / resolve</strong></div>
+      <div class="arsenal-hero-meta-item">Engine <strong>ipaddress + sorted CIDR match</strong></div>
+    </div>
+  </section>
+
+  <div class="arsenal-tabs">
+    <div class="arsenal-tab active" data-tab="resolve">Resolve IP</div>
+    <div class="arsenal-tab" data-tab="ranges">Upload CIDR Ranges</div>
+    <div class="arsenal-tab" data-tab="visits">Visit Log</div>
+  </div>
+
+  <div class="arsenal-tab-panel active" id="panel-resolve">
+    <div class="arsenal-grid">
+      <div class="arsenal-card">
+        <div class="arsenal-card-header"><span class="arsenal-card-title">Lookup</span></div>
+        <div class="arsenal-card-body">
+          <div class="arsenal-field"><label class="arsenal-label">Visitor IP Address</label><input class="arsenal-input" id="lookupIp" placeholder="203.0.113.42"></div>
+          <button class="arsenal-btn" id="resolveBtn" onclick="runResolve()">Resolve →</button>
+        </div>
+      </div>
+      <div class="arsenal-card">
+        <div class="arsenal-card-header"><span class="arsenal-card-title">Result</span></div>
+        <div class="arsenal-card-body" id="resolveResultsWrap">
+          <div class="arsenal-empty"><div class="arsenal-empty-icon">◌</div><div class="arsenal-empty-text">Resolve an IP to see the matched company.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arsenal-tab-panel" id="panel-ranges">
+    <div class="arsenal-card">
+      <div class="arsenal-card-header"><span class="arsenal-card-title">Upload CIDR → Company Map (CSV or JSON)</span></div>
+      <div class="arsenal-card-body">
+        <div class="arsenal-field">
+          <label class="arsenal-label">Paste rows: one per line, "cidr,company_name"</label>
+          <textarea class="arsenal-textarea" id="rangesInput" style="min-height:180px" placeholder="203.0.113.0/24,Panchshil Realty&#10;198.51.100.0/22,Kolte-Patil"></textarea>
+          <div class="arsenal-hint">Free — this is your own reference data, not a paid lookup.</div>
+        </div>
+        <button class="arsenal-btn" id="uploadBtn" onclick="runUpload()">Upload Ranges →</button>
+        <div id="uploadResult" style="margin-top:1rem"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arsenal-tab-panel" id="panel-visits">
+    <div class="arsenal-card">
+      <div class="arsenal-card-header"><span class="arsenal-card-title">Recent Resolved Visits</span></div>
+      <div class="arsenal-card-body" id="visitsWrap"><div class="arsenal-empty"><div class="arsenal-empty-text">Loading…</div></div></div>
+    </div>
+  </div>
+</main>
+
+<script>
+let RAPTOR_API_URL   = localStorage.getItem('raptor_api_url')   || 'https://websites-api-5wmu.onrender.com';
+let SUPABASE_URL_VAL = localStorage.getItem('raptor_sb_url')    || 'https://pcdbtcpctlnvdtbrrqoo.supabase.co';
+let SUPABASE_KEY_VAL = localStorage.getItem('raptor_sb_key')    || '';
+const supabaseClient = SUPABASE_URL_VAL.startsWith('http') ? window.supabase.createClient(SUPABASE_URL_VAL, SUPABASE_KEY_VAL) : null;
+const TOOL_BASE = `${RAPTOR_API_URL}/api/resolver`;
+
+function showToast(msg, type='') {
+  const stack = document.getElementById('toastStack');
+  const t = document.createElement('div'); t.className='arsenal-toast '+type; t.textContent=msg;
+  stack.appendChild(t); setTimeout(()=>t.remove(), 3500);
+}
+async function getAuthHeader() {
+  if (!supabaseClient) { showToast('Supabase not configured','error'); return null; }
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) { showToast('Session expired — please log in again','error'); setTimeout(()=>window.location.href='/ventures/raptor/',1200); return null; }
+  return { 'Authorization': `Bearer ${session.access_token}`, 'Content-Type': 'application/json' };
+}
+function handleUnauthorized() { showToast('Session expired — please log in again','error'); if(supabaseClient) supabaseClient.auth.signOut(); setTimeout(()=>window.location.href='/ventures/raptor/',1200); }
+function syncCredits(c) { if (typeof c === 'number') document.getElementById('topbarCredits').textContent = c; }
+
+document.querySelectorAll('.arsenal-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.arsenal-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.arsenal-tab-panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-'+tab.dataset.tab).classList.add('active');
+    if (tab.dataset.tab === 'visits') loadVisits();
+  });
+});
+
+async function runResolve() {
+  const ip = document.getElementById('lookupIp').value.trim();
+  if (!ip) return showToast('Enter an IP address', 'error');
+  const btn = document.getElementById('resolveBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="arsenal-spinner"></span> Matching CIDR blocks…';
+  const headers = await getAuthHeader();
+  if (!headers) { btn.disabled=false; btn.textContent='Resolve →'; return; }
+  try {
+    const res = await fetch(`${TOOL_BASE}/resolve?ip=${encodeURIComponent(ip)}`, { headers });
+    if (res.status === 401) return handleUnauthorized();
+    if (res.status === 402) return showToast('Out of credits', 'error');
+    if (!res.ok) { const err = await res.json(); throw new Error(err.detail || 'Resolve failed'); }
+    const json = await res.json();
+    syncCredits(json.credits_left);
+    document.getElementById('resolveResultsWrap').innerHTML = json.matched
+      ? `<div class="arsenal-stats"><div class="arsenal-stat"><div class="arsenal-stat-label">Matched Company</div><div class="arsenal-stat-value accent" style="font-size:1.4rem">${json.company_name}</div></div></div>`
+      : `<div class="arsenal-empty"><div class="arsenal-empty-icon">✗</div><div class="arsenal-empty-text">No CIDR range in your table covers ${json.ip}.</div></div>`;
+  } catch (e) { showToast(e.message || 'Resolve failed', 'error'); }
+  finally { btn.disabled=false; btn.textContent='Resolve →'; }
+}
+
+async function runUpload() {
+  const raw = document.getElementById('rangesInput').value.trim();
+  if (!raw) return showToast('Paste at least one CIDR row', 'error');
+  const ranges = raw.split('\n').map(line => {
+    const [cidr, ...rest] = line.split(',');
+    return { cidr: (cidr||'').trim(), company_name: rest.join(',').trim() };
+  }).filter(r => r.cidr);
+
+  const btn = document.getElementById('uploadBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="arsenal-spinner"></span> Uploading…';
+  const headers = await getAuthHeader();
+  if (!headers) { btn.disabled=false; btn.textContent='Upload Ranges →'; return; }
+  try {
+    const res = await fetch(`${TOOL_BASE}/ranges/upload`, { method:'POST', headers, body: JSON.stringify({ ranges }) });
+    if (res.status === 401) return handleUnauthorized();
+    if (!res.ok) { const err = await res.json(); throw new Error(err.detail || 'Upload failed'); }
+    const json = await res.json();
+    document.getElementById('uploadResult').innerHTML = `<span class="arsenal-badge ok"><span class="dot"></span>${json.inserted} ranges loaded</span> ${json.invalid.length ? `<span class="arsenal-badge fail" style="margin-left:0.6rem"><span class="dot"></span>${json.invalid.length} invalid rows skipped</span>` : ''}`;
+    showToast('CIDR ranges uploaded', 'success');
+  } catch (e) { showToast(e.message || 'Upload failed', 'error'); }
+  finally { btn.disabled=false; btn.textContent='Upload Ranges →'; }
+}
+
+async function loadVisits() {
+  const headers = await getAuthHeader();
+  if (!headers) return;
+  try {
+    const res = await fetch(`${TOOL_BASE}/visits`, { headers });
+    if (res.status === 401) return handleUnauthorized();
+    const json = await res.json();
+    const wrap = document.getElementById('visitsWrap');
+    if (!json.visits.length) { wrap.innerHTML = '<div class="arsenal-empty"><div class="arsenal-empty-text">No resolved visits yet.</div></div>'; return; }
+    wrap.innerHTML = `<table class="arsenal-table"><thead><tr><th>IP</th><th>Company</th><th>Source</th><th>Time</th></tr></thead><tbody>
+      ${json.visits.map(v => `<tr><td>${v.ip}</td><td style="color:var(--white)">${v.company_name || '—'}</td><td>${v.source}</td><td>${new Date(v.created_at).toLocaleString('en-IN')}</td></tr>`).join('')}
+    </tbody></table>`;
+  } catch (e) { showToast('Could not load visit log', 'error'); }
+}
+</script>
+</body>
+</html>

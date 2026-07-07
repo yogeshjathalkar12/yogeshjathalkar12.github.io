@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spintax Compiler — Raptor Arsenal</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body class="arsenal-body" data-tool="spintax">
+<div class="arsenal-toast-stack" id="toastStack"></div>
+
+<header class="arsenal-topbar">
+  <a href="/dashboard.html" class="arsenal-back">← Dashboard</a>
+  <div class="arsenal-tool-badge"><span class="dot"></span>SPINTAX COMPILER</div>
+  <div class="arsenal-topbar-right">
+    <div class="arsenal-credits-pill"><div><div class="arsenal-credits-label">Credits</div><div class="arsenal-credits-value" id="topbarCredits">—</div></div></div>
+  </div>
+</header>
+
+<main class="arsenal-main">
+  <section class="arsenal-hero">
+    <div class="arsenal-hero-eyebrow">Tool 03 / Outreach Compiler</div>
+    <h1 class="arsenal-hero-title">Spintax Compiler &amp;<br>Injection Queue</h1>
+    <p class="arsenal-hero-desc">Compiles nested Spintax into every mathematically unique permutation with a real recursive-descent parser, hashes each with SHA-256, and queues them for outbound send.</p>
+    <div class="arsenal-hero-meta">
+      <div class="arsenal-hero-meta-item">Cost <strong>1 credit / unique variant queued</strong></div>
+      <div class="arsenal-hero-meta-item">Engine <strong>AST parser + itertools.product</strong></div>
+    </div>
+  </section>
+
+  <div class="arsenal-grid">
+    <div class="arsenal-card">
+      <div class="arsenal-card-header"><span class="arsenal-card-title">Template</span></div>
+      <div class="arsenal-card-body">
+        <div class="arsenal-field">
+          <label class="arsenal-label">Spintax Template</label>
+          <textarea class="arsenal-textarea" id="template" style="min-height:150px" placeholder="{Hi|Hello|Hey} {name}, our tool boosts {margins|ROI|close rates} for teams like yours.">{Hi|Hello|Hey} there, our tool boosts {margins|ROI|{close rates|conversion}} for teams like yours.</textarea>
+          <div class="arsenal-hint">Nesting supported: {A|{B|C}}. Preview is free — queueing costs 1 credit per unique variant.</div>
+        </div>
+        <div class="arsenal-field">
+          <label class="arsenal-label">Campaign ID</label>
+          <input class="arsenal-input" id="campaignId" placeholder="acme-outreach-9x2">
+        </div>
+        <button class="arsenal-btn arsenal-btn-secondary" id="previewBtn" onclick="runPreview()" style="margin-bottom:0.8rem">Preview Permutations (Free) →</button>
+        <button class="arsenal-btn" id="queueBtn" onclick="runQueue()">Compile &amp; Queue →</button>
+      </div>
+    </div>
+    <div class="arsenal-card">
+      <div class="arsenal-card-header"><span class="arsenal-card-title">Output</span><span class="arsenal-card-sub" id="variantCount"></span></div>
+      <div class="arsenal-card-body" id="outputWrap">
+        <div class="arsenal-empty"><div class="arsenal-empty-icon">◌</div><div class="arsenal-empty-text">Preview your template to see generated variants.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arsenal-card" style="margin-top:1.5rem">
+    <div class="arsenal-card-header"><span class="arsenal-card-title">Queue Lookup</span></div>
+    <div class="arsenal-card-body">
+      <div class="arsenal-field-row" style="align-items:flex-end">
+        <div class="arsenal-field"><label class="arsenal-label">Campaign ID</label><input class="arsenal-input" id="lookupCampaignId" placeholder="acme-outreach-9x2"></div>
+        <button class="arsenal-btn arsenal-btn-secondary" style="width:auto;padding:0.75rem 1.4rem" onclick="loadQueue()">Load Queue</button>
+      </div>
+      <div id="queueWrap" style="margin-top:1rem"></div>
+    </div>
+  </div>
+</main>
+
+<script>
+let RAPTOR_API_URL   = localStorage.getItem('raptor_api_url')   || 'https://websites-api-5wmu.onrender.com';
+let SUPABASE_URL_VAL = localStorage.getItem('raptor_sb_url')    || 'https://pcdbtcpctlnvdtbrrqoo.supabase.co';
+let SUPABASE_KEY_VAL = localStorage.getItem('raptor_sb_key')    || '';
+const supabaseClient = SUPABASE_URL_VAL.startsWith('http') ? window.supabase.createClient(SUPABASE_URL_VAL, SUPABASE_KEY_VAL) : null;
+const TOOL_BASE = `${RAPTOR_API_URL}/api/spintax`;
+
+function showToast(msg, type='') {
+  const stack = document.getElementById('toastStack');
+  const t = document.createElement('div'); t.className='arsenal-toast '+type; t.textContent=msg;
+  stack.appendChild(t); setTimeout(()=>t.remove(), 3500);
+}
+async function getAuthHeader() {
+  if (!supabaseClient) { showToast('Supabase not configured','error'); return null; }
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) { showToast('Session expired — please log in again','error'); setTimeout(()=>window.location.href='/ventures/raptor/',1200); return null; }
+  return { 'Authorization': `Bearer ${session.access_token}`, 'Content-Type': 'application/json' };
+}
+function handleUnauthorized() { showToast('Session expired — please log in again','error'); if(supabaseClient) supabaseClient.auth.signOut(); setTimeout(()=>window.location.href='/ventures/raptor/',1200); }
+function syncCredits(c) { if (typeof c === 'number') document.getElementById('topbarCredits').textContent = c; }
+
+async function runPreview() {
+  const template = document.getElementById('template').value;
+  if (!template.trim()) return showToast('Enter a template', 'error');
+  const btn = document.getElementById('previewBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="arsenal-spinner"></span> Compiling…';
+  const headers = await getAuthHeader();
+  if (!headers) { btn.disabled=false; btn.textContent='Preview Permutations (Free) →'; return; }
+  try {
+    const res = await fetch(`${TOOL_BASE}/compile`, { method:'POST', headers, body: JSON.stringify({ template }) });
+    if (res.status === 401) return handleUnauthorized();
+    if (!res.ok) { const err = await res.json(); throw new Error(err.detail || 'Compile failed'); }
+    const json = await res.json();
+    document.getElementById('variantCount').textContent = `${json.variant_count} unique variants`;
+    document.getElementById('outputWrap').innerHTML = `
+      <div class="arsenal-stats" style="margin-bottom:1rem">
+        <div class="arsenal-stat"><div class="arsenal-stat-label">Total Permutations</div><div class="arsenal-stat-value accent">${json.variant_count}</div></div>
+        <div class="arsenal-stat"><div class="arsenal-stat-label">Credits to Queue All</div><div class="arsenal-stat-value">${json.variant_count}</div></div>
+      </div>
+      <div class="arsenal-console">${json.sample.map((s,i)=>`<div class="arsenal-console-line ok"><span class="ts">#${i+1}</span><span class="msg">${s}</span></div>`).join('')}</div>
+    `;
+  } catch (e) { showToast(e.message || 'Compile failed', 'error'); }
+  finally { btn.disabled=false; btn.textContent='Preview Permutations (Free) →'; }
+}
+
+async function runQueue() {
+  const template = document.getElementById('template').value;
+  const campaign_id = document.getElementById('campaignId').value.trim();
+  if (!template.trim() || !campaign_id) return showToast('Template and Campaign ID are required', 'error');
+
+  const btn = document.getElementById('queueBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="arsenal-spinner"></span> Queueing…';
+  const headers = await getAuthHeader();
+  if (!headers) { btn.disabled=false; btn.textContent='Compile & Queue →'; return; }
+
+  try {
+    const res = await fetch(`${TOOL_BASE}/queue`, { method:'POST', headers, body: JSON.stringify({ template, campaign_id }) });
+    if (res.status === 401) return handleUnauthorized();
+    if (res.status === 402) return showToast('Out of credits', 'error');
+    if (!res.ok) { const err = await res.json(); throw new Error(err.detail || 'Queue failed'); }
+    const json = await res.json();
+    syncCredits(json.credits_left);
+    showToast(`Queued ${json.unique_variants_queued} variants for "${json.campaign_id}"`, 'success');
+    document.getElementById('lookupCampaignId').value = json.campaign_id;
+    loadQueue();
+  } catch (e) { showToast(e.message || 'Queue failed', 'error'); }
+  finally { btn.disabled=false; btn.textContent='Compile & Queue →'; }
+}
+
+async function loadQueue() {
+  const campaignId = document.getElementById('lookupCampaignId').value.trim();
+  if (!campaignId) return showToast('Enter a campaign ID', 'error');
+  const headers = await getAuthHeader();
+  if (!headers) return;
+  try {
+    const res = await fetch(`${TOOL_BASE}/queue/${encodeURIComponent(campaignId)}`, { headers });
+    if (res.status === 401) return handleUnauthorized();
+    const json = await res.json();
+    const wrap = document.getElementById('queueWrap');
+    if (!json.queue.length) { wrap.innerHTML = '<div class="arsenal-empty"><div class="arsenal-empty-text">No queued variants for this campaign.</div></div>'; return; }
+    wrap.innerHTML = `<table class="arsenal-table"><thead><tr><th>Variant</th><th>Status</th></tr></thead><tbody>
+      ${json.queue.map(q => `<tr><td style="color:var(--white)">${q.variant_text}</td><td>${q.sent ? '<span class="arsenal-badge ok"><span class="dot"></span>Sent</span>' : '<span class="arsenal-badge pending"><span class="dot"></span>Pending</span>'}</td></tr>`).join('')}
+    </tbody></table>`;
+  } catch (e) { showToast('Could not load queue', 'error'); }
+}
+</script>
+</body>
+</html>
