@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnostic Suite — Raptor Arsenal</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body class="arsenal-body" data-tool="diagnostic">
+<div class="arsenal-toast-stack" id="toastStack"></div>
+
+<header class="arsenal-topbar">
+  <a href="/dashboard.html" class="arsenal-back">← Dashboard</a>
+  <div class="arsenal-tool-badge"><span class="dot"></span>DIAGNOSTIC SUITE</div>
+  <div class="arsenal-topbar-right">
+    <div class="arsenal-credits-pill">
+      <div>
+        <div class="arsenal-credits-label">Credits</div>
+        <div class="arsenal-credits-value" id="topbarCredits">—</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="arsenal-main">
+  <section class="arsenal-hero">
+    <div class="arsenal-hero-eyebrow">Tool 01 / Infrastructure</div>
+    <h1 class="arsenal-hero-title">Unified Infrastructure<br>Diagnostic Suite</h1>
+    <p class="arsenal-hero-desc">Bulk deliverability &amp; routing analyzer — async DNS across thousands of domains, live DNSBL blacklist checks, and Received-header hop tracing that tells you exactly which server dropped the packet.</p>
+    <div class="arsenal-hero-meta">
+      <div class="arsenal-hero-meta-item">Cost <strong>1 credit / domain</strong></div>
+      <div class="arsenal-hero-meta-item">Engine <strong>asyncio + dnspython</strong></div>
+      <div class="arsenal-hero-meta-item">Endpoint <strong>/api/diagnostic</strong></div>
+    </div>
+  </section>
+
+  <div class="arsenal-tabs">
+    <div class="arsenal-tab active" data-tab="bulk">Bulk Domain Check</div>
+    <div class="arsenal-tab" data-tab="blacklist">Blacklist Check</div>
+    <div class="arsenal-tab" data-tab="headers">Header Tracer</div>
+  </div>
+
+  <!-- ── BULK CHECK ── -->
+  <div class="arsenal-tab-panel active" id="panel-bulk">
+    <div class="arsenal-grid">
+      <div class="arsenal-card">
+        <div class="arsenal-card-header"><span class="arsenal-card-title">Input</span></div>
+        <div class="arsenal-card-body">
+          <div class="arsenal-field">
+            <label class="arsenal-label">Domains (one per line)</label>
+            <textarea class="arsenal-textarea" id="bulkDomains" placeholder="acme.com&#10;widgets.io&#10;prospect-corp.net"></textarea>
+            <div class="arsenal-hint">Max 200 domains per batch · 1 credit per domain checked</div>
+          </div>
+          <button class="arsenal-btn" id="bulkBtn" onclick="runBulkCheck()">Run Diagnostic →</button>
+          <div class="arsenal-upgrade-wall" id="bulkUpgradeWall">
+            <h4>Out of Credits</h4>
+            <p>You've used all your Raptor credits this cycle.</p>
+            <button class="arsenal-btn arsenal-btn-secondary" onclick="handleUpgrade()">Upgrade to Pro</button>
+          </div>
+        </div>
+      </div>
+      <div class="arsenal-card">
+        <div class="arsenal-card-header">
+          <span class="arsenal-card-title">Results</span>
+          <span class="arsenal-card-sub" id="bulkResultCount"></span>
+        </div>
+        <div class="arsenal-card-body" id="bulkResultsWrap">
+          <div class="arsenal-empty"><div class="arsenal-empty-icon">◌</div><div class="arsenal-empty-text">Run a check to see live DNS results here.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BLACKLIST CHECK ── -->
+  <div class="arsenal-tab-panel" id="panel-blacklist">
+    <div class="arsenal-grid">
+      <div class="arsenal-card">
+        <div class="arsenal-card-header"><span class="arsenal-card-title">Input</span></div>
+        <div class="arsenal-card-body">
+          <div class="arsenal-field">
+            <label class="arsenal-label">Domain</label>
+            <input class="arsenal-input" id="blDomain" placeholder="acme.com">
+            <div class="arsenal-hint">Resolves the MX, reverses the IP, queries 5 real DNSBL zones · 1 credit</div>
+          </div>
+          <button class="arsenal-btn" id="blBtn" onclick="runBlacklistCheck()">Check Blacklists →</button>
+        </div>
+      </div>
+      <div class="arsenal-card">
+        <div class="arsenal-card-header"><span class="arsenal-card-title">Results</span></div>
+        <div class="arsenal-card-body" id="blResultsWrap">
+          <div class="arsenal-empty"><div class="arsenal-empty-icon">◌</div><div class="arsenal-empty-text">No blacklist check run yet.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── HEADER TRACER ── -->
+  <div class="arsenal-tab-panel" id="panel-headers">
+    <div class="arsenal-grid">
+      <div class="arsenal-card">
+        <div class="arsenal-card-header"><span class="arsenal-card-title">Paste Bounce / Raw Headers</span></div>
+        <div class="arsenal-card-body">
+          <div class="arsenal-field">
+            <textarea class="arsenal-textarea" id="rawHeaders" style="min-height:220px" placeholder="Received: from mail.prospect.com ...&#10;Received: from mx1.shoonyaorigins.com ..."></textarea>
+            <div class="arsenal-hint">Paste the full raw header block from a bounced email · 1 credit</div>
+          </div>
+          <button class="arsenal-btn" id="hdrBtn" onclick="runHeaderTrace()">Trace Route →</button>
+        </div>
+      </div>
+      <div class="arsenal-card">
+        <div class="arsenal-card-header"><span class="arsenal-card-title">Hop-by-Hop Path</span></div>
+        <div class="arsenal-card-body" id="hdrResultsWrap">
+          <div class="arsenal-empty"><div class="arsenal-empty-icon">◌</div><div class="arsenal-empty-text">Paste headers to reconstruct the routing path.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────
+let RAPTOR_API_URL   = localStorage.getItem('raptor_api_url')   || 'https://websites-api-5wmu.onrender.com';
+let SUPABASE_URL_VAL = localStorage.getItem('raptor_sb_url')    || 'https://pcdbtcpctlnvdtbrrqoo.supabase.co';
+let SUPABASE_KEY_VAL = localStorage.getItem('raptor_sb_key')    || '';
+const supabaseClient = SUPABASE_URL_VAL.startsWith('http') ? window.supabase.createClient(SUPABASE_URL_VAL, SUPABASE_KEY_VAL) : null;
+const TOOL_BASE = `${RAPTOR_API_URL}/api/diagnostic`;
+
+// ── TOAST ───────────────────────────────────────────
+function showToast(msg, type='') {
+  const stack = document.getElementById('toastStack');
+  const t = document.createElement('div');
+  t.className = 'arsenal-toast ' + type;
+  t.textContent = msg;
+  stack.appendChild(t);
+  setTimeout(()=> t.remove(), 3500);
+}
+
+// ── AUTH ────────────────────────────────────────────
+async function getAuthHeader() {
+  if (!supabaseClient) { showToast('Supabase not configured', 'error'); return null; }
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) {
+    showToast('Session expired — please log in again', 'error');
+    setTimeout(()=> window.location.href = '/ventures/raptor/', 1200);
+    return null;
+  }
+  return { 'Authorization': `Bearer ${session.access_token}`, 'Content-Type': 'application/json' };
+}
+function handleUnauthorized() {
+  showToast('Session expired — please log in again', 'error');
+  if (supabaseClient) supabaseClient.auth.signOut();
+  setTimeout(()=> window.location.href = '/ventures/raptor/', 1200);
+}
+function syncCredits(creditsLeft) {
+  if (typeof creditsLeft === 'number') document.getElementById('topbarCredits').textContent = creditsLeft;
+}
+function handleUpgrade() {
+  window.open('mailto:yogeshjathalkar@gmail.com?subject=Raptor Pro Upgrade', '_blank');
+}
+async function loadCreditsOnly() {
+  const headers = await getAuthHeader();
+  if (!headers) return;
+  try {
+    const res = await fetch(`${RAPTOR_API_URL}/api/raptor/status`);
+    // status endpoint has no credit data; credits populate after first tool call instead
+  } catch(e) {}
+}
+
+// ── TABS ────────────────────────────────────────────
+document.querySelectorAll('.arsenal-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.arsenal-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.arsenal-tab-panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-'+tab.dataset.tab).classList.add('active');
+  });
+});
+
+// ── BULK CHECK ──────────────────────────────────────
+async function runBulkCheck() {
+  const raw = document.getElementById('bulkDomains').value.trim();
+  if (!raw) return showToast('Enter at least one domain', 'error');
+  const domains = raw.split('\n').map(d=>d.trim()).filter(Boolean);
+
+  const btn = document.getElementById('bulkBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="arsenal-spinner"></span> Resolving DNS…';
+  document.getElementById('bulkUpgradeWall').classList.remove('visible');
+
+  const headers = await getAuthHeader();
+  if (!headers) { btn.disabled=false; btn.textContent='Run Diagnostic →'; return; }
+
+  try {
+    const res = await fetch(`${TOOL_BASE}/bulk-check`, { method:'POST', headers, body: JSON.stringify({ domains }) });
+    if (res.status === 401) return handleUnauthorized();
+    if (res.status === 402) { document.getElementById('bulkUpgradeWall').classList.add('visible'); return; }
+    if (!res.ok) { const err = await res.json(); throw new Error(err.detail || 'API error'); }
+    const json = await res.json();
+    syncCredits(json.credits_left);
+    renderBulkResults(json.results);
+  } catch (e) {
+    showToast(e.message || 'Diagnostic failed', 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Run Diagnostic →';
+  }
+}
+
+function renderBulkResults(results) {
+  document.getElementById('bulkResultCount').textContent = `${results.length} domain${results.length!==1?'s':''}`;
+  const wrap = document.getElementById('bulkResultsWrap');
+  wrap.innerHTML = `<table class="arsenal-table"><thead><tr><th>Domain</th><th>MX</th><th>SPF</th><th>DMARC</th><th>Verdict</th></tr></thead><tbody>
+    ${results.map(r => `
+      <tr>
+        <td style="color:var(--white)">${r.domain}</td>
+        <td>${r.mx.length ? r.mx[0] + (r.mx.length>1?` +${r.mx.length-1}`:'') : '—'}</td>
+        <td>${r.spf ? '✓' : '✗'}</td>
+        <td>${r.dmarc ? '✓' : '✗'}</td>
+        <td><span class="arsenal-badge ${r.verdict==='healthy'?'ok':r.verdict==='warn'?'warn':'fail'}"><span class="dot"></span>${r.verdict}</span></td>
+      </tr>
+      ${r.reasons.length ? `<tr><td colspan="5" style="font-size:0.6rem;color:var(--dim2);padding-top:0">${r.reasons.join(' · ')}</td></tr>` : ''}
+    `).join('')}
+  </tbody></table>`;
+}
+
+// ── BLACKLIST CHECK ─────────────────────────────────
+async function runBlacklistCheck() {
+  const domain = document.getElementById('blDomain').value.trim();
+  if (!domain) return showToast('Enter a domain', 'error');
+
+  const btn = document.getElementById('blBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="arsenal-spinner"></span> Querying DNSBLs…';
+
+  const headers = await getAuthHeader();
+  if (!headers) { btn.disabled=false; btn.textContent='Check Blacklists →'; return; }
+
+  try {
+    const res = await fetch(`${TOOL_BASE}/blacklist`, { method:'POST', headers, body: JSON.stringify({ domain }) });
+    if (res.status === 401) return handleUnauthorized();
+    if (res.status === 402) return showToast('Out of credits', 'error');
+    if (!res.ok) { const err = await res.json(); throw new Error(err.detail || 'API error'); }
+    const json = await res.json();
+    syncCredits(json.credits_left);
+    renderBlacklistResults(json);
+  } catch (e) {
+    showToast(e.message || 'Blacklist check failed', 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Check Blacklists →';
+  }
+}
+
+function renderBlacklistResults(json) {
+  const wrap = document.getElementById('blResultsWrap');
+  if (json.error) { wrap.innerHTML = `<div class="arsenal-empty"><div class="arsenal-empty-text">${json.error}</div></div>`; return; }
+  wrap.innerHTML = `
+    <div class="arsenal-stats" style="margin-bottom:1.2rem">
+      <div class="arsenal-stat"><div class="arsenal-stat-label">MX Host</div><div class="arsenal-stat-value" style="font-size:1rem">${json.mx_host}</div></div>
+      <div class="arsenal-stat"><div class="arsenal-stat-label">IP</div><div class="arsenal-stat-value" style="font-size:1rem">${json.ip}</div></div>
+      <div class="arsenal-stat"><div class="arsenal-stat-label">Listed On</div><div class="arsenal-stat-value accent">${json.listed_count}/${json.checks.length}</div></div>
+    </div>
+    <table class="arsenal-table"><thead><tr><th>DNSBL Zone</th><th>Status</th></tr></thead><tbody>
+      ${json.checks.map(c => `<tr><td style="color:var(--white)">${c.zone}</td><td>${
+        c.listed === true ? '<span class="arsenal-badge fail"><span class="dot"></span>Listed</span>' :
+        c.listed === false ? '<span class="arsenal-badge ok"><span class="dot"></span>Clean</span>' :
+        '<span class="arsenal-badge pending"><span class="dot"></span>Timeout</span>'
+      }</td></tr>`).join('')}
+    </tbody></table>`;
+}
+
+// ── HEADER TRACER ───────────────────────────────────
+async function runHeaderTrace() {
+  const raw_headers = document.getElementById('rawHeaders').value;
+  if (!raw_headers.trim()) return showToast('Paste header text first', 'error');
+
+  const btn = document.getElementById('hdrBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="arsenal-spinner"></span> Parsing hops…';
+
+  const headers = await getAuthHeader();
+  if (!headers) { btn.disabled=false; btn.textContent='Trace Route →'; return; }
+
+  try {
+    const res = await fetch(`${TOOL_BASE}/parse-headers`, { method:'POST', headers, body: JSON.stringify({ raw_headers }) });
+    if (res.status === 401) return handleUnauthorized();
+    if (res.status === 402) return showToast('Out of credits', 'error');
+    if (!res.ok) { const err = await res.json(); throw new Error(err.detail || 'API error'); }
+    const json = await res.json();
+    syncCredits(json.credits_left);
+    renderHeaderTrace(json);
+  } catch (e) {
+    showToast(e.message || 'Header parsing failed', 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Trace Route →';
+  }
+}
+
+function renderHeaderTrace(json) {
+  const wrap = document.getElementById('hdrResultsWrap');
+  if (!json.hop_count) { wrap.innerHTML = `<div class="arsenal-empty"><div class="arsenal-empty-text">No Received: hops found in that text.</div></div>`; return; }
+  wrap.innerHTML = `
+    <div class="arsenal-console">
+      ${json.hops.map((h,i) => `
+        <div class="arsenal-console-line ${json.likely_filter_hop===h?'fail':'ok'}">
+          <span class="ts">#${i+1}</span>
+          <span class="msg">${h.from_host||'unknown'} → ${h.by_host||'unknown'} ${h.ip?`[${h.ip}]`:''} ${h.timestamp?`@ ${h.timestamp}`:''}</span>
+        </div>
+      `).join('')}
+    </div>
+    ${json.likely_filter_hop ? `<div class="arsenal-badge fail" style="margin-top:1rem"><span class="dot"></span>Likely dropped at: ${json.likely_filter_hop.from_host || json.likely_filter_hop.by_host}</div>` : ''}
+  `;
+}
+
+document.addEventListener('DOMContentLoaded', loadCreditsOnly);
+</script>
+</body>
+</html>
