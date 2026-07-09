@@ -10,7 +10,7 @@
 
   gtag('config', 'G-XV0W5ZV0RQ');
 </script>
-<script src="script.js"></script>
+ <link rel="icon" type="image/x-icon" href="/icon.ico">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Construct | The Nervous System of Infrastructure</title>
@@ -30,29 +30,42 @@
         <div class="bulb"></div>
         <div class="pull-string"><div class="knob"></div></div>
     </div>
-
-    <a href="../../index.html" class="back-link">← Return to Origins</a>
+     
     <button class="auth-trigger-btn" id="navLoginBtn" data-open-auth="login">Log In / Sign Up</button>
+
+    <div class="sidebar-toggle" id="sidebarToggle">
+        <img src="assets/menu-icon.png" alt="Open menu" class="hamburger-icon" id="hamburgerIcon">
+        <span class="toggle-label" id="toggleLabel"></span>
+    </div>
+
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
     <div class="brand" id="gameTrigger">THE CONSTRUCT</div>
 
-    <div class="sys-monitor">
+    <div class="sys-monitor" id="sysMonitor">
         <div class="sys-header">
             <span>CONSTRUCT.OS</span>
         </div>
         
         <ul class="sys-list">
             <li class="sys-item active" onclick="scrollToId('hero-top')"><span>00. OVERVIEW</span></li>
-            <li class="sys-item" onclick="scrollToId('c-safety')"><span>01. SAFETY</span></li>
-            <li class="sys-item" onclick="scrollToId('c-logistics')"><span>02. LOGISTICS</span></li>
-            <li class="sys-item" onclick="scrollToId('c-oracle')"><span>03. FINANCE</span></li>
-            <li class="sys-item" onclick="scrollToId('c-quality')"><span>04. QUALITY</span></li>
-            <li class="sys-item" onclick="scrollToId('c-eco')"><span>05. ECO</span></li>
-            <li class="sys-item" onclick="scrollToId('c-bio')"><span>06. BIO</span></li>
-            <li class="sys-item" onclick="scrollToId('c-twin')"><span>07. TWIN</span></li>
-            <li class="sys-item" onclick="scrollToId('c-reality')"><span>08. REALITY</span></li>
-            <li class="sys-item" onclick="scrollToId('c-vortex')"><span>09. VORTEX</span></li>
-            <li class="sys-item" onclick="scrollToId('c-rover')"><span>10. ROVER</span></li>
+            <li class="sys-item" onclick="scrollToId('problem-section')"><span>01. THE PROBLEM</span></li>
+            <li class="sys-item" onclick="scrollToId('approach-section')"><span>02. OUR APPROACH</span></li>
+            <li class="sys-item" onclick="scrollToId('roi-section')"><span>03. ROI & IMPACT</span></li>
+            <li class="sys-item" onclick="scrollToId('onboarding-section')"><span>04. ONBOARDING</span></li>
+            <li class="sys-item" onclick="scrollToId('lifecycle-section')"><span>05. LIFECYCLE</span></li>
+            <li class="sys-item" onclick="scrollToId('diff-section')"><span>06. DIFFERENCE</span></li>
+            <li class="sys-item" onclick="scrollToId('cta-section')"><span>07. START NOW</span></li>
+            <li class="sys-item" onclick="scrollToId('c-safety')"><span>08. SAFETY</span></li>
+            <li class="sys-item" onclick="scrollToId('c-logistics')"><span>09. LOGISTICS</span></li>
+            <li class="sys-item" onclick="scrollToId('c-oracle')"><span>10. FINANCE</span></li>
+            <li class="sys-item" onclick="scrollToId('c-quality')"><span>11. QUALITY</span></li>
+            <li class="sys-item" onclick="scrollToId('c-eco')"><span>12. ECO</span></li>
+            <li class="sys-item" onclick="scrollToId('c-bio')"><span>13. BIO</span></li>
+            <li class="sys-item" onclick="scrollToId('c-twin')"><span>14. TWIN</span></li>
+            <li class="sys-item" onclick="scrollToId('c-reality')"><span>15. REALITY</span></li>
+            <li class="sys-item" onclick="scrollToId('c-vortex')"><span>16. VORTEX</span></li>
+            <li class="sys-item" onclick="scrollToId('c-rover')"><span>17. ROVER</span></li>
         </ul>
 
         <div class="sys-details" id="sys-details">
@@ -87,18 +100,218 @@
                 </a>
             </div>
         </section> 
-    </div> 
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 1: THE PROBLEM
+         ═══════════════════════════════════════ -->
+    <section id="problem-section" class="intro-section" data-aos="fade-up">
+        <div class="section-header">
+            <h2>The Real Cost of Traditional Construction</h2>
+            <p class="section-subtitle">For decades, construction has remained fundamentally unchanged.</p>
+        </div>
+        
+        <div class="problems-grid">
+            <div class="problem-card" data-aos="fade-up">
+                <div class="problem-icon">📊</div>
+                <h3>Material Shrinkage & Theft</h3>
+                <p>15-30% of materials disappear during construction. No visibility, no accountability, no recovery.</p>
+            </div>
+            
+            <div class="problem-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="problem-icon">📋</div>
+                <h3>Manual Safety Logs</h3>
+                <p>Safety compliance is reactive, not preventive. Incidents discovered after they happen, not prevented before.</p>
+            </div>
+            
+            <div class="problem-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="problem-icon">🔨</div>
+                <h3>No Quality Mapping</h3>
+                <p>Defects discovered in final inspection. Rework erupts at closeout when it should have been caught daily.</p>
+            </div>
+            
+            <div class="problem-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="problem-icon">⏱️</div>
+                <h3>Resource Misalignment</h3>
+                <p>Equipment sits idle. Labor gets allocated based on hunches. No real-time visibility into utilization.</p>
+            </div>
+            
+            <div class="problem-card" data-aos="fade-up" data-aos-delay="400">
+                <div class="problem-icon">📂</div>
+                <h3>Fragmented Data</h3>
+                <p>Spreadsheets, PDFs, disconnected systems. No single source of truth. Decisions made 2 weeks behind reality.</p>
+            </div>
+            
+            <div class="problem-card" data-aos="fade-up" data-aos-delay="500">
+                <div class="problem-icon">💰</div>
+                <h3>Silent Hemorrhaging</h3>
+                <p>On a $50M project, $5-10M disappears to inefficiency, waste, and undetected problems. Silently.</p>
+            </div>
+        </div>
+
+        <div class="problem-summary" data-aos="zoom-in">
+            <p>Even modern construction companies use 1970s operational playbooks. <strong>We built Construct OS because this shouldn't be acceptable in 2024.</strong></p>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 2: OUR APPROACH
+         ═══════════════════════════════════════ -->
+    <section id="approach-section" class="intro-section" data-aos="fade-up">
+        <div class="section-header">
+            <h2>Physics First. Data Driven. Built for Construction.</h2>
+            <p class="section-subtitle">Not a monitoring tool. An automated ecosystem engineered from first principles.</p>
+        </div>
+
+        <div class="approach-grid">
+            <div class="approach-card" data-aos="fade-right">
+                <div class="approach-number">✓</div>
+                <h3>Physics-First Design</h3>
+                <p>Built from the ground up to model construction-specific dynamics: material flow, spatial relationships, temporal scheduling, and resource entropy. Every calculation respects the actual physics of your site.</p>
+            </div>
+
+            <div class="approach-card" data-aos="fade-left">
+                <div class="approach-number">✓</div>
+                <h3>Zero Friction Integration</h3>
+                <p>Connects to your existing ERP, project management, and accounting tools in days, not months. We don't ask you to replace your systems. We make them work better together.</p>
+            </div>
+
+            <div class="approach-card" data-aos="fade-right">
+                <div class="approach-number">✓</div>
+                <h3>Automated Intelligence</h3>
+                <p>Most platforms dump data at you. Construct OS makes decisions for you. Automated alerts, predictive interventions, and optimization recommendations—not just pretty charts.</p>
+            </div>
+
+            <div class="approach-card" data-aos="fade-left">
+                <div class="approach-number">✓</div>
+                <h3>Built for Your Team</h3>
+                <p>Your site supervisors and project managers don't need to be data scientists. Construct OS speaks their language: cost, schedule, safety, quality. Insights are actionable in seconds.</p>
+            </div>
+
+            <div class="approach-card" data-aos="fade-right">
+                <div class="approach-number">✓</div>
+                <h3>Your Data Stays Yours</h3>
+                <p>Deploy on your infrastructure or ours. Zero vendor lock-in. No multi-year contracts. Ownership, not subscription servitude.</p>
+            </div>
+
+            <div class="approach-card" data-aos="fade-left">
+                <div class="approach-number">✓</div>
+                <h3>Learns Your Site</h3>
+                <p>Construct OS learns how you work automatically. The system becomes smarter every week, predicting problems weeks before they surface.</p>
+            </div>
+        </div>
+
+        <div class="approach-cta" data-aos="zoom-in">
+            <p><strong>This is not software. This is your competitive advantage.</strong></p>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 3: ROI & IMPACT
+         ═══════════════════════════════════════ -->
+    <section id="roi-section" class="intro-section" data-aos="fade-up">
+        <div class="section-header">
+            <h2>Quantified Impact. Real Money. Immediate Results.</h2>
+            <p class="section-subtitle">Construction companies implementing Construct OS see:</p>
+        </div>
+
+        <div class="roi-cards-container">
+            <div class="roi-category" data-aos="fade-up">
+                <h3 class="roi-category-title">💎 MATERIAL & LOGISTICS</h3>
+                <div class="roi-metrics">
+                    <div class="roi-metric">
+                        <div class="roi-value">25-40%</div>
+                        <div class="roi-label">Shrinkage Reduction</div>
+                        <div class="roi-detail">On $100M: $2.5-4M recovered</div>
+                    </div>
+                    <div class="roi-metric">
+                        <div class="roi-value">20%</div>
+                        <div class="roi-label">Equipment Utilization Gain</div>
+                        <div class="roi-detail">Fewer idle assets, more productive hours</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="roi-category" data-aos="fade-up" data-aos-delay="100">
+                <h3 class="roi-category-title">🛡️ SAFETY & LIABILITY</h3>
+                <div class="roi-metrics">
+                    <div class="roi-metric">
+                        <div class="roi-value">70-90%</div>
+                        <div class="roi-label">Incident Reduction</div>
+                        <div class="roi-detail">Perfect compliance record</div>
+                    </div>
+                    <div class="roi-metric">
+                        <div class="roi-value">8-15%</div>
+                        <div class="roi-label">Insurance Savings</div>
+                        <div class="roi-detail">$500k-2M per major project</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="roi-category" data-aos="fade-up" data-aos-delay="200">
+                <h3 class="roi-category-title">✨ QUALITY & REWORK</h3>
+                <div class="roi-metrics">
+                    <div class="roi-metric">
+                        <div class="roi-value">35-50%</div>
+                        <div class="roi-label">Rework Reduction</div>
+                        <div class="roi-detail">Defects caught real-time, not rebuild-later</div>
+                    </div>
+                    <div class="roi-metric">
+                        <div class="roi-value">60%</div>
+                        <div class="roi-label">Faster Closeout</div>
+                        <div class="roi-detail">Data-backed sign-off, not negotiated</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="roi-category" data-aos="fade-up" data-aos-delay="300">
+                <h3 class="roi-category-title">⚡ TIMELINE & EFFICIENCY</h3>
+                <div class="roi-metrics">
+                    <div class="roi-metric">
+                        <div class="roi-value">10-20%</div>
+                        <div class="roi-label">Schedule Acceleration</div>
+                        <div class="roi-detail">4-8 weeks ahead of traditional</div>
+                    </div>
+                    <div class="roi-metric">
+                        <div class="roi-value">15-25%</div>
+                        <div class="roi-label">Productivity Increase</div>
+                        <div class="roi-detail">Data-driven task allocation</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="roi-bottom-line" data-aos="zoom-in">
+            <h3>BOTTOM LINE</h3>
+            <p>On a typical <strong>$50M project</strong>, Construct OS clients save <strong>$3-7M</strong> while finishing <strong>4-8 weeks early</strong>.</p>
+            <p class="roi-bold">The platform pays for itself in Q1.</p>
+        </div>
+    </section>
+
     <div class="map-container">
         <svg class="cable-svg" xmlns="http://www.w3.org/2000/svg">
-            <path class="cable-path" d="M 100 100 Q 500 200 1200 450 T 200 800 T 700 1200 T 1200 1550 T 100 1950 T 1100 2350 T 200 2750 T 600 3150 T 700 3450 T 900 3900" vector-effect="non-scaling-stroke"/>
+            <path class="cable-path" d="M 100 200 Q 500 400 250 1150 T 350 2150 T 230 3100 T 380 4050 T 250 5000 T 400 5950 T 320 6900 T 400 7850 T 350 8800 T 400 9400" vector-effect="non-scaling-stroke"/>
         </svg>
 
         <div class="card-wrapper" id="c-safety" data-aos="fade-right">
             <a href="modules/safety.html" style="text-decoration:none">
                 <div class="module-card" data-specs="Latency: <10ms|Coverage: 360 Site Wide|Alerts: Instant Push">
+                    <div class="module-image">
+                        <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="100" cy="70" r="48" fill="none" stroke="#fbbf24" stroke-width="2" opacity="0.3"/>
+                            <circle cx="100" cy="70" r="32" fill="none" stroke="#fbbf24" stroke-width="2" opacity="0.55"/>
+                            <path d="M55 70 C55 45 145 45 145 70 C145 95 55 95 55 70 Z" fill="none" stroke="#e2e8f0" stroke-width="3"/>
+                            <circle cx="100" cy="70" r="14" fill="#fbbf24"/>
+                            <circle cx="100" cy="70" r="5" fill="#0f172a"/>
+                        </svg>
+                    </div>
                     <span class="module-id">ID: CNSTRCT-01</span>
                     <h3>Sentinel Safety</h3>
-                    <p>Reduce liability by 100%. Our AI detects safety violations instantly, preventing costly accidents and slashing insurance premiums.</p>
+                    <div class="module-desc">
+                        <p class="lede">Reduce liability by 100%. Our AI detects safety violations instantly, preventing costly accidents and slashing insurance premiums.</p>
+                        <p>Sentinel Safety runs a 360-degree computer vision layer across every active zone on site, watching for missing PPE, unsafe proximity to machinery, unauthorized zone entry, and fall hazards in real time — no manual patrols required.</p>
+                        <p>Every flagged incident is timestamped, geotagged, and pushed to site supervisors within seconds, so corrective action happens before an accident does, not after an insurance claim.</p>
+                    </div>
                 </div>
             </a>
         </div>
@@ -106,9 +319,22 @@
         <div class="card-wrapper" id="c-logistics" data-aos="fade-left">
             <a href="modules/quantum.html" style="text-decoration:none">
                 <div class="module-card" data-specs="Tracking: RFID / BLE|Accuracy: +/- 1.5m|Sync: ERP Integrated">
+                    <div class="module-image">
+                        <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M60 55 L100 35 L140 55 L140 95 L100 115 L60 95 Z" fill="none" stroke="#e2e8f0" stroke-width="3" stroke-linejoin="round"/>
+                            <path d="M60 55 L100 75 L140 55" fill="none" stroke="#e2e8f0" stroke-width="3" stroke-linejoin="round"/>
+                            <line x1="100" y1="75" x2="100" y2="115" stroke="#e2e8f0" stroke-width="3"/>
+                            <path d="M150 40 C158 40 164 46 164 54 C164 64 150 78 150 78 C150 78 136 64 136 54 C136 46 142 40 150 40 Z" fill="#fbbf24" stroke="none"/>
+                            <circle cx="150" cy="53" r="5" fill="#0f172a"/>
+                        </svg>
+                    </div>
                     <span class="module-id">ID: CNSTRCT-02</span>
                     <h3>Quantum Logistics</h3>
-                    <p>Zero material shrinkage. We track every brick and beam in real-time, ensuring you never pay for lost or stolen assets again.</p>
+                    <div class="module-desc">
+                        <p class="lede">Zero material shrinkage. We track every brick and beam in real-time, ensuring you never pay for lost or stolen assets again.</p>
+                        <p>Using a hybrid RFID and Bluetooth Low Energy mesh, Quantum Logistics tags material and equipment the moment it enters the gate, then follows it through storage, transfer, and installation across the entire footprint of the site.</p>
+                        <p>Discrepancies between what was purchased and what was actually used surface automatically, closing the gap where theft, waste, and paperwork errors usually hide.</p>
+                    </div>
                 </div>
             </a>
         </div>
@@ -116,9 +342,22 @@
         <div class="card-wrapper" id="c-oracle" data-aos="zoom-in">
             <a href="modules/oracle.html" style="text-decoration:none">
                 <div class="module-card" data-specs="Model: Monte Carlo|Horizon: 12 Weeks|Data: 50k Points/Day">
+                    <div class="module-image">
+                        <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="45" y="80" width="22" height="35" fill="#e2e8f0" opacity="0.8"/>
+                            <rect x="80" y="60" width="22" height="55" fill="#e2e8f0" opacity="0.8"/>
+                            <rect x="115" y="40" width="22" height="75" fill="#fbbf24"/>
+                            <path d="M45 65 L80 45 L115 30 L150 15" fill="none" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+                            <path d="M138 15 L150 15 L150 27" fill="none" stroke="#fbbf24" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
                     <span class="module-id">ID: CNSTRCT-03</span>
                     <h3>Predictive Oracle</h3>
-                    <p>Eliminate budget overruns. Our AI predicts financial bottlenecks weeks in advance, protecting your profit margin from delays.</p>
+                    <div class="module-desc">
+                        <p class="lede">Eliminate budget overruns. Our AI predicts financial bottlenecks weeks in advance, protecting your profit margin from delays.</p>
+                        <p>Predictive Oracle runs Monte Carlo simulations against live procurement, labor, and weather data, modeling thousands of possible cost trajectories for your project every single day.</p>
+                        <p>Instead of discovering a budget overrun in a quarterly review, you see it forming twelve weeks out — with enough runway to renegotiate, reschedule, or reroute before it hits the bottom line.</p>
+                    </div>
                 </div>
             </a>
         </div>
@@ -126,9 +365,23 @@
         <div class="card-wrapper" id="c-quality" data-aos="fade-up">
             <a href="modules/spectra.html" style="text-decoration:none">
                 <div class="module-card" data-specs="Sensors: Thermal/LiDAR|Res: < 2mm|Output: Auto-PDF">
+                    <div class="module-image">
+                        <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
+                            <g stroke="#e2e8f0" stroke-width="1.5" opacity="0.5">
+                                <line x1="50" y1="40" x2="150" y2="40"/><line x1="50" y1="60" x2="150" y2="60"/><line x1="50" y1="80" x2="150" y2="80"/><line x1="50" y1="100" x2="150" y2="100"/>
+                                <line x1="60" y1="30" x2="60" y2="110"/><line x1="90" y1="30" x2="90" y2="110"/><line x1="120" y1="30" x2="120" y2="110"/>
+                            </g>
+                            <circle cx="105" cy="65" r="28" fill="none" stroke="#fbbf24" stroke-width="3.5"/>
+                            <line x1="125" y1="85" x2="148" y2="108" stroke="#fbbf24" stroke-width="4" stroke-linecap="round"/>
+                        </svg>
+                    </div>
                     <span class="module-id">ID: CNSTRCT-04</span>
                     <h3>Spectra Quality</h3>
-                    <p>Zero structural rework. We detect micro-fractures during the pour, ensuring perfect structural integrity and avoiding million-dollar repairs.</p>
+                    <div class="module-desc">
+                        <p class="lede">Zero structural rework. We detect micro-fractures during the pour, ensuring perfect structural integrity and avoiding million-dollar repairs.</p>
+                        <p>Thermal and LiDAR sensors scan every concrete pour and structural weld as it happens, cross-referencing the readings against engineering tolerances to catch defects invisible to the naked eye.</p>
+                        <p>Anomalies generate an auto-compiled PDF report with exact coordinates, so remediation happens while the crew and equipment are still on-site — not months later when it's ten times the cost.</p>
+                    </div>
                 </div>
             </a>
         </div>
@@ -136,9 +389,22 @@
         <div class="card-wrapper" id="c-eco" data-aos="fade-left">
             <a href="modules/eco.html" style="text-decoration:none">
                 <div class="module-card" data-specs="Compliance: LEED/BREEAM|Tracking: Carbon/Water|Diversion: Real-time %">
+                    <div class="module-image">
+                        <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="100" cy="70" r="50" fill="none" stroke="#e2e8f0" stroke-width="2" stroke-dasharray="6 6" opacity="0.4"/>
+                            <path d="M100 35 C130 35 145 60 130 85 C118 105 90 105 80 85" fill="none" stroke="#fbbf24" stroke-width="4" stroke-linecap="round"/>
+                            <path d="M122 78 L130 85 L138 75" fill="none" stroke="#fbbf24" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M100 105 C70 105 55 80 70 55 C82 35 110 35 120 55" fill="none" stroke="#e2e8f0" stroke-width="4" stroke-linecap="round"/>
+                            <path d="M78 62 L70 55 L62 65" fill="none" stroke="#e2e8f0" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
                     <span class="module-id">ID: CNSTRCT-05</span>
                     <h3>Eco Recovery</h3>
-                    <p>Turn waste into revenue. We automate recycling tracking to meet Green Standards and monetize scrap material streams.</p>
+                    <div class="module-desc">
+                        <p class="lede">Turn waste into revenue. We automate recycling tracking to meet Green Standards and monetize scrap material streams.</p>
+                        <p>Eco Recovery logs every load of waste and scrap leaving the site, sorting it against LEED and BREEAM diversion categories automatically instead of relying on manual paper logs at the dumpster.</p>
+                        <p>The result is audit-ready compliance documentation on demand, plus visibility into which scrap streams are worth selling instead of hauling away at a loss.</p>
+                    </div>
                 </div>
             </a>
         </div>
@@ -146,9 +412,21 @@
         <div class="card-wrapper" id="c-bio" data-aos="fade-right">
             <a href="modules/bio.html" style="text-decoration:none">
                 <div class="module-card" data-specs="Vitals: HR / Temp|Env: Wet Bulb / AQI|Privacy: GDPR Safe">
+                    <div class="module-image">
+                        <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="70" cy="55" r="20" fill="none" stroke="#e2e8f0" stroke-width="3"/>
+                            <path d="M50 55 A20 20 0 0 1 90 55" fill="#fbbf24" opacity="0.9"/>
+                            <path d="M40 100 L45 60 L65 70 L75 60 L95 100" fill="none" stroke="#e2e8f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+                            <path d="M95 85 L115 85 L122 70 L132 100 L140 85 L160 85" fill="none" stroke="#fbbf24" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
                     <span class="module-id">ID: CNSTRCT-06</span>
                     <h3>Bio-Ergonomics</h3>
-                    <p>Maximize workforce uptime. We prevent heatstroke and fatigue, ensuring your team operates at peak efficiency safely.</p>
+                    <div class="module-desc">
+                        <p class="lede">Maximize workforce uptime. We prevent heatstroke and fatigue, ensuring your team operates at peak efficiency safely.</p>
+                        <p>Wearable sensors track heart rate, core temperature trends, and wet-bulb globe temperature across the site, flagging individual workers approaching heat-stress thresholds before symptoms appear.</p>
+                        <p>All health data stays GDPR-compliant and worker-anonymized at the dashboard level, so you get safety without turning it into a surveillance and trust problem.</p>
+                    </div>
                 </div>
             </a>
         </div>
@@ -156,9 +434,27 @@
         <div class="card-wrapper" id="c-twin" data-aos="fade-left">
             <a href="modules/digital-twin.html" style="text-decoration:none">
                 <div class="module-card" data-specs="Dim: 4D (Time)|Format: IFC / Revit|Sync: Real-time">
+                    <div class="module-image">
+                        <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
+                            <g stroke="#e2e8f0" stroke-width="2" fill="none" opacity="0.6">
+                                <path d="M45 55 L75 40 L105 55 L105 90 L75 105 L45 90 Z"/>
+                                <path d="M45 55 L75 70 L105 55"/>
+                                <line x1="75" y1="70" x2="75" y2="105"/>
+                            </g>
+                            <g stroke="#fbbf24" stroke-width="2.5" fill="none">
+                                <path d="M90 50 L120 35 L150 50 L150 85 L120 100 L90 85 Z"/>
+                                <path d="M90 50 L120 65 L150 50"/>
+                                <line x1="120" y1="65" x2="120" y2="100"/>
+                            </g>
+                        </svg>
+                    </div>
                     <span class="module-id">ID: CNSTRCT-07</span>
                     <h3>Digital Twin</h3>
-                    <p>Perfect reconciliation. Compare "As-Built" vs "As-Designed" daily to catch deviation errors in millimeters, not meters.</p>
+                    <div class="module-desc">
+                        <p class="lede">Perfect reconciliation. Compare "As-Built" vs "As-Designed" daily to catch deviation errors in millimeters, not meters.</p>
+                        <p>Digital Twin maintains a live 4D model of the site — three spatial dimensions plus construction sequencing over time — synced continuously against IFC and Revit source files.</p>
+                        <p>When actual construction drifts from design intent, the deviation is visualized instantly instead of surfacing during a punch-list walkthrough weeks later.</p>
+                    </div>
                 </div>
             </a>
         </div>
@@ -166,9 +462,30 @@
         <div class="card-wrapper" id="c-reality" data-aos="fade-right">
             <a href="modules/reality.html" style="text-decoration:none">
                 <div class="module-card" data-specs="Tech: Lidar SLAM|Density: High-Res|Compute: Edge">
+                    <div class="module-image">
+                        <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
+                            <g fill="#e2e8f0" opacity="0.55">
+                                <circle cx="50" cy="100" r="2.5"/><circle cx="65" cy="90" r="2.5"/><circle cx="80" cy="105" r="2.5"/><circle cx="95" cy="95" r="2.5"/><circle cx="110" cy="108" r="2.5"/><circle cx="125" cy="92" r="2.5"/><circle cx="140" cy="102" r="2.5"/><circle cx="155" cy="88" r="2.5"/>
+                                <circle cx="60" cy="80" r="2.5"/><circle cx="90" cy="75" r="2.5"/><circle cx="120" cy="78" r="2.5"/><circle cx="145" cy="70" r="2.5"/>
+                            </g>
+                            <g stroke="#fbbf24" stroke-width="3" stroke-linecap="round">
+                                <line x1="70" y1="45" x2="55" y2="30"/><line x1="130" y1="45" x2="145" y2="30"/>
+                                <line x1="70" y1="55" x2="55" y2="70"/><line x1="130" y1="55" x2="145" y2="70"/>
+                            </g>
+                            <circle cx="55" cy="27" r="6" fill="none" stroke="#fbbf24" stroke-width="2.5"/>
+                            <circle cx="145" cy="27" r="6" fill="none" stroke="#fbbf24" stroke-width="2.5"/>
+                            <circle cx="55" cy="73" r="6" fill="none" stroke="#fbbf24" stroke-width="2.5"/>
+                            <circle cx="145" cy="73" r="6" fill="none" stroke="#fbbf24" stroke-width="2.5"/>
+                            <rect x="85" y="42" width="30" height="16" rx="3" fill="#fbbf24"/>
+                        </svg>
+                    </div>
                     <span class="module-id">ID: CNSTRCT-08</span>
                     <h3>Reality Capture</h3>
-                    <p>Automated daily surveying. Our drones generate point clouds in minutes, giving you a daily snapshot of progress.</p>
+                    <div class="module-desc">
+                        <p class="lede">Automated daily surveying. Our drones generate point clouds in minutes, giving you a daily snapshot of progress.</p>
+                        <p>Autonomous drone flights use LiDAR SLAM to capture high-resolution point clouds of the entire site every day, processed at the edge so results are ready before the morning safety briefing.</p>
+                        <p>Progress tracking, volumetric earthwork calculations, and stakeholder reporting all pull from the same daily capture — no separate survey crew required.</p>
+                    </div>
                 </div>
             </a>
         </div>
@@ -176,9 +493,27 @@
         <div class="card-wrapper" id="c-vortex" data-aos="zoom-in">
             <a href="modules/vortex.html" style="text-decoration:none">
                 <div class="module-card" data-specs="Type: Mesh Network|Uptime: 99.99%|Encryption: AES-256">
+                    <div class="module-image">
+                        <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
+                            <g stroke="#e2e8f0" stroke-width="1.5" opacity="0.5">
+                                <line x1="100" y1="70" x2="50" y2="35"/><line x1="100" y1="70" x2="150" y2="35"/>
+                                <line x1="100" y1="70" x2="45" y2="90"/><line x1="100" y1="70" x2="155" y2="90"/>
+                                <line x1="100" y1="70" x2="70" y2="115"/><line x1="100" y1="70" x2="130" y2="115"/>
+                            </g>
+                            <circle cx="50" cy="35" r="6" fill="#e2e8f0"/><circle cx="150" cy="35" r="6" fill="#e2e8f0"/>
+                            <circle cx="45" cy="90" r="6" fill="#e2e8f0"/><circle cx="155" cy="90" r="6" fill="#e2e8f0"/>
+                            <circle cx="70" cy="115" r="6" fill="#e2e8f0"/><circle cx="130" cy="115" r="6" fill="#e2e8f0"/>
+                            <circle cx="100" cy="70" r="18" fill="#fbbf24"/>
+                            <circle cx="100" cy="70" r="8" fill="#0f172a"/>
+                        </svg>
+                    </div>
                     <span class="module-id">ID: CNSTRCT-09</span>
                     <h3>Vortex Neural Engine</h3>
-                    <p>Automated site management. The central brain that coordinates sensors and data, making decisions while you sleep.</p>
+                    <div class="module-desc">
+                        <p class="lede">Automated site management. The central brain that coordinates sensors and data, making decisions while you sleep.</p>
+                        <p>Vortex is the coordination layer that every other Construct module reports into — safety alerts, logistics data, financial forecasts, and quality scans converge here over an encrypted mesh network with 99.99% uptime.</p>
+                        <p>It doesn't just store the data; it acts on it, routing alerts to the right person and triggering workflows automatically, so the site keeps running even during off-hours.</p>
+                    </div>
                 </div>
             </a>
         </div>
@@ -186,59 +521,303 @@
         <div class="card-wrapper" id="c-rover" data-aos="fade-up">
             <a href="modules/rover.html" style="text-decoration:none">
                 <div class="module-card hw-card" data-specs="Payload: 500kg|Runtime: 12 Hours|Autonomy: Level 4">
+                    <div class="module-image">
+                        <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M40 85 L50 60 L150 60 L160 85 Z" fill="none" stroke="#e2e8f0" stroke-width="3" stroke-linejoin="round"/>
+                            <rect x="75" y="40" width="45" height="22" rx="3" fill="none" stroke="#e2e8f0" stroke-width="3"/>
+                            <circle cx="60" cy="95" r="14" fill="#0f172a" stroke="#fbbf24" stroke-width="3"/>
+                            <circle cx="140" cy="95" r="14" fill="#0f172a" stroke="#fbbf24" stroke-width="3"/>
+                            <circle cx="100" cy="95" r="14" fill="#0f172a" stroke="#fbbf24" stroke-width="3"/>
+                            <line x1="40" y1="85" x2="160" y2="85" stroke="#fbbf24" stroke-width="2"/>
+                        </svg>
+                    </div>
                     <span class="module-id">ID: CNSTRCT-10</span>
                     <h3>Construct Rover</h3>
-                    <p>24/7 autonomous logistics. Our heavy-lift rovers move material day and night, keeping your site moving non-stop.</p>
+                    <div class="module-desc">
+                        <p class="lede">24/7 autonomous logistics. Our heavy-lift rovers move material day and night, keeping your site moving non-stop.</p>
+                        <p>Each rover carries up to 500kg and operates with Level 4 autonomy, navigating site terrain, avoiding personnel and obstacles, and running continuously for up to 12 hours per charge cycle.</p>
+                        <p>Material moves happen on the schedule the project needs, not on the availability of a driver's shift — cutting idle time between deliveries to near zero.</p>
+                    </div>
                 </div>
             </a>
         </div>
     </div>
 
-    <section class="form-section" data-aos="fade-up">
-        <div class="form-container">
-            <h2>Strategic Partnership Inquiry</h2>
-            <p style="margin-bottom: 2rem; color: var(--text-light); line-height: 1.5;">
-                The Construct is currently selecting Alpha-stage partners for site-specific implementations.
-            </p>
-            <form id="construct-form">
-                <div class="form-group">
-                    <label>IDENTIFICATION (NAME / FIRM)</label>
-                    <input type="text" name="Name" placeholder="e.g., xyz Group / Lead Engineer" required>
+    
+    <!-- ═══════════════════════════════════════
+         SECTION 4: ONBOARDING
+         ═══════════════════════════════════════ -->
+    <section id="onboarding-section" class="intro-section" data-aos="fade-up">
+        <div class="section-header">
+            <h2>From Day 1 to Full Visibility</h2>
+            <p class="section-subtitle">How Construct OS Onboarding Works</p>
+        </div>
+
+        <div class="timeline-container">
+            <div class="timeline-item" data-aos="fade-up">
+                <div class="timeline-marker">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-label">WEEK 1</div>
                 </div>
-                <div class="form-group">
-                    <label>CONTACT EMAIL</label>
-                    <input type="email" name="Email" placeholder="yogeshjathalkar@gmail.com" required>
+                <div class="timeline-content">
+                    <h3>Baseline & Setup</h3>
+                    <p>We deploy sensors, RFID readers, and camera infrastructure across your site. Integrations with your ERP, project management, and safety systems configured. Your team gets trained in 2-hour sessions.</p>
+                    <ul class="timeline-list">
+                        <li><strong>5-7 days</strong> for full sensor deployment</li>
+                        <li><strong>4-6 hours</strong> of your team's time total</li>
+                        <li><strong>Immediate:</strong> First data ingestion begins</li>
+                    </ul>
                 </div>
-                <div class="form-group">
-                    <label>ENGAGEMENT TYPE</label>
-                    <select name="Category">
-                        <option value="Pilot Implementation">Pilot Site Implementation (Alpha)</option>
-                        <option value="Strategic Capital">Strategic Capital / Equity Partnership</option>
-                        <option value="Hardware Integration">Hardware Provisioning</option>
-                        <option value="Technical Review">Technical Review / Feedback</option>
-                    </select>
+            </div>
+
+            <div class="timeline-item" data-aos="fade-up" data-aos-delay="100">
+                <div class="timeline-marker">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-label">WEEK 2-3</div>
                 </div>
-                <div class="form-group">
-                    <label>PROPOSITION / REQUIREMENTS</label>
-                    <textarea name="Message" rows="4" placeholder="Briefly describe site requirements..."></textarea>
+                <div class="timeline-content">
+                    <h3>Real-Time Monitoring Begins</h3>
+                    <p>Sentinel Safety starts watching. Quantum Logistics begins tracking material flow. Your first automated safety alerts, material discrepancies, and quality flags appear.</p>
+                    <ul class="timeline-list">
+                        <li><strong>Real-time notifications</strong> to supervisors & managers</li>
+                        <li><strong>Live dashboard:</strong> Project status, resource allocation, risk scores</li>
+                        <li><strong>AI Learning:</strong> System learns your site's patterns</li>
+                    </ul>
                 </div>
-                <button type="submit" class="submit-btn" id="submit-btn">Transmit to Vortex Engine</button>
-                <div id="form-status"></div>
-            </form>
+            </div>
+
+            <div class="timeline-item" data-aos="fade-up" data-aos-delay="200">
+                <div class="timeline-marker">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-label">WEEK 4-8</div>
+                </div>
+                <div class="timeline-content">
+                    <h3>Predictive Insights Activate</h3>
+                    <p>Oracle (Finance module) begins Monte Carlo forecasting. Early warning signals surface 4-6 weeks before they impact your timeline and budget.</p>
+                    <ul class="timeline-list">
+                        <li><strong>12-week forecasts</strong> with confidence intervals</li>
+                        <li><strong>Bottleneck alerts:</strong> Before they hit</li>
+                        <li><strong>Optimization recommendations</strong> automated</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="timeline-item" data-aos="fade-up" data-aos-delay="300">
+                <div class="timeline-marker">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-label">ONGOING</div>
+                </div>
+                <div class="timeline-content">
+                    <h3>Continuous Optimization</h3>
+                    <p>Construct OS becomes smarter every week. Your site's unique physics gets learned. Waste patterns surface before they compound.</p>
+                    <ul class="timeline-list">
+                        <li><strong>Monthly insights reports</strong> on savings & risks</li>
+                        <li><strong>Quarterly strategy reviews</strong> across projects</li>
+                        <li><strong>ROI dashboard:</strong> Cumulative savings tracked</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="onboarding-summary" data-aos="zoom-in">
+            <div class="summary-box">
+                <p><strong>Full adoption:</strong> 6-8 weeks</p>
+                <p><strong>First ROI:</strong> 4 weeks</p>
+            </div>
         </div>
     </section>
 
-    <footer> 
-        <div class="social-links">
-           <a href="https://www.linkedin.com/in/yogesh-jathalkar-67b179208/" class="social-link">LinkedIn</a>
-           <a href="https://x.com/just1YOGESH" class="social-link">Twitter / X</a>
-           <a href="mailto:yogeshjathalkar@gmail.com" class="social-link">Email</a>
-         </div>
-        <p style="opacity:0.6; font-size:0.8rem;">
-            &copy; 2026 The Construct. A Shoonya Origins Venture.<br>
-            <a href="#" style="color:inherit; text-decoration:none; margin:0 10px;">Privacy Policy</a> | 
-            <a href="#" style="color:inherit; text-decoration:none; margin:0 10px;">Terms of Service</a>
-        </p>
+    <!-- ═══════════════════════════════════════
+         SECTION 5: PROJECT LIFECYCLE
+         ═══════════════════════════════════════ -->
+    <section id="lifecycle-section" class="intro-section" data-aos="fade-up">
+        <div class="section-header">
+            <h2>Your Project Timeline. Reimagined.</h2>
+            <p class="section-subtitle">How Construct OS transforms every phase of construction</p>
+        </div>
+
+        <div class="lifecycle-phases">
+            <div class="phase" data-aos="fade-up">
+                <div class="phase-header">
+                    <h3>PHASE 1: PRE-CONSTRUCTION</h3>
+                    <span class="phase-duration">Planning</span>
+                </div>
+                <div class="phase-content">
+                    <div class="phase-before">
+                        <strong>Traditional:</strong>
+                        <p>Excel models, gut-feel estimates, scattered historical data across 3 vendors.</p>
+                    </div>
+                    <div class="phase-arrow">→</div>
+                    <div class="phase-after">
+                        <strong>With Construct OS:</strong>
+                        <p>Predictive model built from 50k data points/day across all your past projects. Every schedule date, budget line, and resource need backed by physics-based simulation.</p>
+                        <p class="phase-result">✓ <strong>30% more confidence</strong> entering the site. Risk premiums drop.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="phase" data-aos="fade-up" data-aos-delay="100">
+                <div class="phase-header">
+                    <h3>PHASE 2: MOBILIZATION</h3>
+                    <span class="phase-duration">Weeks 1-6</span>
+                </div>
+                <div class="phase-content">
+                    <div class="phase-before">
+                        <strong>Traditional:</strong>
+                        <p>Hope materials arrive on time. Safety depends on manual inspections. Quality gets checked at 60% completion.</p>
+                    </div>
+                    <div class="phase-arrow">→</div>
+                    <div class="phase-after">
+                        <strong>With Construct OS:</strong>
+                        <p>Sentinel Safety catches PPE violations before anyone gets hurt. Quantum Logistics flags theft in real-time. Quality monitoring begins day 1. Oracle predicts resource bottlenecks 4-6 weeks ahead.</p>
+                        <p class="phase-result">✓ <strong>20-30% cost reduction</strong> early-stage. Zero surprises.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="phase" data-aos="fade-up" data-aos-delay="200">
+                <div class="phase-header">
+                    <h3>PHASE 3: CRITICAL PATH</h3>
+                    <span class="phase-duration">Weeks 7-16</span>
+                </div>
+                <div class="phase-content">
+                    <div class="phase-before">
+                        <strong>Traditional:</strong>
+                        <p>Daily standups reviewing yesterday's progress. Decisions made 2 weeks behind reality. Rework discovered mid-phase.</p>
+                    </div>
+                    <div class="phase-arrow">→</div>
+                    <div class="phase-after">
+                        <strong>With Construct OS:</strong>
+                        <p>Bio module reallocates labor to highest-impact tasks in real-time. Twin shows you 24 hours ahead. Reality overlays predicted vs. actual. Vortex predicts cost overruns before they happen.</p>
+                        <p class="phase-result">✓ <strong>15-25% productivity gain</strong>. Projects stay on schedule.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="phase" data-aos="fade-up" data-aos-delay="300">
+                <div class="phase-header">
+                    <h3>PHASE 4: COMPLETION</h3>
+                    <span class="phase-duration">Final 2-4 weeks</span>
+                </div>
+                <div class="phase-content">
+                    <div class="phase-before">
+                        <strong>Traditional:</strong>
+                        <p>Punch list discovered at final inspection. Owner argues about completion. Warranty claims surface 6 months later.</p>
+                    </div>
+                    <div class="phase-arrow">→</div>
+                    <div class="phase-after">
+                        <strong>With Construct OS:</strong>
+                        <p>Quality module has flagged every defect during construction—punch list already addressed. Eco tracked all certifications. Rover audited every critical connection. Project is 99% done before traditional projects enter punch-list phase.</p>
+                        <p class="phase-result">✓ <strong>4-8 weeks early</strong>. Owner accepts immediately. Zero post-delivery claims.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="phase" data-aos="fade-up" data-aos-delay="400">
+                <div class="phase-header">
+                    <h3>PHASE 5: OPERATIONS</h3>
+                    <span class="phase-duration">Post-Completion</span>
+                </div>
+                <div class="phase-content">
+                    <div class="phase-before">
+                        <strong>Traditional:</strong>
+                        <p>Static 'as-built' drawings. Facility team operates blind to structural intelligence.</p>
+                    </div>
+                    <div class="phase-arrow">→</div>
+                    <div class="phase-after">
+                        <strong>With Construct OS:</strong>
+                        <p>Digital Twin persists as live operational model. Predictive maintenance alerts facility teams before failures occur. Every warranty claim traced to exact moment of failure—data-backed insurance resolution.</p>
+                        <p class="phase-result">✓ <strong>25-35% maintenance cost reduction</strong> over first 3 years.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 6: WHY WE'RE DIFFERENT
+         ═══════════════════════════════════════ -->
+    <section id="diff-section" class="intro-section" data-aos="fade-up">
+        <div class="section-header">
+            <h2>Why Construct OS Is Different</h2>
+            <p class="section-subtitle">Most construction software is retrofitted IT. We built it from scratch for construction.</p>
+        </div>
+
+        <div class="diff-comparison">
+            <div class="diff-column traditional" data-aos="fade-right">
+                <h3>Traditional Software</h3>
+                <ul>
+                    <li>❌ Generic IT systems bolted onto construction</li>
+                    <li>❌ Built by technologists, not engineers</li>
+                    <li>❌ Requires you to change how you work</li>
+                    <li>❌ Dumps data at you (dashboards to stare at)</li>
+                    <li>❌ Data scientists required to extract insights</li>
+                    <li>❌ Vendor lock-in & multi-year contracts</li>
+                    <li>❌ Fragmented integrations (duct tape required)</li>
+                </ul>
+            </div>
+
+            <div class="diff-divider">
+                <div class="divider-line"></div>
+            </div>
+
+            <div class="diff-column construct" data-aos="fade-left">
+                <h3>Construct OS</h3>
+                <ul>
+                    <li>✓ Physics-first, purpose-built for construction</li>
+                    <li>✓ Built by construction engineers</li>
+                    <li>✓ Works the way you already work</li>
+                    <li>✓ Makes automated decisions for you</li>
+                    <li>✓ Site supervisors understand instantly</li>
+                    <li>✓ Own your data, zero lock-in</li>
+                    <li>✓ Seamless ERP / PM integration in days</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="diff-cta" data-aos="zoom-in">
+            <p>The sites that don't adopt this will ask in 5 years:</p>
+            <p class="cta-emphasis">"Why didn't we do this sooner?"</p>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 7: CALL TO ACTION
+         ═══════════════════════════════════════ -->
+    <section id="cta-section" class="cta-final" data-aos="fade-up">
+        <div class="cta-content">
+            <h2>Construction Has Been Crying Out for This</h2>
+            <p class="cta-tagline">For 50 years.</p>
+            
+            <p class="cta-body">Every dollar you save through Construct OS is a dollar that goes to your team, your bottom line, or your next ambitious project.</p>
+
+            <div class="cta-actions">
+                <button class="cta-btn primary" id="navLoginBtn" data-open-auth="signup">Start Your Journey</button>
+                <a href="#" class="cta-btn secondary">Schedule Strategy Session</a>
+            </div>
+
+            <p class="cta-footer">No pitch. No fluff. Just physics, data, and results.</p>
+        </div>
+    </section>
+
+    <footer class="main-footer">
+      <div class="footer-inner">
+        <div class="footer-brand">The Construct · Shoonya<span>Origins</span></div>
+        <div class="footer-links" aria-label="Footer navigation">
+          <a href="https://www.linkedin.com/in/yogesh-jathalkar-67b179208/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+          <a href="https://x.com/just1YOGESH" target="_blank" rel="noopener noreferrer">Twitter / X</a>
+          <a href="../../about">About</a>
+          <a href="../../about/blogs" target="_blank" rel="noopener noreferrer">Blogs</a>
+          <a href="mailto:yogeshjathalkar@gmail.com">Contact Us</a>
+          <a href="../../about/privacy.html">Privacy Policy</a>
+          <a href="../../about/terms.html">Terms of Service</a>
+          <a href="../../about/disclaimer.html">Legal Disclaimer</a>
+        </div>
+        <div class="footer-meta">
+          <p>&copy; 2026 The Construct. A Shoonya Origins Venture. All Rights Reserved.</p>
+          <p class="footer-location">System Active · Pune, India</p>
+        </div>
+      </div>
     </footer>
 
     <canvas id="gameCanvas"></canvas>
@@ -402,6 +981,7 @@
     </div>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="script.js"></script>
     <script>
 // ═══════════════════════════════════════════════════
 // SUPABASE CONFIG — PLACEHOLDER until the Construct Supabase
@@ -419,19 +999,8 @@ const supabaseClient = (SUPABASE_URL.startsWith('http'))
 // id="lightSwitch") but script.js was empty, so none of this
 // worked at all. Wiring up the minimum needed alongside auth.
 
-// Lamp pull → dark mode toggle (same pattern as Raptor)
-const lamp = document.getElementById('lightSwitch');
-if (lamp) {
-  lamp.addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-  });
-}
-
-// Sidebar nav scroll (sys-item onclick="scrollToId('...')")
-function scrollToId(id) {
-  const el = document.getElementById(id);
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
+// Lamp toggle (animated .pulled version) and scrollToId
+// are already wired up in script.js — not duplicated here.
 
 // ═══════════════════════════════════════════════════
 // AUTH MODAL LOGIC — same proven pattern as Raptor's auth system:
@@ -687,7 +1256,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => { window.location.reload(); }, 1500);
   });
 });
-    </script>
     </script>
 </body>
 </html>
