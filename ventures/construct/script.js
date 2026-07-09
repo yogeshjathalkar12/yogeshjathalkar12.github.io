@@ -1,5 +1,4 @@
-
-        AOS.init({ duration: 800, once: false, mirror: true });
+AOS.init({ duration: 800, once: false, mirror: true });
 
         // 1. DYNAMIC SIDE PANEL LOGIC (Distance Sync)
         const detailTitle = document.getElementById('detail-title');
@@ -24,12 +23,37 @@
             });
         });
 
+        // 4. SIDEBAR TOGGLE (off-canvas, hidden by default — both states use image icons)
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sysMonitor = document.getElementById('sysMonitor');
+        const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+        const hamburgerIcon = document.getElementById('hamburgerIcon');
+        const toggleLabel = document.getElementById('toggleLabel');
+
+        // Drop your own icon files here — same convention as Raptor's assets folder
+        const MENU_ICON_SRC = 'assets/menu-icon.png';
+        const CLOSE_ICON_SRC = 'assets/close-icon.png';
+
+        function setSidebarOpen(open) {
+            sysMonitor.classList.toggle('sidebar-open', open);
+            sidebarBackdrop.classList.toggle('visible', open);
+            hamburgerIcon.src = open ? CLOSE_ICON_SRC : MENU_ICON_SRC;
+            hamburgerIcon.alt = open ? 'Close menu' : 'Open menu';
+            toggleLabel.textContent = open ? 'Close' : '';
+        }
+
+        sidebarToggle.addEventListener('click', () => {
+            setSidebarOpen(!sysMonitor.classList.contains('sidebar-open'));
+        });
+        sidebarBackdrop.addEventListener('click', () => setSidebarOpen(false));
+        listItems.forEach(li => li.addEventListener('click', () => setSidebarOpen(false)));
+
         function scrollToId(id) {
             document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
         window.addEventListener('scroll', () => {
-            const wrappers = document.querySelectorAll('.card-wrapper');
+            const wrappers = document.querySelectorAll('.card-wrapper, .intro-section, .cta-final');
             let current = '';
             let minDistance = Infinity;
             const viewportCenter = window.scrollY + window.innerHeight / 2;
@@ -50,18 +74,25 @@
                 if(li.getAttribute('onclick').includes(current)) {
                     li.classList.add('active');
                     if(current) {
-                        const targetCard = document.getElementById(current).querySelector('.module-card');
-                        const title = targetCard.querySelector('h3').innerText;
-                        const specsData = targetCard.getAttribute('data-specs');
+                        const targetElement = document.getElementById(current);
+                        const targetCard = targetElement.querySelector('.module-card');
                         
-                        detailTitle.innerText = title;
-                        detailSpecs.innerHTML = '';
-                        if (specsData) {
-                            specsData.split('|').forEach(spec => {
-                                const li = document.createElement('li');
-                                li.innerText = spec;
-                                detailSpecs.appendChild(li);
-                            });
+                        if (targetCard) {
+                            const title = targetCard.querySelector('h3').innerText;
+                            const specsData = targetCard.getAttribute('data-specs');
+                            
+                            detailTitle.innerText = title;
+                            detailSpecs.innerHTML = '';
+                            if (specsData) {
+                                specsData.split('|').forEach(spec => {
+                                    const li = document.createElement('li');
+                                    li.innerText = spec;
+                                    detailSpecs.appendChild(li);
+                                });
+                            }
+                        } else {
+                            detailTitle.innerText = targetElement.querySelector('h2')?.innerText || 'SYSTEM ACTIVE';
+                            detailSpecs.innerHTML = '<li>New section loaded</li>';
                         }
                     }
                 }
