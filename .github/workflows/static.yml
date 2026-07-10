@@ -22,22 +22,33 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Single deploy job since we're just deploying
   deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
+
+      # --- NEW STEP: Checking for broken links ---
+      - name: Check for broken links with Lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          # This tells it to look at all HTML files in your repo
+          args: './**/*.html' 
+          # This forces the pipeline to STOP and FAIL if it finds a broken link
+          fail: true 
+      # -------------------------------------------
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
+        
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
           path: '.'
+          
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/deploy-pages@v4
