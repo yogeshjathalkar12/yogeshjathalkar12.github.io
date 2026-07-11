@@ -12,7 +12,7 @@
 <div class="arsenal-toast-stack" id="toastStack"></div>
 
 <header class="arsenal-topbar">
-  <a href="/dashboard.html" class="arsenal-back">← Dashboard</a>
+  <a href="/ventures/raptor/dashboard.html" class="arsenal-back">← Dashboard</a>
   <div class="arsenal-tool-badge"><span class="dot"></span>CALL AUDIO VAD</div>
   <div class="arsenal-topbar-right">
     <div class="arsenal-credits-pill"><div><div class="arsenal-credits-label">Credits</div><div class="arsenal-credits-value" id="topbarCredits">—</div></div></div>
@@ -69,7 +69,7 @@ let RAPTOR_API_URL   = localStorage.getItem('raptor_api_url')   || 'https://webs
 let SUPABASE_URL_VAL = localStorage.getItem('raptor_sb_url')    || 'https://pcdbtcpctlnvdtbrrqoo.supabase.co';
 let SUPABASE_KEY_VAL = localStorage.getItem('raptor_sb_key')    || '';
 const supabaseClient = SUPABASE_URL_VAL.startsWith('http') ? window.supabase.createClient(SUPABASE_URL_VAL, SUPABASE_KEY_VAL) : null;
-const TOOL_BASE = `${RAPTOR_API_URL}/api/vad`;
+const TOOL_BASE = `${RAPTOR_API_URL}/api/raptor/vad`;
 
 let currentFile = null;
 
