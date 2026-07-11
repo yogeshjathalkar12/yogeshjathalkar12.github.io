@@ -353,7 +353,7 @@ body::after {
 
   <nav class="sidebar" id="sidebarNav">
     <div class="sidebar-label">Raptor</div>
-    <a class="nav-link" href="dashboard.html">
+    <a class="nav-link" href="/ventures/raptor/dashboard.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       Back to Dashboard
     </a>
@@ -1414,7 +1414,7 @@ document.getElementById('btnRefreshContacts').addEventListener('click', async ()
 function subscribeRealtime() {
   if (!supabase) return;
   supabase.channel('crm-deals').on('postgres_changes', { event: '*', schema: 'public', table: 'deals' }, async () => { await loadDeals(); renderKanban(); renderOverview(); }).subscribe();
-  supabase.channel('crm-contactsx').on('postgres_changes', { event: '*', schema: 'public', table: 'contacts' }, async () => { await loadContacts(); renderContacts(document.getElementById('contactSearch').value); populateContactSelect(); renderOverview(); }).subscribe();
+  supabase.channel('crm-contacts').on('postgres_changes', { event: '*', schema: 'public', table: 'contacts' }, async () => { await loadContacts(); renderContacts(document.getElementById('contactSearch').value); populateContactSelect(); renderOverview(); }).subscribe();
   supabase.channel('crm-interactions').on('postgres_changes', { event: '*', schema: 'public', table: 'interactions' }, async () => { await loadInteractions(); renderActivityFeed(); renderOverview(); }).subscribe();
   supabase.channel('crm-reminders').on('postgres_changes', { event: '*', schema: 'public', table: 'reminders' }, async () => { await loadReminders(); renderReminders(); }).subscribe();
   supabase.channel('crm-automation-runs').on('postgres_changes', { event: '*', schema: 'public', table: 'automation_runs' }, async () => { await loadAutomationRuns(); renderAutomationRuns(); }).subscribe();
