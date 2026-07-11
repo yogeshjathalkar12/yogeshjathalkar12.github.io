@@ -79,7 +79,7 @@ async function getAuthHeader() {
   return { 'Authorization': `Bearer ${session.access_token}`, 'Content-Type': 'application/json' };
 }
 function handleUnauthorized() { showToast('Session expired — please log in again','error'); if(supabaseClient) supabaseClient.auth.signOut(); setTimeout(()=>window.location.href='/ventures/raptor/',1200); }
-function syncCredits(c) { if (typeof c === 'number') document.getElementById('topbarCredits').textContent = c; }
+function syncCredits(c) { if (typeof c === 'number') document.getElementById('topbarCredits').textContent = c; }\n\n// Credits were only ever updated AFTER a paid action returned credits_left --\n// meaning the pill showed '—' forever until you actually ran something. This\n// fetches the real starting balance the same way dashboard.html does: read\n// directly from Supabase (RLS already restricts this to the caller's own\n// row), not through the backend -- no credit spend for just checking a number.\nasync function loadCredits() {\n  if (!supabaseClient) return;\n  const { data: { session } } = await supabaseClient.auth.getSession();\n  if (!session) return;\n  const { data, error } = await supabaseClient\n    .from('raptor_users')\n    .select('credits')\n    .eq('user_id', session.user.id)\n    .single();\n  if (!error \&\& data) syncCredits(data.credits);\n}\ndocument.addEventListener('DOMContentLoaded', loadCredits);
 
 async function runSimulate() {
   const dealsStr = document.getElementById('dealsInput').value.trim();
