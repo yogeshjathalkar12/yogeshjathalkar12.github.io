@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRM — Raptor</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+<!--
+═══════════════════════════════════════════════════════════════════
+DEVELOPER SETUP — this section is for whoever wires up the database.
+Nothing here is shown to people using the CRM.
+
+1. Create a Supabase project.
+2. Run this in the SQL editor:
+
+create table companies (
+  id          uuid primary key default gen_random_uuid(),
+  owner_id    uuid references auth.users not null default auth.uid(),
+  name        text not null,
+  industry    text,
+  website     text,
+  created_at  timestamptz default now()
+);
+
+create table contacts (
+  id                   uuid primary key default gen_random_uuid(),
+  owner_id             uuid references auth.users not null default auth.uid(),
+  company_id           uuid references companies(id) on delete set null,
+  name                 text not null,
+  role                 text,
+  email                text,
+  phone                text,
+  status               text default 'cold' check (status in ('hot','active','cold')),
+  last_interaction_at  timestamptz,
+  created_at           timestamptz default now()
+);
+
+create table deals (
+  id          uuid primary key default gen_random_uuid(),
+  owner_id    uuid references auth.users not null default auth.uid(),
+  contact_id  uuid references contacts(id) on delete set null,
+  company_id  uuid references companies(id) on delete set null,
+  title       text not null,
+  value       numeric default 0,
+  stage       text default 'lead' check (stage in ('lead','meeting','negotiation','won','lost')),
+  created_at  timestamptz default now(),
+  updated_at  timestamptz default now(),
+  closed_at   timestamptz
+);
+
+create table interactions (
+  id          uuid primary key default gen_random_uuid(),
+  owner_id    uuid references auth.users not null default auth.uid(),
+  contact_id  uuid references contacts(id) on delete cascade,
+  type        text check (type in ('email','call','meeting','note')),
+  content     text,
+  created_at  timestamptz default now()
+);
+
+create table automations (
+  id          uuid primary key default gen_random_uuid(),
+  owner_id    uuid references auth.users not null default auth.uid(),
+  name        text not null,
+  -- structured trigger/action so the rule can actually be executed by a
+  -- machine (a scheduled backend job), not just displayed as text.
+  trigger_type   text not null default 'contact_no_reply'
+                 check (trigger_type in ('contact_no_reply','deal_stalled','deal_won')),
+  trigger_days   int default 3,
+  action_type    text not null default 'log_note'
+                 check (action_type in ('log_note','create_reminder','webhook')),
+  action_message text,
+  action_webhook_url text,
+  is_active   boolean default true,
+  last_run_at timestamptz,
+  created_at  timestamptz default now()
+);
+
+-- Reminders an automation can create for you to act on.
+create table reminders (
+  id            uuid primary key default gen_random_uuid(),
+  owner_id      uuid references auth.users not null default auth.uid(),
+  automation_id uuid references automations(id) on delete cascade,
+  contact_id    uuid references contacts(id) on delete cascade,
+  deal_id       uuid references deals(id) on delete cascade,
+  message       text not null,
+  is_done       boolean default false,
+  created_at    timestamptz default now()
+);
+
+-- A log of every time an automation actually fired, so you can see
+-- (and trust) that it's really running, not just sitting there.
+create table automation_runs (
+  id            uuid primary key default gen_random_uuid(),
+  owner_id      uuid references auth.users not null,
+  automation_id uuid references automations(id) on delete cascade,
+  contact_id    uuid references contacts(id) on delete set null,
+  deal_id       uuid references deals(id) on delete set null,
+  action_taken  text,
+  ran_at        timestamptz default now()
+);
+
+3. Turn on Row Level Security and restrict every table to its owner:
+
+alter table companies enable row level security;
+alter table contacts enable row level security;
+alter table deals enable row level security;
+alter table interactions enable row level security;
+alter table automations enable row level security;
+alter table reminders enable row level security;
+alter table automation_runs enable row level security;
+
+create policy "owner full access" on companies       for all using (owner_id = auth.uid()) with check (owner_id = auth.uid());
+create policy "owner full access" on contacts        for all using (owner_id = auth.uid()) with check (owner_id = auth.uid());
+create policy "owner full access" on deals           for all using (owner_id = auth.uid()) with check (owner_id = auth.uid());
+create policy "owner full access" on interactions    for all using (owner_id = auth.uid()) with check (owner_id = auth.uid());
+create policy "owner full access" on automations     for all using (owner_id = auth.uid()) with check (owner_id = auth.uid());
+create policy "owner full access" on reminders       for all using (owner_id = auth.uid()) with check (owner_id = auth.uid());
+create policy "owner full access" on automation_runs for all using (owner_id = auth.uid()) with check (owner_id = auth.uid());
+
+4. Turn on live updates: Dashboard → Database → Replication → add
+   deals, contacts, interactions to the supabase_realtime publication.
+
+5. Fill in SUPABASE_URL and SUPABASE_ANON_KEY near the bottom of the
+   <script> tag in this file (Supabase → Settings → API).
+
+6. MAKE AUTOMATIONS ACTUALLY RUN (this is the part that was missing):
+   a) Mount `automations_router.py` (shipped alongside this file) on your
+      existing FastAPI backend, e.g. in main.py:
+        from automations_router import router as automations_router
+        app.include_router(automations_router, prefix="/api/automations")
+      It needs these env vars set on your backend (Render → Environment):
+        SUPABASE_URL             (this CRM's project URL)
+        SUPABASE_KEY             (the service_role key — NOT anon — so it
+                                   can read every user's rows to evaluate
+                                   triggers; Settings → API → service_role)
+        AUTOMATION_CRON_SECRET   (any random string you make up)
+   b) Schedule POST https://your-backend.onrender.com/api/automations/run
+      with header  X-Automation-Secret: <the same random string>
+      Render's free tier has no built-in cron, so use one of:
+        - Render Cron Job (paid, but simplest: Dashboard → New → Cron Job)
+        - cron-job.org (free, external, just needs your URL + header)
+        - a scheduled GitHub Actions workflow that curls the endpoint
+      Run it every 15–60 minutes.
+   c) That's it — active rules will be checked on that schedule and will
+      log a note, create a reminder, or hit a webhook, depending on what
+      the rule says.
+═══════════════════════════════════════════════════════════════════
+-->
+
+<style>
+:root {
+  --black: #030303; --surface: #0a0a0a; --surface2: #0f0f0f;
+  --border: rgba(255,255,255,0.06);
+  --purple: #a855f7; --pink: #ec4899;
+  --grad: linear-gradient(135deg, #a855f7, #ec4899);
+  --white: #f4f4f5; --dim: #71717a; --dim2: #3f3f46;
+  --green: #22c55e; --amber: #f59e0b; --red: #ef4444;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--black); color: var(--white);
+  font-family: 'DM Mono', monospace; min-height: 100vh;
+}
+body::after {
+  content: ''; position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 998; opacity: 0.5;
+}
+
+/* ─── TOP BAR ─── */
+.topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 200; height: 64px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 2rem; gap: 1.5rem; }
+.topbar-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.7rem; letter-spacing: 0.08em; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; white-space: nowrap; }
+.topbar-search { flex: 1; max-width: 360px; position: relative; }
+.topbar-search input { width: 100%; padding: 0.6rem 0.9rem; background: var(--surface2); border: 1px solid var(--border); color: var(--white); font-family: 'DM Mono', monospace; font-size: 0.65rem; }
+.topbar-search input:focus { outline: none; border-color: var(--purple); }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 1.2rem; }
+
+.status-pill { display: flex; align-items: center; gap: 0.5rem; font-size: 0.5rem; letter-spacing: 0.15em; text-transform: uppercase; }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.status-dot.on { background: var(--green); box-shadow: 0 0 8px rgba(34,197,94,0.6); animation: pulse 2s infinite; }
+.status-dot.off { background: var(--dim2); }
+.status-dot.error { background: var(--red); box-shadow: 0 0 8px rgba(239,68,68,0.6); }
+.status-pill.on { color: var(--green); } .status-pill.off { color: var(--dim2); } .status-pill.error { color: var(--red); }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+/* ─── LAYOUT ─── */
+.layout { display: flex; padding-top: 64px; min-height: 100vh; }
+.sidebar { width: 220px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); position: fixed; left: 0; top: 64px; bottom: 0; padding: 1.5rem 0; overflow-y: auto; z-index: 150; }
+.sidebar-label { font-size: 0.45rem; letter-spacing: 0.3em; color: var(--dim2); text-transform: uppercase; padding: 0 1.5rem; margin-bottom: 0.5rem; margin-top: 1.5rem; }
+.sidebar-label:first-child { margin-top: 0; }
+.nav-link, .nav-item {
+  display: flex; align-items: center; gap: 0.9rem; padding: 0.7rem 1.5rem;
+  font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim);
+  cursor: pointer; border-left: 2px solid transparent; background: none; border-top: none; border-right: none; border-bottom: none;
+  width: 100%; text-align: left; text-decoration: none; font-family: inherit;
+}
+.nav-item svg, .nav-link svg { width: 15px; height: 15px; flex-shrink: 0; opacity: 0.8; }
+.nav-item.active { color: var(--purple); border-left-color: var(--purple); background: rgba(168,85,247,0.06); }
+.nav-item.active svg { opacity: 1; }
+.nav-item:hover:not(.active), .nav-link:hover { color: var(--white); background: rgba(255,255,255,0.02); }
+.main { margin-left: 220px; flex: 1; padding: 2.2rem 2.8rem 4rem; max-width: calc(100vw - 220px); }
+
+.page-eyebrow { font-size: 0.5rem; letter-spacing: 0.35em; color: var(--purple); text-transform: uppercase; margin-bottom: 0.4rem; }
+.page-title { font-family: 'Bebas Neue', sans-serif; font-size: 2.6rem; letter-spacing: 0.03em; margin-bottom: 1.8rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.page-title span.grad { background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.page-title-actions { display: flex; gap: 0.6rem; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; margin-bottom: 1.4rem; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.4rem; margin-bottom: 1.4rem; }
+.card { background: var(--surface); border: 1px solid var(--border); padding: 1.6rem; position: relative; overflow: hidden; }
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; gap: 1rem; flex-wrap: wrap; }
+.card-title { font-size: 0.58rem; letter-spacing: 0.18em; color: var(--dim); text-transform: uppercase; }
+.kpi-value { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; margin-top: 0.4rem; }
+.kpi-value.grad { background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.kpi-sub { font-size: 0.5rem; color: var(--dim2); margin-top: 0.3rem; text-transform: uppercase; letter-spacing: 0.08em; }
+
+.btn { padding: 0.7rem 1rem; background: var(--grad); color: white; border: none; cursor: pointer; font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; transition: opacity 0.2s; white-space: nowrap; }
+.btn:hover { opacity: 0.88; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn.outline { background: transparent; border: 1px solid var(--purple); color: var(--purple); }
+.btn.ghost { background: transparent; border: 1px solid var(--border); color: var(--dim); }
+.btn.danger { background: transparent; border: 1px solid rgba(239,68,68,0.4); color: var(--red); }
+.btn.small { padding: 0.5rem 0.8rem; font-size: 0.5rem; }
+
+/* ─── VIEWS ─── */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ─── PIPELINE ─── */
+.kanban-wrapper { display: flex; gap: 1.4rem; overflow-x: auto; padding-bottom: 1rem; }
+.kanban-col { background: var(--surface2); border: 1px solid var(--border); min-width: 280px; flex: 1; display: flex; flex-direction: column; transition: border-color 0.2s, background 0.2s; }
+.kanban-col.drag-over { border-color: var(--purple); background: rgba(168,85,247,0.05); }
+.kanban-header { padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.kanban-col-title { font-size: 0.55rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--white); }
+.kanban-col-count { font-size: 0.48rem; color: var(--dim); background: var(--surface); padding: 0.2rem 0.5rem; border: 1px solid var(--border); white-space: nowrap; }
+.kanban-body { padding: 1rem; min-height: 360px; display: flex; flex-direction: column; gap: 0.9rem; }
+
+.deal-card { background: var(--surface); border: 1px solid var(--border); padding: 1.1rem; cursor: grab; transition: all 0.2s ease; position: relative; }
+.deal-card:hover { border-color: rgba(168,85,247,0.4); transform: translateY(-2px); }
+.deal-card.dragging { opacity: 0.4; }
+.deal-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--grad); transform: scaleY(0); transform-origin: top; transition: transform 0.3s; }
+.deal-card:hover::before { transform: scaleY(1); }
+.deal-value { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; }
+.deal-title { font-size: 0.62rem; color: var(--white); margin: 0.3rem 0 0.2rem; }
+.deal-company { font-size: 0.55rem; color: var(--dim); margin-bottom: 0.7rem; }
+.deal-contact { display: flex; align-items: center; gap: 0.5rem; font-size: 0.52rem; color: var(--dim2); }
+.avatar { width: 18px; height: 18px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 0.42rem; color: var(--white); flex-shrink: 0; }
+
+/* ─── TABLE ─── */
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th { text-align: left; padding: 0.8rem 1rem; font-size: 0.44rem; letter-spacing: 0.18em; color: var(--dim2); text-transform: uppercase; border-bottom: 1px solid var(--border); font-weight: 400; }
+.data-table td { padding: 0.9rem 1rem; font-size: 0.6rem; color: var(--dim); border-bottom: 1px solid var(--border); vertical-align: middle; }
+.data-table tr { cursor: pointer; }
+.data-table tr:hover td { background: rgba(168,85,247,0.03); }
+.data-table td:first-child { color: var(--white); }
+.pill { display: inline-block; padding: 0.2rem 0.6rem; font-size: 0.44rem; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 2px; }
+.pill.hot { background: rgba(239,68,68,0.1); color: var(--red); border: 1px solid rgba(239,68,68,0.2); }
+.pill.cold { background: rgba(113,113,122,0.1); color: var(--dim); border: 1px solid rgba(113,113,122,0.2); }
+.pill.active { background: rgba(34,197,94,0.1); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
+
+/* ─── STATES ─── */
+.setup-note { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--amber); padding: 1rem 1.4rem; margin-bottom: 1.4rem; font-size: 0.65rem; color: var(--dim); line-height: 1.7; display: none; }
+.empty-state { padding: 2.6rem 1.5rem; text-align: center; color: var(--dim2); font-size: 0.62rem; letter-spacing: 0.03em; line-height: 1.8; }
+.empty-state strong { color: var(--dim); display: block; font-size: 0.72rem; margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.14em; }
+.skeleton { background: linear-gradient(90deg, var(--surface2) 25%, var(--border) 50%, var(--surface2) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+.kpi-skeleton { height: 2rem; width: 55%; margin-top: 0.5rem; }
+
+/* ─── MODAL / PANEL ─── */
+.overlay { display: none; position: fixed; inset: 0; z-index: 3000; background: rgba(3,3,3,0.75); backdrop-filter: blur(6px); }
+.overlay.active { display: block; }
+.overlay.center { display: none; align-items: center; justify-content: center; padding: 1.5rem; }
+.overlay.center.active { display: flex; }
+.modal { background: var(--surface); border: 1px solid var(--border); max-width: 440px; width: 100%; padding: 2rem; max-height: 90vh; overflow-y: auto; position: relative; }
+.modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: 0.03em; margin-bottom: 1.4rem; }
+.modal-close { position: absolute; top: 1.1rem; right: 1.1rem; background: none; border: none; color: var(--dim); cursor: pointer; font-size: 1rem; line-height: 1; }
+
+.panel { position: fixed; top: 0; right: 0; bottom: 0; width: 400px; max-width: 92vw; background: var(--surface); border-left: 1px solid var(--border); z-index: 3100; transform: translateX(100%); transition: transform 0.25s ease; overflow-y: auto; padding: 2rem; }
+.panel.active { transform: translateX(0); }
+.panel-close { position: absolute; top: 1.3rem; right: 1.3rem; background: none; border: none; color: var(--dim); cursor: pointer; font-size: 1.1rem; }
+.panel-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.7rem; margin-bottom: 0.2rem; margin-top: 1rem; }
+.panel-company { font-size: 0.65rem; color: var(--dim); margin-bottom: 1.4rem; }
+.panel-field { display: flex; justify-content: space-between; font-size: 0.6rem; padding: 0.6rem 0; border-bottom: 1px solid var(--border); color: var(--dim); }
+.panel-field span:last-child { color: var(--white); text-align: right; }
+.panel-section-title { font-size: 0.5rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--dim2); margin: 1.6rem 0 0.8rem; }
+
+.form-group { margin-bottom: 1rem; }
+.form-label { display: block; font-size: 0.44rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim2); margin-bottom: 0.5rem; }
+.form-input, .form-select, .form-textarea {
+  width: 100%; padding: 0.7rem 0.85rem; background: var(--surface2); border: 1px solid var(--border);
+  color: var(--white); font-family: 'DM Mono', monospace; font-size: 0.62rem;
+}
+.form-textarea { resize: vertical; min-height: 64px; }
+.form-select { appearance: none; cursor: pointer; }
+.form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--purple); }
+.form-row { display: flex; gap: 0.7rem; }
+.form-row .form-group { flex: 1; }
+.modal-actions { display: flex; gap: 0.7rem; margin-top: 1.4rem; }
+.modal-actions .btn { flex: 1; }
+
+/* ─── ACTIVITY ─── */
+.activity-item { display: flex; gap: 0.9rem; padding: 0.9rem 0; border-bottom: 1px solid var(--border); }
+.activity-item:last-child { border-bottom: none; }
+.activity-icon { width: 24px; height: 24px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.55rem; flex-shrink: 0; }
+.activity-meta { font-size: 0.55rem; color: var(--white); margin-bottom: 0.2rem; }
+.activity-meta span { color: var(--dim2); text-transform: uppercase; letter-spacing: 0.1em; }
+.activity-content { font-size: 0.58rem; color: var(--dim); line-height: 1.6; }
+.activity-time { font-size: 0.44rem; color: var(--dim2); margin-top: 0.3rem; text-transform: uppercase; letter-spacing: 0.1em; }
+
+/* ─── AUTOMATIC ACTIONS ─── */
+.rule-row { display: flex; align-items: center; gap: 1.1rem; padding: 1rem 0; border-bottom: 1px solid var(--border); }
+.rule-row:last-child { border-bottom: none; }
+.rule-name { font-size: 0.62rem; color: var(--white); margin-bottom: 0.3rem; }
+.rule-desc { font-size: 0.54rem; color: var(--dim); line-height: 1.6; }
+.rule-desc strong { color: var(--dim2); }
+.toggle { width: 32px; height: 17px; background: var(--surface2); border: 1px solid var(--border); border-radius: 999px; position: relative; cursor: pointer; flex-shrink: 0; }
+.toggle.on { background: var(--purple); border-color: var(--purple); }
+.toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 11px; height: 11px; border-radius: 50%; background: var(--white); transition: transform 0.2s; }
+.toggle.on::after { transform: translateX(15px); }
+
+/* ─── TOASTS ─── */
+.toast-stack { position: fixed; bottom: 1.4rem; right: 1.4rem; z-index: 5000; display: flex; flex-direction: column; gap: 0.6rem; }
+.toast { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--purple); padding: 0.85rem 1.1rem; font-size: 0.58rem; color: var(--white); min-width: 220px; max-width: 320px; animation: toastIn 0.25s ease; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+.toast.error { border-left-color: var(--red); }
+.toast.success { border-left-color: var(--green); }
+@keyframes toastIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 900px) {
+  .grid-4, .grid-2 { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .main { margin-left: 0; max-width: 100vw; }
+  .topbar-search { display: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-logo">Raptor CRM</div>
+  <div class="topbar-search">
+    <input id="globalSearch" placeholder="Search contacts, companies, deals…">
+  </div>
+  <div class="topbar-right">
+    <div class="status-pill off" id="connStatus"><div class="status-dot off" id="connDot"></div><span id="connLabel">Connecting…</span></div>
+    <button class="btn small" id="btnQuickDeal">+ New Deal</button>
+  </div>
+</header>
+
+<div class="layout">
+
+  <nav class="sidebar" id="sidebarNav">
+    <div class="sidebar-label">Raptor</div>
+    <a class="nav-link" href="dashboard.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Dashboard
+    </a>
+
+    <div class="sidebar-label">CRM</div>
+    <button type="button" class="nav-item active" data-view="overview">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+      Overview
+    </button>
+    <button type="button" class="nav-item" data-view="pipeline">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v4l-7 7v6l-4 2v-8L3 7V3z"/></svg>
+      Pipeline
+    </button>
+    <button type="button" class="nav-item" data-view="contacts">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+      Contacts
+    </button>
+    <button type="button" class="nav-item" data-view="activity">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>
+      Activity
+    </button>
+    <button type="button" class="nav-item" data-view="automations">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.9l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.9-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1-1.6 1.7 1.7 0 00-1.9.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.9 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1 1.7 1.7 0 00-.3-1.9l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.9.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.9-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.9V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg>
+      Automatic Actions
+    </button>
+  </nav>
+
+  <main class="main">
+
+    <div class="setup-note" id="setupBanner">
+      This CRM isn't connected to a database yet, so everything below is empty. Once it's connected, your contacts, deals and activity will show up here automatically.
+    </div>
+
+    <!-- ═══════════ OVERVIEW ═══════════ -->
+    <section class="view active" id="view-overview">
+      <div class="page-eyebrow">At a Glance</div>
+      <div class="page-title"><span class="grad">Overview</span></div>
+
+      <div class="grid-4">
+        <div class="card">
+          <div class="card-title">Open Pipeline</div>
+          <div class="skeleton kpi-skeleton" id="kpiPipelineValue"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Open Deals</div>
+          <div class="skeleton kpi-skeleton" id="kpiActiveDeals"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Won This Month</div>
+          <div class="skeleton kpi-skeleton" id="kpiWonMonth"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Contacts</div>
+          <div class="skeleton kpi-skeleton" id="kpiContacts"></div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="align-items: start;">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Recent Activity</div>
+            <button class="btn ghost small" data-goto="activity">View All</button>
+          </div>
+          <div id="overviewActivity"></div>
+          <div id="overviewActivityEmpty" class="empty-state" style="display:none;">
+            <strong>Nothing logged yet</strong>
+            Activity you record with contacts will appear here.
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Quick Actions</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 0.7rem;">
+            <button class="btn" id="btnQuickDeal2">+ New Deal</button>
+            <button class="btn outline" id="btnQuickContact">+ New Contact</button>
+            <button class="btn ghost" data-goto="pipeline">Open Pipeline Board</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ PIPELINE ═══════════ -->
+    <section class="view" id="view-pipeline">
+      <div class="page-eyebrow">Deals in Motion</div>
+      <div class="page-title">
+        <span class="grad">Pipeline</span>
+        <div class="page-title-actions">
+          <button class="btn ghost small" id="btnRefreshPipeline">Refresh</button>
+          <button class="btn small" id="btnNewDeal">+ New Deal</button>
+        </div>
+      </div>
+      <div class="kanban-wrapper" id="kanbanWrapper"></div>
+    </section>
+
+    <!-- ═══════════ CONTACTS ═══════════ -->
+    <section class="view" id="view-contacts">
+      <div class="page-eyebrow">Everyone You Talk To</div>
+      <div class="page-title">
+        <span class="grad">Contacts</span>
+        <div class="page-title-actions">
+          <button class="btn ghost small" id="btnRefreshContacts">Refresh</button>
+          <button class="btn small" id="btnNewContact">+ New Contact</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <input class="form-input" id="contactSearch" style="max-width: 280px;" placeholder="Search name or company…">
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr><th>Name</th><th>Company</th><th>Last Contact</th><th>Status</th><th>Open Deals</th></tr>
+          </thead>
+          <tbody id="contactsTableBody"></tbody>
+        </table>
+        <div id="contactsEmpty" class="empty-state" style="display:none;">
+          <strong>No contacts yet</strong>
+          Add one with "+ New Contact" or create a deal and we'll add the contact for you.
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ ACTIVITY ═══════════ -->
+    <section class="view" id="view-activity">
+      <div class="page-eyebrow">Everything That's Happened</div>
+      <div class="page-title"><span class="grad">Activity</span></div>
+
+      <div class="grid-2" style="align-items: start;">
+        <div class="card">
+          <div class="card-title" style="margin-bottom: 1.2rem;">Log Something</div>
+          <form id="activityForm">
+            <div class="form-group">
+              <label class="form-label">Contact</label>
+              <select class="form-select" id="activityContact" required></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Type</label>
+              <select class="form-select" id="activityType">
+                <option value="note">Note</option>
+                <option value="email">Email</option>
+                <option value="call">Call</option>
+                <option value="meeting">Meeting</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">What happened?</label>
+              <textarea class="form-textarea" id="activityContent" placeholder="e.g. Called to follow up on pricing, sounds interested" required></textarea>
+            </div>
+            <button type="submit" class="btn" style="width:100%;">Save</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="margin-bottom: 1.2rem;">Recent Activity</div>
+          <div id="activityFeed"></div>
+          <div id="activityEmpty" class="empty-state" style="display:none;">
+            <strong>Nothing logged yet</strong>
+            Log your first interaction using the form on the left.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ AUTOMATIC ACTIONS ═══════════ -->
+    <section class="view" id="view-automations">
+      <div class="page-eyebrow">Let The CRM Do The Work</div>
+      <div class="page-title">
+        <span class="grad">Automatic Actions</span>
+        <div class="page-title-actions">
+          <button class="btn small" id="btnNewAutomation">+ New Rule</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title" style="margin-bottom: 0.8rem;">Rules</div>
+        <div id="automationsList"></div>
+        <div id="automationsEmpty" class="empty-state" style="display:none;">
+          <strong>No rules yet</strong>
+          Add a rule for something that should happen automatically, like a follow-up reminder.
+        </div>
+      </div>
+
+      <div class="grid-2" style="align-items: start; margin-top: 1.4rem;">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Reminders</div>
+          </div>
+          <div id="remindersList"></div>
+          <div id="remindersEmpty" class="empty-state" style="display:none;">
+            <strong>No reminders yet</strong>
+            Rules set to "Create a reminder" will drop items here once they fire.
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Recent Runs</div>
+          </div>
+          <div id="automationRunsList"></div>
+          <div id="automationRunsEmpty" class="empty-state" style="display:none;">
+            <strong>Nothing has run yet</strong>
+            Once the scheduled check runs on your active rules, what it did shows up here.
+          </div>
+        </div>
+      </div>
+
+      <p style="font-size: 0.55rem; color: var(--dim2); margin-top: 1rem; line-height: 1.7;">
+        Rules here are executed on a schedule by your backend (see the setup notes at the top of this file), not by this open browser tab — so they keep working even when nobody has the CRM open.
+      </p>
+    </section>
+
+  </main>
+</div>
+
+<!-- ═══════════ NEW DEAL MODAL ═══════════ -->
+<div class="overlay center" id="dealModalOverlay">
+  <div class="modal">
+    <button class="modal-close" data-close="dealModalOverlay">✕</button>
+    <div class="modal-title">New Deal</div>
+    <form id="dealForm">
+      <div class="form-group">
+        <label class="form-label">Deal Title</label>
+        <input class="form-input" id="dealTitle" placeholder="e.g. Defense R&D Proposal" required>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Value (USD)</label>
+          <input class="form-input" id="dealValue" type="number" min="0" step="1" placeholder="10000" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Stage</label>
+          <select class="form-select" id="dealStage">
+            <option value="lead">New Lead</option>
+            <option value="meeting">Meeting Booked</option>
+            <option value="negotiation">Negotiating</option>
+            <option value="won">Won</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Company Name</label>
+        <input class="form-input" id="dealCompany" placeholder="e.g. Construct Robotics" required>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Contact Name</label>
+          <input class="form-input" id="dealContactName" placeholder="e.g. Alex Mercer" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contact Email</label>
+          <input class="form-input" id="dealContactEmail" type="email" placeholder="alex@company.com">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn ghost" data-close="dealModalOverlay">Cancel</button>
+        <button type="submit" class="btn" id="submitDealBtn">Create Deal</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ═══════════ NEW CONTACT MODAL ═══════════ -->
+<div class="overlay center" id="contactModalOverlay">
+  <div class="modal">
+    <button class="modal-close" data-close="contactModalOverlay">✕</button>
+    <div class="modal-title">New Contact</div>
+    <form id="contactForm">
+      <div class="form-group">
+        <label class="form-label">Name</label>
+        <input class="form-input" id="contactName" placeholder="e.g. Sarah Jenkins" required>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" id="contactEmail" type="email" placeholder="sarah@company.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone</label>
+          <input class="form-input" id="contactPhone" placeholder="Optional">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Company</label>
+        <input class="form-input" id="contactCompany" placeholder="e.g. Astra-Q Systems">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-select" id="contactStatus">
+          <option value="cold">Cold</option>
+          <option value="active">Active</option>
+          <option value="hot">Hot</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn ghost" data-close="contactModalOverlay">Cancel</button>
+        <button type="submit" class="btn">Save Contact</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ═══════════ NEW RULE MODAL ═══════════ -->
+<div class="overlay center" id="automationModalOverlay">
+  <div class="modal">
+    <button class="modal-close" data-close="automationModalOverlay">✕</button>
+    <div class="modal-title">New Rule</div>
+    <form id="automationForm">
+      <div class="form-group">
+        <label class="form-label">Rule Name</label>
+        <input class="form-input" id="autoName" placeholder="e.g. Cold pricing follow-up" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">When this happens</label>
+        <select class="form-select" id="autoTriggerType">
+          <option value="contact_no_reply">A hot/active contact goes quiet</option>
+          <option value="deal_stalled">A deal sits in the same stage too long</option>
+          <option value="deal_won">A deal is marked Won</option>
+        </select>
+      </div>
+      <div class="form-group" id="autoDaysGroup">
+        <label class="form-label">…for this many days</label>
+        <input class="form-input" id="autoDays" type="number" min="1" step="1" value="3">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Do this</label>
+        <select class="form-select" id="autoActionType">
+          <option value="log_note">Log a note on the contact automatically</option>
+          <option value="create_reminder">Create a reminder for me</option>
+          <option value="webhook">Call a webhook URL (e.g. Zapier/Make, to send an email)</option>
+        </select>
+      </div>
+      <div class="form-group" id="autoMessageGroup">
+        <label class="form-label">Message</label>
+        <input class="form-input" id="autoMessage" placeholder="e.g. Follow up on pricing — no reply in a while">
+      </div>
+      <div class="form-group" id="autoWebhookGroup" style="display:none;">
+        <label class="form-label">Webhook URL</label>
+        <input class="form-input" id="autoWebhookUrl" type="url" placeholder="https://hooks.zapier.com/…">
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn ghost" data-close="automationModalOverlay">Cancel</button>
+        <button type="submit" class="btn">Save Rule</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ═══════════ DEAL DETAIL MODAL ═══════════ -->
+<div class="overlay center" id="dealDetailOverlay">
+  <div class="modal">
+    <button class="modal-close" data-close="dealDetailOverlay">✕</button>
+    <div class="modal-title" id="dealDetailTitle">Deal</div>
+    <div class="form-group">
+      <label class="form-label">Company / Contact</label>
+      <div style="font-size:0.65rem; color: var(--dim);" id="dealDetailSub">—</div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Value (USD)</label>
+        <input class="form-input" id="dealDetailValue" type="number" min="0" step="1">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Stage</label>
+        <select class="form-select" id="dealDetailStage">
+          <option value="lead">New Lead</option>
+          <option value="meeting">Meeting Booked</option>
+          <option value="negotiation">Negotiating</option>
+          <option value="won">Won</option>
+          <option value="lost">Lost</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn danger" id="btnDeleteDeal">Delete</button>
+      <button type="button" class="btn" id="btnSaveDeal">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ CONTACT SIDE PANEL ═══════════ -->
+<div class="overlay" id="panelOverlay"></div>
+<div class="panel" id="contactPanel">
+  <button class="panel-close" id="panelClose">✕</button>
+  <div class="avatar" id="panelAvatar" style="width:48px;height:48px;font-size:1rem;"></div>
+  <div class="panel-name" id="panelName">—</div>
+  <div class="panel-company" id="panelCompany">—</div>
+
+  <div class="panel-field"><span>Email</span><span id="panelEmail">—</span></div>
+  <div class="panel-field"><span>Phone</span><span id="panelPhone">—</span></div>
+  <div class="panel-field">
+    <span>Status</span>
+    <select class="form-select" id="panelStatus" style="width: auto; padding: 0.3rem 0.6rem; font-size: 0.55rem;">
+      <option value="cold">Cold</option>
+      <option value="active">Active</option>
+      <option value="hot">Hot</option>
+    </select>
+  </div>
+
+  <div class="panel-section-title">Log an Interaction</div>
+  <form id="panelActivityForm">
+    <div class="form-row">
+      <div class="form-group">
+        <select class="form-select" id="panelActivityType">
+          <option value="note">Note</option>
+          <option value="email">Email</option>
+          <option value="call">Call</option>
+          <option value="meeting">Meeting</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <textarea class="form-textarea" id="panelActivityContent" placeholder="What happened?" required></textarea>
+    </div>
+    <button type="submit" class="btn" style="width:100%;">Save</button>
+  </form>
+
+  <div class="panel-section-title">History</div>
+  <div id="panelActivity"></div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   Fill these in once you've connected a database
+   (see the setup notes at the top of this file).
+   ═══════════════════════════════════════════════════ */
+const SUPABASE_URL = '';
+const SUPABASE_ANON_KEY = '';
+
+const DB_CONFIGURED = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
+// Guarded: if the Supabase JS library failed to load from the CDN (offline,
+// ad-blocker, corporate proxy, opening this file directly with file:// in a
+// browser that blocks the request, etc.), `window.supabase` is undefined.
+// Without this try/catch, calling .createClient on it throws and — because
+// this line runs before the sidebar's click listeners are registered further
+// down this script — that ONE error kills the entire script, silently
+// breaking every nav item except whichever view is visible by default.
+let supabase = null;
+let CDN_LOAD_FAILED = false;
+if (DB_CONFIGURED) {
+  try {
+    if (!window.supabase) throw new Error('Supabase client library did not load (check your internet connection / ad-blocker / CDN access).');
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  } catch (err) {
+    console.error('Supabase failed to initialize:', err);
+    CDN_LOAD_FAILED = true;
+  }
+}
+
+const STAGES = [
+  { key: 'lead',        label: 'New Lead' },
+  { key: 'meeting',     label: 'Meeting Booked' },
+  { key: 'negotiation', label: 'Negotiating' },
+  { key: 'won',         label: 'Won' },
+];
+
+let state = { deals: [], contacts: [], interactions: [], automations: [], reminders: [], automationRuns: [], activePanelContactId: null, activeDealId: null };
+
+/* ───────────── UTILITIES ───────────── */
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+function formatCurrency(n) { return '$' + (Number(n) || 0).toLocaleString('en-US', { maximumFractionDigits: 0 }); }
+function initials(name) { if (!name) return '?'; return name.trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase(); }
+function relativeTime(dateStr) {
+  if (!dateStr) return 'No contact yet';
+  const diffMs = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diffMs / 60000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  if (days < 7) return `${days}d ago`;
+  const weeks = Math.floor(days / 7);
+  if (weeks < 5) return `${weeks}w ago`;
+  return new Date(dateStr).toLocaleDateString();
+}
+function toast(message, type = 'default') {
+  const stack = document.getElementById('toastStack');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = message;
+  stack.appendChild(el);
+  setTimeout(() => el.remove(), 4000);
+}
+function setConnStatus(status, label) {
+  document.getElementById('connDot').className = `status-dot ${status}`;
+  document.getElementById('connStatus').className = `status-pill ${status}`;
+  document.getElementById('connLabel').textContent = label;
+}
+function openOverlay(id) { document.getElementById(id).classList.add('active'); }
+function closeOverlay(id) { document.getElementById(id).classList.remove('active'); }
+
+/* ───────────── NAVIGATION (event delegation — robust even if views are re-rendered) ───────────── */
+function switchView(viewName) {
+  document.querySelectorAll('.nav-item[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === viewName));
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === `view-${viewName}`));
+}
+document.getElementById('sidebarNav').addEventListener('click', (e) => {
+  const btn = e.target.closest('.nav-item[data-view]');
+  if (!btn) return;
+  switchView(btn.dataset.view);
+});
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-goto]');
+  if (!btn) return;
+  switchView(btn.dataset.goto);
+});
+
+/* generic overlay close handling (✕ buttons + click-outside for centered modals) */
+document.querySelectorAll('[data-close]').forEach(el => {
+  el.addEventListener('click', () => closeOverlay(el.dataset.close));
+});
+document.querySelectorAll('.overlay.center').forEach(ov => {
+  ov.addEventListener('click', (e) => { if (e.target === ov) ov.classList.remove('active'); });
+});
+
+/* ───────────── BOOTSTRAP ───────────── */
+async function init() {
+  if (!DB_CONFIGURED) {
+    document.getElementById('setupBanner').style.display = 'block';
+    setConnStatus('off', 'Not connected');
+    renderAll();
+    return;
+  }
+  if (CDN_LOAD_FAILED) {
+    const banner = document.getElementById('setupBanner');
+    banner.textContent = 'The Supabase library failed to load (check your internet connection, ad-blocker, or any network restrictions), so the database can\u2019t be reached right now. The rest of the CRM — including this sidebar — still works normally.';
+    banner.style.display = 'block';
+    setConnStatus('error', 'Library failed to load');
+    renderAll();
+    return;
+  }
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      setConnStatus('error', 'Not signed in');
+    } else {
+      setConnStatus('on', 'Connected');
+    }
+  } catch (err) {
+    console.error(err);
+    setConnStatus('error', 'Connection failed');
+    toast('Could not reach the database.', 'error');
+  }
+  await Promise.all([loadDeals(), loadContacts(), loadInteractions(), loadAutomations(), loadReminders(), loadAutomationRuns()]);
+  renderAll();
+  subscribeRealtime();
+}
+
+function renderAll() {
+  renderOverview();
+  renderKanban();
+  renderContacts();
+  renderActivityFeed();
+  renderAutomations();
+  renderReminders();
+  renderAutomationRuns();
+  populateContactSelect();
+}
+
+/* ───────────── DATA LOADING ───────────── */
+async function loadDeals() {
+  if (!supabase) return;
+  const { data, error } = await supabase.from('deals').select('*, contacts(id, name), companies(id, name)').order('created_at', { ascending: false });
+  if (error) { console.error(error); toast('Could not load deals.', 'error'); return; }
+  state.deals = data || [];
+}
+async function loadContacts() {
+  if (!supabase) return;
+  const { data, error } = await supabase.from('contacts').select('*, companies(id, name)').order('last_interaction_at', { ascending: false, nullsFirst: false });
+  if (error) { console.error(error); toast('Could not load contacts.', 'error'); return; }
+  state.contacts = data || [];
+}
+async function loadInteractions() {
+  if (!supabase) return;
+  const { data, error } = await supabase.from('interactions').select('*, contacts(id, name)').order('created_at', { ascending: false }).limit(50);
+  if (error) { console.error(error); toast('Could not load activity.', 'error'); return; }
+  state.interactions = data || [];
+}
+async function loadAutomations() {
+  if (!supabase) return;
+  const { data, error } = await supabase.from('automations').select('*').order('created_at', { ascending: false });
+  if (error) { console.error(error); toast('Could not load rules.', 'error'); return; }
+  state.automations = data || [];
+}
+async function loadReminders() {
+  if (!supabase) return;
+  const { data, error } = await supabase.from('reminders').select('*, contacts(id, name), deals(id, title)').order('created_at', { ascending: false }).limit(50);
+  if (error) { console.error(error); return; }
+  state.reminders = data || [];
+}
+async function loadAutomationRuns() {
+  if (!supabase) return;
+  const { data, error } = await supabase.from('automation_runs').select('*, automations(id, name), contacts(id, name), deals(id, title)').order('ran_at', { ascending: false }).limit(30);
+  if (error) { console.error(error); return; }
+  state.automationRuns = data || [];
+}
+
+/* ───────────── OVERVIEW ───────────── */
+function setKpi(id, text, colorClass) {
+  const el = document.getElementById(id);
+  el.classList.remove('skeleton', 'kpi-skeleton');
+  el.classList.add('kpi-value');
+  if (colorClass) el.classList.add(colorClass);
+  el.textContent = text;
+}
+function renderOverview() {
+  const open = state.deals.filter(d => d.stage !== 'won' && d.stage !== 'lost');
+  const openValue = open.reduce((s, d) => s + (Number(d.value) || 0), 0);
+  const now = new Date();
+  const wonThisMonth = state.deals.filter(d => d.stage === 'won' && d.closed_at && new Date(d.closed_at).getMonth() === now.getMonth() && new Date(d.closed_at).getFullYear() === now.getFullYear());
+  const wonValue = wonThisMonth.reduce((s, d) => s + (Number(d.value) || 0), 0);
+
+  setKpi('kpiPipelineValue', formatCurrency(openValue), 'grad');
+  setKpi('kpiActiveDeals', String(open.length));
+  setKpi('kpiWonMonth', formatCurrency(wonValue));
+  setKpi('kpiContacts', String(state.contacts.length));
+
+  const feed = document.getElementById('overviewActivity');
+  const emptyEl = document.getElementById('overviewActivityEmpty');
+  const recent = state.interactions.slice(0, 5);
+  if (!recent.length) { feed.innerHTML = ''; emptyEl.style.display = 'block'; }
+  else { emptyEl.style.display = 'none'; feed.innerHTML = recent.map(activityItemHtml).join(''); }
+}
+
+/* ───────────── PIPELINE ───────────── */
+function renderKanban() {
+  const wrapper = document.getElementById('kanbanWrapper');
+  wrapper.innerHTML = STAGES.map(stage => {
+    const dealsInStage = state.deals.filter(d => d.stage === stage.key);
+    const stageValue = dealsInStage.reduce((s, d) => s + (Number(d.value) || 0), 0);
+    return `
+      <div class="kanban-col" data-stage="${stage.key}">
+        <div class="kanban-header">
+          <span class="kanban-col-title">${escapeHtml(stage.label)}</span>
+          <span class="kanban-col-count">${dealsInStage.length} · ${formatCurrency(stageValue)}</span>
+        </div>
+        <div class="kanban-body" data-stage="${stage.key}">
+          ${dealsInStage.length ? dealsInStage.map(dealCardHtml).join('') : `<div class="empty-state" style="padding:1.4rem 0.4rem;">No deals here</div>`}
+        </div>
+      </div>`;
+  }).join('');
+  attachDragAndDrop();
+  attachDealCardClicks();
+}
+function dealCardHtml(deal) {
+  const contactName = deal.contacts?.name || 'No contact yet';
+  const companyName = deal.companies?.name || '—';
+  const won = deal.stage === 'won';
+  return `
+    <div class="deal-card" draggable="true" data-deal-id="${deal.id}">
+      <div class="deal-value" style="${won ? 'background: var(--green); -webkit-background-clip: text; -webkit-text-fill-color: transparent;' : ''}">${formatCurrency(deal.value)}</div>
+      <div class="deal-title">${escapeHtml(deal.title)}</div>
+      <div class="deal-company">${escapeHtml(companyName)}</div>
+      <div class="deal-contact"><div class="avatar">${escapeHtml(initials(contactName))}</div> ${escapeHtml(contactName)}</div>
+    </div>`;
+}
+function attachDragAndDrop() {
+  document.querySelectorAll('.deal-card').forEach(card => {
+    card.addEventListener('dragstart', e => { card.classList.add('dragging'); e.dataTransfer.setData('text/plain', card.dataset.dealId); });
+    card.addEventListener('dragend', () => card.classList.remove('dragging'));
+  });
+  document.querySelectorAll('.kanban-body').forEach(body => {
+    body.addEventListener('dragover', e => { e.preventDefault(); body.closest('.kanban-col').classList.add('drag-over'); });
+    body.addEventListener('dragleave', () => body.closest('.kanban-col').classList.remove('drag-over'));
+    body.addEventListener('drop', async e => {
+      e.preventDefault();
+      body.closest('.kanban-col').classList.remove('drag-over');
+      await moveDealToStage(e.dataTransfer.getData('text/plain'), body.dataset.stage);
+    });
+  });
+}
+function attachDealCardClicks() {
+  document.querySelectorAll('.deal-card').forEach(card => {
+    let moved = false;
+    card.addEventListener('dragstart', () => { moved = true; });
+    card.addEventListener('click', () => { if (!moved) openDealDetail(card.dataset.dealId); moved = false; });
+  });
+}
+async function moveDealToStage(dealId, newStage) {
+  const deal = state.deals.find(d => d.id === dealId);
+  if (!deal || deal.stage === newStage) return;
+  const prevStage = deal.stage;
+  deal.stage = newStage;
+  renderKanban(); renderOverview();
+  if (!supabase) { toast('Not connected yet — nothing was saved.', 'error'); return; }
+  const payload = { stage: newStage, updated_at: new Date().toISOString() };
+  if (newStage === 'won' || newStage === 'lost') payload.closed_at = new Date().toISOString();
+  const { error } = await supabase.from('deals').update(payload).eq('id', dealId);
+  if (error) { deal.stage = prevStage; renderKanban(); renderOverview(); toast('Could not move the deal.', 'error'); }
+  else toast('Deal moved to ' + (STAGES.find(s => s.key === newStage)?.label || newStage), 'success');
+}
+
+/* ───────────── DEAL DETAIL ───────────── */
+function openDealDetail(dealId) {
+  const deal = state.deals.find(d => d.id === dealId);
+  if (!deal) return;
+  state.activeDealId = dealId;
+  document.getElementById('dealDetailTitle').textContent = deal.title;
+  document.getElementById('dealDetailSub').textContent = `${deal.companies?.name || '—'} · ${deal.contacts?.name || 'No contact yet'}`;
+  document.getElementById('dealDetailValue').value = deal.value || 0;
+  document.getElementById('dealDetailStage').value = deal.stage;
+  openOverlay('dealDetailOverlay');
+}
+document.getElementById('btnSaveDeal').addEventListener('click', async () => {
+  const dealId = state.activeDealId;
+  if (!dealId) return;
+  const value = Number(document.getElementById('dealDetailValue').value) || 0;
+  const stage = document.getElementById('dealDetailStage').value;
+  if (!supabase) { toast('Not connected yet — nothing was saved.', 'error'); closeOverlay('dealDetailOverlay'); return; }
+  const payload = { value, stage, updated_at: new Date().toISOString() };
+  if (stage === 'won' || stage === 'lost') payload.closed_at = new Date().toISOString();
+  const { error } = await supabase.from('deals').update(payload).eq('id', dealId);
+  if (error) { toast('Could not save changes.', 'error'); return; }
+  toast('Deal updated', 'success');
+  closeOverlay('dealDetailOverlay');
+  await loadDeals(); renderKanban(); renderOverview();
+});
+document.getElementById('btnDeleteDeal').addEventListener('click', async () => {
+  const dealId = state.activeDealId;
+  if (!dealId) return;
+  if (!supabase) { toast('Not connected yet — nothing was saved.', 'error'); closeOverlay('dealDetailOverlay'); return; }
+  const { error } = await supabase.from('deals').delete().eq('id', dealId);
+  if (error) { toast('Could not delete the deal.', 'error'); return; }
+  toast('Deal deleted', 'success');
+  closeOverlay('dealDetailOverlay');
+  await loadDeals(); renderKanban(); renderOverview();
+});
+
+/* ───────────── CONTACTS ───────────── */
+function renderContacts(filter = '') {
+  const tbody = document.getElementById('contactsTableBody');
+  const emptyEl = document.getElementById('contactsEmpty');
+  const q = filter.trim().toLowerCase();
+  const rows = state.contacts.filter(c => !q || (c.name || '').toLowerCase().includes(q) || (c.companies?.name || '').toLowerCase().includes(q));
+  if (!rows.length) { tbody.innerHTML = ''; emptyEl.style.display = 'block'; return; }
+  emptyEl.style.display = 'none';
+  tbody.innerHTML = rows.map(c => {
+    const dealCount = state.deals.filter(d => d.contact_id === c.id && d.stage !== 'won' && d.stage !== 'lost').length;
+    return `
+      <tr data-contact-id="${c.id}">
+        <td>${escapeHtml(c.name)}</td>
+        <td>${escapeHtml(c.companies?.name || '—')}</td>
+        <td>${relativeTime(c.last_interaction_at)}</td>
+        <td><span class="pill ${escapeHtml(c.status || 'cold')}">${escapeHtml(c.status || 'cold')}</span></td>
+        <td>${dealCount}</td>
+      </tr>`;
+  }).join('');
+  tbody.querySelectorAll('tr').forEach(tr => tr.addEventListener('click', () => openContactPanel(tr.dataset.contactId)));
+}
+document.getElementById('contactSearch').addEventListener('input', e => renderContacts(e.target.value));
+document.getElementById('globalSearch').addEventListener('input', e => {
+  switchView('contacts');
+  document.getElementById('contactSearch').value = e.target.value;
+  renderContacts(e.target.value);
+});
+function populateContactSelect() {
+  const select = document.getElementById('activityContact');
+  if (!state.contacts.length) { select.innerHTML = `<option value="">Add a contact first</option>`; return; }
+  select.innerHTML = state.contacts.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+}
+
+/* ───────────── CONTACT SIDE PANEL ───────────── */
+function openContactPanel(contactId) {
+  const c = state.contacts.find(x => x.id === contactId);
+  if (!c) return;
+  state.activePanelContactId = contactId;
+  document.getElementById('panelAvatar').textContent = initials(c.name);
+  document.getElementById('panelName').textContent = c.name;
+  document.getElementById('panelCompany').textContent = c.companies?.name || 'No company on file';
+  document.getElementById('panelEmail').textContent = c.email || '—';
+  document.getElementById('panelPhone').textContent = c.phone || '—';
+  document.getElementById('panelStatus').value = c.status || 'cold';
+  renderPanelActivity(contactId);
+  openOverlay('panelOverlay');
+  document.getElementById('contactPanel').classList.add('active');
+}
+function closeContactPanel() {
+  document.getElementById('contactPanel').classList.remove('active');
+  closeOverlay('panelOverlay');
+}
+document.getElementById('panelClose').addEventListener('click', closeContactPanel);
+document.getElementById('panelOverlay').addEventListener('click', closeContactPanel);
+document.getElementById('panelStatus').addEventListener('change', async (e) => {
+  const contactId = state.activePanelContactId;
+  const status = e.target.value;
+  if (!supabase) { toast('Not connected yet — nothing was saved.', 'error'); return; }
+  const { error } = await supabase.from('contacts').update({ status }).eq('id', contactId);
+  if (error) { toast('Could not update status.', 'error'); return; }
+  await loadContacts(); renderContacts(document.getElementById('contactSearch').value);
+  toast('Status updated', 'success');
+});
+function renderPanelActivity(contactId) {
+  const list = state.interactions.filter(i => i.contact_id === contactId);
+  const el = document.getElementById('panelActivity');
+  el.innerHTML = list.length ? list.map(activityItemHtml).join('') : `<div class="empty-state" style="padding:1.4rem 0.5rem;">Nothing logged for this contact yet</div>`;
+}
+document.getElementById('panelActivityForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const contact_id = state.activePanelContactId;
+  const type = document.getElementById('panelActivityType').value;
+  const content = document.getElementById('panelActivityContent').value.trim();
+  if (!supabase) { toast('Not connected yet — nothing was saved.', 'error'); return; }
+  const { error } = await supabase.from('interactions').insert({ contact_id, type, content });
+  if (error) { toast('Could not save that.', 'error'); return; }
+  await supabase.from('contacts').update({ last_interaction_at: new Date().toISOString() }).eq('id', contact_id);
+  document.getElementById('panelActivityContent').value = '';
+  toast('Saved', 'success');
+  await Promise.all([loadInteractions(), loadContacts()]);
+  renderPanelActivity(contact_id); renderContacts(document.getElementById('contactSearch').value); renderActivityFeed(); renderOverview();
+});
+
+/* ───────────── ACTIVITY (global) ───────────── */
+const TYPE_ICON = { email: '✉', call: '☎', meeting: '◈', note: '✎' };
+function activityItemHtml(i) {
+  return `
+    <div class="activity-item">
+      <div class="activity-icon">${TYPE_ICON[i.type] || '•'}</div>
+      <div>
+        <div class="activity-meta">${escapeHtml(i.contacts?.name || 'Unknown contact')} <span>· ${escapeHtml(i.type)}</span></div>
+        <div class="activity-content">${escapeHtml(i.content)}</div>
+        <div class="activity-time">${relativeTime(i.created_at)}</div>
+      </div>
+    </div>`;
+}
+function renderActivityFeed() {
+  const feed = document.getElementById('activityFeed');
+  const emptyEl = document.getElementById('activityEmpty');
+  if (!state.interactions.length) { feed.innerHTML = ''; emptyEl.style.display = 'block'; return; }
+  emptyEl.style.display = 'none';
+  feed.innerHTML = state.interactions.map(activityItemHtml).join('');
+}
+document.getElementById('activityForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const contact_id = document.getElementById('activityContact').value;
+  const type = document.getElementById('activityType').value;
+  const content = document.getElementById('activityContent').value.trim();
+  if (!contact_id) { toast('Add a contact first.', 'error'); return; }
+  if (!supabase) { toast('Not connected yet — nothing was saved.', 'error'); return; }
+  const { error } = await supabase.from('interactions').insert({ contact_id, type, content });
+  if (error) { toast('Could not save that.', 'error'); return; }
+  await supabase.from('contacts').update({ last_interaction_at: new Date().toISOString() }).eq('id', contact_id);
+  document.getElementById('activityContent').value = '';
+  toast('Saved', 'success');
+  await Promise.all([loadInteractions(), loadContacts()]);
+  renderActivityFeed(); renderContacts(); renderOverview();
+});
+
+/* ───────────── AUTOMATIC ACTIONS ───────────── */
+const TRIGGER_LABELS = {
+  contact_no_reply: days => `A hot/active contact goes ${days} day${days == 1 ? '' : 's'} without a reply`,
+  deal_stalled:      days => `A deal sits in the same stage for ${days} day${days == 1 ? '' : 's'}`,
+  deal_won:          () => `A deal is marked Won`,
+};
+const ACTION_LABELS = {
+  log_note:        a => `log a note: "${a.action_message || ''}"`,
+  create_reminder: a => `create a reminder: "${a.action_message || ''}"`,
+  webhook:         a => `call the webhook ${a.action_webhook_url || '(no URL set)'}`,
+};
+function describeAutomation(a) {
+  const triggerFn = TRIGGER_LABELS[a.trigger_type] || (() => a.trigger_type);
+  const actionFn = ACTION_LABELS[a.action_type] || (() => a.action_type);
+  return { when: triggerFn(a.trigger_days), then: actionFn(a) };
+}
+function renderAutomations() {
+  const list = document.getElementById('automationsList');
+  const emptyEl = document.getElementById('automationsEmpty');
+  if (!state.automations.length) { list.innerHTML = ''; emptyEl.style.display = 'block'; return; }
+  emptyEl.style.display = 'none';
+  list.innerHTML = state.automations.map(a => {
+    const { when, then } = describeAutomation(a);
+    const ranNote = a.last_run_at ? `<div class="rule-desc" style="margin-top:0.3rem; color: var(--dim2);">Last checked ${relativeTime(a.last_run_at)}</div>` : '';
+    return `
+    <div class="rule-row">
+      <div style="flex:1;">
+        <div class="rule-name">${escapeHtml(a.name)}</div>
+        <div class="rule-desc"><strong>When</strong> ${escapeHtml(when)}, <strong>then</strong> ${escapeHtml(then)}</div>
+        ${ranNote}
+      </div>
+      <div class="toggle ${a.is_active ? 'on' : ''}" data-id="${a.id}" data-active="${a.is_active}"></div>
+    </div>`;
+  }).join('');
+  list.querySelectorAll('.toggle').forEach(t => {
+    t.addEventListener('click', async () => {
+      const id = t.dataset.id;
+      const newActive = t.dataset.active !== 'true';
+      t.classList.toggle('on', newActive); t.dataset.active = newActive;
+      if (!supabase) { toast('Not connected yet — nothing was saved.', 'error'); return; }
+      const { error } = await supabase.from('automations').update({ is_active: newActive }).eq('id', id);
+      if (error) toast('Could not update that rule.', 'error');
+    });
+  });
+}
+
+function renderReminders() {
+  const list = document.getElementById('remindersList');
+  const emptyEl = document.getElementById('remindersEmpty');
+  const items = state.reminders.filter(r => !r.is_done);
+  if (!items.length) { list.innerHTML = ''; emptyEl.style.display = 'block'; return; }
+  emptyEl.style.display = 'none';
+  list.innerHTML = items.map(r => `
+    <div class="activity-item">
+      <div class="activity-icon">⏰</div>
+      <div style="flex:1;">
+        <div class="activity-meta">${escapeHtml(r.contacts?.name || r.deals?.title || 'Reminder')}</div>
+        <div class="activity-content">${escapeHtml(r.message)}</div>
+        <div class="activity-time">${relativeTime(r.created_at)}</div>
+      </div>
+      <button class="btn ghost small" data-reminder-done="${r.id}">Done</button>
+    </div>`).join('');
+  list.querySelectorAll('[data-reminder-done]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.dataset.reminderDone;
+      if (!supabase) { toast('Not connected yet.', 'error'); return; }
+      const { error } = await supabase.from('reminders').update({ is_done: true }).eq('id', id);
+      if (error) { toast('Could not update that reminder.', 'error'); return; }
+      await loadReminders(); renderReminders();
+    });
+  });
+}
+
+function renderAutomationRuns() {
+  const list = document.getElementById('automationRunsList');
+  const emptyEl = document.getElementById('automationRunsEmpty');
+  if (!state.automationRuns.length) { list.innerHTML = ''; emptyEl.style.display = 'block'; return; }
+  emptyEl.style.display = 'none';
+  list.innerHTML = state.automationRuns.map(r => `
+    <div class="activity-item">
+      <div class="activity-icon">⚡</div>
+      <div style="flex:1;">
+        <div class="activity-meta">${escapeHtml(r.automations?.name || 'Rule')} <span>${escapeHtml(r.contacts?.name || r.deals?.title || '')}</span></div>
+        <div class="activity-content">${escapeHtml(r.action_taken)}</div>
+        <div class="activity-time">${relativeTime(r.ran_at)}</div>
+      </div>
+    </div>`).join('');
+}
+
+/* ───────────── NEW DEAL ───────────── */
+document.getElementById('btnNewDeal').addEventListener('click', () => openOverlay('dealModalOverlay'));
+document.getElementById('btnQuickDeal').addEventListener('click', () => openOverlay('dealModalOverlay'));
+document.getElementById('btnQuickDeal2').addEventListener('click', () => openOverlay('dealModalOverlay'));
+document.getElementById('dealForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const submitBtn = document.getElementById('submitDealBtn');
+  const title = document.getElementById('dealTitle').value.trim();
+  const value = Number(document.getElementById('dealValue').value) || 0;
+  const stage = document.getElementById('dealStage').value;
+  const companyName = document.getElementById('dealCompany').value.trim();
+  const contactName = document.getElementById('dealContactName').value.trim();
+  const contactEmail = document.getElementById('dealContactEmail').value.trim();
+  if (!supabase) { toast('Not connected yet — nothing was saved.', 'error'); return; }
+  submitBtn.disabled = true; submitBtn.textContent = 'Creating…';
+  try {
+    let { data: company } = await supabase.from('companies').select('id').ilike('name', companyName).maybeSingle();
+    if (!company) { const { data: nc, error } = await supabase.from('companies').insert({ name: companyName }).select('id').single(); if (error) throw error; company = nc; }
+    let { data: contact } = await supabase.from('contacts').select('id').ilike('name', contactName).eq('company_id', company.id).maybeSingle();
+    if (!contact) { const { data: ncn, error } = await supabase.from('contacts').insert({ name: contactName, email: contactEmail || null, company_id: company.id, status: 'active' }).select('id').single(); if (error) throw error; contact = ncn; }
+    const { error: dealErr } = await supabase.from('deals').insert({ title, value, stage, company_id: company.id, contact_id: contact.id });
+    if (dealErr) throw dealErr;
+    toast('Deal created', 'success');
+    document.getElementById('dealForm').reset();
+    closeOverlay('dealModalOverlay');
+    await Promise.all([loadDeals(), loadContacts()]);
+    renderAll();
+  } catch (err) {
+    console.error(err); toast('Could not create the deal.', 'error');
+  } finally {
+    submitBtn.disabled = false; submitBtn.textContent = 'Create Deal';
+  }
+});
+
+/* ───────────── NEW CONTACT ───────────── */
+document.getElementById('btnNewContact').addEventListener('click', () => openOverlay('contactModalOverlay'));
+document.getElementById('btnQuickContact').addEventListener('click', () => openOverlay('contactModalOverlay'));
+document.getElementById('contactForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const name = document.getElementById('contactName').value.trim();
+  const email = document.getElementById('contactEmail').value.trim();
+  const phone = document.getElementById('contactPhone').value.trim();
+  const companyName = document.getElementById('contactCompany').value.trim();
+  const status = document.getElementById('contactStatus').value;
+  if (!supabase) { toast('Not connected yet — nothing was saved.', 'error'); return; }
+  try {
+    let company_id = null;
+    if (companyName) {
+      let { data: company } = await supabase.from('companies').select('id').ilike('name', companyName).maybeSingle();
+      if (!company) { const { data: nc, error } = await supabase.from('companies').insert({ name: companyName }).select('id').single(); if (error) throw error; company = nc; }
+      company_id = company.id;
+    }
+    const { error } = await supabase.from('contacts').insert({ name, email: email || null, phone: phone || null, company_id, status });
+    if (error) throw error;
+    toast('Contact saved', 'success');
+    document.getElementById('contactForm').reset();
+    closeOverlay('contactModalOverlay');
+    await loadContacts(); renderContacts(); populateContactSelect(); renderOverview();
+  } catch (err) {
+    console.error(err); toast('Could not save the contact.', 'error');
+  }
+});
+
+/* ───────────── NEW RULE ───────────── */
+document.getElementById('btnNewAutomation').addEventListener('click', () => openOverlay('automationModalOverlay'));
+
+function updateAutomationFormFields() {
+  const triggerType = document.getElementById('autoTriggerType').value;
+  document.getElementById('autoDaysGroup').style.display = (triggerType === 'deal_won') ? 'none' : 'block';
+  const actionType = document.getElementById('autoActionType').value;
+  document.getElementById('autoMessageGroup').style.display = (actionType === 'webhook') ? 'none' : 'block';
+  document.getElementById('autoWebhookGroup').style.display = (actionType === 'webhook') ? 'block' : 'none';
+}
+document.getElementById('autoTriggerType').addEventListener('change', updateAutomationFormFields);
+document.getElementById('autoActionType').addEventListener('change', updateAutomationFormFields);
+updateAutomationFormFields();
+
+document.getElementById('automationForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const name = document.getElementById('autoName').value.trim();
+  const trigger_type = document.getElementById('autoTriggerType').value;
+  const trigger_days = Number(document.getElementById('autoDays').value) || 3;
+  const action_type = document.getElementById('autoActionType').value;
+  const action_message = document.getElementById('autoMessage').value.trim();
+  const action_webhook_url = document.getElementById('autoWebhookUrl').value.trim();
+  if (action_type === 'webhook' && !action_webhook_url) { toast('Add a webhook URL first.', 'error'); return; }
+  if (action_type !== 'webhook' && !action_message) { toast('Add a message for the note/reminder.', 'error'); return; }
+  if (!supabase) { toast('Not connected yet — nothing was saved.', 'error'); return; }
+  const { error } = await supabase.from('automations').insert({
+    name, trigger_type, trigger_days, action_type,
+    action_message: action_message || null,
+    action_webhook_url: action_webhook_url || null,
+  });
+  if (error) { toast('Could not save that rule.', 'error'); return; }
+  toast('Rule saved', 'success');
+  document.getElementById('automationForm').reset();
+  updateAutomationFormFields();
+  closeOverlay('automationModalOverlay');
+  await loadAutomations(); renderAutomations();
+});
+
+/* ───────────── REFRESH ───────────── */
+document.getElementById('btnRefreshPipeline').addEventListener('click', async () => {
+  if (!supabase) { toast('Not connected yet.', 'error'); return; }
+  await loadDeals(); renderKanban(); renderOverview(); toast('Pipeline refreshed', 'success');
+});
+document.getElementById('btnRefreshContacts').addEventListener('click', async () => {
+  if (!supabase) { toast('Not connected yet.', 'error'); return; }
+  await loadContacts(); renderContacts(document.getElementById('contactSearch').value); toast('Contacts refreshed', 'success');
+});
+
+/* ───────────── LIVE UPDATES ───────────── */
+function subscribeRealtime() {
+  if (!supabase) return;
+  supabase.channel('crm-deals').on('postgres_changes', { event: '*', schema: 'public', table: 'deals' }, async () => { await loadDeals(); renderKanban(); renderOverview(); }).subscribe();
+  supabase.channel('crm-contactsx').on('postgres_changes', { event: '*', schema: 'public', table: 'contacts' }, async () => { await loadContacts(); renderContacts(document.getElementById('contactSearch').value); populateContactSelect(); renderOverview(); }).subscribe();
+  supabase.channel('crm-interactions').on('postgres_changes', { event: '*', schema: 'public', table: 'interactions' }, async () => { await loadInteractions(); renderActivityFeed(); renderOverview(); }).subscribe();
+  supabase.channel('crm-reminders').on('postgres_changes', { event: '*', schema: 'public', table: 'reminders' }, async () => { await loadReminders(); renderReminders(); }).subscribe();
+  supabase.channel('crm-automation-runs').on('postgres_changes', { event: '*', schema: 'public', table: 'automation_runs' }, async () => { await loadAutomationRuns(); renderAutomationRuns(); }).subscribe();
+}
+
+init();
+</script>
+
+</body>
+</html>
