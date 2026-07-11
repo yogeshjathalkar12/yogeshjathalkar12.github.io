@@ -12,6 +12,22 @@
    DESIGN TOKENS — identical to main site
 ───────────────────────────────────────── */
 :root {
+   
+  --black: #faf7f4;
+  --surface: #f0ebe4;
+  --surface2: #e8e0d6;
+  --border: rgba(0,0,0,0.08);
+  --purple: #6d28d9;
+  --pink: #be185d;
+  --grad: linear-gradient(135deg, #6d28d9, #be185d);
+  --white: #1c1018;
+  --dim: #6b5f6a;
+  --dim2: #9c8fa0;
+  --bulb-color: #ffaa00;
+  --bulb-glow: drop-shadow(0 0 15px rgba(255,170,0,0.8));
+}
+body.light-mode {
+   
   --black: #030303;
   --surface: #0a0a0a;
   --surface2: #0f0f0f;
@@ -27,20 +43,7 @@
   --red: #ef4444;
   --bulb-color: #cbd5e1;
   --bulb-glow: none;
-}
-body.light-mode {
-  --black: #faf7f4;
-  --surface: #f0ebe4;
-  --surface2: #e8e0d6;
-  --border: rgba(0,0,0,0.08);
-  --purple: #6d28d9;
-  --pink: #be185d;
-  --grad: linear-gradient(135deg, #6d28d9, #be185d);
-  --white: #1c1018;
-  --dim: #6b5f6a;
-  --dim2: #9c8fa0;
-  --bulb-color: #ffaa00;
-  --bulb-glow: drop-shadow(0 0 15px rgba(255,170,0,0.8));
+
 }
 
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -50,7 +53,6 @@ body {
   color: var(--white);
   font-family: 'DM Mono', monospace;
   overflow-x: hidden;
-  cursor: none;
   min-height: 100vh;
 }
 
