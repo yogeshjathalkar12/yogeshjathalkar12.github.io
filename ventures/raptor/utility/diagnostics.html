@@ -160,12 +160,15 @@ function handleUpgrade() {
   window.open('mailto:yogeshjathalkar@gmail.com?subject=Raptor Pro Upgrade', '_blank');
 }
 async function loadCreditsOnly() {
-  const headers = await getAuthHeader();
-  if (!headers) return;
-  try {
-    const res = await fetch(`${RAPTOR_API_URL}/api/raptor/status`);
-    // status endpoint has no credit data; credits populate after first tool call instead
-  } catch(e) {}
+  if (!supabaseClient) return;
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) return;
+  const { data, error } = await supabaseClient
+    .from('raptor_users')
+    .select('credits')
+    .eq('user_id', session.user.id)
+    .single();
+  if (!error && data) syncCredits(data.credits);
 }
 
 // ── TABS ────────────────────────────────────────────
