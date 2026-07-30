@@ -17,7 +17,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" type="image/x-icon" href="favicon1.png">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     
 </head>
@@ -35,7 +34,7 @@
     <button class="auth-trigger-btn" id="navLoginBtn" data-open-auth="login">Log In / Sign Up</button>
 
     <div class="sidebar-toggle" id="sidebarToggle">
-        <img src="favicon1.png" alt="Open menu" class="hamburger-icon" id="hamburgerIcon">
+        <img src="assets/menu-icon.png" alt="Open menu" class="hamburger-icon" id="hamburgerIcon">
         <span class="toggle-label" id="toggleLabel"></span>
     </div>
 
@@ -298,13 +297,7 @@
             <a href="modules/safety.html" style="text-decoration:none">
                 <div class="module-card" data-specs="Latency: <10ms|Coverage: 360 Site Wide|Alerts: Instant Push">
                     <div class="module-image">
-                        <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="100" cy="70" r="48" fill="none" stroke="#fbbf24" stroke-width="2" opacity="0.3"/>
-                            <circle cx="100" cy="70" r="32" fill="none" stroke="#fbbf24" stroke-width="2" opacity="0.55"/>
-                            <path d="M55 70 C55 45 145 45 145 70 C145 95 55 95 55 70 Z" fill="none" stroke="#e2e8f0" stroke-width="3"/>
-                            <circle cx="100" cy="70" r="14" fill="#fbbf24"/>
-                            <circle cx="100" cy="70" r="5" fill="#0f172a"/>
-                        </svg>
+                        <img src="images/sentinel-safety.png" alt="Sentinel Safety module illustration" loading="lazy">
                     </div>
                     <span class="module-id">ID: CNSTRCT-01</span>
                     <h3>Sentinel Safety</h3>
@@ -321,13 +314,7 @@
             <a href="modules/quantum.html" style="text-decoration:none">
                 <div class="module-card" data-specs="Tracking: RFID / BLE|Accuracy: +/- 1.5m|Sync: ERP Integrated">
                     <div class="module-image">
-                        <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M60 55 L100 35 L140 55 L140 95 L100 115 L60 95 Z" fill="none" stroke="#e2e8f0" stroke-width="3" stroke-linejoin="round"/>
-                            <path d="M60 55 L100 75 L140 55" fill="none" stroke="#e2e8f0" stroke-width="3" stroke-linejoin="round"/>
-                            <line x1="100" y1="75" x2="100" y2="115" stroke="#e2e8f0" stroke-width="3"/>
-                            <path d="M150 40 C158 40 164 46 164 54 C164 64 150 78 150 78 C150 78 136 64 136 54 C136 46 142 40 150 40 Z" fill="#fbbf24" stroke="none"/>
-                            <circle cx="150" cy="53" r="5" fill="#0f172a"/>
-                        </svg>
+                        <img src="images/quantum-logistics.png" alt="Quantum Logistics module illustration" loading="lazy">
                     </div>
                     <span class="module-id">ID: CNSTRCT-02</span>
                     <h3>Quantum Logistics</h3>
@@ -344,13 +331,7 @@
             <a href="modules/oracle.html" style="text-decoration:none">
                 <div class="module-card" data-specs="Model: Monte Carlo|Horizon: 12 Weeks|Data: 50k Points/Day">
                     <div class="module-image">
-                        <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
-                            <rect x="45" y="80" width="22" height="35" fill="#e2e8f0" opacity="0.8"/>
-                            <rect x="80" y="60" width="22" height="55" fill="#e2e8f0" opacity="0.8"/>
-                            <rect x="115" y="40" width="22" height="75" fill="#fbbf24"/>
-                            <path d="M45 65 L80 45 L115 30 L150 15" fill="none" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
-                            <path d="M138 15 L150 15 L150 27" fill="none" stroke="#fbbf24" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+                        <img src="images/predictive-oracle.png" alt="Predictive Oracle module illustration" loading="lazy">
                     </div>
                     <span class="module-id">ID: CNSTRCT-03</span>
                     <h3>Predictive Oracle</h3>
@@ -367,14 +348,7 @@
             <a href="modules/spectra.html" style="text-decoration:none">
                 <div class="module-card" data-specs="Sensors: Thermal/LiDAR|Res: < 2mm|Output: Auto-PDF">
                     <div class="module-image">
-                        <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
-                            <g stroke="#e2e8f0" stroke-width="1.5" opacity="0.5">
-                                <line x1="50" y1="40" x2="150" y2="40"/><line x1="50" y1="60" x2="150" y2="60"/><line x1="50" y1="80" x2="150" y2="80"/><line x1="50" y1="100" x2="150" y2="100"/>
-                                <line x1="60" y1="30" x2="60" y2="110"/><line x1="90" y1="30" x2="90" y2="110"/><line x1="120" y1="30" x2="120" y2="110"/>
-                            </g>
-                            <circle cx="105" cy="65" r="28" fill="none" stroke="#fbbf24" stroke-width="3.5"/>
-                            <line x1="125" y1="85" x2="148" y2="108" stroke="#fbbf24" stroke-width="4" stroke-linecap="round"/>
-                        </svg>
+                        <img src="images/spectra-quality.png" alt="Spectra Quality module illustration" loading="lazy">
                     </div>
                     <span class="module-id">ID: CNSTRCT-04</span>
                     <h3>Spectra Quality</h3>
@@ -391,13 +365,7 @@
             <a href="modules/eco.html" style="text-decoration:none">
                 <div class="module-card" data-specs="Compliance: LEED/BREEAM|Tracking: Carbon/Water|Diversion: Real-time %">
                     <div class="module-image">
-                        <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="100" cy="70" r="50" fill="none" stroke="#e2e8f0" stroke-width="2" stroke-dasharray="6 6" opacity="0.4"/>
-                            <path d="M100 35 C130 35 145 60 130 85 C118 105 90 105 80 85" fill="none" stroke="#fbbf24" stroke-width="4" stroke-linecap="round"/>
-                            <path d="M122 78 L130 85 L138 75" fill="none" stroke="#fbbf24" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M100 105 C70 105 55 80 70 55 C82 35 110 35 120 55" fill="none" stroke="#e2e8f0" stroke-width="4" stroke-linecap="round"/>
-                            <path d="M78 62 L70 55 L62 65" fill="none" stroke="#e2e8f0" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+                        <img src="images/eco-recovery.png" alt="Eco Recovery module illustration" loading="lazy">
                     </div>
                     <span class="module-id">ID: CNSTRCT-05</span>
                     <h3>Eco Recovery</h3>
@@ -414,12 +382,7 @@
             <a href="modules/bio.html" style="text-decoration:none">
                 <div class="module-card" data-specs="Vitals: HR / Temp|Env: Wet Bulb / AQI|Privacy: GDPR Safe">
                     <div class="module-image">
-                        <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="70" cy="55" r="20" fill="none" stroke="#e2e8f0" stroke-width="3"/>
-                            <path d="M50 55 A20 20 0 0 1 90 55" fill="#fbbf24" opacity="0.9"/>
-                            <path d="M40 100 L45 60 L65 70 L75 60 L95 100" fill="none" stroke="#e2e8f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
-                            <path d="M95 85 L115 85 L122 70 L132 100 L140 85 L160 85" fill="none" stroke="#fbbf24" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+                        <img src="images/bio-ergonomics.png" alt="Bio-Ergonomics module illustration" loading="lazy">
                     </div>
                     <span class="module-id">ID: CNSTRCT-06</span>
                     <h3>Bio-Ergonomics</h3>
@@ -436,18 +399,7 @@
             <a href="modules/digital-twin.html" style="text-decoration:none">
                 <div class="module-card" data-specs="Dim: 4D (Time)|Format: IFC / Revit|Sync: Real-time">
                     <div class="module-image">
-                        <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
-                            <g stroke="#e2e8f0" stroke-width="2" fill="none" opacity="0.6">
-                                <path d="M45 55 L75 40 L105 55 L105 90 L75 105 L45 90 Z"/>
-                                <path d="M45 55 L75 70 L105 55"/>
-                                <line x1="75" y1="70" x2="75" y2="105"/>
-                            </g>
-                            <g stroke="#fbbf24" stroke-width="2.5" fill="none">
-                                <path d="M90 50 L120 35 L150 50 L150 85 L120 100 L90 85 Z"/>
-                                <path d="M90 50 L120 65 L150 50"/>
-                                <line x1="120" y1="65" x2="120" y2="100"/>
-                            </g>
-                        </svg>
+                        <img src="images/digital-twin.png" alt="Digital Twin module illustration" loading="lazy">
                     </div>
                     <span class="module-id">ID: CNSTRCT-07</span>
                     <h3>Digital Twin</h3>
@@ -464,21 +416,7 @@
             <a href="modules/reality.html" style="text-decoration:none">
                 <div class="module-card" data-specs="Tech: Lidar SLAM|Density: High-Res|Compute: Edge">
                     <div class="module-image">
-                        <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
-                            <g fill="#e2e8f0" opacity="0.55">
-                                <circle cx="50" cy="100" r="2.5"/><circle cx="65" cy="90" r="2.5"/><circle cx="80" cy="105" r="2.5"/><circle cx="95" cy="95" r="2.5"/><circle cx="110" cy="108" r="2.5"/><circle cx="125" cy="92" r="2.5"/><circle cx="140" cy="102" r="2.5"/><circle cx="155" cy="88" r="2.5"/>
-                                <circle cx="60" cy="80" r="2.5"/><circle cx="90" cy="75" r="2.5"/><circle cx="120" cy="78" r="2.5"/><circle cx="145" cy="70" r="2.5"/>
-                            </g>
-                            <g stroke="#fbbf24" stroke-width="3" stroke-linecap="round">
-                                <line x1="70" y1="45" x2="55" y2="30"/><line x1="130" y1="45" x2="145" y2="30"/>
-                                <line x1="70" y1="55" x2="55" y2="70"/><line x1="130" y1="55" x2="145" y2="70"/>
-                            </g>
-                            <circle cx="55" cy="27" r="6" fill="none" stroke="#fbbf24" stroke-width="2.5"/>
-                            <circle cx="145" cy="27" r="6" fill="none" stroke="#fbbf24" stroke-width="2.5"/>
-                            <circle cx="55" cy="73" r="6" fill="none" stroke="#fbbf24" stroke-width="2.5"/>
-                            <circle cx="145" cy="73" r="6" fill="none" stroke="#fbbf24" stroke-width="2.5"/>
-                            <rect x="85" y="42" width="30" height="16" rx="3" fill="#fbbf24"/>
-                        </svg>
+                        <img src="images/reality-capture.png" alt="Reality Capture module illustration" loading="lazy">
                     </div>
                     <span class="module-id">ID: CNSTRCT-08</span>
                     <h3>Reality Capture</h3>
@@ -495,18 +433,7 @@
             <a href="modules/vortex.html" style="text-decoration:none">
                 <div class="module-card" data-specs="Type: Mesh Network|Uptime: 99.99%|Encryption: AES-256">
                     <div class="module-image">
-                        <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
-                            <g stroke="#e2e8f0" stroke-width="1.5" opacity="0.5">
-                                <line x1="100" y1="70" x2="50" y2="35"/><line x1="100" y1="70" x2="150" y2="35"/>
-                                <line x1="100" y1="70" x2="45" y2="90"/><line x1="100" y1="70" x2="155" y2="90"/>
-                                <line x1="100" y1="70" x2="70" y2="115"/><line x1="100" y1="70" x2="130" y2="115"/>
-                            </g>
-                            <circle cx="50" cy="35" r="6" fill="#e2e8f0"/><circle cx="150" cy="35" r="6" fill="#e2e8f0"/>
-                            <circle cx="45" cy="90" r="6" fill="#e2e8f0"/><circle cx="155" cy="90" r="6" fill="#e2e8f0"/>
-                            <circle cx="70" cy="115" r="6" fill="#e2e8f0"/><circle cx="130" cy="115" r="6" fill="#e2e8f0"/>
-                            <circle cx="100" cy="70" r="18" fill="#fbbf24"/>
-                            <circle cx="100" cy="70" r="8" fill="#0f172a"/>
-                        </svg>
+                        <img src="images/vortex-neural-engine.png" alt="Vortex Neural Engine module illustration" loading="lazy">
                     </div>
                     <span class="module-id">ID: CNSTRCT-09</span>
                     <h3>Vortex Neural Engine</h3>
@@ -523,14 +450,7 @@
             <a href="modules/rover.html" style="text-decoration:none">
                 <div class="module-card hw-card" data-specs="Payload: 500kg|Runtime: 12 Hours|Autonomy: Level 4">
                     <div class="module-image">
-                        <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M40 85 L50 60 L150 60 L160 85 Z" fill="none" stroke="#e2e8f0" stroke-width="3" stroke-linejoin="round"/>
-                            <rect x="75" y="40" width="45" height="22" rx="3" fill="none" stroke="#e2e8f0" stroke-width="3"/>
-                            <circle cx="60" cy="95" r="14" fill="#0f172a" stroke="#fbbf24" stroke-width="3"/>
-                            <circle cx="140" cy="95" r="14" fill="#0f172a" stroke="#fbbf24" stroke-width="3"/>
-                            <circle cx="100" cy="95" r="14" fill="#0f172a" stroke="#fbbf24" stroke-width="3"/>
-                            <line x1="40" y1="85" x2="160" y2="85" stroke="#fbbf24" stroke-width="2"/>
-                        </svg>
+                       <img src="images/rover.png" alt="Vortex Neural Engine module illustration" loading="lazy"> 
                     </div>
                     <span class="module-id">ID: CNSTRCT-10</span>
                     <h3>Construct Rover</h3>
