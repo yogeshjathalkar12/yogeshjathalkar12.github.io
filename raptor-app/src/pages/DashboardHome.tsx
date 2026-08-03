@@ -1,19 +1,57 @@
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../hooks/AuthContext';
 import { useCredits } from '../hooks/CreditsContext';
 import { TOOLS } from '../tools/registry';
+import { supabase } from '../lib/supabaseClient'; 
 
 export default function DashboardHome() {
   const { user } = useAuth();
   const { credits, totalCredits } = useCredits();
   const displayName = (user?.user_metadata?.full_name || user?.email || 'User').split(' ')[0];
 
-  // CRM Placeholder Data
-  const activeLeads = [
-    { id: 1, company: "Acme Corp", contact: "John Doe", status: "Negotiation", value: "$45,000", lastTouch: "2 hrs ago" },
-    { id: 2, company: "TechFlow Inc", contact: "Sarah Smith", status: "Discovery Call", value: "$12,500", lastTouch: "1 day ago" },
-    { id: 3, company: "Global Logistics", contact: "Mike Johnson", status: "Contract Sent", value: "$89,000", lastTouch: "3 hrs ago" },
-  ];
+  const [activeLeads, setActiveLeads] = useState<any[]>([]);
+  const [loadingLeads, setLoadingLeads] = useState(true);
+
+  // Fetch all active deals from Supabase
+  useEffect(() => {
+    async function fetchActivePipeline() {
+      if (!user) return;
+      try {
+        const { data, error } = await supabase
+          .from('deals')
+          .select(`
+            id,
+            title,
+            value,
+            stage,
+            updated_at,
+            companies ( name ),
+            contacts ( name )
+          `)
+          .neq('stage', 'won')
+          .neq('stage', 'lost')
+          .order('updated_at', { ascending: false });
+
+        if (error) throw error;
+        setActiveLeads(data || []);
+      } catch (error) {
+        console.error('Error fetching pipeline:', error);
+      } finally {
+        setLoadingLeads(false);
+      }
+    }
+
+    fetchActivePipeline();
+  }, [user]);
+
+  const formatTimeAgo = (dateString: string) => {
+    if (!dateString) return '—';
+    const hours = Math.abs(new Date().getTime() - new Date(dateString).getTime()) / 36e5;
+    if (hours < 1) return 'Just now';
+    if (hours < 24) return `${Math.floor(hours)} hrs ago`;
+    return `${Math.floor(hours / 24)} days ago`;
+  };
 
   return (
     <div style={{ padding: '2rem' }}>
@@ -36,36 +74,56 @@ export default function DashboardHome() {
           <div style={{ fontSize: '0.8rem', letterSpacing: '0.2em', color: 'var(--dim2)', textTransform: 'uppercase' }}>
             Active Pipeline
           </div>
-          <button style={{ backgroundColor: 'var(--accent)', color: '#fff', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: '0.8rem' }}>
-            + New Target
-          </button>
+          <Link to="/crm/pipeline" style={{ backgroundColor: 'var(--accent)', color: '#fff', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: '0.8rem', textDecoration: 'none' }}>
+            Go to Pipeline →
+          </Link>
         </div>
         
         <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontFamily: 'var(--mono)', fontSize: '0.85rem' }}>
             <thead>
               <tr style={{ backgroundColor: 'var(--bg)', color: 'var(--dim)', borderBottom: '1px solid var(--border)' }}>
+                <th style={{ padding: '1rem' }}>Deal Title</th>
                 <th style={{ padding: '1rem' }}>Company</th>
                 <th style={{ padding: '1rem' }}>Contact</th>
-                <th style={{ padding: '1rem' }}>Status</th>
-                <th style={{ padding: '1rem' }}>Deal Value</th>
+                <th style={{ padding: '1rem' }}>Stage</th>
+                <th style={{ padding: '1rem' }}>Value (USD)</th>
                 <th style={{ padding: '1rem' }}>Last Touch</th>
               </tr>
             </thead>
             <tbody>
-              {activeLeads.map((lead) => (
-                <tr key={lead.id} style={{ borderBottom: '1px solid var(--border)', color: 'var(--fg)' }}>
-                  <td style={{ padding: '1rem', fontWeight: 'bold' }}>{lead.company}</td>
-                  <td style={{ padding: '1rem' }}>{lead.contact}</td>
-                  <td style={{ padding: '1rem' }}>
-                    <span style={{ backgroundColor: 'var(--accent-dim)', color: 'var(--accent)', padding: '0.2rem 0.6rem', borderRadius: '12px', fontSize: '0.75rem' }}>
-                      {lead.status}
-                    </span>
+              {loadingLeads ? (
+                <tr>
+                  <td colSpan={6} style={{ padding: '2rem', textAlign: 'center', color: 'var(--dim)' }}>
+                    Syncing with database...
                   </td>
-                  <td style={{ padding: '1rem' }}>{lead.value}</td>
-                  <td style={{ padding: '1rem', color: 'var(--dim)' }}>{lead.lastTouch}</td>
                 </tr>
-              ))}
+              ) : activeLeads.length === 0 ? (
+                <tr>
+                  <td colSpan={6} style={{ padding: '2rem', textAlign: 'center', color: 'var(--dim)' }}>
+                    No active deals in pipeline.
+                  </td>
+                </tr>
+              ) : (
+                activeLeads.map((lead) => (
+                  <tr key={lead.id} style={{ borderBottom: '1px solid var(--border)', color: 'var(--fg)' }}>
+                    <td style={{ padding: '1rem', fontWeight: 'bold' }}>{lead.title}</td>
+                    <td style={{ padding: '1rem' }}>{lead.companies?.name || '—'}</td>
+                    <td style={{ padding: '1rem' }}>{lead.contacts?.name || '—'}</td>
+                    <td style={{ padding: '1rem' }}>
+                      <span style={{ backgroundColor: 'var(--accent-dim)', color: 'var(--accent)', padding: '0.2rem 0.6rem', borderRadius: '12px', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                        {lead.stage}
+                      </span>
+                    </td>
+                    <td style={{ padding: '1rem' }}>
+                      ${(Number(lead.value) || 0).toLocaleString()}
+                    </td>
+                    <td style={{ padding: '1rem', color: 'var(--dim)' }}>
+                      {formatTimeAgo(lead.updated_at)}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

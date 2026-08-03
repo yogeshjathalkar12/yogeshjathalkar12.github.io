@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { supabase } from '../../lib/supabaseClient';
 
 const STAGES = [
   { key: 'lead', label: 'New Lead' },
@@ -8,36 +9,91 @@ const STAGES = [
 ];
 
 export default function CrmPipeline() {
-  // Placeholder state - ready to be replaced by a Supabase fetch
-  const [deals, setDeals] = useState([
-    { id: '1', title: 'Defense R&D Proposal', company: 'Construct Robotics', value: 45000, stage: 'negotiation' },
-    { id: '2', title: 'Q3 Enterprise License', company: 'Astra-Q Systems', value: 12500, stage: 'lead' },
-    { id: '3', title: 'Security Audit', company: 'Global Logistics', value: 89000, stage: 'meeting' },
-  ]);
+  const [deals, setDeals] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Initial load and Realtime Subscription
+  useEffect(() => {
+    fetchDeals();
+
+    // Replicate the realtime listener from crm.html
+    const channel = supabase.channel('crm-deals')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'deals' }, () => {
+        fetchDeals();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  async function fetchDeals() {
+    try {
+      const { data, error } = await supabase
+        .from('deals')
+        .select('*, contacts(id, name), companies(id, name)')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setDeals(data || []);
+    } catch (error) {
+      console.error('Failed to load deals:', error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const handleDragStart = (e: React.DragEvent, dealId: string) => {
     e.dataTransfer.setData('dealId', dealId);
   };
 
-  const handleDrop = (e: React.DragEvent, stageKey: string) => {
+  const handleDrop = async (e: React.DragEvent, newStage: string) => {
     e.preventDefault();
     const dealId = e.dataTransfer.getData('dealId');
+    const dealToUpdate = deals.find(d => d.id === dealId);
     
-    // Update local state (later, you will add the Supabase update call here)
+    if (!dealToUpdate || dealToUpdate.stage === newStage) return;
+
+    // 1. Optimistic UI update (feels instant to the user)
+    const previousDeals = [...deals];
     setDeals(deals.map(deal => 
-      deal.id === dealId ? { ...deal, stage: stageKey } : deal
+      deal.id === dealId ? { ...deal, stage: newStage } : deal
     ));
+
+    // 2. Exact backend update from crm.html logic
+    try {
+      const payload: any = { stage: newStage, updated_at: new Date().toISOString() };
+      if (newStage === 'won' || newStage === 'lost') {
+        payload.closed_at = new Date().toISOString();
+      }
+
+      const { error } = await supabase
+        .from('deals')
+        .update(payload)
+        .eq('id', dealId);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Failed to move deal:', error);
+      // Revert if the server fails
+      setDeals(previousDeals);
+    }
   };
 
   const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault(); // Required to allow dropping
+    e.preventDefault(); 
   };
+
+  if (loading) {
+    return <div style={{ padding: '2rem', color: 'var(--dim)' }}>Syncing pipeline...</div>;
+  }
 
   return (
     <div style={{ display: 'flex', gap: '1.4rem', overflowX: 'auto', paddingBottom: '1rem', height: '100%' }}>
       {STAGES.map(stage => {
         const stageDeals = deals.filter(d => d.stage === stage.key);
-        const stageValue = stageDeals.reduce((sum, d) => sum + d.value, 0);
+        const stageValue = stageDeals.reduce((sum, d) => sum + (Number(d.value) || 0), 0);
 
         return (
           <div 
@@ -64,26 +120,31 @@ export default function CrmPipeline() {
             </div>
 
             <div style={{ padding: '1rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
-              {stageDeals.map(deal => (
-                <div 
-                  key={deal.id}
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, deal.id)}
-                  style={{
-                    background: 'var(--surface)',
-                    border: '1px solid var(--border)',
-                    padding: '1.1rem',
-                    cursor: 'grab',
-                    position: 'relative'
-                  }}
-                >
-                  <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.5rem', color: deal.stage === 'won' ? 'var(--green)' : 'inherit' }}>
-                    ${deal.value.toLocaleString()}
+              {stageDeals.length === 0 ? (
+                <div style={{ fontSize: '0.6rem', color: 'var(--dim2)', textAlign: 'center', padding: '1rem 0' }}>No deals here</div>
+              ) : (
+                stageDeals.map(deal => (
+                  <div 
+                    key={deal.id}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, deal.id)}
+                    style={{
+                      background: 'var(--surface)',
+                      border: '1px solid var(--border)',
+                      padding: '1.1rem',
+                      cursor: 'grab',
+                      position: 'relative'
+                    }}
+                  >
+                    <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.5rem', color: deal.stage === 'won' ? 'var(--green)' : 'inherit' }}>
+                      ${(Number(deal.value) || 0).toLocaleString()}
+                    </div>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--white)', margin: '0.3rem 0' }}>{deal.title}</div>
+                    <div style={{ fontSize: '0.6rem', color: 'var(--dim)', marginBottom: '0.5rem' }}>{deal.companies?.name || '—'}</div>
+                    <div style={{ fontSize: '0.55rem', color: 'var(--dim2)' }}>{deal.contacts?.name || 'No contact'}</div>
                   </div>
-                  <div style={{ fontSize: '0.7rem', color: 'var(--white)', margin: '0.3rem 0' }}>{deal.title}</div>
-                  <div style={{ fontSize: '0.6rem', color: 'var(--dim)' }}>{deal.company}</div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         );
