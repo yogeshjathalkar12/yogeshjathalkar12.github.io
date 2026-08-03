@@ -232,7 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.disabled = false; btn.textContent = 'Log In';
     if (error) { showError('loginError', error.message); return; }
 
-    window.location.href = '/ventures/raptor/dashboard.html';
+    window.location.href = '/ventures/raptor/app/#/dashboard';
   });
 
   // ── SIGN UP ──
@@ -262,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // this is where Supabase sends the user after they click the
         // confirmation link in their inbox. Must also be added to
         // Supabase → Authentication → URL Configuration → Redirect URLs.
-        emailRedirectTo: window.location.origin + '/ventures/raptor/dashboard.html'
+        emailRedirectTo: window.location.origin + '/ventures/raptor/app/#/dashboard'
       }
     });
     btn.disabled = false; btn.textContent = 'Create Account';
@@ -271,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // If Supabase returned a live session, email confirmation is OFF
     // for this project -- the account is immediately usable.
     if (data.session) {
-      window.location.href = '/ventures/raptor/dashboard.html';
+      window.location.href = '/ventures/raptor/app/#/dashboard';
       return;
     }
 
@@ -299,7 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Configuration, or Supabase will refuse the redirect.
     supabaseClient.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.origin + '/ventures/raptor/dashboard.html' }
+      options: { redirectTo: window.location.origin + '/ventures/raptor/app/#/dashboard' }
     });
   }
   document.getElementById('googleLoginBtn').addEventListener('click', googleAuth);
