@@ -1,11 +1,11 @@
-import { useState, type ReactNode } from 'react';
-import { NavLink } from 'react-router-dom';
+import { useState } from 'react';
+import { NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from '../hooks/AuthContext';
 import { useCredits } from '../hooks/CreditsContext';
 import { useTheme } from '../hooks/ThemeContext';
 import { TOOLS } from '../tools/registry';
 
-export function DashboardLayout({ children }: { children: ReactNode }) {
+export function DashboardLayout() {
   const { user, signOut } = useAuth();
   const { credits, totalCredits, plan } = useCredits();
   const { isLight, toggle } = useTheme();
@@ -46,25 +46,27 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
 
       <div className="dash-layout">
         <nav className="dash-sidebar">
-          <div className="dash-sidebar-section-label">Overview</div>
+          <div className="dash-sidebar-section-label">Command Center</div>
           <NavLink to="/dashboard" end className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
             <span className="dash-sidebar-icon">⊞</span><span>Dashboard</span>
           </NavLink>
 
-          <div className="dash-sidebar-section-label">Arsenal Tools</div>
+          <NavLink to="/crm" className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
+            <span className="dash-sidebar-icon">◫</span><span>Active CRM</span>
+          </NavLink>
+
+          <div className="dash-sidebar-section-label">Intelligence Suite</div>
           {TOOLS.map((tool) => (
             <NavLink key={tool.slug} to={tool.route} className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
               <span className="dash-sidebar-icon">{tool.icon}</span><span>{tool.navLabel}</span>
             </NavLink>
           ))}
-
-          <div className="dash-sidebar-section-label">CRM</div>
-          <NavLink to="/crm" className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
-            <span className="dash-sidebar-icon">◫</span><span>Pipeline &amp; Contacts</span>
-          </NavLink>
         </nav>
 
-        <main className="dash-main">{children}</main>
+        {/* The Outlet renders the nested routes while keeping the sidebar intact */}
+        <main className="dash-main">
+          <Outlet />
+        </main>
       </div>
     </div>
   );
