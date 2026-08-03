@@ -10,6 +10,10 @@ import DashboardHome from './pages/DashboardHome';
 import { DashboardLayout } from './layouts/DashboardLayout';
 import { TOOLS } from './tools/registry';
 
+/*crm files */
+import CrmLayout from './pages/crm/CrmLayout';
+import CrmPipeline from './pages/crm/CrmPipeline';
+
 function ToolFallback() {
   return (
     <div style={{ padding: '3rem', textAlign: 'center' }}>
@@ -28,11 +32,18 @@ export default function App() {
               <Routes>
                 <Route path="/login" element={<Login />} />
                 
-                {/* Persistent Layout Wrapper */}
                 <Route element={<RequireAuth><DashboardLayout /></RequireAuth>}>
-                  <Route path="/dashboard" element={<DashboardHome />} />
-                  <Route path="/crm" element={<div style={{padding: '3rem'}}>CRM Module Loading...</div>} />
-                  
+                <Route path="/dashboard" element={<DashboardHome />} />
+  
+                 {/* Nested CRM Routes */}
+                <Route path="/crm" element={<CrmLayout />}>
+                <Route index element={<Navigate to="pipeline" replace />} />
+                <Route path="overview" element={<div style={{padding: '2rem'}}>Overview Coming Soon</div>} />
+                <Route path="pipeline" element={<CrmPipeline />} />
+                <Route path="contacts" element={<div style={{padding: '2rem'}}>Contacts Coming Soon</div>} />
+                <Route path="activity" element={<div style={{padding: '2rem'}}>Activity Coming Soon</div>} />
+                <Route path="automations" element={<div style={{padding: '2rem'}}>Automations Coming Soon</div>} />
+              </Route>  
                   {TOOLS.map((tool) => {
                     const ToolComponent = tool.component;
                     return (
