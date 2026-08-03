@@ -11,8 +11,12 @@ import { DashboardLayout } from './layouts/DashboardLayout';
 import { TOOLS } from './tools/registry';
 
 /*crm files */
-import CrmLayout from './pages/crm/CrmLayout';
+import CrmLayout from './layouts/CrmLayout';
+import CrmOverview from './pages/crm/CrmOverview';
 import CrmPipeline from './pages/crm/CrmPipeline';
+import CrmContacts from './pages/crm/CrmContacts';
+import CrmActivity from './pages/crm/CrmActivity';
+import CrmAutomations from './pages/crm/CrmAutomations';
 
 function ToolFallback() {
   return (
@@ -31,19 +35,19 @@ export default function App() {
             <CreditsProvider>
               <Routes>
                 <Route path="/login" element={<Login />} />
-                
+
                 <Route element={<RequireAuth><DashboardLayout /></RequireAuth>}>
                 <Route path="/dashboard" element={<DashboardHome />} />
-  
-                 {/* Nested CRM Routes */}
-                <Route path="/crm" element={<CrmLayout />}>
-                <Route index element={<Navigate to="pipeline" replace />} />
-                <Route path="overview" element={<div style={{padding: '2rem'}}>Overview Coming Soon</div>} />
-                <Route path="pipeline" element={<CrmPipeline />} />
-                <Route path="contacts" element={<div style={{padding: '2rem'}}>Contacts Coming Soon</div>} />
-                <Route path="activity" element={<div style={{padding: '2rem'}}>Activity Coming Soon</div>} />
-                <Route path="automations" element={<div style={{padding: '2rem'}}>Automations Coming Soon</div>} />
-              </Route>  
+
+                 <Route path="/crm" element={<CrmLayout />}>
+                 <Route index element={<Navigate to="pipeline" replace />} />
+                 <Route path="overview" element={<CrmOverview />} />
+                 <Route path="pipeline" element={<CrmPipeline />} />
+                 <Route path="contacts" element={<CrmContacts />} />
+                <Route path="activity" element={<CrmActivity />} />
+                <Route path="automations" element={<CrmAutomations />} />
+               </Route>
+
                   {TOOLS.map((tool) => {
                     const ToolComponent = tool.component;
                     return (
