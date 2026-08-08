@@ -1,0 +1,58 @@
+name: Build & Deploy Raptor App
+
+# Runs only when something inside raptor-app/ changes — your marketing
+# site, pricing page, and everything else in the repo is untouched by
+# this workflow and never triggers a rebuild.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'raptor-app/**'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: raptor-app/package-lock.json
+
+      - name: Install dependencies
+        working-directory: raptor-app
+        run: npm ci
+
+      - name: Build
+        working-directory: raptor-app
+        run: npm run build
+        env:
+          # Set these as repo Settings → Secrets and variables → Actions
+          # → Variables if you ever want to point at a different backend
+          # or Supabase project without editing code. Falls back to the
+          # values already hardcoded in src/lib/config.ts if unset.
+          VITE_RAPTOR_API_URL: ${{ vars.VITE_RAPTOR_API_URL }}
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
+
+      - name: Sync build output into ventures/raptor/app/
+        run: |
+          rm -rf ventures/raptor/app
+          mkdir -p ventures/raptor/app
+          cp -r raptor-app/dist/* ventures/raptor/app/
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add ventures/raptor/app
+          git diff --staged --quiet || git commit -m "Deploy Raptor app [skip ci]"
+          git push

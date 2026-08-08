@@ -19,6 +19,8 @@ interface DealDetailModalProps {
 export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailModalProps) {
   const [value, setValue] = useState('0');
   const [stage, setStage] = useState('lead');
+  const [campaignId, setCampaignId] = useState('');
+  const [campaigns, setCampaigns] = useState<any[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,9 +28,21 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
     if (deal) {
       setValue(String(deal.value ?? 0));
       setStage(deal.stage);
+      setCampaignId(deal.campaign_id || '');
       setError(null);
+      fetchCampaigns();
     }
   }, [deal]);
+
+  async function fetchCampaigns() {
+    try {
+      const { data, error } = await supabase.from('campaigns').select('id, name').order('created_at', { ascending: false });
+      if (error) throw error;
+      setCampaigns(data || []);
+    } catch (error) {
+      console.error('Failed to load campaigns:', error);
+    }
+  }
 
   if (!deal) return null;
 
@@ -36,7 +50,12 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
     setSaving(true);
     setError(null);
     try {
-      const payload: any = { value: Number(value) || 0, stage, updated_at: new Date().toISOString() };
+      const payload: any = {
+        value: Number(value) || 0,
+        stage,
+        campaign_id: campaignId || null,
+        updated_at: new Date().toISOString(),
+      };
       if (stage === 'won' || stage === 'lost') payload.closed_at = new Date().toISOString();
       const { error: updateErr } = await supabase.from('deals').update(payload).eq('id', deal.id);
       if (updateErr) throw updateErr;
@@ -80,6 +99,14 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
       <select style={fieldInputStyle} value={stage} onChange={(e) => setStage(e.target.value)}>
         {STAGE_OPTIONS.map((s) => (
           <option key={s.key} value={s.key}>{s.label}</option>
+        ))}
+      </select>
+
+      <label style={fieldLabelStyle}>Campaign</label>
+      <select style={fieldInputStyle} value={campaignId} onChange={(e) => setCampaignId(e.target.value)}>
+        <option value="">No campaign</option>
+        {campaigns.map((c) => (
+          <option key={c.id} value={c.id}>{c.name}</option>
         ))}
       </select>
 

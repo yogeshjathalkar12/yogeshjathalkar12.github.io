@@ -3,9 +3,6 @@ import { NavLink, Outlet } from 'react-router-dom';
 export default function CrmLayout() {
   return (
     <div style={{ padding: '2rem', height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <div className="arsenal-hero-eyebrow">Active Pipeline</div>
-      <h1 className="arsenal-hero-title" style={{ marginBottom: '1.5rem' }}>CRM & Contacts</h1>
-
       {/* CRM Sub-Navigation Tabs */}
       <nav style={{ display: 'flex', gap: '2rem', borderBottom: '1px solid var(--border)', marginBottom: '2rem' }}>
         {[
@@ -13,7 +10,8 @@ export default function CrmLayout() {
           { name: 'Pipeline', path: '/crm/pipeline' },
           { name: 'Contacts', path: '/crm/contacts' },
           { name: 'Activity', path: '/crm/activity' },
-          { name: 'Automations', path: '/crm/automations' }
+          { name: 'Automations', path: '/crm/automations' },
+          { name: 'Campaigns', path: '/crm/campaigns' }
         ].map((tab) => (
           <NavLink
             key={tab.name}

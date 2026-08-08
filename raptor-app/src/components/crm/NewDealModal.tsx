@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import Modal, { fieldLabelStyle, fieldInputStyle, primaryBtnStyle, ghostBtnStyle } from './Modal';
 
@@ -22,12 +22,30 @@ export default function NewDealModal({ open, onClose, onCreated }: NewDealModalP
   const [companyName, setCompanyName] = useState('');
   const [contactName, setContactName] = useState('');
   const [contactEmail, setContactEmail] = useState('');
+  const [campaignId, setCampaignId] = useState('');
+  const [campaigns, setCampaigns] = useState<any[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (open) {
+      fetchCampaigns();
+    }
+  }, [open]);
+
+  async function fetchCampaigns() {
+    try {
+      const { data, error } = await supabase.from('campaigns').select('id, name').order('created_at', { ascending: false });
+      if (error) throw error;
+      setCampaigns(data || []);
+    } catch (error) {
+      console.error('Failed to load campaigns:', error);
+    }
+  }
+
   function reset() {
     setTitle(''); setValue(''); setStage('lead');
-    setCompanyName(''); setContactName(''); setContactEmail('');
+    setCompanyName(''); setContactName(''); setContactEmail(''); setCampaignId('');
     setError(null);
   }
 
@@ -93,6 +111,7 @@ export default function NewDealModal({ open, onClose, onCreated }: NewDealModalP
         stage,
         company_id: companyId,
         contact_id: contactId,
+        campaign_id: campaignId || null,
       });
       if (dealErr) throw dealErr;
 
@@ -120,6 +139,14 @@ export default function NewDealModal({ open, onClose, onCreated }: NewDealModalP
         <select style={fieldInputStyle} value={stage} onChange={(e) => setStage(e.target.value)}>
           {STAGE_OPTIONS.map((s) => (
             <option key={s.key} value={s.key}>{s.label}</option>
+          ))}
+        </select>
+
+        <label style={fieldLabelStyle}>Campaign</label>
+        <select style={fieldInputStyle} value={campaignId} onChange={(e) => setCampaignId(e.target.value)}>
+          <option value="">No campaign</option>
+          {campaigns.map((c) => (
+            <option key={c.id} value={c.id}>{c.name}</option>
           ))}
         </select>
 
