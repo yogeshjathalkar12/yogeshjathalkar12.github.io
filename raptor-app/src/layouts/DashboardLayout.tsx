@@ -4,14 +4,17 @@ import { useAuth } from '../hooks/AuthContext';
 import { useCredits } from '../hooks/CreditsContext';
 import { useTheme } from '../hooks/ThemeContext';
 import { TOOLS } from '../tools/registry';
+import { PaymentModal } from './PaymentModal';
 
 export function DashboardLayout() {
   const { user, signOut } = useAuth();
   const { credits, totalCredits, plan } = useCredits();
   const { isLight, toggle } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
 
   const displayName = (user?.user_metadata?.full_name || user?.email || 'User').split(' ')[0];
+  const isPro = plan.toLowerCase() === 'pro';
 
   return (
     <div>
@@ -25,6 +28,13 @@ export function DashboardLayout() {
               <div className="dash-credits-sub">of {totalCredits} · {plan} plan</div>
             </div>
           </div>
+
+          <button
+            className={`dash-billing-btn${isPro ? '' : ' dash-billing-btn-primary'}`}
+            onClick={() => setShowPayment(true)}
+          >
+            {isPro ? 'Buy More Credits' : 'Upgrade to Pro'}
+          </button>
 
           <div className="lamp-container" onClick={toggle} title="Toggle theme">
             <div className="lamp-wire" />
@@ -68,6 +78,8 @@ export function DashboardLayout() {
           <Outlet />
         </main>
       </div>
+
+      {showPayment && <PaymentModal plan={plan} onClose={() => setShowPayment(false)} />}
     </div>
   );
 }
