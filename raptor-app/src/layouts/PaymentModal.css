@@ -123,6 +123,87 @@ body.light-mode .billing-modal-price {
   color: #6b7280;
 }
 
+.billing-pack-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.billing-pack-option {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.billing-pack-option:hover:not(:disabled) {
+  border-color: #7c3aed;
+  background: rgba(124, 58, 237, 0.08);
+}
+
+.billing-pack-option:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+body.light-mode .billing-pack-option {
+  border-color: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.billing-pack-credits {
+  font-size: 15px;
+  font-weight: 600;
+  color: #f1f1f5;
+}
+
+body.light-mode .billing-pack-credits {
+  color: #111;
+}
+
+.billing-pack-price {
+  font-size: 15px;
+  font-weight: 700;
+  color: #f1f1f5;
+}
+
+body.light-mode .billing-pack-price {
+  color: #111;
+}
+
+.billing-pack-rate {
+  position: absolute;
+  bottom: 4px;
+  right: 16px;
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+.billing-pack-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(20, 20, 28, 0.9);
+  border-radius: 10px;
+  font-size: 13px;
+  color: #f1f1f5;
+}
+
+body.light-mode .billing-pack-loading {
+  background: rgba(255, 255, 255, 0.92);
+  color: #111;
+}
+
 @keyframes billing-fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
