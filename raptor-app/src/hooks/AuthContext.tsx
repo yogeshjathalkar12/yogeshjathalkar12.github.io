@@ -32,6 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    window.location.href = 'https://shoonyaorigins.com/ventures/raptor/';
   };
 
   return (
