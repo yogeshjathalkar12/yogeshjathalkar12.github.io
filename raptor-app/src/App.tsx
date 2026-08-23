@@ -31,6 +31,9 @@ import WaBroadcasts from './pages/whatsapp/WaBroadcasts';
 import WaSequences from './pages/whatsapp/WaSequences';
 import WaTriggers from './pages/whatsapp/WaTriggers';
 
+/* playground */
+import Playground from './pages/playground/Playground';
+
 function ToolFallback() {
   return (
     <div style={{ padding: '3rem', textAlign: 'center' }}>
@@ -75,6 +78,8 @@ export default function App() {
                   <Route path="sequences" element={<WaSequences />} />
                   <Route path="triggers" element={<WaTriggers />} />
                 </Route>
+
+                <Route path="/playground" element={<Playground />} />
 
                   {TOOLS.map((tool) => {
                     const ToolComponent = tool.component;

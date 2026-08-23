@@ -140,6 +140,11 @@ export function DashboardLayout() {
             </NavLink>
           ))}
 
+          <div className="dash-sidebar-section-label">Training</div>
+          <NavLink to="/playground" className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
+            <span className="dash-sidebar-icon">◆</span><span>AI Playground</span>
+          </NavLink>
+
           <div className="dash-sidebar-section-label">Intelligence Suite</div>
           {intelligenceTools.map((tool) => (
             <NavLink key={tool.slug} to={tool.route} className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
