@@ -5,7 +5,7 @@ import { toolApiBase } from '../../lib/config';
 
 const EMAIL_API = toolApiBase('email');
 
-const EMAIL_BACKEND_URL = import.meta.env.VITE_EMAIL_BACKEND_URL;
+//const EMAIL_BACKEND_URL = import.meta.env.VITE_EMAIL_BACKEND_URL;
 
 export default function EmailConnectionSetup() {
   const [accounts, setAccounts] = useState<any[]>([]);
