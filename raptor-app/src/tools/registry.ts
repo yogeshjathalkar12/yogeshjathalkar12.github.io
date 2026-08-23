@@ -11,6 +11,7 @@ export interface ToolMeta {
   costLabel: string; // "1 credit / resolve"
   engineLabel: string;
   extraMeta?: string[]; // additional hero-meta chips, e.g. video's "100% local"
+  category?: 'intelligence' | 'automation'; // controls which sidebar section this renders under — default 'intelligence'
   component: LazyExoticComponent<ComponentType>;
 }
 
@@ -132,6 +133,7 @@ export const TOOLS: ToolMeta[] = [
     costLabel: 'Free — uses your own API key',
     engineLabel: 'BYOK · chained multi-provider pipeline',
     extraMeta: ['Your key, encrypted — never sent to us unencrypted or reused elsewhere'],
+    category: 'automation',
     component: lazy(() => import('../pages/content/ContentTool')),
   },
   {

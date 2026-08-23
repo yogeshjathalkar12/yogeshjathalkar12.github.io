@@ -19,6 +19,18 @@ import CrmActivity from './pages/crm/CrmActivity';
 import CrmAutomations from './pages/crm/CrmAutomations';
 import CrmCampaigns from './pages/crm/CrmCampaigns';
 
+/* email files */
+import EmailLayout from './layouts/EmailLayout';
+import EmailConnectionSetup from './pages/email/EmailConnectionSetup';
+import EmailCampaigns from './pages/email/EmailCampaigns';
+
+/* whatsapp files */
+import WhatsappLayout from './layouts/WhatsappLayout';
+import WaConnectionSetup from './pages/whatsapp/WaConnectionSetup';
+import WaBroadcasts from './pages/whatsapp/WaBroadcasts';
+import WaSequences from './pages/whatsapp/WaSequences';
+import WaTriggers from './pages/whatsapp/WaTriggers';
+
 function ToolFallback() {
   return (
     <div style={{ padding: '3rem', textAlign: 'center' }}>
@@ -49,6 +61,20 @@ export default function App() {
                 <Route path="automations" element={<CrmAutomations />} />
                 <Route path="campaigns" element={<CrmCampaigns />} />
                </Route>
+
+                <Route path="/email" element={<EmailLayout />}>
+                  <Route index element={<Navigate to="setup" replace />} />
+                  <Route path="setup" element={<EmailConnectionSetup />} />
+                  <Route path="campaigns" element={<EmailCampaigns />} />
+                </Route>
+
+                <Route path="/whatsapp" element={<WhatsappLayout />}>
+                  <Route index element={<Navigate to="setup" replace />} />
+                  <Route path="setup" element={<WaConnectionSetup />} />
+                  <Route path="broadcasts" element={<WaBroadcasts />} />
+                  <Route path="sequences" element={<WaSequences />} />
+                  <Route path="triggers" element={<WaTriggers />} />
+                </Route>
 
                   {TOOLS.map((tool) => {
                     const ToolComponent = tool.component;
