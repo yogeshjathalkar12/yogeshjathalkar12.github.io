@@ -121,6 +121,20 @@ export const TOOLS: ToolMeta[] = [
     component: lazy(() => import('./video/VideoTool')),
   },
   {
+    slug: 'content',
+    route: '/tools/content',
+    icon: '✎',
+    navLabel: 'AI Content Suite',
+    eyebrow: 'Tool 10 / Generative Content',
+    title: 'AI Content Suite —\nBring Your Own Key',
+    description:
+      "Generate posts, emails, flyers, and short video from a static prompt template you never write yourself — using your own OpenAI, Google, or Anthropic key, with the option to chain one model's output into another for a draft-then-refine pass.",
+    costLabel: 'Free — uses your own API key',
+    engineLabel: 'BYOK · chained multi-provider pipeline',
+    extraMeta: ['Your key, encrypted — never sent to us unencrypted or reused elsewhere'],
+    component: lazy(() => import('../pages/content/ContentTool')),
+  },
+  {
     slug: 'montecarlo',
     route: '/tools/montecarlo',
     icon: '≈',
