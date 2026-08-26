@@ -121,6 +121,32 @@ export const TOOLS: ToolMeta[] = [
     engineLabel: 'ffmpeg + ffprobe on server',
     component: lazy(() => import('./video/VideoTool')),
   },
+    {
+    slug: 'validator',
+    route: '/tools/validator',
+    icon: '✉',
+    navLabel: 'Email Validator',
+    eyebrow: 'Tool 11 / Deliverability Verification',
+    title: 'Ping-Verify\nEmail Validator',
+    description:
+      'Checks DNS/MX records and performs an SMTP handshake with the target mail server — without sending an actual email. Instant deliverability verdict: safe to send, risky, or will hard-bounce.',
+    costLabel: '1 credit / check',
+    engineLabel: 'DNS/MX lookup + SMTP handshake',
+    component: lazy(() => import('./validator/ValidatorTool')),
+  },
+  {
+    slug: 'tracker',
+    route: '/tools/tracker',
+    icon: '◎',
+    navLabel: 'Stealth Tracker',
+    eyebrow: 'Tool 12 / Open Tracking',
+    title: 'Stealth Tracker —\nInvisible Open Pixels',
+    description:
+      'Generates a unique 1×1 invisible tracking pixel for your email pitches. Embed it and see exactly when — and how many times — a prospect opens your email, with a live-polling open log.',
+    costLabel: '1 credit / campaign',
+    engineLabel: 'Tracking pixel + server-side open resolution',
+    component: lazy(() => import('./tracker/TrackerTool')),
+  },
   {
     slug: 'content',
     route: '/tools/content',
