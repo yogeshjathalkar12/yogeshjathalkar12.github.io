@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useAuthedFetch } from '../../hooks/useAuthedFetch';
 import { useToast } from '../../hooks/ToastContext';
 import { toolApiBase } from '../../lib/config';
@@ -130,157 +129,151 @@ export default function Playground() {
   }
 
   return (
-    <>
-      <header className="arsenal-topbar">
-        <Link to="/dashboard" className="arsenal-back">← Dashboard</Link>
-        <div className="arsenal-tool-badge"><span className="dot" />AI PLAYGROUND</div>
-        <div className="arsenal-topbar-right" />
-      </header>
+    <div style={{ padding: '2rem', height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ marginBottom: '2rem' }}>
+        <div style={{ fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--dim)', fontFamily: 'var(--mono)' }}>
+          Practice Space
+        </div>
+        <h1 style={{ margin: '0.3rem 0', color: 'var(--purple)' }}>AI Playground</h1>
+        <p style={{ color: 'var(--dim)', maxWidth: '640px', fontSize: '0.85rem' }}>
+          Roleplay a real lead from your CRM to rehearse a call, or get general sales coaching —
+          both run on your own saved AI provider key.
+        </p>
+      </div>
 
-      <main className="arsenal-main">
-        <section className="arsenal-hero">
-          <div className="arsenal-hero-eyebrow">Practice Space</div>
-          <h1 className="arsenal-hero-title">AI Playground</h1>
-          <p className="arsenal-hero-desc">
-            Roleplay a real lead from your CRM to rehearse a call, or get general sales coaching —
-            both run on your own saved AI provider key.
-          </p>
-        </section>
+      <div style={{ flex: 1, overflow: 'hidden', display: 'grid', gridTemplateColumns: '280px 1fr', gap: '1.5rem' }}>
+        <div style={{ overflowY: 'auto' }}>
+          <div className="arsenal-card" style={{ marginBottom: '1rem' }}>
+            <div className="arsenal-card-header"><span className="arsenal-card-title">New Session</span></div>
+            <div className="arsenal-card-body">
+              <div className="arsenal-field">
+                <label className="arsenal-label">Mode</label>
+                <select className="arsenal-input" value={mode} onChange={(e) => setMode(e.target.value as Mode)}>
+                  <option value="lead_roleplay">Roleplay a Lead</option>
+                  <option value="coaching">General Coaching</option>
+                </select>
+              </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: '1.5rem' }}>
-          <div>
-            <div className="arsenal-card" style={{ marginBottom: '1rem' }}>
-              <div className="arsenal-card-header"><span className="arsenal-card-title">New Session</span></div>
-              <div className="arsenal-card-body">
-                <div className="arsenal-field">
-                  <label className="arsenal-label">Mode</label>
-                  <select className="arsenal-input" value={mode} onChange={(e) => setMode(e.target.value as Mode)}>
-                    <option value="lead_roleplay">Roleplay a Lead</option>
-                    <option value="coaching">General Coaching</option>
-                  </select>
-                </div>
-
-                <div className="arsenal-field">
-                  <label className="arsenal-label">AI Provider</label>
-                  <select className="arsenal-input" value={provider} onChange={(e) => setProvider(e.target.value)}>
-                    <option value="">Select…</option>
-                    {keys.map((k) => <option key={k.provider} value={k.provider}>{k.provider}</option>)}
-                  </select>
-                  {keys.length === 0 && (
-                    <div style={{ fontSize: '0.7rem', color: 'var(--dim)', marginTop: '0.3rem' }}>
-                      No saved key yet — add one under AI Content Suite first.
-                    </div>
-                  )}
-                </div>
-
-                {mode === 'lead_roleplay' ? (
-                  <>
-                    <div className="arsenal-field">
-                      <label className="arsenal-label">Lead</label>
-                      <select className="arsenal-input" value={dealId} onChange={(e) => setDealId(e.target.value)}>
-                        <option value="">Select…</option>
-                        {deals.map((d) => (
-                          <option key={d.id} value={d.id}>
-                            {(d.contacts as any)?.name || d.title} — {(d.companies as any)?.name || ''} ({d.stage})
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="arsenal-field">
-                      <label className="arsenal-label">Extra context (optional)</label>
-                      <textarea
-                        className="arsenal-input"
-                        style={{ minHeight: 70 }}
-                        value={extraContext}
-                        onChange={(e) => setExtraContext(e.target.value)}
-                        placeholder="Anything specific about this prospect to roleplay against"
-                      />
-                    </div>
-                  </>
-                ) : (
-                  <div className="arsenal-field">
-                    <label className="arsenal-label">Topic (optional)</label>
-                    <input
-                      className="arsenal-input"
-                      value={topic}
-                      onChange={(e) => setTopic(e.target.value)}
-                      placeholder="e.g. handling price objections"
-                    />
+              <div className="arsenal-field">
+                <label className="arsenal-label">AI Provider</label>
+                <select className="arsenal-input" value={provider} onChange={(e) => setProvider(e.target.value)}>
+                  <option value="">Select…</option>
+                  {keys.map((k) => <option key={k.provider} value={k.provider}>{k.provider}</option>)}
+                </select>
+                {keys.length === 0 && (
+                  <div style={{ fontSize: '0.7rem', color: 'var(--dim)', marginTop: '0.3rem' }}>
+                    No saved key yet — add one under AI Content Suite first.
                   </div>
                 )}
-
-                <button className="arsenal-btn" disabled={starting} onClick={startSession}>
-                  {starting ? 'Starting…' : 'Start Session →'}
-                </button>
               </div>
-            </div>
 
-            <div className="arsenal-card">
-              <div className="arsenal-card-header"><span className="arsenal-card-title">History</span></div>
-              <div className="arsenal-card-body" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                {sessions.length === 0 && <div style={{ color: 'var(--dim2)', fontSize: '0.7rem' }}>No sessions yet.</div>}
-                {sessions.map((s) => (
-                  <div
-                    key={s.id}
-                    onClick={() => openSession(s.id)}
-                    style={{
-                      padding: '0.5rem 0.7rem',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      background: activeSessionId === s.id ? 'var(--accent-dim)' : 'transparent',
-                      fontSize: '0.7rem',
-                      color: 'var(--white)',
-                    }}
-                  >
-                    {s.title}
+              {mode === 'lead_roleplay' ? (
+                <>
+                  <div className="arsenal-field">
+                    <label className="arsenal-label">Lead</label>
+                    <select className="arsenal-input" value={dealId} onChange={(e) => setDealId(e.target.value)}>
+                      <option value="">Select…</option>
+                      {deals.map((d) => (
+                        <option key={d.id} value={d.id}>
+                          {(d.contacts as any)?.name || d.title} — {(d.companies as any)?.name || ''} ({d.stage})
+                        </option>
+                      ))}
+                    </select>
                   </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="arsenal-card" style={{ display: 'flex', flexDirection: 'column', height: '65vh' }}>
-            <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: '1.2rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-              {!activeSessionId && (
-                <div className="arsenal-empty">
-                  <div className="arsenal-empty-text">Start a session on the left to begin.</div>
+                  <div className="arsenal-field">
+                    <label className="arsenal-label">Extra context (optional)</label>
+                    <textarea
+                      className="arsenal-input"
+                      style={{ minHeight: 70 }}
+                      value={extraContext}
+                      onChange={(e) => setExtraContext(e.target.value)}
+                      placeholder="Anything specific about this prospect to roleplay against"
+                    />
+                  </div>
+                </>
+              ) : (
+                <div className="arsenal-field">
+                  <label className="arsenal-label">Topic (optional)</label>
+                  <input
+                    className="arsenal-input"
+                    value={topic}
+                    onChange={(e) => setTopic(e.target.value)}
+                    placeholder="e.g. handling price objections"
+                  />
                 </div>
               )}
-              {messages.map((m, i) => (
-                <div key={i} style={{ alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '75%' }}>
-                  <div
-                    style={{
-                      background: m.role === 'user' ? 'var(--grad)' : 'var(--bg-card)',
-                      color: m.role === 'user' ? '#fff' : 'var(--white)',
-                      border: m.role === 'user' ? 'none' : '1px solid var(--border)',
-                      borderRadius: '10px',
-                      padding: '0.6rem 0.9rem',
-                      fontSize: '0.8rem',
-                      whiteSpace: 'pre-wrap',
-                    }}
-                  >
-                    {m.content}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div style={{ borderTop: '1px solid var(--border)', padding: '0.8rem', display: 'flex', gap: '0.6rem' }}>
-              <input
-                className="arsenal-input"
-                style={{ flex: 1 }}
-                value={draft}
-                disabled={!activeSessionId || sending}
-                onChange={(e) => setDraft(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') sendMessage(); }}
-                placeholder={activeSessionId ? 'Type your message…' : 'Start a session first'}
-              />
-              <button className="arsenal-btn" disabled={!activeSessionId || sending} onClick={sendMessage}>
-                {sending ? '…' : 'Send'}
+
+              <button className="arsenal-btn" disabled={starting} onClick={startSession}>
+                {starting ? 'Starting…' : 'Start Session →'}
               </button>
             </div>
           </div>
+
+          <div className="arsenal-card">
+            <div className="arsenal-card-header"><span className="arsenal-card-title">History</span></div>
+            <div className="arsenal-card-body" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              {sessions.length === 0 && <div style={{ color: 'var(--dim2)', fontSize: '0.7rem' }}>No sessions yet.</div>}
+              {sessions.map((s) => (
+                <div
+                  key={s.id}
+                  onClick={() => openSession(s.id)}
+                  style={{
+                    padding: '0.5rem 0.7rem',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    background: activeSessionId === s.id ? 'var(--accent-dim)' : 'transparent',
+                    fontSize: '0.7rem',
+                    color: 'var(--white)',
+                  }}
+                >
+                  {s.title}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-      </main>
-    </>
+
+        <div className="arsenal-card" style={{ display: 'flex', flexDirection: 'column' }}>
+          <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: '1.2rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+            {!activeSessionId && (
+              <div className="arsenal-empty">
+                <div className="arsenal-empty-text">Start a session on the left to begin.</div>
+              </div>
+            )}
+            {messages.map((m, i) => (
+              <div key={i} style={{ alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '75%' }}>
+                <div
+                  style={{
+                    background: m.role === 'user' ? 'var(--grad)' : 'var(--bg-card)',
+                    color: m.role === 'user' ? '#fff' : 'var(--white)',
+                    border: m.role === 'user' ? 'none' : '1px solid var(--border)',
+                    borderRadius: '10px',
+                    padding: '0.6rem 0.9rem',
+                    fontSize: '0.8rem',
+                    whiteSpace: 'pre-wrap',
+                  }}
+                >
+                  {m.content}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{ borderTop: '1px solid var(--border)', padding: '0.8rem', display: 'flex', gap: '0.6rem' }}>
+            <input
+              className="arsenal-input"
+              style={{ flex: 1 }}
+              value={draft}
+              disabled={!activeSessionId || sending}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') sendMessage(); }}
+              placeholder={activeSessionId ? 'Type your message…' : 'Start a session first'}
+            />
+            <button className="arsenal-btn" disabled={!activeSessionId || sending} onClick={sendMessage}>
+              {sending ? '…' : 'Send'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

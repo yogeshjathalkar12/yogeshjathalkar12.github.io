@@ -1,4 +1,4 @@
-import { Link, NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet } from 'react-router-dom';
 
 const TABS = [
   { path: '/whatsapp/setup', label: 'Connection' },
@@ -9,48 +9,44 @@ const TABS = [
 
 export default function WhatsappLayout() {
   return (
-    <>
-      <header className="arsenal-topbar">
-        <Link to="/dashboard" className="arsenal-back">← Dashboard</Link>
-        <div className="arsenal-tool-badge">
-          <span className="dot" />
-          WHATSAPP AUTOMATION
+    <div style={{ padding: '2rem', height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ marginBottom: '2rem' }}>
+        <div style={{ fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--dim)', fontFamily: 'var(--mono)' }}>
+          Bring Your Own Meta App
         </div>
-        <div className="arsenal-topbar-right" />
-      </header>
+        <h1 style={{ margin: '0.3rem 0', color: 'var(--purple)' }}>WhatsApp Automation</h1>
+        <p style={{ color: 'var(--dim)', maxWidth: '640px', fontSize: '0.85rem' }}>
+          Broadcasts, drip sequences, and keyword-triggered auto-replies on your own Meta
+          WhatsApp Cloud API number — no reseller markup, no shared number.
+        </p>
+      </div>
 
-      <main className="arsenal-main">
-        <section className="arsenal-hero">
-          <div className="arsenal-hero-eyebrow">Bring Your Own Meta App</div>
-          <h1 className="arsenal-hero-title">WhatsApp Automation</h1>
-          <p className="arsenal-hero-desc">
-            Broadcasts, drip sequences, and keyword-triggered auto-replies on your own Meta
-            WhatsApp Cloud API number — no reseller markup, no shared number.
-          </p>
-        </section>
+      {/* WhatsApp Sub-Navigation Tabs */}
+      <nav style={{ display: 'flex', gap: '2rem', borderBottom: '1px solid var(--border)', marginBottom: '2rem' }}>
+        {TABS.map((tab) => (
+          <NavLink
+            key={tab.path}
+            to={tab.path}
+            style={({ isActive }) => ({
+              paddingBottom: '0.8rem',
+              fontSize: '0.8rem',
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              textDecoration: 'none',
+              color: isActive ? 'var(--purple)' : 'var(--dim)',
+              borderBottom: isActive ? '2px solid var(--purple)' : '2px solid transparent',
+              fontFamily: 'var(--mono)',
+              transition: 'all 0.2s ease'
+            })}
+          >
+            {tab.label}
+          </NavLink>
+        ))}
+      </nav>
 
-        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', borderBottom: '1px solid var(--border)' }}>
-          {TABS.map((t) => (
-            <NavLink
-              key={t.path}
-              to={t.path}
-              style={({ isActive }) => ({
-                padding: '0.6rem 1rem',
-                fontSize: '0.7rem',
-                textTransform: 'uppercase',
-                letterSpacing: '0.1em',
-                textDecoration: 'none',
-                color: isActive ? 'var(--accent)' : 'var(--dim)',
-                borderBottom: isActive ? '2px solid var(--accent)' : '2px solid transparent',
-              })}
-            >
-              {t.label}
-            </NavLink>
-          ))}
-        </div>
-
+      <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         <Outlet />
-      </main>
-    </>
+      </div>
+    </div>
   );
 }

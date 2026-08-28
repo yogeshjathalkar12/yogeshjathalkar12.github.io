@@ -9,8 +9,10 @@ import Login from './pages/Login';
 import DashboardHome from './pages/DashboardHome';
 import { DashboardLayout } from './layouts/DashboardLayout';
 import { TOOLS } from './tools/registry';
+import { NotificationsProvider } from './hooks/NotificationsContext';
+import { NotificationOverlay } from './components/NotificationOverlay';
 
-/*crm files */
+/*crm files */0
 import CrmLayout from './layouts/CrmLayout';
 import CrmOverview from './pages/crm/CrmOverview';
 import CrmPipeline from './pages/crm/CrmPipeline';
@@ -49,6 +51,8 @@ export default function App() {
         <AuthProvider>
           <ToastProvider>
             <CreditsProvider>
+            <NotificationsProvider>
+                <NotificationOverlay />
               <Routes>
                 <Route path="/login" element={<Login />} />
 
@@ -99,6 +103,7 @@ export default function App() {
                 
                 <Route path="*" element={<Navigate to="/dashboard" replace />} />
               </Routes>
+              </NotificationsProvider>
             </CreditsProvider>
           </ToastProvider>
         </AuthProvider>

@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/AuthContext';
 import { useCredits } from '../hooks/CreditsContext';
 import { useTheme } from '../hooks/ThemeContext';
 import { TOOLS } from '../tools/registry';
+import { NotificationBell } from '../components/NotificationBell';
 import { PaymentModal } from './PaymentModal';
 
 export function DashboardLayout() {
@@ -49,11 +50,15 @@ export function DashboardLayout() {
             {isPro ? 'Buy More Credits' : 'Upgrade to Pro'}
           </button>
 
+          <NotificationBell />
+
           <div className="lamp-container" onClick={toggle} title="Toggle theme">
             <div className="lamp-wire" />
             <div className="lamp-socket" />
             <div className="lamp-bulb" style={{ background: isLight ? '#ffaa00' : '#cbd5e1' }} />
           </div>
+
+          
 
           <div className="dash-user" onClick={() => setMenuOpen((v) => !v)} style={{ position: 'relative' }}>
             <div className="dash-user-avatar">{displayName[0]?.toUpperCase()}</div>
@@ -117,40 +122,66 @@ export function DashboardLayout() {
       </header>
 
       <div className="dash-layout">
-        <nav className="dash-sidebar">
-          <div className="dash-sidebar-section-label">Command Center</div>
-          <NavLink to="/dashboard" end className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
-            <span className="dash-sidebar-icon">⊞</span><span>Dashboard</span>
-          </NavLink>
-
-          <NavLink to="/crm" className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
-            <span className="dash-sidebar-icon">◫</span><span>Active CRM</span>
-          </NavLink>
-
-          <div className="dash-sidebar-section-label">Automation</div>
-          <NavLink to="/email" className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
-            <span className="dash-sidebar-icon">✉</span><span>Email</span>
-          </NavLink>
-          <NavLink to="/whatsapp" className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
-            <span className="dash-sidebar-icon">◉</span><span>WhatsApp</span>
-          </NavLink>
-          {automationTools.map((tool) => (
-            <NavLink key={tool.slug} to={tool.route} className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
-              <span className="dash-sidebar-icon">{tool.icon}</span><span>{tool.navLabel}</span>
+        <nav className="dash-sidebar" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <div style={{ flex: 1, overflowY: 'auto' }}>
+            <div className="dash-sidebar-section-label">Command Center</div>
+            <NavLink to="/dashboard" end className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
+              <span className="dash-sidebar-icon">⊞</span><span>Dashboard</span>
             </NavLink>
-          ))}
 
-          <div className="dash-sidebar-section-label">Training</div>
-          <NavLink to="/playground" className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
-            <span className="dash-sidebar-icon">◆</span><span>AI Playground</span>
-          </NavLink>
-
-          <div className="dash-sidebar-section-label">Intelligence Suite</div>
-          {intelligenceTools.map((tool) => (
-            <NavLink key={tool.slug} to={tool.route} className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
-              <span className="dash-sidebar-icon">{tool.icon}</span><span>{tool.navLabel}</span>
+            <NavLink to="/crm" className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
+              <span className="dash-sidebar-icon">◫</span><span>Active CRM</span>
             </NavLink>
-          ))}
+
+            <div className="dash-sidebar-section-label">Automation</div>
+            <NavLink to="/email" className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
+              <span className="dash-sidebar-icon">✉</span><span>Email</span>
+            </NavLink>
+            <NavLink to="/whatsapp" className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
+              <span className="dash-sidebar-icon">◉</span><span>WhatsApp</span>
+            </NavLink>
+            {automationTools.map((tool) => (
+              <NavLink key={tool.slug} to={tool.route} className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
+                <span className="dash-sidebar-icon">{tool.icon}</span><span>{tool.navLabel}</span>
+              </NavLink>
+            ))}
+
+            <div className="dash-sidebar-section-label">Training</div>
+            <NavLink to="/playground" className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
+              <span className="dash-sidebar-icon">◆</span><span>AI Playground</span>
+            </NavLink>
+
+            <div className="dash-sidebar-section-label">Intelligence Suite</div>
+            {intelligenceTools.map((tool) => (
+              <NavLink key={tool.slug} to={tool.route} className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
+                <span className="dash-sidebar-icon">{tool.icon}</span><span>{tool.navLabel}</span>
+              </NavLink>
+            ))}
+
+            <div className="dash-sidebar-section-label">Account</div>
+            <NavLink to="/credits" className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
+              <span className="dash-sidebar-icon">◇</span><span>Credits &amp; Plan</span>
+            </NavLink>
+            <NavLink to="/settings" className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
+              <span className="dash-sidebar-icon">⚙</span><span>Settings</span>
+            </NavLink>
+          </div>
+
+          {/* Sidebar footer — plan summary + upgrade CTA, pinned to the bottom */}
+          <div style={{ padding: '1rem', borderTop: '1px solid var(--border)' }}>
+            <div style={{ fontSize: '0.65rem', letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--dim)', marginBottom: '0.6rem' }}>
+              {plan} Plan · {totalCredits} Credits/mo
+            </div>
+            {!isPro && (
+              <button
+                className="dash-billing-btn-primary"
+                style={{ width: '100%' }}
+                onClick={() => setShowPayment(true)}
+              >
+                Upgrade to Pro →
+              </button>
+            )}
+          </div>
         </nav>
 
         {/* The Outlet renders the nested routes while keeping the sidebar intact */}

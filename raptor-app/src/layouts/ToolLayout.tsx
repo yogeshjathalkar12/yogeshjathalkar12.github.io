@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import type { ReactNode } from 'react';
 import { useCredits } from '../hooks/CreditsContext';
 import type { ToolMeta } from '../tools/registry';
@@ -12,39 +11,35 @@ export function ToolLayout({ tool, children }: ToolLayoutProps) {
   const { credits } = useCredits();
 
   return (
-    <>
-      <header className="arsenal-topbar">
-        <Link to="/dashboard" className="arsenal-back">← Dashboard</Link>
-        <div className="arsenal-tool-badge">
-          <span className="dot" />
-          {tool.navLabel.toUpperCase()}
-        </div>
-        <div className="arsenal-topbar-right">
-          <div className="arsenal-credits-pill">
-            <div>
-              <div className="arsenal-credits-label">Credits</div>
-              <div className="arsenal-credits-value">{credits ?? '—'}</div>
-            </div>
+    <div style={{ padding: '2rem', height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem', gap: '1.5rem' }}>
+        <div>
+          <div style={{ fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--dim)', fontFamily: 'var(--mono)' }}>
+            {tool.eyebrow}
           </div>
-        </div>
-      </header>
+          <h1 style={{ margin: '0.3rem 0', color: 'var(--purple)' }}>{tool.title}</h1>
+          <p style={{ color: 'var(--dim)', maxWidth: '640px', fontSize: '0.85rem' }}>{tool.description}</p>
 
-      <main className="arsenal-main">
-        <section className="arsenal-hero">
-          <div className="arsenal-hero-eyebrow">{tool.eyebrow}</div>
-          <h1 className="arsenal-hero-title">{tool.title}</h1>
-          <p className="arsenal-hero-desc">{tool.description}</p>
-          <div className="arsenal-hero-meta">
-            <div className="arsenal-hero-meta-item">Cost <strong>{tool.costLabel}</strong></div>
-            <div className="arsenal-hero-meta-item">Engine <strong>{tool.engineLabel}</strong></div>
+          <div style={{ display: 'flex', gap: '1.5rem', marginTop: '0.8rem', fontSize: '0.7rem', color: 'var(--dim)', fontFamily: 'var(--mono)' }}>
+            <div>Cost <strong style={{ color: 'var(--white)' }}>{tool.costLabel}</strong></div>
+            <div>Engine <strong style={{ color: 'var(--white)' }}>{tool.engineLabel}</strong></div>
             {tool.extraMeta?.map((m) => (
-              <div className="arsenal-hero-meta-item" key={m}>{m}</div>
+              <div key={m}>{m}</div>
             ))}
           </div>
-        </section>
+        </div>
 
+        <div style={{ textAlign: 'right', flexShrink: 0 }}>
+          <div style={{ fontSize: '0.65rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--dim)', fontFamily: 'var(--mono)' }}>
+            Credits
+          </div>
+          <div style={{ fontSize: '1.1rem', color: 'var(--white)', fontFamily: 'var(--mono)' }}>{credits ?? '—'}</div>
+        </div>
+      </div>
+
+      <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         {children}
-      </main>
-    </>
+      </div>
+    </div>
   );
 }
