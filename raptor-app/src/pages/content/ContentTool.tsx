@@ -11,6 +11,7 @@ const API = toolApiBase('content');
 
 type Modality = 'text' | 'image' | 'video';
 type Provider = 'openai' | 'google' | 'anthropic';
+type StepMode = 'template' | 'custom';
 
 interface TemplateDef {
   modality: Modality;
@@ -24,10 +25,25 @@ interface KeyEntry {
   created_at: string;
 }
 
+interface FileAttachment {
+  filename: string;
+  media_type: string;
+  data_base64: string;
+}
+
 interface StepDraft {
-  provider: Provider | '';
+  mode: StepMode;
+  providers: Provider[]; // execution providers — 1 = single, 2+ = parallel agents on the same prompt
+  // template mode
   template_id: string;
   variables: Record<string, string>;
+  // custom mode ("write your own prompt")
+  modality: Modality;
+  subject: string;
+  files: FileAttachment[];
+  draftProvider: Provider | '';
+  draftPrompt: string;
+  drafting: boolean;
 }
 
 interface StepResult {
@@ -49,7 +65,32 @@ const PROVIDER_LABEL: Record<Provider, string> = {
   anthropic: 'Anthropic',
 };
 
-const emptyStep = (): StepDraft => ({ provider: '', template_id: '', variables: {} });
+const MAX_FILES_PER_STEP = 3;
+
+const emptyStep = (): StepDraft => ({
+  mode: 'custom',
+  providers: [],
+  template_id: '',
+  variables: {},
+  modality: 'text',
+  subject: '',
+  files: [],
+  draftProvider: '',
+  draftPrompt: '',
+  drafting: false,
+});
+
+const fileToAttachment = (file: File): Promise<FileAttachment> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = (reader.result as string) || '';
+      const base64 = result.split(',')[1] || '';
+      resolve({ filename: file.name, media_type: file.type || 'application/octet-stream', data_base64: base64 });
+    };
+    reader.onerror = () => reject(new Error(`Could not read ${file.name}`));
+    reader.readAsDataURL(file);
+  });
 
 export default function ContentTool() {
   const { authedFetch } = useAuthedFetch();
@@ -119,7 +160,7 @@ export default function ContentTool() {
   };
 
   // A provider only shows up as a choice for a step if the user has saved a
-  // key for it AND that key confirmed capability for the template's modality.
+  // key for it AND that key confirmed capability for the relevant modality.
   const providersFor = (modality: Modality): Provider[] =>
     keys.filter((k) => k.capabilities?.[modality]).map((k) => k.provider);
 
@@ -136,6 +177,61 @@ export default function ContentTool() {
   };
 
   const removeStep = (idx: number) => setSteps((prev) => prev.filter((_, i) => i !== idx));
+
+  const setStepMode = (idx: number, mode: StepMode) => updateStep(idx, { mode, providers: [] });
+
+  const setStepModality = (idx: number, modality: Modality) =>
+    updateStep(idx, { modality, providers: [], draftPrompt: '', draftProvider: '' });
+
+  const toggleStepProvider = (idx: number, provider: Provider) => {
+    setSteps((prev) =>
+      prev.map((s, i) => {
+        if (i !== idx) return s;
+        const has = s.providers.includes(provider);
+        return { ...s, providers: has ? s.providers.filter((p) => p !== provider) : [...s.providers, provider] };
+      }),
+    );
+  };
+
+  const handleFilesSelected = async (idx: number, fileList: FileList | null) => {
+    if (!fileList || fileList.length === 0) return;
+    try {
+      const attachments = await Promise.all(Array.from(fileList).map(fileToAttachment));
+      setSteps((prev) =>
+        prev.map((s, i) => (i === idx ? { ...s, files: [...s.files, ...attachments].slice(0, MAX_FILES_PER_STEP) } : s)),
+      );
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Could not read that file', 'error');
+    }
+  };
+
+  const removeFile = (idx: number, filename: string) => {
+    setSteps((prev) =>
+      prev.map((s, i) => (i === idx ? { ...s, files: s.files.filter((f) => f.filename !== filename) } : s)),
+    );
+  };
+
+  const draftForStep = async (idx: number) => {
+    const step = steps[idx];
+    if (!step.subject.trim()) return showToast('Describe what you want first', 'error');
+    if (!step.draftProvider) return showToast('Pick a provider to draft with', 'error');
+    updateStep(idx, { drafting: true });
+    try {
+      const json = await authedFetch<{ draft_prompt: string }>(`${API}/draft`, {
+        method: 'POST',
+        body: JSON.stringify({
+          subject: step.subject,
+          modality: step.modality,
+          provider: step.draftProvider,
+          files: step.files,
+        }),
+      });
+      updateStep(idx, { draftPrompt: json.draft_prompt, drafting: false });
+    } catch (e) {
+      updateStep(idx, { drafting: false });
+      showToast(e instanceof Error ? e.message : 'Could not draft a prompt', 'error');
+    }
+  };
 
   const pollPipeline = async (pipelineId: string) => {
     const poll = async () => {
@@ -156,17 +252,27 @@ export default function ContentTool() {
   };
 
   const runPipeline = async () => {
-    if (steps.some((s) => !s.provider || !s.template_id)) {
-      return showToast('Fill in every step before running', 'error');
+    const invalid = steps.some((s) =>
+      s.mode === 'template'
+        ? !s.template_id || s.providers.length === 0
+        : !s.draftPrompt.trim() || s.providers.length === 0,
+    );
+    if (invalid) {
+      return showToast('Finish every step: pick a template or draft+edit a prompt, and pick at least one provider', 'error');
     }
     setRunning(true);
     setResults(null);
     setVideoStatus(null);
     setVideoUrl(null);
     try {
+      const payloadSteps = steps.map((s) =>
+        s.mode === 'template'
+          ? { provider: s.providers[0], template_id: s.template_id, variables: s.variables }
+          : { providers: s.providers, prompt: s.draftPrompt, modality: s.modality },
+      );
       const json = await authedFetch<{ pipeline_id: string; status: string; step_results: StepResult[] }>(
         `${API}/pipeline`,
-        { method: 'POST', body: JSON.stringify({ content_type: 'chain', steps }) },
+        { method: 'POST', body: JSON.stringify({ content_type: 'chain', steps: payloadSteps }) },
       );
       setResults(json.step_results);
       if (json.status === 'running') {
@@ -187,36 +293,47 @@ export default function ContentTool() {
       <div className="arsenal-card" style={{ marginBottom: '1.5rem' }}>
         <div className="arsenal-card-header"><span className="arsenal-card-title">Your API Keys</span></div>
         <div className="arsenal-card-body">
-          <div className="arsenal-field-row" style={{ alignItems: 'flex-end' }}>
-            <div className="arsenal-field">
-              <label className="arsenal-label">Provider</label>
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+            <div style={{ width: '180px' }}>
+              <label className="arsenal-label" style={{ display: 'block', marginBottom: '0.4rem' }}>Provider</label>
               <select
                 className="arsenal-input"
                 value={newKeyProvider}
                 onChange={(e) => setNewKeyProvider(e.target.value as Provider)}
+                style={{ width: '100%' }}
               >
                 {(Object.keys(PROVIDER_LABEL) as Provider[]).map((p) => (
                   <option key={p} value={p}>{PROVIDER_LABEL[p]}</option>
                 ))}
               </select>
             </div>
-            <div className="arsenal-field" style={{ flex: 1 }}>
-              <label className="arsenal-label">API Key</label>
+
+            <div style={{ flex: '1', minWidth: '250px' }}>
+              <label className="arsenal-label" style={{ display: 'block', marginBottom: '0.4rem' }}>API Key</label>
               <input
                 className="arsenal-input"
                 type="password"
                 value={newKeyValue}
                 onChange={(e) => setNewKeyValue(e.target.value)}
                 placeholder="Stored encrypted — never shown again after saving"
+                style={{ width: '100%' }}
               />
             </div>
-            <button className="arsenal-btn" disabled={savingKey} onClick={saveKey}>
-              {savingKey ? 'Validating…' : 'Save Key'}
-            </button>
+
+            <div>
+              <button
+                className="arsenal-btn"
+                disabled={savingKey}
+                onClick={saveKey}
+                style={{ height: '38px', padding: '0 1.5rem', whiteSpace: 'nowrap' }}
+              >
+                {savingKey ? 'Validating…' : 'Save Key'}
+              </button>
+            </div>
           </div>
 
           {keys.length > 0 && (
-            <div style={{ marginTop: '1rem' }}>
+            <div style={{ marginTop: '1.2rem', borderTop: '1px solid var(--border)', paddingTop: '0.8rem' }}>
               {keys.map((k) => (
                 <div key={k.provider} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 0', borderBottom: '1px solid var(--border)' }}>
                   <span style={{ color: 'var(--white)' }}>{PROVIDER_LABEL[k.provider]}</span>
@@ -235,72 +352,218 @@ export default function ContentTool() {
         <div className="arsenal-card-header"><span className="arsenal-card-title">Build Your Content</span></div>
         <div className="arsenal-card-body">
           {steps.map((step, idx) => {
-            const stepTemplate = step.template_id ? templates[step.template_id] : null;
+            const stepTemplate = step.mode === 'template' && step.template_id ? templates[step.template_id] : null;
+            const draftProviders = providersFor('text');
+            const execProviders = providersFor(step.mode === 'template' ? (stepTemplate?.modality ?? 'text') : step.modality);
+
             return (
               <div key={idx} className="arsenal-field" style={{ border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem', marginBottom: '1rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
                   <span style={{ color: 'var(--dim)', fontSize: '0.8rem' }}>Step {idx + 1}{idx > 0 ? ' — chained from step above' : ''}</span>
                   {steps.length > 1 && (
                     <button className="arsenal-copy-btn" onClick={() => removeStep(idx)}>Remove step</button>
                   )}
                 </div>
 
-                <div className="arsenal-field-row">
-                  <div className="arsenal-field">
-                    <label className="arsenal-label">What to generate</label>
-                    <select
-                      className="arsenal-input"
-                      value={step.template_id}
-                      onChange={(e) => updateStep(idx, { template_id: e.target.value, provider: '' })}
-                    >
-                      <option value="">Select…</option>
-                      <optgroup label="Text">
-                        {templatesFor('text').map(([id]) => <option key={id} value={id}>{id}</option>)}
-                      </optgroup>
-                      <optgroup label="Image (flyer)">
-                        {templatesFor('image').map(([id]) => <option key={id} value={id}>{id}</option>)}
-                      </optgroup>
-                      <optgroup label="Video">
-                        {templatesFor('video').map(([id]) => <option key={id} value={id}>{id}</option>)}
-                      </optgroup>
-                    </select>
-                  </div>
+                {/* Mode toggle: write your own prompt (default) vs. pick a fixed template */}
+                <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.8rem' }}>
+                  <button
+                    className="arsenal-btn"
+                    style={step.mode === 'custom' ? {} : { background: 'transparent', border: '1px solid var(--border)' }}
+                    onClick={() => setStepMode(idx, 'custom')}
+                  >
+                    Write your own prompt
+                  </button>
+                  <button
+                    className="arsenal-btn"
+                    style={step.mode === 'template' ? {} : { background: 'transparent', border: '1px solid var(--border)' }}
+                    onClick={() => setStepMode(idx, 'template')}
+                  >
+                    Use a template
+                  </button>
+                </div>
 
-                  {stepTemplate && (
-                    <div className="arsenal-field">
-                      <label className="arsenal-label">Provider (only keys that support this)</label>
-                      <select
+                {step.mode === 'custom' ? (
+                  <>
+                    <div className="arsenal-field-row">
+                      <div className="arsenal-field">
+                        <label className="arsenal-label">What kind of content</label>
+                        <select
+                          className="arsenal-input"
+                          value={step.modality}
+                          onChange={(e) => setStepModality(idx, e.target.value as Modality)}
+                        >
+                          <option value="text">Text</option>
+                          <option value="image">Image</option>
+                          <option value="video">Video</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="arsenal-field" style={{ marginTop: '0.6rem' }}>
+                      <label className="arsenal-label">What do you want? (subject, goal, anything relevant)</label>
+                      <textarea
                         className="arsenal-input"
-                        value={step.provider}
-                        onChange={(e) => updateStep(idx, { provider: e.target.value as Provider })}
-                      >
-                        <option value="">Select…</option>
-                        {providersFor(stepTemplate.modality).map((p) => (
-                          <option key={p} value={p}>{PROVIDER_LABEL[p]}</option>
-                        ))}
-                      </select>
-                      {providersFor(stepTemplate.modality).length === 0 && (
-                        <div style={{ fontSize: '0.75rem', color: 'var(--dim)', marginTop: '0.3rem' }}>
-                          No saved key supports this yet — add one above.
+                        style={{ width: '100%', minHeight: '70px', resize: 'vertical' }}
+                        value={step.subject}
+                        onChange={(e) => updateStep(idx, { subject: e.target.value })}
+                        placeholder="e.g. a launch post for our new espresso machine, aimed at cafe owners"
+                      />
+                    </div>
+
+                    <div className="arsenal-field" style={{ marginTop: '0.6rem' }}>
+                      <label className="arsenal-label">Attach files (optional — images or text files, up to {MAX_FILES_PER_STEP})</label>
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/*,text/*"
+                        onChange={(e) => {
+                          handleFilesSelected(idx, e.target.files);
+                          e.target.value = '';
+                        }}
+                        disabled={step.files.length >= MAX_FILES_PER_STEP}
+                      />
+                      {step.files.length > 0 && (
+                        <div style={{ marginTop: '0.4rem', display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                          {step.files.map((f) => (
+                            <span
+                              key={f.filename}
+                              style={{ fontSize: '0.75rem', color: 'var(--dim)', border: '1px solid var(--border)', borderRadius: '4px', padding: '0.2rem 0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                            >
+                              {f.filename}
+                              <button
+                                className="arsenal-copy-btn"
+                                style={{ padding: 0, lineHeight: 1 }}
+                                onClick={() => removeFile(idx, f.filename)}
+                              >
+                                ×
+                              </button>
+                            </span>
+                          ))}
                         </div>
                       )}
                     </div>
-                  )}
-                </div>
 
-                {stepTemplate && stepTemplate.variables.length > 0 && (
-                  <div className="arsenal-field-row" style={{ marginTop: '0.6rem' }}>
-                    {stepTemplate.variables.map((v) => (
-                      <div className="arsenal-field" key={v}>
-                        <label className="arsenal-label">{v}</label>
-                        <input
+                    <div className="arsenal-field-row" style={{ marginTop: '0.6rem', alignItems: 'flex-end' }}>
+                      <div className="arsenal-field">
+                        <label className="arsenal-label">Draft using</label>
+                        <select
                           className="arsenal-input"
-                          value={step.variables[v] || ''}
-                          onChange={(e) => updateStep(idx, { variables: { ...step.variables, [v]: e.target.value } })}
-                        />
+                          value={step.draftProvider}
+                          onChange={(e) => updateStep(idx, { draftProvider: e.target.value as Provider })}
+                        >
+                          <option value="">Select…</option>
+                          {draftProviders.map((p) => (
+                            <option key={p} value={p}>{PROVIDER_LABEL[p]}</option>
+                          ))}
+                        </select>
+                        {draftProviders.length === 0 && (
+                          <div style={{ fontSize: '0.75rem', color: 'var(--dim)', marginTop: '0.3rem' }}>
+                            No saved key can draft yet — add one above.
+                          </div>
+                        )}
                       </div>
-                    ))}
-                  </div>
+                      <button className="arsenal-btn" disabled={step.drafting} onClick={() => draftForStep(idx)}>
+                        {step.drafting ? (<><span className="arsenal-spinner" /> Drafting…</>) : 'Draft a prompt'}
+                      </button>
+                    </div>
+
+                    <div className="arsenal-field" style={{ marginTop: '0.6rem' }}>
+                      <label className="arsenal-label">
+                        Prompt {step.draftPrompt.trim() ? '— review and edit, then run' : '— draft one above, or write it yourself'}
+                      </label>
+                      <textarea
+                        className="arsenal-input"
+                        style={{ width: '100%', minHeight: '110px', resize: 'vertical' }}
+                        value={step.draftPrompt}
+                        onChange={(e) => updateStep(idx, { draftPrompt: e.target.value })}
+                        placeholder="The detailed prompt that actually gets sent to the model. Draft one, or type your own."
+                      />
+                    </div>
+
+                    <div className="arsenal-field" style={{ marginTop: '0.6rem' }}>
+                      <label className="arsenal-label">
+                        Run with {execProviders.length > 1 ? '(pick more than one to have them work on it at the same time)' : ''}
+                      </label>
+                      <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                        {execProviders.map((p) => (
+                          <label key={p} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--white)', fontSize: '0.9rem' }}>
+                            <input
+                              type="checkbox"
+                              checked={step.providers.includes(p)}
+                              onChange={() => toggleStepProvider(idx, p)}
+                            />
+                            {PROVIDER_LABEL[p]}
+                          </label>
+                        ))}
+                      </div>
+                      {execProviders.length === 0 && (
+                        <div style={{ fontSize: '0.75rem', color: 'var(--dim)', marginTop: '0.3rem' }}>
+                          No saved key supports {step.modality} yet — add one above.
+                        </div>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="arsenal-field-row">
+                      <div className="arsenal-field">
+                        <label className="arsenal-label">What to generate</label>
+                        <select
+                          className="arsenal-input"
+                          value={step.template_id}
+                          onChange={(e) => updateStep(idx, { template_id: e.target.value, providers: [] })}
+                        >
+                          <option value="">Select…</option>
+                          <optgroup label="Text">
+                            {templatesFor('text').map(([id]) => <option key={id} value={id}>{id}</option>)}
+                          </optgroup>
+                          <optgroup label="Image (flyer)">
+                            {templatesFor('image').map(([id]) => <option key={id} value={id}>{id}</option>)}
+                          </optgroup>
+                          <optgroup label="Video">
+                            {templatesFor('video').map(([id]) => <option key={id} value={id}>{id}</option>)}
+                          </optgroup>
+                        </select>
+                      </div>
+
+                      {stepTemplate && (
+                        <div className="arsenal-field">
+                          <label className="arsenal-label">Provider (only keys that support this)</label>
+                          <select
+                            className="arsenal-input"
+                            value={step.providers[0] || ''}
+                            onChange={(e) => updateStep(idx, { providers: e.target.value ? [e.target.value as Provider] : [] })}
+                          >
+                            <option value="">Select…</option>
+                            {providersFor(stepTemplate.modality).map((p) => (
+                              <option key={p} value={p}>{PROVIDER_LABEL[p]}</option>
+                            ))}
+                          </select>
+                          {providersFor(stepTemplate.modality).length === 0 && (
+                            <div style={{ fontSize: '0.75rem', color: 'var(--dim)', marginTop: '0.3rem' }}>
+                              No saved key supports this yet — add one above.
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {stepTemplate && stepTemplate.variables.length > 0 && (
+                      <div className="arsenal-field-row" style={{ marginTop: '0.6rem' }}>
+                        {stepTemplate.variables.map((v) => (
+                          <div className="arsenal-field" key={v}>
+                            <label className="arsenal-label">{v}</label>
+                            <input
+                              className="arsenal-input"
+                              value={step.variables[v] || ''}
+                              onChange={(e) => updateStep(idx, { variables: { ...step.variables, [v]: e.target.value } })}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             );
@@ -323,9 +586,11 @@ export default function ContentTool() {
           <div className="arsenal-card-body">
             {results?.map((r, i) => (
               <div key={i} className="arsenal-field">
-                <label className="arsenal-label">Step {i + 1} — {PROVIDER_LABEL[r.provider]} · {r.template_id}</label>
+                <label className="arsenal-label">
+                  {PROVIDER_LABEL[r.provider]} · {r.template_id === 'custom' ? 'Custom prompt' : r.template_id}
+                </label>
                 {r.modality === 'text' && <div className="arsenal-code-block" style={{ whiteSpace: 'pre-wrap', color: 'var(--white)' }}>{r.output}</div>}
-                {r.modality === 'image' && <img src={r.output} alt="Generated flyer" style={{ maxWidth: '100%', borderRadius: '8px' }} />}
+                {r.modality === 'image' && <img src={r.output} alt="Generated" style={{ maxWidth: '100%', borderRadius: '8px' }} />}
               </div>
             ))}
             {videoStatus === 'running' && (
