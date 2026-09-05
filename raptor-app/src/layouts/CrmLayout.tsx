@@ -11,7 +11,10 @@ export default function CrmLayout() {
           { name: 'Contacts', path: '/crm/contacts' },
           { name: 'Activity', path: '/crm/activity' },
           { name: 'Automations', path: '/crm/automations' },
-          { name: 'Campaigns', path: '/crm/campaigns' }
+          { name: 'Campaigns', path: '/crm/campaigns' },
+          { name: 'Tickets', path: '/crm/tickets' },
+          { name: 'Analytics', path: '/crm/analytics' },
+          { name: 'Marketing', path: '/crm/marketing' },
         ].map((tab) => (
           <NavLink
             key={tab.name}
@@ -25,7 +28,7 @@ export default function CrmLayout() {
               color: isActive ? 'var(--purple)' : 'var(--dim)',
               borderBottom: isActive ? '2px solid var(--purple)' : '2px solid transparent',
               fontFamily: 'var(--mono)',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.2s ease',
             })}
           >
             {tab.name}

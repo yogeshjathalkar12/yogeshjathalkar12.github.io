@@ -12,7 +12,7 @@ import { TOOLS } from './tools/registry';
 import { NotificationsProvider } from './hooks/NotificationsContext';
 import { NotificationOverlay } from './components/NotificationOverlay';
 
-/*crm files */0
+/* crm files */
 import CrmLayout from './layouts/CrmLayout';
 import CrmOverview from './pages/crm/CrmOverview';
 import CrmPipeline from './pages/crm/CrmPipeline';
@@ -20,6 +20,9 @@ import CrmContacts from './pages/crm/CrmContacts';
 import CrmActivity from './pages/crm/CrmActivity';
 import CrmAutomations from './pages/crm/CrmAutomations';
 import CrmCampaigns from './pages/crm/CrmCampaigns';
+import CrmTickets from './pages/crm/CrmTickets';
+import CrmAnalytics from './pages/crm/CrmAnalytics';
+import CrmMarketing from './pages/crm/CrmMarketing';
 
 /* email files */
 import EmailLayout from './layouts/EmailLayout';
@@ -51,58 +54,61 @@ export default function App() {
         <AuthProvider>
           <ToastProvider>
             <CreditsProvider>
-            <NotificationsProvider>
+              <NotificationsProvider>
                 <NotificationOverlay />
-              <Routes>
-                <Route path="/login" element={<Login />} />
+                <Routes>
+                  <Route path="/login" element={<Login />} />
 
-                <Route element={<RequireAuth><DashboardLayout /></RequireAuth>}>
-                <Route path="/dashboard" element={<DashboardHome />} />
+                  <Route element={<RequireAuth><DashboardLayout /></RequireAuth>}>
+                    <Route path="/dashboard" element={<DashboardHome />} />
 
-                 <Route path="/crm" element={<CrmLayout />}>
-                 <Route index element={<Navigate to="pipeline" replace />} />
-                 <Route path="overview" element={<CrmOverview />} />
-                 <Route path="pipeline" element={<CrmPipeline />} />
-                 <Route path="contacts" element={<CrmContacts />} />
-                <Route path="activity" element={<CrmActivity />} />
-                <Route path="automations" element={<CrmAutomations />} />
-                <Route path="campaigns" element={<CrmCampaigns />} />
-               </Route>
+                    <Route path="/crm" element={<CrmLayout />}>
+                      <Route index element={<Navigate to="pipeline" replace />} />
+                      <Route path="overview" element={<CrmOverview />} />
+                      <Route path="pipeline" element={<CrmPipeline />} />
+                      <Route path="contacts" element={<CrmContacts />} />
+                      <Route path="activity" element={<CrmActivity />} />
+                      <Route path="automations" element={<CrmAutomations />} />
+                      <Route path="campaigns" element={<CrmCampaigns />} />
+                      <Route path="tickets" element={<CrmTickets />} />
+                      <Route path="analytics" element={<CrmAnalytics />} />
+                      <Route path="marketing" element={<CrmMarketing />} />
+                    </Route>
 
-                <Route path="/email" element={<EmailLayout />}>
-                  <Route index element={<Navigate to="setup" replace />} />
-                  <Route path="setup" element={<EmailConnectionSetup />} />
-                  <Route path="campaigns" element={<EmailCampaigns />} />
-                </Route>
+                    <Route path="/email" element={<EmailLayout />}>
+                      <Route index element={<Navigate to="setup" replace />} />
+                      <Route path="setup" element={<EmailConnectionSetup />} />
+                      <Route path="campaigns" element={<EmailCampaigns />} />
+                    </Route>
 
-                <Route path="/whatsapp" element={<WhatsappLayout />}>
-                  <Route index element={<Navigate to="setup" replace />} />
-                  <Route path="setup" element={<WaConnectionSetup />} />
-                  <Route path="broadcasts" element={<WaBroadcasts />} />
-                  <Route path="sequences" element={<WaSequences />} />
-                  <Route path="triggers" element={<WaTriggers />} />
-                </Route>
+                    <Route path="/whatsapp" element={<WhatsappLayout />}>
+                      <Route index element={<Navigate to="setup" replace />} />
+                      <Route path="setup" element={<WaConnectionSetup />} />
+                      <Route path="broadcasts" element={<WaBroadcasts />} />
+                      <Route path="sequences" element={<WaSequences />} />
+                      <Route path="triggers" element={<WaTriggers />} />
+                    </Route>
 
-                <Route path="/playground" element={<Playground />} />
+                    <Route path="/playground" element={<Playground />} />
 
-                  {TOOLS.map((tool) => {
-                    const ToolComponent = tool.component;
-                    return (
-                      <Route
-                        key={tool.slug}
-                        path={tool.route}
-                        element={
-                          <Suspense fallback={<ToolFallback />}>
-                            <ToolComponent />
-                          </Suspense>
-                        }
-                      />
-                    );
-                  })}
-                </Route>
-                
-                <Route path="*" element={<Navigate to="/dashboard" replace />} />
-              </Routes>
+                    {TOOLS.map((tool) => {
+                      const ToolComponent = tool.component;
+                      return (
+                        <Route
+                          key={tool.slug}
+                          path={tool.route}
+                          element={
+                            <Suspense fallback={<ToolFallback />}>
+                              <ToolComponent />
+                            </Suspense>
+                          }
+                        />
+                      );
+                    })}
+                  </Route>
+
+                  <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                </Routes>
               </NotificationsProvider>
             </CreditsProvider>
           </ToastProvider>

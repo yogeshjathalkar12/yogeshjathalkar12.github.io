@@ -40,9 +40,16 @@ export default function CrmContacts() {
   async function fetchAll() {
     try {
       const [contactsRes, dealsRes, interactionsRes] = await Promise.all([
-        supabase.from('contacts').select('*, companies(id, name)').order('last_interaction_at', { ascending: false, nullsFirst: false }),
+        supabase
+          .from('contacts')
+          .select('*, companies(id, name)')
+          .order('last_interaction_at', { ascending: false, nullsFirst: false }),
         supabase.from('deals').select('id, contact_id, stage'),
-        supabase.from('interactions').select('*, contacts(id, name)').order('created_at', { ascending: false }).limit(200),
+        supabase
+          .from('interactions')
+          .select('*, contacts(id, name)')
+          .order('created_at', { ascending: false })
+          .limit(200),
       ]);
 
       if (contactsRes.error) throw contactsRes.error;
@@ -53,8 +60,9 @@ export default function CrmContacts() {
       setDeals(dealsRes.data || []);
       setInteractions(interactionsRes.data || []);
 
-      // Keep the open panel's data fresh if it's showing
-      setActiveContact((prev: any) => (prev ? (contactsRes.data || []).find((c: any) => c.id === prev.id) || null : null));
+      setActiveContact((prev: any) =>
+        prev ? (contactsRes.data || []).find((c: any) => c.id === prev.id) || null : null
+      );
     } catch (error) {
       console.error('Failed to load contacts:', error);
     } finally {
@@ -64,7 +72,12 @@ export default function CrmContacts() {
 
   const q = search.trim().toLowerCase();
   const filtered = contacts.filter(
-    (c) => !q || (c.name || '').toLowerCase().includes(q) || (c.companies?.name || '').toLowerCase().includes(q)
+    (c) =>
+      !q ||
+      (c.name || '').toLowerCase().includes(q) ||
+      (c.companies?.name || '').toLowerCase().includes(q) ||
+      (c.email || '').toLowerCase().includes(q) ||
+      (c.phone || '').toLowerCase().includes(q)
   );
 
   function activeDealCount(contactId: string) {
@@ -77,14 +90,29 @@ export default function CrmContacts() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', marginBottom: '1.4rem', flexWrap: 'wrap' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          gap: '1rem',
+          marginBottom: '1.4rem',
+          flexWrap: 'wrap',
+        }}
+      >
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search contacts or companies…"
+          placeholder="Search contacts, emails, or companies…"
           style={{
-            flex: 1, maxWidth: 320, padding: '0.6rem 0.9rem', background: 'var(--surface2)',
-            border: '1px solid var(--border)', color: 'var(--white)', fontFamily: 'var(--mono)', fontSize: '0.7rem', borderRadius: '4px',
+            flex: 1,
+            maxWidth: 320,
+            padding: '0.6rem 0.9rem',
+            background: 'var(--surface2)',
+            border: '1px solid var(--border)',
+            color: 'var(--white)',
+            fontFamily: 'var(--mono)',
+            fontSize: '0.7rem',
+            borderRadius: '4px',
           }}
         />
         <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
@@ -101,9 +129,16 @@ export default function CrmContacts() {
           <button
             onClick={() => setShowImport(true)}
             style={{
-              background: 'transparent', color: 'var(--dim)', border: '1px solid var(--border)', padding: '0.6rem 1.1rem',
-              borderRadius: '4px', cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: '0.65rem',
-              letterSpacing: '0.08em', textTransform: 'uppercase',
+              background: 'transparent',
+              color: 'var(--dim)',
+              border: '1px solid var(--border)',
+              padding: '0.6rem 1.1rem',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontFamily: 'var(--mono)',
+              fontSize: '0.65rem',
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
             }}
           >
             Bulk Import
@@ -111,9 +146,16 @@ export default function CrmContacts() {
           <button
             onClick={() => setShowNewContact(true)}
             style={{
-              background: 'var(--grad)', color: '#fff', border: 'none', padding: '0.6rem 1.1rem',
-              borderRadius: '4px', cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: '0.65rem',
-              letterSpacing: '0.08em', textTransform: 'uppercase',
+              background: 'var(--grad)',
+              color: '#fff',
+              border: 'none',
+              padding: '0.6rem 1.1rem',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontFamily: 'var(--mono)',
+              fontSize: '0.65rem',
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
             }}
           >
             + New Contact
@@ -121,8 +163,23 @@ export default function CrmContacts() {
         </div>
       </div>
 
-      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontFamily: 'var(--mono)', fontSize: '0.75rem' }}>
+      <div
+        style={{
+          background: 'var(--surface)',
+          border: '1px solid var(--border)',
+          borderRadius: '6px',
+          overflow: 'hidden',
+        }}
+      >
+        <table
+          style={{
+            width: '100%',
+            borderCollapse: 'collapse',
+            textAlign: 'left',
+            fontFamily: 'var(--mono)',
+            fontSize: '0.75rem',
+          }}
+        >
           <thead>
             <tr style={{ background: 'var(--surface2)', color: 'var(--dim)', borderBottom: '1px solid var(--border)' }}>
               <th style={{ padding: '0.9rem 1rem' }}>Name</th>
@@ -152,10 +209,17 @@ export default function CrmContacts() {
                     <td style={{ padding: '1rem', color: 'var(--dim)' }}>{c.companies?.name || '—'}</td>
                     <td style={{ padding: '1rem', color: 'var(--dim)' }}>{relativeTime(c.last_interaction_at)}</td>
                     <td style={{ padding: '1rem' }}>
-                      <span style={{
-                        background: colors.bg, color: colors.fg, padding: '0.2rem 0.6rem',
-                        borderRadius: '12px', fontSize: '0.6rem', textTransform: 'uppercase', letterSpacing: '0.05em',
-                      }}>
+                      <span
+                        style={{
+                          background: colors.bg,
+                          color: colors.fg,
+                          padding: '0.2rem 0.6rem',
+                          borderRadius: '12px',
+                          fontSize: '0.6rem',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.05em',
+                        }}
+                      >
                         {c.status || 'cold'}
                       </span>
                     </td>
@@ -176,7 +240,12 @@ export default function CrmContacts() {
         schema={CONTACTS_IMPORT_SCHEMA}
         onImported={fetchAll}
       />
-      <ContactPanel contact={activeContact} interactions={interactions} onClose={() => setActiveContact(null)} onChanged={fetchAll} />
+      <ContactPanel
+        contact={activeContact}
+        interactions={interactions}
+        onClose={() => setActiveContact(null)}
+        onChanged={fetchAll}
+      />
     </div>
   );
 }
