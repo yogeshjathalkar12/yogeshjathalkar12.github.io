@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import Modal, { fieldLabelStyle, fieldInputStyle, primaryBtnStyle, ghostBtnStyle } from './Modal';
+import { findOrCreateContact } from '../../lib/crmContacts';
 
 const STAGE_OPTIONS = [
   { key: 'lead', label: 'New Lead' },
@@ -21,6 +22,11 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
   const [stage, setStage] = useState('lead');
   const [campaignId, setCampaignId] = useState('');
   const [campaigns, setCampaigns] = useState<any[]>([]);
+  const [contacts, setContacts] = useState<any[]>([]);
+  const [contactId, setContactId] = useState('');
+  const [addingContact, setAddingContact] = useState(false);
+  const [newContactName, setNewContactName] = useState('');
+  const [newContactEmail, setNewContactEmail] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,8 +35,13 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
       setValue(String(deal.value ?? 0));
       setStage(deal.stage);
       setCampaignId(deal.campaign_id || '');
+      setContactId(deal.contact_id || '');
+      setAddingContact(false);
+      setNewContactName('');
+      setNewContactEmail('');
       setError(null);
       fetchCampaigns();
+      fetchContacts();
     }
   }, [deal]);
 
@@ -44,16 +55,42 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
     }
   }
 
+  async function fetchContacts() {
+    try {
+      const { data, error } = await supabase.from('contacts').select('id, name').order('name', { ascending: true });
+      if (error) throw error;
+      setContacts(data || []);
+    } catch (error) {
+      console.error('Failed to load contacts:', error);
+    }
+  }
+
   if (!deal) return null;
 
   async function handleSave() {
     setSaving(true);
     setError(null);
     try {
+      let finalContactId: string | null = contactId || null;
+
+      // Only touches the shared resolver if the user actually typed a new
+      // person here — this is what makes "add a contact mid-deal" land in
+      // `contacts` instead of only ever living on this one deal row.
+      if (addingContact && newContactName.trim()) {
+        const { contact } = await findOrCreateContact({
+          name: newContactName,
+          email: newContactEmail,
+          companyId: deal.company_id || null,
+          status: 'active',
+        });
+        finalContactId = contact.id;
+      }
+
       const payload: any = {
         value: Number(value) || 0,
         stage,
         campaign_id: campaignId || null,
+        contact_id: finalContactId,
         updated_at: new Date().toISOString(),
       };
       if (stage === 'won' || stage === 'lost') payload.closed_at = new Date().toISOString();
@@ -109,6 +146,36 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
           <option key={c.id} value={c.id}>{c.name}</option>
         ))}
       </select>
+
+      <label style={fieldLabelStyle}>Contact</label>
+      {!addingContact ? (
+        <>
+          <select style={fieldInputStyle} value={contactId} onChange={(e) => setContactId(e.target.value)}>
+            <option value="">No contact</option>
+            {contacts.map((c) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+          <button
+            type="button"
+            onClick={() => { setAddingContact(true); setContactId(''); }}
+            style={{ ...ghostBtnStyle, marginBottom: '1.1rem', padding: '0.5rem 0.8rem' }}
+          >
+            + New Contact
+          </button>
+        </>
+      ) : (
+        <div style={{ border: '1px solid var(--border)', borderRadius: '4px', padding: '0.9rem', marginBottom: '1.1rem' }}>
+          <label style={fieldLabelStyle}>Name</label>
+          <input style={fieldInputStyle} value={newContactName} onChange={(e) => setNewContactName(e.target.value)} placeholder="e.g. Jane Doe" />
+          <label style={fieldLabelStyle}>Email</label>
+          <input style={{ ...fieldInputStyle, marginBottom: '0.6rem' }} value={newContactEmail} onChange={(e) => setNewContactEmail(e.target.value)} placeholder="jane@acme.com" />
+          <div style={{ fontSize: '0.6rem', color: 'var(--dim)', marginBottom: '0.6rem' }}>
+            If this person already exists (matched by email or name), we'll link to them instead of creating a duplicate.
+          </div>
+          <button type="button" style={ghostBtnStyle} onClick={() => setAddingContact(false)}>Cancel</button>
+        </div>
+      )}
 
       {error && <div style={{ color: 'var(--red)', fontSize: '0.65rem', marginBottom: '1rem' }}>{error}</div>}
 

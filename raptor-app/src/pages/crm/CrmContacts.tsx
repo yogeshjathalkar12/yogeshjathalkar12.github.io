@@ -3,6 +3,9 @@ import { supabase } from '../../lib/supabaseClient';
 import { relativeTime } from '../../lib/crmHelpers';
 import NewContactModal from '../../components/crm/NewContactModal';
 import ContactPanel from '../../components/crm/ContactPanel';
+import BulkImportModal from '../../components/crm/BulkImportModal';
+import ExportButton from '../../components/crm/ExportButton';
+import { CONTACTS_IMPORT_SCHEMA } from '../../lib/importSchema';
 
 const STATUS_COLORS: Record<string, { bg: string; fg: string }> = {
   hot: { bg: 'rgba(239,68,68,0.1)', fg: 'var(--red)' },
@@ -17,6 +20,7 @@ export default function CrmContacts() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [showNewContact, setShowNewContact] = useState(false);
+  const [showImport, setShowImport] = useState(false);
   const [activeContact, setActiveContact] = useState<any | null>(null);
 
   useEffect(() => {
@@ -73,7 +77,7 @@ export default function CrmContacts() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', marginBottom: '1.4rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', marginBottom: '1.4rem', flexWrap: 'wrap' }}>
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -83,16 +87,38 @@ export default function CrmContacts() {
             border: '1px solid var(--border)', color: 'var(--white)', fontFamily: 'var(--mono)', fontSize: '0.7rem', borderRadius: '4px',
           }}
         />
-        <button
-          onClick={() => setShowNewContact(true)}
-          style={{
-            background: 'var(--grad)', color: '#fff', border: 'none', padding: '0.6rem 1.1rem',
-            borderRadius: '4px', cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: '0.65rem',
-            letterSpacing: '0.08em', textTransform: 'uppercase',
-          }}
-        >
-          + New Contact
-        </button>
+        <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+          <ExportButton
+            data={contacts}
+            columns={[
+              { key: 'name', label: 'Name' },
+              { key: 'email', label: 'Email' },
+              { key: 'phone', label: 'Phone' },
+              { key: 'status', label: 'Status' },
+            ]}
+            filename="contacts"
+          />
+          <button
+            onClick={() => setShowImport(true)}
+            style={{
+              background: 'transparent', color: 'var(--dim)', border: '1px solid var(--border)', padding: '0.6rem 1.1rem',
+              borderRadius: '4px', cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: '0.65rem',
+              letterSpacing: '0.08em', textTransform: 'uppercase',
+            }}
+          >
+            Bulk Import
+          </button>
+          <button
+            onClick={() => setShowNewContact(true)}
+            style={{
+              background: 'var(--grad)', color: '#fff', border: 'none', padding: '0.6rem 1.1rem',
+              borderRadius: '4px', cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: '0.65rem',
+              letterSpacing: '0.08em', textTransform: 'uppercase',
+            }}
+          >
+            + New Contact
+          </button>
+        </div>
       </div>
 
       <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', overflow: 'hidden' }}>
@@ -143,6 +169,13 @@ export default function CrmContacts() {
       </div>
 
       <NewContactModal open={showNewContact} onClose={() => setShowNewContact(false)} onCreated={fetchAll} />
+      <BulkImportModal
+        open={showImport}
+        onClose={() => setShowImport(false)}
+        tableName="contacts"
+        schema={CONTACTS_IMPORT_SCHEMA}
+        onImported={fetchAll}
+      />
       <ContactPanel contact={activeContact} interactions={interactions} onClose={() => setActiveContact(null)} onChanged={fetchAll} />
     </div>
   );

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import Modal, { fieldLabelStyle, fieldInputStyle, primaryBtnStyle, ghostBtnStyle } from './Modal';
+import { findOrCreateCompany, findOrCreateContact } from '../../lib/crmContacts';
 
 const STAGE_OPTIONS = [
   { key: 'lead', label: 'New Lead' },
@@ -54,55 +55,19 @@ export default function NewDealModal({ open, onClose, onCreated }: NewDealModalP
     setError(null);
     setSaving(true);
     try {
-      // Find-or-create the company by name (case-insensitive match, same as before)
-      let companyId: string | null = null;
-      if (companyName.trim()) {
-        const { data: existingCompany } = await supabase
-          .from('companies')
-          .select('id')
-          .ilike('name', companyName.trim())
-          .maybeSingle();
+      // Both of these now go through the same identity resolution NewContactModal
+      // uses — same person, same company, no matter which form they were typed into.
+      const companyId = await findOrCreateCompany(companyName);
 
-        if (existingCompany) {
-          companyId = existingCompany.id;
-        } else {
-          const { data: newCompany, error: companyErr } = await supabase
-            .from('companies')
-            .insert({ name: companyName.trim() })
-            .select('id')
-            .single();
-          if (companyErr) throw companyErr;
-          companyId = newCompany.id;
-        }
-      }
-
-      // Find-or-create the contact within that company
       let contactId: string | null = null;
       if (contactName.trim()) {
-        const contactQuery = supabase
-          .from('contacts')
-          .select('id')
-          .ilike('name', contactName.trim());
-        const { data: existingContact } = companyId
-          ? await contactQuery.eq('company_id', companyId).maybeSingle()
-          : await contactQuery.maybeSingle();
-
-        if (existingContact) {
-          contactId = existingContact.id;
-        } else {
-          const { data: newContact, error: contactErr } = await supabase
-            .from('contacts')
-            .insert({
-              name: contactName.trim(),
-              email: contactEmail.trim() || null,
-              company_id: companyId,
-              status: 'active',
-            })
-            .select('id')
-            .single();
-          if (contactErr) throw contactErr;
-          contactId = newContact.id;
-        }
+        const { contact } = await findOrCreateContact({
+          name: contactName,
+          email: contactEmail,
+          companyId,
+          status: 'active',
+        });
+        contactId = contact.id;
       }
 
       const { error: dealErr } = await supabase.from('deals').insert({
