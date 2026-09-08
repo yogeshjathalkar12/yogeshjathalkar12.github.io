@@ -18,10 +18,7 @@ export function DashboardLayout() {
   const fullName = user?.user_metadata?.full_name || displayName;
   const isPro = plan.toLowerCase() === 'pro';
 
-  // "Intelligence Suite" is the original Arsenal tools; "automation" tools
-  // (currently just AI Content) get their own section below, next to
-  // Email/WhatsApp — none of those three are credit-metered utilities the
-  // way chronos/kmeans/montecarlo are, so they don't belong in the same list.
+  // "Intelligence Suite" tools vs "automation" tools
   const intelligenceTools = TOOLS.filter((t) => (t.category ?? 'intelligence') === 'intelligence');
   const automationTools = TOOLS.filter((t) => t.category === 'automation');
   const contentTool = automationTools.find((t) => t.slug === 'content');
@@ -57,8 +54,6 @@ export function DashboardLayout() {
             <div className="lamp-socket" />
             <div className="lamp-bulb" style={{ background: isLight ? '#ffaa00' : '#cbd5e1' }} />
           </div>
-
-          
 
           <div className="dash-user" onClick={() => setMenuOpen((v) => !v)} style={{ position: 'relative' }}>
             <div className="dash-user-avatar">{displayName[0]?.toUpperCase()}</div>
@@ -167,7 +162,6 @@ export function DashboardLayout() {
             </NavLink>
           </div>
 
-          {/* Sidebar footer — plan summary + upgrade CTA, pinned to the bottom */}
           <div style={{ padding: '1rem', borderTop: '1px solid var(--border)' }}>
             <div style={{ fontSize: '0.65rem', letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--dim)', marginBottom: '0.6rem' }}>
               {plan} Plan · {totalCredits} Credits/mo
@@ -184,7 +178,6 @@ export function DashboardLayout() {
           </div>
         </nav>
 
-        {/* The Outlet renders the nested routes while keeping the sidebar intact */}
         <main className="dash-main">
           <Outlet />
         </main>

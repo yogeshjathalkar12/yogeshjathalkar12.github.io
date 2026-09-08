@@ -3,6 +3,11 @@ import { NavLink, Outlet } from 'react-router-dom';
 const TABS = [
   { path: '/email/setup', label: 'Connection' },
   { path: '/email/campaigns', label: 'Campaigns' },
+  { path: '/email/segments', label: 'Segments' },
+  { path: '/email/triggers', label: 'Triggers' },
+  { path: '/email/followups', label: 'Follow-ups' },
+  { path: '/email/sequences', label: 'Sequences' },
+  { path: '/email/analytics', label: 'Analytics' },
 ];
 
 export default function EmailLayout() {

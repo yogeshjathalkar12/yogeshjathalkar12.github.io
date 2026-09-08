@@ -56,7 +56,7 @@ export default function DashboardHome() {
   return (
     <div style={{ padding: '2rem' }}>
       <div className="arsenal-hero-eyebrow">ShoonyaOrigins · Raptor</div>
-      <h1 className="arsenal-hero-title" style={{ marginBottom: '2rem' }}>Command Center. Welcome, {displayName}.</h1>
+      <h1 className="arsenal-hero-title" style={{ marginBottom: '2rem' }}>Workspace. Welcome, {displayName}.</h1>
 
       <div className="arsenal-stats" style={{ marginBottom: '3rem' }}>
         <div className="arsenal-stat">

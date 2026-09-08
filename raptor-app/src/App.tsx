@@ -28,6 +28,11 @@ import CrmMarketing from './pages/crm/CrmMarketing';
 import EmailLayout from './layouts/EmailLayout';
 import EmailConnectionSetup from './pages/email/EmailConnectionSetup';
 import EmailCampaigns from './pages/email/EmailCampaigns';
+import EmailTriggers from './pages/email/EmailTriggers';
+import EmailFollowups from './pages/email/EmailFollowups';
+import EmailSequences from './pages/email/EmailSequences';
+import EmailSegments from './pages/email/EmailSegments';
+import EmailAnalytics from './pages/email/EmailAnalytics';
 
 /* whatsapp files */
 import WhatsappLayout from './layouts/WhatsappLayout';
@@ -35,6 +40,9 @@ import WaConnectionSetup from './pages/whatsapp/WaConnectionSetup';
 import WaBroadcasts from './pages/whatsapp/WaBroadcasts';
 import WaSequences from './pages/whatsapp/WaSequences';
 import WaTriggers from './pages/whatsapp/WaTriggers';
+import WaInbox from './pages/whatsapp/WaInbox';
+import WaFlows from './pages/whatsapp/WaFlows';
+import WaFlowBuilder from './pages/whatsapp/WaFlowBuilder';
 
 /* playground */
 import Playground from './pages/playground/Playground';
@@ -79,11 +87,19 @@ export default function App() {
                       <Route index element={<Navigate to="setup" replace />} />
                       <Route path="setup" element={<EmailConnectionSetup />} />
                       <Route path="campaigns" element={<EmailCampaigns />} />
+                      <Route path="triggers" element={<EmailTriggers />} />
+                      <Route path="followups" element={<EmailFollowups />} />
+                      <Route path="sequences" element={<EmailSequences />} />
+                      <Route path="segments" element={<EmailSegments />} />
+                      <Route path="analytics" element={<EmailAnalytics />} />
                     </Route>
 
                     <Route path="/whatsapp" element={<WhatsappLayout />}>
                       <Route index element={<Navigate to="setup" replace />} />
                       <Route path="setup" element={<WaConnectionSetup />} />
+                      <Route path="inbox" element={<WaInbox />} />
+                      <Route path="flows" element={<WaFlows />} />
+                      <Route path="flows/:flowId" element={<WaFlowBuilder />} />
                       <Route path="broadcasts" element={<WaBroadcasts />} />
                       <Route path="sequences" element={<WaSequences />} />
                       <Route path="triggers" element={<WaTriggers />} />

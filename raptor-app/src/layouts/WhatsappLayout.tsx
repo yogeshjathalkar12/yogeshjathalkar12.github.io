@@ -2,6 +2,8 @@ import { NavLink, Outlet } from 'react-router-dom';
 
 const TABS = [
   { path: '/whatsapp/setup', label: 'Connection' },
+  { path: '/whatsapp/inbox', label: 'Inbox' },
+  { path: '/whatsapp/flows', label: 'AI Flows' },
   { path: '/whatsapp/broadcasts', label: 'Broadcasts' },
   { path: '/whatsapp/sequences', label: 'Sequences' },
   { path: '/whatsapp/triggers', label: 'Triggers' },
