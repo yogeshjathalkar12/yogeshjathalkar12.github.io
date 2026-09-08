@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { fieldInputStyle, primaryBtnStyle } from '../../components/crm/Modal';
+import EmailBodyEditor from '../../components/email/EmailBodyEditor';
 
 const CONDITIONS = [
   { value: 'opened', label: 'Opened the original email' },
@@ -21,10 +22,11 @@ export default function EmailFollowups() {
   const [condition, setCondition] = useState('not_opened');
   const [waitHours, setWaitHours] = useState('24');
   const [subject, setSubject] = useState('');
-  const [bodyHtml, setBodyHtml] = useState('<p>Hi {{first_name}},</p>\n\n<p></p>\n\n<p><a href="{{unsubscribe_url}}">Unsubscribe</a></p>');
+  const [bodyHtml, setBodyHtml] = useState('');
   const [isTransactional, setIsTransactional] = useState(false);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [formResetKey, setFormResetKey] = useState(0);
 
   useEffect(() => {
     fetchAccounts();
@@ -112,6 +114,7 @@ export default function EmailFollowups() {
       if (insertErr) throw insertErr;
       setName('');
       setSubject('');
+      setFormResetKey((k) => k + 1);
       fetchFollowups();
     } catch (err: any) {
       setError(err.message || 'Could not create follow-up.');
@@ -187,10 +190,11 @@ export default function EmailFollowups() {
                 </label>
               </div>
               <input style={fieldInputStyle} placeholder="Subject — supports {{first_name}} and {a|b} spintax" value={subject} onChange={(e) => setSubject(e.target.value)} />
-              <textarea
-                style={{ ...fieldInputStyle, minHeight: 160, fontFamily: 'var(--mono)', fontSize: '0.65rem', resize: 'vertical' }}
-                value={bodyHtml}
-                onChange={(e) => setBodyHtml(e.target.value)}
+              <EmailBodyEditor
+                key={formResetKey}
+                initialHtml={bodyHtml}
+                onChange={setBodyHtml}
+                requireUnsubscribe={!isTransactional}
               />
               <label style={{ fontSize: '0.65rem', color: 'var(--dim)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                 <input type="checkbox" checked={isTransactional} onChange={(e) => setIsTransactional(e.target.checked)} />

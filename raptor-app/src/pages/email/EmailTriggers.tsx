@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { fieldInputStyle, primaryBtnStyle } from '../../components/crm/Modal';
 import { toolApiBase } from '../../lib/config';
+import EmailBodyEditor from '../../components/email/EmailBodyEditor';
 
 const EMAIL_API = toolApiBase('email');
 
@@ -19,11 +20,12 @@ export default function EmailTriggers() {
   const [targetSequenceId, setTargetSequenceId] = useState('');
   const [sequences, setSequences] = useState<any[]>([]);
   const [subject, setSubject] = useState('');
-  const [bodyHtml, setBodyHtml] = useState('<p>Hi {{first_name}},</p>\n\n<p></p>\n\n<p><a href="{{unsubscribe_url}}">Unsubscribe</a></p>');
+  const [bodyHtml, setBodyHtml] = useState('');
   const [delayMinutes, setDelayMinutes] = useState('0');
   const [isTransactional, setIsTransactional] = useState(false);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [formResetKey, setFormResetKey] = useState(0);
 
   // Shopify's own request signature, separate from the shared
   // X-Webhook-Secret above — set once per account, never re-displayed.
@@ -135,6 +137,7 @@ export default function EmailTriggers() {
       setTargetSequenceId('');
       setDelayMinutes('0');
       setIsTransactional(false);
+      setFormResetKey((k) => k + 1);
       fetchTriggers();
     } catch (err: any) {
       setError(err.message || 'Could not create trigger.');
@@ -331,10 +334,11 @@ export default function EmailTriggers() {
           ) : (
             <>
               <input style={fieldInputStyle} placeholder="Subject — supports {{first_name}} and {a|b} spintax" value={subject} onChange={(e) => setSubject(e.target.value)} />
-              <textarea
-                style={{ ...fieldInputStyle, minHeight: 160, fontFamily: 'var(--mono)', fontSize: '0.65rem', resize: 'vertical' }}
-                value={bodyHtml}
-                onChange={(e) => setBodyHtml(e.target.value)}
+              <EmailBodyEditor
+                key={formResetKey}
+                initialHtml={bodyHtml}
+                onChange={setBodyHtml}
+                requireUnsubscribe={!isTransactional}
               />
             </>
           )}

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { fieldInputStyle, primaryBtnStyle } from '../../components/crm/Modal';
 import { toolApiBase } from '../../lib/config';
+import EmailBodyEditor from '../../components/email/EmailBodyEditor';
 
 const EMAIL_API = toolApiBase('email');
 
@@ -25,7 +26,7 @@ export default function EmailSequences() {
   const [creatingSequence, setCreatingSequence] = useState(false);
 
   const [stepSubject, setStepSubject] = useState('');
-  const [stepBodyHtml, setStepBodyHtml] = useState('<p>Hi {{first_name}},</p>\n\n<p></p>\n\n<p><a href="{{unsubscribe_url}}">Unsubscribe</a></p>');
+  const [stepBodyHtml, setStepBodyHtml] = useState('');
   const [stepDelayHours, setStepDelayHours] = useState('24');
   const [stepIsTransactional, setStepIsTransactional] = useState(false);
   const [addingStep, setAddingStep] = useState(false);
@@ -42,6 +43,7 @@ export default function EmailSequences() {
   const [enrollResult, setEnrollResult] = useState<string | null>(null);
 
   const [error, setError] = useState<string | null>(null);
+  const [formResetKey, setFormResetKey] = useState(0);
 
   useEffect(() => {
     fetchAccounts();
@@ -177,6 +179,7 @@ export default function EmailSequences() {
       setStepSubject('');
       setStepDelayHours('24');
       setStepIsTransactional(false);
+      setFormResetKey((k) => k + 1);
       fetchSteps();
     } catch (err: any) {
       setError(err.message || 'Could not add step.');
@@ -520,10 +523,11 @@ export default function EmailSequences() {
             <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.1rem', marginBottom: '1rem' }}>Add Step {steps.length + 1}</div>
             <form onSubmit={handleAddStep} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
               <input style={fieldInputStyle} placeholder="Subject — supports {{first_name}} and {a|b} spintax" value={stepSubject} onChange={(e) => setStepSubject(e.target.value)} />
-              <textarea
-                style={{ ...fieldInputStyle, minHeight: 140, fontFamily: 'var(--mono)', fontSize: '0.65rem', resize: 'vertical' }}
-                value={stepBodyHtml}
-                onChange={(e) => setStepBodyHtml(e.target.value)}
+              <EmailBodyEditor
+                key={formResetKey}
+                initialHtml={stepBodyHtml}
+                onChange={setStepBodyHtml}
+                requireUnsubscribe={!stepIsTransactional}
               />
               <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                 <label style={{ fontSize: '0.65rem', color: 'var(--dim)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>

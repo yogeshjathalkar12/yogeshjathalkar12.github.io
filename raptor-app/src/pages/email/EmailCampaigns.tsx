@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { fieldInputStyle, primaryBtnStyle } from '../../components/crm/Modal';
 import { toolApiBase } from '../../lib/config';
+import EmailBodyEditor from '../../components/email/EmailBodyEditor';
 
 const EMAIL_API = `${toolApiBase('email')}`; // now the same backend as every other tool — see lib/config.ts
 
@@ -13,7 +14,7 @@ export default function EmailCampaigns() {
 
   const [name, setName] = useState('');
   const [subject, setSubject] = useState('');
-  const [bodyHtml, setBodyHtml] = useState('<p>Hi {{first_name}},</p>\n\n<p></p>\n\n<p><a href="{{unsubscribe_url}}">Unsubscribe</a></p>');
+  const [bodyHtml, setBodyHtml] = useState('');
   const [audienceTag, setAudienceTag] = useState('');
   const [segments, setSegments] = useState<any[]>([]);
   const [segmentId, setSegmentId] = useState('');
@@ -23,13 +24,14 @@ export default function EmailCampaigns() {
   // A/B testing
   const [abTestEnabled, setAbTestEnabled] = useState(false);
   const [variants, setVariants] = useState<{ label: string; subject: string; body_html: string }[]>([
-    { label: 'A', subject: '', body_html: '<p>Hi {{first_name}},</p>\n\n<p></p>\n\n<p><a href="{{unsubscribe_url}}">Unsubscribe</a></p>' },
-    { label: 'B', subject: '', body_html: '<p>Hi {{first_name}},</p>\n\n<p></p>\n\n<p><a href="{{unsubscribe_url}}">Unsubscribe</a></p>' },
+    { label: 'A', subject: '', body_html: '' },
+    { label: 'B', subject: '', body_html: '' },
   ]);
   const [abTestPercentage, setAbTestPercentage] = useState('50');
   const [abWinnerMetric, setAbWinnerMetric] = useState<'click_rate' | 'open_rate'>('click_rate');
   const [abTestDurationHours, setAbTestDurationHours] = useState('4');
   const [decidingWinner, setDecidingWinner] = useState<string | null>(null);
+  const [formResetKey, setFormResetKey] = useState(0);
 
   useEffect(() => {
     fetchAccounts();
@@ -75,7 +77,7 @@ export default function EmailCampaigns() {
   function addVariant() {
     setVariants((prev) => [
       ...prev,
-      { label: String.fromCharCode(65 + prev.length), subject: '', body_html: '<p>Hi {{first_name}},</p>\n\n<p></p>\n\n<p><a href="{{unsubscribe_url}}">Unsubscribe</a></p>' },
+      { label: String.fromCharCode(65 + prev.length), subject: '', body_html: '' },
     ]);
   }
 
@@ -163,9 +165,10 @@ export default function EmailCampaigns() {
       setAudienceTag('');
       setAbTestEnabled(false);
       setVariants([
-        { label: 'A', subject: '', body_html: '<p>Hi {{first_name}},</p>\n\n<p></p>\n\n<p><a href="{{unsubscribe_url}}">Unsubscribe</a></p>' },
-        { label: 'B', subject: '', body_html: '<p>Hi {{first_name}},</p>\n\n<p></p>\n\n<p><a href="{{unsubscribe_url}}">Unsubscribe</a></p>' },
+        { label: 'A', subject: '', body_html: '' },
+        { label: 'B', subject: '', body_html: '' },
       ]);
+      setFormResetKey((k) => k + 1);
       fetchCampaigns();
     } catch (err: any) {
       setError(err.message || 'Could not create campaign.');
@@ -284,10 +287,10 @@ export default function EmailCampaigns() {
                     value={v.subject}
                     onChange={(e) => updateVariant(i, { subject: e.target.value })}
                   />
-                  <textarea
-                    style={{ ...fieldInputStyle, marginBottom: 0, minHeight: 120, fontFamily: 'var(--mono)', fontSize: '0.65rem', resize: 'vertical' }}
-                    value={v.body_html}
-                    onChange={(e) => updateVariant(i, { body_html: e.target.value })}
+                  <EmailBodyEditor
+                    key={`${formResetKey}-variant-${i}`}
+                    initialHtml={v.body_html}
+                    onChange={(html) => updateVariant(i, { body_html: html })}
                   />
                 </div>
               ))}
@@ -317,10 +320,10 @@ export default function EmailCampaigns() {
           ) : (
             <>
               <input style={fieldInputStyle} placeholder="Subject — supports {{first_name}} and {a|b} spintax" value={subject} onChange={(e) => setSubject(e.target.value)} />
-              <textarea
-                style={{ ...fieldInputStyle, minHeight: 160, fontFamily: 'var(--mono)', fontSize: '0.65rem', resize: 'vertical' }}
-                value={bodyHtml}
-                onChange={(e) => setBodyHtml(e.target.value)}
+              <EmailBodyEditor
+                key={`${formResetKey}-plain`}
+                initialHtml={bodyHtml}
+                onChange={setBodyHtml}
               />
             </>
           )}
