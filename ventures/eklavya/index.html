@@ -443,6 +443,80 @@
         }
 
         .hidden { display: none; }
+
+        /* --- FEATURE CARDS AS LINKS --- */
+        a.feature-card {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            transition: all 0.3s;
+        }
+        a.feature-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 15px 40px rgba(210, 6, 46, 0.1);
+            transform: translateY(-4px);
+        }
+        .feature-arrow {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-top: 12px;
+        }
+
+        /* --- SITE FOOTER --- */
+        footer.site-footer {
+            border-top: 1px solid var(--glass-border);
+            padding: 60px 6% 30px;
+            text-align: left;
+        }
+        .footer-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr;
+            gap: 32px;
+        }
+        .footer-col h4 {
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-main);
+            margin-bottom: 16px;
+        }
+        .footer-col a {
+            display: block;
+            font-size: 14px;
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-bottom: 10px;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+        .footer-col a:hover { color: var(--primary); }
+        .footer-brand .footer-tagline {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 40px auto 0;
+            padding-top: 24px;
+            border-top: 1px solid var(--divider);
+            text-align: center;
+            color: var(--text-light);
+            font-size: 13px;
+        }
+        .footer-bottom p { margin-bottom: 6px; }
+
+        @media (max-width: 900px) {
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 768px) {
+            .footer-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 
@@ -461,10 +535,10 @@
         </div>
     </nav>
 
-    <div class="hero">
+    <div class="hero" id="get-started">
         <div class="hero-tag">Career Guidance Platform</div>
         <h1>Continuous Career Guidance for India's Youth</h1>
-        <p>Eklavya helps students build an evolving profile of their interests, skills, and achievements from age 12 through professional life, and uses that to surface scholarships, colleges, internships, and career opportunities that actually fit them.</p>
+        <p>Eklavya helps students build an evolving profile of their interests, skills, and achievements from age 12 through professional life, and uses that to surface scholarships, colleges, internships, and career opportunities that actually fit them. Built directly into a real learning platform, so course activity, quiz performance, and practice sessions strengthen your profile automatically — not just what you type into a form.</p>
         <div class="hero-buttons">
             <button class="btn-primary" onclick="document.getElementById('loginPanel').style.display='flex'; window.scrollTo(0, 0);">Log In</button>
             <button class="btn-ghost" onclick="document.getElementById('signupPanel').style.display='flex'; window.scrollTo(0, 0);">Create Account</button>
@@ -525,8 +599,8 @@
             </div>
 
             <div class="solution-card">
-                <div class="card-title">Multi-Platform Coverage</div>
-                <div class="card-desc">Web platform for exploration and guidance, mobile app for daily logging, and a desktop client with offline support for students in low-connectivity areas.</div>
+                <div class="card-title">Learns From What You're Already Doing</div>
+                <div class="card-desc">Course completions, quiz scores, and mock-interview performance on the learning platform Eklavya is built on feed your profile automatically — every fact tagged with where it came from, so nothing you enter yourself is ever silently overwritten.</div>
             </div>
 
             <div class="solution-card">
@@ -539,7 +613,7 @@
     <div class="divider-line"></div>
 
     <!-- WHO IT'S FOR SECTION -->
-    <div class="section features-section">
+    <div class="section features-section" id="who-its-for">
         <div class="section-tag">Who It's For</div>
         <h2 class="section-title">Guidance at Every Stage</h2>
 
@@ -573,35 +647,41 @@
         <h2 class="section-title">What Eklavya Delivers</h2>
 
         <div class="features-grid">
-            <div class="feature-card">
+            <a class="feature-card" href="features/longitudinal-profiling.html">
                 <div class="feature-name">Longitudinal Profiling</div>
                 <div class="feature-desc">Continuous data collection from age 12 onwards. Academic records, skills, interests, and achievements shape a profile that grows more accurate over time.</div>
-            </div>
+                <div class="feature-arrow">Learn more →</div>
+            </a>
 
-            <div class="feature-card">
+            <a class="feature-card" href="features/personalized-matching.html">
                 <div class="feature-name">Personalized Matching</div>
                 <div class="feature-desc">Students are matched to opportunities based on their own profile, not generic filters — surfacing scholarships, colleges, internships, and jobs relevant to them specifically.</div>
-            </div>
+                <div class="feature-arrow">Learn more →</div>
+            </a>
 
-            <div class="feature-card">
+            <a class="feature-card" href="features/conversational-onboarding.html">
                 <div class="feature-name">Conversational Onboarding</div>
                 <div class="feature-desc">A guided, conversational intake process makes profile building simple and approachable from day one.</div>
-            </div>
+                <div class="feature-arrow">Learn more →</div>
+            </a>
 
-            <div class="feature-card">
+            <a class="feature-card" href="features/cross-platform-access.html">
                 <div class="feature-name">Cross-Platform Access</div>
-                <div class="feature-desc">Web platform for exploration, mobile app for daily logging, and a desktop client with offline capability. Profiles stay in sync across all of them.</div>
-            </div>
+                <div class="feature-desc">A full-featured web platform today, built on a shared backend so a mobile app for daily logging and an offline-capable desktop client can plug into the same profile as they're built out.</div>
+                <div class="feature-arrow">Learn more →</div>
+            </a>
 
-            <div class="feature-card">
+            <a class="feature-card" href="features/social-learning-communities.html">
                 <div class="feature-name">Social Learning Communities</div>
                 <div class="feature-desc">Interest-based groups let students connect with peers on similar paths, share resources, and stay motivated together.</div>
-            </div>
+                <div class="feature-arrow">Learn more →</div>
+            </a>
 
-            <div class="feature-card">
+            <a class="feature-card" href="features/curated-opportunity-database.html">
                 <div class="feature-name">Curated Opportunity Database</div>
                 <div class="feature-desc">A continuously updated database of scholarships, colleges, internships, jobs, and certifications, tagged and organized for easy discovery.</div>
-            </div>
+                <div class="feature-arrow">Learn more →</div>
+            </a>
         </div>
     </div>
 
@@ -620,7 +700,7 @@
 
                 <p>The approach is pragmatic: start with longitudinal data from age 12, build a clearer picture over the years, and compound better decision-making at each life stage — leading to more efficient talent discovery across India's economy.</p>
             </div>
-
+        </div>
     </div>
 
     <!-- AUTH PANELS -->
@@ -671,9 +751,43 @@
         </div>
     </div>
 
-    <footer>
-        <p>Copyright 2024 Eklavya Venture. Built by Shoonya Origins for India's Career Guidance.</p>
-        <p style="margin-top: 12px;">This venture is incubated under Shoonya Origins.</p>
+    <footer class="site-footer">
+        <div class="footer-grid">
+            <div class="footer-col footer-brand">
+                <a class="logo" href="index.html"><span>Eklavya</span></a>
+                <p class="footer-tagline">Continuous career guidance for India's youth.</p>
+            </div>
+            <div class="footer-col">
+                <h4>About Eklavya</h4>
+                <a href="#problem">The Problem</a>
+                <a href="#solution">The Solution</a>
+                <a href="#who-its-for">Who It's For</a>
+                <a href="#about">About the Venture</a>
+            </div>
+            <div class="footer-col">
+                <h4>Features</h4>
+                <a href="features/longitudinal-profiling.html">Longitudinal Profiling</a>
+                <a href="features/personalized-matching.html">Personalized Matching</a>
+                <a href="features/conversational-onboarding.html">Conversational Onboarding</a>
+                <a href="features/cross-platform-access.html">Cross-Platform Access</a>
+                <a href="features/social-learning-communities.html">Social Learning Communities</a>
+                <a href="features/curated-opportunity-database.html">Curated Opportunity Database</a>
+            </div>
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <a href="terms.html">Terms &amp; Conditions</a>
+                <a href="privacy.html">Privacy Policy</a>
+            </div>
+            <div class="footer-col">
+                <h4>My Account</h4>
+                <a onclick="document.getElementById('loginPanel').style.display='flex';">Log In</a>
+                <a onclick="document.getElementById('signupPanel').style.display='flex';">Create Account</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>Copyright 2024 Eklavya Venture. Built by Shoonya Origins for India's Career Guidance.</p>
+            <p>This venture is incubated under Shoonya Origins.</p>
+        </div>
     </footer>
 
     <script>
@@ -698,6 +812,15 @@
         document.getElementById('signupPanel').addEventListener('click', function(e) {
             if (e.target === this) this.style.display = 'none';
         });
+
+        // Auto-open the login/signup panel when arriving via #login or
+        // #signup (used by the footer links on terms.html, privacy.html,
+        // and the feature pages, since those don't duplicate this modal).
+        if (window.location.hash === '#login') {
+            document.getElementById('loginPanel').style.display = 'flex';
+        } else if (window.location.hash === '#signup') {
+            document.getElementById('signupPanel').style.display = 'flex';
+        }
     </script>
 </body>
 </html>

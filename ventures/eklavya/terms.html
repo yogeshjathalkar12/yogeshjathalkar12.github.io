@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms & Conditions | Eklavya</title>
+    <meta name="description" content="The terms and conditions governing use of the Eklavya career guidance platform.">
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #d2062e; --primary-light: #ff3d5c; --primary-dark: #8b0620; --accent: #f97316;
+            --bg-main: #fef8f9; --bg-secondary: #f5f0f2;
+            --glass-bg: rgba(255, 255, 255, 0.65); --glass-border: rgba(210, 6, 46, 0.2); --glass-hover: rgba(255, 255, 255, 0.85);
+            --text-main: #2c0715; --text-muted: #5a5a5a; --text-light: #999999; --divider: rgba(210, 6, 46, 0.1);
+        }
+        [data-theme="dark"] {
+            --bg-main: #0a0209; --bg-secondary: #1a0e12;
+            --glass-bg: rgba(15, 23, 42, 0.6); --glass-border: rgba(255, 61, 92, 0.15); --glass-hover: rgba(30, 41, 59, 0.8);
+            --text-main: #fef8f9; --text-muted: #c0c0c0; --text-light: #888888;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-main); color: var(--text-main); overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
+
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 6%; background: var(--glass-bg); backdrop-filter: blur(16px); border-bottom: 1px solid var(--glass-border); position: sticky; top: 0; z-index: 1000; }
+        .logo { font-size: 24px; font-weight: 800; color: var(--text-main); text-decoration: none; letter-spacing: -1px; }
+        .logo span { color: var(--primary); }
+        .nav-center { display: flex; gap: 3rem; align-items: center; }
+        .nav-link { font-size: 14px; font-weight: 600; color: var(--text-muted); text-decoration: none; transition: color 0.3s; }
+        .nav-link:hover { color: var(--primary); }
+        .nav-right { display: flex; gap: 1rem; align-items: center; }
+        .theme-toggle { cursor: pointer; background: transparent; border: 1px solid var(--glass-border); padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; color: var(--text-muted); transition: all 0.3s; }
+        .theme-toggle:hover { color: var(--primary); border-color: var(--primary); background: var(--glass-hover); }
+        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; border: none; padding: 11px 22px; border-radius: 50px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.3s; box-shadow: 0 8px 20px rgba(210, 6, 46, 0.2); text-decoration: none; display: inline-block; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(210, 6, 46, 0.3); }
+
+        .page-hero { padding: 70px 6% 40px; max-width: 900px; margin: 0 auto; }
+        .page-tag { font-size: 13px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; color: var(--primary); margin-bottom: 16px; }
+        .page-hero h1 { font-size: 44px; font-weight: 800; line-height: 1.2; letter-spacing: -1px; margin-bottom: 16px; }
+        .page-hero .updated { font-size: 14px; color: var(--text-light); }
+
+        .legal-notice { max-width: 900px; margin: 0 auto 20px; padding: 0 6%; }
+        .notice-box { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 20px 24px; font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+        .legal-content { max-width: 900px; margin: 0 auto; padding: 20px 6% 100px; font-size: 16px; line-height: 1.8; color: var(--text-muted); }
+        .legal-content h2 { font-size: 24px; font-weight: 800; color: var(--text-main); margin: 40px 0 14px; }
+        .legal-content h3 { font-size: 18px; font-weight: 700; color: var(--text-main); margin: 24px 0 10px; }
+        .legal-content p { margin-bottom: 14px; }
+        .legal-content ul { margin: 0 0 14px 22px; }
+        .legal-content li { margin-bottom: 8px; }
+
+        footer.site-footer { border-top: 1px solid var(--glass-border); padding: 60px 6% 30px; }
+        .footer-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr; gap: 32px; }
+        .footer-col h4 { font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-main); margin-bottom: 16px; }
+        .footer-col a { display: block; font-size: 14px; color: var(--text-muted); text-decoration: none; margin-bottom: 10px; transition: color 0.2s; }
+        .footer-col a:hover { color: var(--primary); }
+        .footer-brand .footer-tagline { font-size: 13px; color: var(--text-light); margin-top: 10px; line-height: 1.5; }
+        .footer-bottom { max-width: 1200px; margin: 40px auto 0; padding-top: 24px; border-top: 1px solid var(--divider); text-align: center; color: var(--text-light); font-size: 13px; }
+        .footer-bottom p { margin-bottom: 6px; }
+
+        @media (max-width: 900px) {
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+            .page-hero h1 { font-size: 32px; }
+        }
+        @media (max-width: 768px) {
+            .nav-center { display: none; }
+            .footer-grid { grid-template-columns: 1fr; }
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a class="logo" href="index.html"><span>Eklavya</span></a>
+        <div class="nav-center">
+            <a class="nav-link" href="index.html#problem">The Problem</a>
+            <a class="nav-link" href="index.html#solution">The Solution</a>
+            <a class="nav-link" href="index.html#features">Features</a>
+            <a class="nav-link" href="index.html#about">About</a>
+        </div>
+        <div class="nav-right">
+            <button class="theme-toggle" id="themeToggle">Dark Mode</button>
+            <a class="btn-primary" href="index.html#get-started">Get Started</a>
+        </div>
+    </nav>
+
+    <div class="page-hero">
+        <div class="page-tag">Legal</div>
+        <h1>Terms &amp; Conditions</h1>
+        <p class="updated">Last updated: September 2026</p>
+    </div>
+
+    <div class="legal-notice">
+        <div class="notice-box">
+            Eklavya is an early-stage venture incubated at Shoonya Origins. These terms are written for that stage — clear about what the service does and doesn't promise today — and will evolve as the platform matures. If you're evaluating Eklavya for a school or institution, please also see our Privacy Policy for how student data (including data for users under 18) is handled.
+        </div>
+    </div>
+
+    <div class="legal-content">
+        <h2>1. Acceptance of these terms</h2>
+        <p>By creating an account or otherwise using Eklavya, you agree to these Terms &amp; Conditions and our Privacy Policy. If you are under 18, a parent or guardian must also agree to these terms on your behalf, consistent with the parental consent process described in our Privacy Policy.</p>
+
+        <h2>2. What Eklavya is</h2>
+        <p>Eklavya is a longitudinal career-guidance platform: it helps you build an evolving profile of your academic history, interests, skills, and achievements, and uses that profile to surface scholarships, colleges, internships, certifications, and job opportunities that may be relevant to you. Where Eklavya is deployed alongside a school's learning platform, your course activity on that platform may automatically contribute signal to your Eklavya profile — this is described in detail in our Privacy Policy.</p>
+
+        <h2>3. What Eklavya is not</h2>
+        <ul>
+            <li>Eklavya is not a licensed career counselor, guidance counselor, or educational consultant, and nothing in the platform constitutes professional career, financial, legal, or educational advice.</li>
+            <li>Eklavya does not guarantee admission, selection, or acceptance to any scholarship, college, internship, or job it surfaces — recommendations are informational, based on an automated matching process, and final decisions always rest with the opportunity provider.</li>
+            <li>Eklavya does not independently verify every opportunity listed in its database for continued accuracy or availability at every moment; always confirm details (deadlines, eligibility) directly with the provider before applying.</li>
+        </ul>
+
+        <h2>4. Your account and responsibilities</h2>
+        <ul>
+            <li>You're responsible for the accuracy of the information you provide, and for keeping your login credentials secure.</li>
+            <li>You agree not to use Eklavya to submit false achievement records, impersonate another person, or misuse the community features (spam, harassment, or posting content that isn't your own).</li>
+            <li>If you use Eklavya's AI-assisted features, you understand your messages may be processed by a third-party AI provider as described in our Privacy Policy, and that AI-generated suggestions (career track classifications, profile extractions, opportunity matches) may occasionally be inaccurate and should be reviewed by you before you rely on them.</li>
+        </ul>
+
+        <h2>5. AI features and their limitations</h2>
+        <p>Eklavya's career-track classification is currently a rule-based approximation, not a machine-learning model trained on real outcome data — it is one input among several to help focus your search, not a definitive assessment of your abilities or potential. Match scores and recommendations are algorithmic estimates, not guarantees of suitability or eligibility.</p>
+
+        <h2>6. Fair use of AI features</h2>
+        <p>AI-powered features (conversational onboarding, opportunity matching explanations, and similar) are provided subject to usage limits designed to keep the service sustainable and prevent abuse. If your usage exceeds what your institution has provisioned, you may be asked to provide your own API key from a supported AI provider to continue.</p>
+
+        <h2>7. Community content</h2>
+        <p>Content you post in Eklavya's community features (interest groups, posts) is visible to other members of that group, or to other Eklavya users for ungrouped posts. Don't post anything you wouldn't want visible to peers on the platform. We may remove content that violates these terms or applicable law.</p>
+
+        <h2>8. Intellectual property</h2>
+        <p>The Eklavya name, branding, and platform software are the property of Shoonya Origins. You retain ownership of the content you personally submit (journal entries, achievement descriptions, posts), and grant us a limited license to store and display it back to you (and, where applicable, to the group you posted it in) as part of operating the service.</p>
+
+        <h2>9. Termination</h2>
+        <p>You may stop using Eklavya and request account deletion at any time. We may suspend or terminate accounts that violate these terms, misuse the platform, or pose a security risk to other users.</p>
+
+        <h2>10. Changes to the service and these terms</h2>
+        <p>Eklavya is an active, evolving venture. Features described on this site may change, and this early-stage product should be expected to evolve significantly as it matures. We'll update the "Last updated" date above when these terms change materially.</p>
+
+        <h2>11. Limitation of liability</h2>
+        <p>Eklavya is provided "as is," without warranty of any kind, express or implied. To the fullest extent permitted by law, Shoonya Origins is not liable for decisions made based on Eklavya's recommendations, or for the accuracy, availability, or outcome of any third-party opportunity listed on the platform.</p>
+
+        <h2>12. Contact</h2>
+        <p>Questions about these terms can be sent to <strong>legal@shoonyaorigins.com</strong>.</p>
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-grid">
+            <div class="footer-col footer-brand">
+                <a class="logo" href="index.html"><span>Eklavya</span></a>
+                <p class="footer-tagline">Continuous career guidance for India's youth.</p>
+            </div>
+            <div class="footer-col">
+                <h4>About Eklavya</h4>
+                <a href="index.html#problem">The Problem</a>
+                <a href="index.html#solution">The Solution</a>
+                <a href="index.html#who-its-for">Who It's For</a>
+                <a href="index.html#about">About the Venture</a>
+            </div>
+            <div class="footer-col">
+                <h4>Features</h4>
+                <a href="features/longitudinal-profiling.html">Longitudinal Profiling</a>
+                <a href="features/personalized-matching.html">Personalized Matching</a>
+                <a href="features/conversational-onboarding.html">Conversational Onboarding</a>
+                <a href="features/cross-platform-access.html">Cross-Platform Access</a>
+                <a href="features/social-learning-communities.html">Social Learning Communities</a>
+                <a href="features/curated-opportunity-database.html">Curated Opportunity Database</a>
+            </div>
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <a href="terms.html">Terms &amp; Conditions</a>
+                <a href="privacy.html">Privacy Policy</a>
+            </div>
+            <div class="footer-col">
+                <h4>My Account</h4>
+                <a href="index.html#login">Log In</a>
+                <a href="index.html#signup">Create Account</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>Copyright 2024 Eklavya Venture. Built by Shoonya Origins for India's Career Guidance.</p>
+            <p>This venture is incubated under Shoonya Origins.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('themeToggle').addEventListener('click', function() {
+            const html = document.documentElement;
+            const isDark = html.getAttribute('data-theme') === 'dark';
+            html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            localStorage.setItem('theme', isDark ? 'light' : 'dark');
+            this.textContent = isDark ? 'Dark Mode' : 'Light Mode';
+        });
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.getElementById('themeToggle').textContent = savedTheme === 'dark' ? 'Light Mode' : 'Dark Mode';
+    </script>
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy | Eklavya</title>
+    <meta name="description" content="How Eklavya collects, uses, and protects your data, including special protections for users under 18 under India's DPDP Act, 2023.">
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #d2062e; --primary-light: #ff3d5c; --primary-dark: #8b0620; --accent: #f97316;
+            --bg-main: #fef8f9; --bg-secondary: #f5f0f2;
+            --glass-bg: rgba(255, 255, 255, 0.65); --glass-border: rgba(210, 6, 46, 0.2); --glass-hover: rgba(255, 255, 255, 0.85);
+            --text-main: #2c0715; --text-muted: #5a5a5a; --text-light: #999999; --divider: rgba(210, 6, 46, 0.1);
+        }
+        [data-theme="dark"] {
+            --bg-main: #0a0209; --bg-secondary: #1a0e12;
+            --glass-bg: rgba(15, 23, 42, 0.6); --glass-border: rgba(255, 61, 92, 0.15); --glass-hover: rgba(30, 41, 59, 0.8);
+            --text-main: #fef8f9; --text-muted: #c0c0c0; --text-light: #888888;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-main); color: var(--text-main); overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
+
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 6%; background: var(--glass-bg); backdrop-filter: blur(16px); border-bottom: 1px solid var(--glass-border); position: sticky; top: 0; z-index: 1000; }
+        .logo { font-size: 24px; font-weight: 800; color: var(--text-main); text-decoration: none; letter-spacing: -1px; }
+        .logo span { color: var(--primary); }
+        .nav-center { display: flex; gap: 3rem; align-items: center; }
+        .nav-link { font-size: 14px; font-weight: 600; color: var(--text-muted); text-decoration: none; transition: color 0.3s; }
+        .nav-link:hover { color: var(--primary); }
+        .nav-right { display: flex; gap: 1rem; align-items: center; }
+        .theme-toggle { cursor: pointer; background: transparent; border: 1px solid var(--glass-border); padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; color: var(--text-muted); transition: all 0.3s; }
+        .theme-toggle:hover { color: var(--primary); border-color: var(--primary); background: var(--glass-hover); }
+        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; border: none; padding: 11px 22px; border-radius: 50px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.3s; box-shadow: 0 8px 20px rgba(210, 6, 46, 0.2); text-decoration: none; display: inline-block; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(210, 6, 46, 0.3); }
+
+        .page-hero { padding: 70px 6% 40px; max-width: 900px; margin: 0 auto; }
+        .page-tag { font-size: 13px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; color: var(--primary); margin-bottom: 16px; }
+        .page-hero h1 { font-size: 44px; font-weight: 800; line-height: 1.2; letter-spacing: -1px; margin-bottom: 16px; }
+        .page-hero .updated { font-size: 14px; color: var(--text-light); }
+
+        .legal-notice { max-width: 900px; margin: 0 auto 20px; padding: 0 6%; }
+        .notice-box { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 20px 24px; font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+        .legal-content { max-width: 900px; margin: 0 auto; padding: 20px 6% 100px; font-size: 16px; line-height: 1.8; color: var(--text-muted); }
+        .legal-content h2 { font-size: 24px; font-weight: 800; color: var(--text-main); margin: 40px 0 14px; }
+        .legal-content h3 { font-size: 18px; font-weight: 700; color: var(--text-main); margin: 24px 0 10px; }
+        .legal-content p { margin-bottom: 14px; }
+        .legal-content ul { margin: 0 0 14px 22px; }
+        .legal-content li { margin-bottom: 8px; }
+        .legal-content table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 14px; }
+        .legal-content th, .legal-content td { text-align: left; padding: 10px 12px; border: 1px solid var(--glass-border); }
+        .legal-content th { background: var(--glass-bg); color: var(--text-main); }
+        .source-tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 6px; background: var(--glass-bg); color: var(--primary); }
+
+        .divider-line { height: 1px; background: var(--divider); margin: 40px 0; }
+
+        footer.site-footer { border-top: 1px solid var(--glass-border); padding: 60px 6% 30px; }
+        .footer-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr; gap: 32px; }
+        .footer-col h4 { font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-main); margin-bottom: 16px; }
+        .footer-col a { display: block; font-size: 14px; color: var(--text-muted); text-decoration: none; margin-bottom: 10px; transition: color 0.2s; }
+        .footer-col a:hover { color: var(--primary); }
+        .footer-brand .footer-tagline { font-size: 13px; color: var(--text-light); margin-top: 10px; line-height: 1.5; }
+        .footer-bottom { max-width: 1200px; margin: 40px auto 0; padding-top: 24px; border-top: 1px solid var(--divider); text-align: center; color: var(--text-light); font-size: 13px; }
+        .footer-bottom p { margin-bottom: 6px; }
+
+        @media (max-width: 900px) {
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+            .page-hero h1 { font-size: 32px; }
+        }
+        @media (max-width: 768px) {
+            .nav-center { display: none; }
+            .footer-grid { grid-template-columns: 1fr; }
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a class="logo" href="index.html"><span>Eklavya</span></a>
+        <div class="nav-center">
+            <a class="nav-link" href="index.html#problem">The Problem</a>
+            <a class="nav-link" href="index.html#solution">The Solution</a>
+            <a class="nav-link" href="index.html#features">Features</a>
+            <a class="nav-link" href="index.html#about">About</a>
+        </div>
+        <div class="nav-right">
+            <button class="theme-toggle" id="themeToggle">Dark Mode</button>
+            <a class="btn-primary" href="index.html#get-started">Get Started</a>
+        </div>
+    </nav>
+
+    <div class="page-hero">
+        <div class="page-tag">Legal</div>
+        <h1>Privacy Policy</h1>
+        <p class="updated">Last updated: September 2026</p>
+    </div>
+
+    <div class="legal-notice">
+        <div class="notice-box">
+            <strong>Plain-language summary:</strong> Eklavya builds a career profile from what you tell us directly (forms, chat), what you do on the platform (courses, quizzes, practice sessions), and what our AI extracts from conversations you have with it — and we label every piece of your profile with where it came from, visible to you at all times. If you're under 18, we ask for a parent or guardian's consent before building anything beyond a basic account, in line with India's Digital Personal Data Protection Act, 2023 ("DPDP Act"). This is a working draft describing how the system is actually built — it has not yet been reviewed by a lawyer, and should be before Eklavya is used with real users at scale.
+        </div>
+    </div>
+
+    <div class="legal-content">
+        <h2>1. Who this policy covers</h2>
+        <p>This policy applies to anyone who creates an account on Eklavya, whether you access it directly or through a school/institution that has adopted the underlying learning platform Eklavya is built on top of. If you are under 18, this policy is written for your parent or guardian to read together with you.</p>
+
+        <h2>2. What we collect, and where it comes from</h2>
+        <p>Every fact in your career profile is tagged with a <span class="source-tag">source</span> so its origin is never ambiguous:</p>
+        <table>
+            <tr><th>Source tag</th><th>What it means</th><th>Examples</th></tr>
+            <tr><td><span class="source-tag">manual</span></td><td>You typed or selected it yourself</td><td>Age, education level, location, interests, skills, achievements, journal entries</td></tr>
+            <tr><td><span class="source-tag">llm_extracted</span></td><td>Our AI pulled it out of a conversation you had with it during onboarding</td><td>Academic records, interests, and skills mentioned in a chat</td></tr>
+            <tr><td><span class="source-tag">lms_sync</span></td><td>Derived automatically from your activity on the learning platform</td><td>Course completions, quiz scores, mock-interview performance</td></tr>
+            <tr><td><span class="source-tag">social</span></td><td>Inferred from your activity in Eklavya's community features</td><td>Group memberships based on declared interests</td></tr>
+        </table>
+        <p>We also collect standard account information (name, email, login method) and, if you sign up with Google, the basic profile information Google shares with us during sign-in.</p>
+
+        <h2>3. Age and parental consent (DPDP Act, 2023)</h2>
+        <p>Before we build out anything beyond a bare account, we ask you to declare your age. If you are under 18:</p>
+        <ul>
+            <li>We do not collect academic records, interests, skills, achievements, or journal entries until a parent or guardian has provided consent.</li>
+            <li>Consent is recorded against your account and can be withdrawn by contacting us (see Section 9).</li>
+            <li>We do not knowingly target advertising at children, and Eklavya carries no advertising today.</li>
+        </ul>
+        <p><strong>Where this is still a work in progress:</strong> our current consent mechanism records that consent was given, but does not yet independently verify that the person giving it is actually the account holder's parent or guardian (for example, via a confirmation link emailed to the parent). Treat this section as describing our intent and design direction, not a completed, audited compliance guarantee.</p>
+
+        <h2>4. How we use your data</h2>
+        <ul>
+            <li>To build and continuously update your career profile and completeness score.</li>
+            <li>To run our matching engine and surface scholarships, colleges, internships, and jobs relevant to you.</li>
+            <li>To power the conversational onboarding assistant and other AI features you choose to use.</li>
+            <li>To operate community features (interest groups, posts) you choose to participate in.</li>
+            <li>To maintain platform security and prevent abuse (for example, rate-limiting how often any one account can call our AI features).</li>
+        </ul>
+        <p>We do not sell your personal data. We do not use your journal entries or AI conversation transcripts for anything other than building your own profile — they are not shared with other users, teachers, or administrators under any circumstance, including platform administrators.</p>
+
+        <h2>5. AI features and conversation data</h2>
+        <p>When you use Eklavya's conversational onboarding, your messages are sent to a third-party AI provider (OpenAI or Anthropic, depending on configuration) to extract structured profile information. We instruct the AI to treat your messages strictly as information to extract from, never as instructions to follow, as a safeguard against manipulation of the assistant.</p>
+        <p>Raw conversation transcripts are retained for a limited period (currently 30 days) after which they are automatically deleted — only the structured facts extracted from them (tagged <span class="source-tag">llm_extracted</span>) remain in your profile after that.</p>
+        <p>If your institution has not yet provided AI access, or you've used your monthly allowance, you may be asked to provide your own API key for a third-party AI provider to continue using AI features. Keys you provide are encrypted before storage and are never visible to teachers, administrators, or other students.</p>
+
+        <h2>6. Who can see your data</h2>
+        <ul>
+            <li><strong>You</strong> can see everything in your own profile at all times.</li>
+            <li><strong>Nobody else</strong> — including platform administrators — can see your journal entries or AI conversation transcripts, without exception.</li>
+            <li>Your recommended opportunities and match scores are visible only to you.</li>
+            <li>If you post in a community group, that post is visible to other members of that group (or, for ungrouped posts, to other Eklavya users).</li>
+            <li>If you're affiliated with a school through the underlying learning platform, that school's administrators can see your enrollment and academic activity within their own school's courses — but not your Eklavya career profile, journal, or AI conversations.</li>
+        </ul>
+
+        <h2>7. Data retention</h2>
+        <p>We keep your profile data for as long as your account is active. Raw AI conversation transcripts are deleted automatically after 30 days. If you delete your account, we will delete your personal data within a reasonable period, except where we're required to retain records by law.</p>
+
+        <h2>8. Security</h2>
+        <p>Data is stored using row-level access controls so that, even at the database layer, most tables can only be read by their owning user. Sensitive credentials (encryption keys, institutional AI provider keys) are never hardcoded in our code or written to logs.</p>
+
+        <h2>9. Your rights and how to reach us</h2>
+        <p>You (or, for a minor, their parent/guardian) can request a copy of the data we hold, ask us to correct it, ask us to delete it, or withdraw parental consent at any time by emailing <strong>privacy@shoonyaorigins.com</strong>.</p>
+
+        <h2>10. Changes to this policy</h2>
+        <p>We'll update the "Last updated" date at the top of this page whenever this policy changes, and, for material changes, make a reasonable effort to notify active users directly.</p>
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-grid">
+            <div class="footer-col footer-brand">
+                <a class="logo" href="index.html"><span>Eklavya</span></a>
+                <p class="footer-tagline">Continuous career guidance for India's youth.</p>
+            </div>
+            <div class="footer-col">
+                <h4>About Eklavya</h4>
+                <a href="index.html#problem">The Problem</a>
+                <a href="index.html#solution">The Solution</a>
+                <a href="index.html#who-its-for">Who It's For</a>
+                <a href="index.html#about">About the Venture</a>
+            </div>
+            <div class="footer-col">
+                <h4>Features</h4>
+                <a href="features/longitudinal-profiling.html">Longitudinal Profiling</a>
+                <a href="features/personalized-matching.html">Personalized Matching</a>
+                <a href="features/conversational-onboarding.html">Conversational Onboarding</a>
+                <a href="features/cross-platform-access.html">Cross-Platform Access</a>
+                <a href="features/social-learning-communities.html">Social Learning Communities</a>
+                <a href="features/curated-opportunity-database.html">Curated Opportunity Database</a>
+            </div>
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <a href="terms.html">Terms &amp; Conditions</a>
+                <a href="privacy.html">Privacy Policy</a>
+            </div>
+            <div class="footer-col">
+                <h4>My Account</h4>
+                <a href="index.html#login">Log In</a>
+                <a href="index.html#signup">Create Account</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>Copyright 2024 Eklavya Venture. Built by Shoonya Origins for India's Career Guidance.</p>
+            <p>This venture is incubated under Shoonya Origins.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('themeToggle').addEventListener('click', function() {
+            const html = document.documentElement;
+            const isDark = html.getAttribute('data-theme') === 'dark';
+            html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            localStorage.setItem('theme', isDark ? 'light' : 'dark');
+            this.textContent = isDark ? 'Dark Mode' : 'Light Mode';
+        });
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.getElementById('themeToggle').textContent = savedTheme === 'dark' ? 'Light Mode' : 'Dark Mode';
+    </script>
+</body>
+</html>

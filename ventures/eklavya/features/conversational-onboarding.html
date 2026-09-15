@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversational Onboarding | Eklavya</title>
+    <meta name="description" content="Build your career profile by chatting naturally, or fill out a structured form — Eklavya extracts the same structured data either way.">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #d2062e; --primary-light: #ff3d5c; --primary-dark: #8b0620; --accent: #f97316;
+            --bg-main: #fef8f9; --bg-secondary: #f5f0f2;
+            --glass-bg: rgba(255, 255, 255, 0.65); --glass-border: rgba(210, 6, 46, 0.2); --glass-hover: rgba(255, 255, 255, 0.85);
+            --text-main: #2c0715; --text-muted: #5a5a5a; --text-light: #999999; --divider: rgba(210, 6, 46, 0.1);
+        }
+        [data-theme="dark"] {
+            --bg-main: #0a0209; --bg-secondary: #1a0e12;
+            --glass-bg: rgba(15, 23, 42, 0.6); --glass-border: rgba(255, 61, 92, 0.15); --glass-hover: rgba(30, 41, 59, 0.8);
+            --text-main: #fef8f9; --text-muted: #c0c0c0; --text-light: #888888;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-main); color: var(--text-main); overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 6%; background: var(--glass-bg); backdrop-filter: blur(16px); border-bottom: 1px solid var(--glass-border); position: sticky; top: 0; z-index: 1000; }
+        .logo { font-size: 24px; font-weight: 800; color: var(--text-main); text-decoration: none; letter-spacing: -1px; }
+        .logo span { color: var(--primary); }
+        .nav-center { display: flex; gap: 3rem; align-items: center; }
+        .nav-link { font-size: 14px; font-weight: 600; color: var(--text-muted); text-decoration: none; transition: color 0.3s; }
+        .nav-link:hover { color: var(--primary); }
+        .nav-right { display: flex; gap: 1rem; align-items: center; }
+        .theme-toggle { cursor: pointer; background: transparent; border: 1px solid var(--glass-border); padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; color: var(--text-muted); transition: all 0.3s; }
+        .theme-toggle:hover { color: var(--primary); border-color: var(--primary); background: var(--glass-hover); }
+        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; border: none; padding: 11px 22px; border-radius: 50px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.3s; box-shadow: 0 8px 20px rgba(210, 6, 46, 0.2); text-decoration: none; display: inline-block; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(210, 6, 46, 0.3); }
+        .breadcrumb { max-width: 900px; margin: 0 auto; padding: 24px 6% 0; font-size: 13px; color: var(--text-light); }
+        .breadcrumb a { color: var(--text-light); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--primary); }
+        .page-hero { padding: 20px 6% 40px; max-width: 900px; margin: 0 auto; }
+        .page-tag { font-size: 13px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; color: var(--primary); margin-bottom: 16px; }
+        .page-hero h1 { font-size: 44px; font-weight: 800; line-height: 1.2; letter-spacing: -1px; margin-bottom: 20px; }
+        .page-hero p { font-size: 18px; color: var(--text-muted); line-height: 1.65; max-width: 700px; }
+        .feature-body { max-width: 900px; margin: 0 auto; padding: 20px 6% 60px; }
+        .feature-body h2 { font-size: 26px; font-weight: 800; margin: 44px 0 16px; }
+        .feature-body p { font-size: 16px; color: var(--text-muted); line-height: 1.8; margin-bottom: 16px; }
+        .chat-mock { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 20px; margin: 20px 0; }
+        .chat-bubble { max-width: 75%; padding: 10px 16px; border-radius: 14px; font-size: 14px; margin-bottom: 10px; line-height: 1.5; }
+        .chat-bubble.bot { background: var(--bg-secondary); color: var(--text-main); }
+        .chat-bubble.user { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; margin-left: auto; }
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 20px; }
+        .detail-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; }
+        .detail-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 10px; }
+        .detail-card p { font-size: 14px; color: var(--text-muted); line-height: 1.65; margin: 0; }
+        .honesty-note { background: var(--bg-secondary); border-left: 3px solid var(--accent); border-radius: 8px; padding: 16px 20px; font-size: 14px; color: var(--text-muted); margin: 20px 0; }
+        .cta-band { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 40px; text-align: center; margin: 50px 0 20px; }
+        .cta-band h3 { font-size: 24px; font-weight: 800; margin-bottom: 12px; }
+        .cta-band p { color: var(--text-muted); margin-bottom: 20px; }
+        .other-features h4 { font-size: 13px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); margin-bottom: 16px; }
+        .other-links { display: flex; flex-wrap: wrap; gap: 10px; }
+        .other-links a { font-size: 13px; font-weight: 600; color: var(--text-muted); text-decoration: none; border: 1px solid var(--glass-border); padding: 8px 16px; border-radius: 50px; transition: all 0.2s; }
+        .other-links a:hover { color: var(--primary); border-color: var(--primary); }
+        footer.site-footer { border-top: 1px solid var(--glass-border); padding: 60px 6% 30px; }
+        .footer-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr; gap: 32px; }
+        .footer-col h4 { font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-main); margin-bottom: 16px; }
+        .footer-col a { display: block; font-size: 14px; color: var(--text-muted); text-decoration: none; margin-bottom: 10px; transition: color 0.2s; }
+        .footer-col a:hover { color: var(--primary); }
+        .footer-brand .footer-tagline { font-size: 13px; color: var(--text-light); margin-top: 10px; line-height: 1.5; }
+        .footer-bottom { max-width: 1200px; margin: 40px auto 0; padding-top: 24px; border-top: 1px solid var(--divider); text-align: center; color: var(--text-light); font-size: 13px; }
+        @media (max-width: 900px) { .footer-grid { grid-template-columns: 1fr 1fr; } .page-hero h1 { font-size: 32px; } .detail-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .nav-center { display: none; } .footer-grid { grid-template-columns: 1fr; } }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a class="logo" href="../index.html"><span>Eklavya</span></a>
+        <div class="nav-center">
+            <a class="nav-link" href="../index.html#problem">The Problem</a>
+            <a class="nav-link" href="../index.html#solution">The Solution</a>
+            <a class="nav-link" href="../index.html#features">Features</a>
+            <a class="nav-link" href="../index.html#about">About</a>
+        </div>
+        <div class="nav-right">
+            <button class="theme-toggle" id="themeToggle">Dark Mode</button>
+            <a class="btn-primary" href="../index.html#get-started">Get Started</a>
+        </div>
+    </nav>
+
+    <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../index.html#features">Features</a> / Conversational Onboarding</div>
+
+    <div class="page-hero">
+        <div class="page-tag">Feature</div>
+        <h1>Conversational Onboarding</h1>
+        <p>A blank profile form is intimidating, especially for a student who's never had career guidance before. Eklavya lets you just talk instead — and pulls the structured details out for you.</p>
+    </div>
+
+    <div class="feature-body">
+        <h2>Two ways to build your profile</h2>
+        <div class="detail-grid">
+            <div class="detail-card">
+                <h3>Chat naturally</h3>
+                <p>Tell Eklavya's assistant about yourself in your own words — your age, what you're studying, what you enjoy, what you're aiming for. It extracts the structured fields as you go.</p>
+            </div>
+            <div class="detail-card">
+                <h3>Or fill a structured form</h3>
+                <p>Prefer forms? A traditional multi-step form captures the exact same fields directly, no conversation required. Use either, or both — they write to the same profile.</p>
+            </div>
+        </div>
+
+        <h2>What that actually looks like</h2>
+        <div class="chat-mock">
+            <div class="chat-bubble user">I'm in class 11, I love biology and want to become a doctor.</div>
+            <div class="chat-bubble bot">Noted: 1 academic record, 1 interest (Medicine &amp; Healthcare), profile basics. Anything else you'd like to add?</div>
+        </div>
+
+        <h2>Every extraction is checked before it's trusted</h2>
+        <p>What the assistant pulls out of a conversation is validated against a strict schema before anything is saved — malformed or unclear extractions are never silently stored as fact. And your conversation is treated as data to extract from, never as instructions the assistant should follow, which protects the extraction process from being manipulated.</p>
+
+        <div class="honesty-note">
+            <strong>Data handling:</strong> raw conversation transcripts are kept only for a limited period after which they're automatically deleted — see our <a href="../privacy.html" style="color:var(--primary); font-weight:600;">Privacy Policy</a> for details. Only the structured facts extracted from a conversation remain in your profile afterward, clearly tagged as AI-extracted rather than manually entered.
+        </div>
+    </div>
+
+    <div class="cta-band" style="max-width:900px; margin-left:auto; margin-right:auto;">
+        <h3>Try it yourself</h3>
+        <p>Chat or fill a form — whichever feels easier.</p>
+        <a class="btn-primary" href="../index.html#get-started">Get Started</a>
+    </div>
+
+    <div class="other-features" style="max-width:900px; margin-left:auto; margin-right:auto;">
+        <h4>Explore other features</h4>
+        <div class="other-links">
+            <a href="longitudinal-profiling.html">Longitudinal Profiling</a>
+            <a href="personalized-matching.html">Personalized Matching</a>
+            <a href="cross-platform-access.html">Cross-Platform Access</a>
+            <a href="social-learning-communities.html">Social Learning Communities</a>
+            <a href="curated-opportunity-database.html">Curated Opportunity Database</a>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-grid">
+            <div class="footer-col footer-brand">
+                <a class="logo" href="../index.html"><span>Eklavya</span></a>
+                <p class="footer-tagline">Continuous career guidance for India's youth.</p>
+            </div>
+            <div class="footer-col">
+                <h4>About Eklavya</h4>
+                <a href="../index.html#problem">The Problem</a>
+                <a href="../index.html#solution">The Solution</a>
+                <a href="../index.html#who-its-for">Who It's For</a>
+                <a href="../index.html#about">About the Venture</a>
+            </div>
+            <div class="footer-col">
+                <h4>Features</h4>
+                <a href="longitudinal-profiling.html">Longitudinal Profiling</a>
+                <a href="personalized-matching.html">Personalized Matching</a>
+                <a href="conversational-onboarding.html">Conversational Onboarding</a>
+                <a href="cross-platform-access.html">Cross-Platform Access</a>
+                <a href="social-learning-communities.html">Social Learning Communities</a>
+                <a href="curated-opportunity-database.html">Curated Opportunity Database</a>
+            </div>
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <a href="../terms.html">Terms &amp; Conditions</a>
+                <a href="../privacy.html">Privacy Policy</a>
+            </div>
+            <div class="footer-col">
+                <h4>My Account</h4>
+                <a href="../index.html#login">Log In</a>
+                <a href="../index.html#signup">Create Account</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>Copyright 2024 Eklavya Venture. Built by Shoonya Origins for India's Career Guidance.</p>
+            <p>This venture is incubated under Shoonya Origins.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('themeToggle').addEventListener('click', function() {
+            const html = document.documentElement;
+            const isDark = html.getAttribute('data-theme') === 'dark';
+            html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            localStorage.setItem('theme', isDark ? 'light' : 'dark');
+            this.textContent = isDark ? 'Dark Mode' : 'Light Mode';
+        });
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.getElementById('themeToggle').textContent = savedTheme === 'dark' ? 'Light Mode' : 'Dark Mode';
+    </script>
+</body>
+</html>
