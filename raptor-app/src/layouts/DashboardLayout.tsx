@@ -127,6 +127,9 @@ export function DashboardLayout() {
             <NavLink to="/crm" className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
               <span className="dash-sidebar-icon">◫</span><span>Active CRM</span>
             </NavLink>
+            <NavLink to="/sync" className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
+              <span className="dash-sidebar-icon">⇄</span><span>Desktop Sync</span>
+            </NavLink>
 
             <div className="dash-sidebar-section-label">Automation</div>
             <NavLink to="/email" className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>

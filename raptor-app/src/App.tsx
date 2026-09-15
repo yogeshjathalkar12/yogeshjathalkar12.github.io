@@ -24,6 +24,14 @@ import CrmTickets from './pages/crm/CrmTickets';
 import CrmAnalytics from './pages/crm/CrmAnalytics';
 import CrmMarketing from './pages/crm/CrmMarketing';
 
+/* desktop sync files */
+import SyncLayout from './layouts/SyncLayout';
+import SyncPipeline from './pages/sync/SyncPipeline';
+import SyncDna from './pages/sync/SyncDna';
+import SyncDossiers from './pages/sync/SyncDossiers';
+import SyncPitches from './pages/sync/SyncPitches';
+import SyncCompetitors from './pages/sync/SyncCompetitors';
+
 /* email files */
 import EmailLayout from './layouts/EmailLayout';
 import EmailConnectionSetup from './pages/email/EmailConnectionSetup';
@@ -81,6 +89,15 @@ export default function App() {
                       <Route path="tickets" element={<CrmTickets />} />
                       <Route path="analytics" element={<CrmAnalytics />} />
                       <Route path="marketing" element={<CrmMarketing />} />
+                    </Route>
+
+                    <Route path="/sync" element={<SyncLayout />}>
+                      <Route index element={<Navigate to="pipeline" replace />} />
+                      <Route path="pipeline" element={<SyncPipeline />} />
+                      <Route path="dna" element={<SyncDna />} />
+                      <Route path="dossiers" element={<SyncDossiers />} />
+                      <Route path="pitches" element={<SyncPitches />} />
+                      <Route path="competitors" element={<SyncCompetitors />} />
                     </Route>
 
                     <Route path="/email" element={<EmailLayout />}>

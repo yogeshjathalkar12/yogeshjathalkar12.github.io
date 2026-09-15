@@ -2,7 +2,10 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import BulkImportModal from '../../components/crm/BulkImportModal';
 import ExportButton from '../../components/crm/ExportButton';
+import LiveCallPanel from '../../components/crm/LiveCallPanel';
 import { DEALS_IMPORT_SCHEMA } from '../../lib/importSchema';
+import { startCall } from '../../lib/calls';
+import { useAuth } from '../../hooks/AuthContext';
 
 const STAGES = [
   { key: 'lead', label: 'New Lead' },
@@ -12,9 +15,36 @@ const STAGES = [
 ];
 
 export default function CrmPipeline() {
+  const { session } = useAuth();
   const [deals, setDeals] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showImport, setShowImport] = useState(false);
+  const [activeCall, setActiveCall] = useState<{
+    prospectCompany: string; contactPhone: string | null; contactEmail: string | null;
+  } | null>(null);
+  const [callError, setCallError] = useState<string | null>(null);
+  const [callingDealId, setCallingDealId] = useState<string | null>(null);
+
+  const handleCall = async (e: React.MouseEvent, deal: any) => {
+    e.stopPropagation();
+    if (!deal.contacts?.id || !session?.access_token) return;
+    setCallError(null);
+    setCallingDealId(deal.id);
+    try {
+      const result = await startCall(session.access_token, deal.contacts.id);
+      setActiveCall({
+        prospectCompany: result.prospect_company,
+        contactPhone: result.contact_phone,
+        contactEmail: result.contact_email,
+      });
+    } catch (err: any) {
+      // Most likely cause: the desktop app isn't running on this machine —
+      // that's where the mic/call backend actually lives.
+      setCallError(err.message || 'Could not start call. Is the desktop app running?');
+    } finally {
+      setCallingDealId(null);
+    }
+  };
 
   // Initial load and Realtime Subscription
   useEffect(() => {
@@ -180,7 +210,18 @@ export default function CrmPipeline() {
                       </div>
                       <div style={{ fontSize: '0.7rem', color: 'var(--white)', margin: '0.3rem 0' }}>{deal.title}</div>
                       <div style={{ fontSize: '0.6rem', color: 'var(--dim)', marginBottom: '0.5rem' }}>{deal.companies?.name || '—'}</div>
-                      <div style={{ fontSize: '0.55rem', color: 'var(--dim2)' }}>{deal.contacts?.name || 'No contact'}</div>
+                      <div style={{ fontSize: '0.55rem', color: 'var(--dim2)', marginBottom: deal.contacts?.id ? '0.5rem' : 0 }}>
+                        {deal.contacts?.name || 'No contact'}
+                      </div>
+                      {deal.contacts?.id && (
+                        <button
+                          onClick={(e) => handleCall(e, deal)}
+                          disabled={callingDealId === deal.id}
+                          style={{ fontSize: '0.55rem', padding: '0.3rem 0.6rem', width: '100%' }}
+                        >
+                          {callingDealId === deal.id ? 'Connecting…' : 'Call'}
+                        </button>
+                      )}
                     </div>
                   ))
                 )}
@@ -189,6 +230,22 @@ export default function CrmPipeline() {
           );
         })}
       </div>
+
+      {callError && (
+        <div style={{ position: 'fixed', bottom: '1rem', right: '1rem', background: '#2d0d0d', border: '1px solid #4d1a1a', color: '#ff8888', padding: '0.8rem 1rem', borderRadius: '4px', fontSize: '0.65rem', zIndex: 1000 }}>
+          {callError}
+        </div>
+      )}
+
+      {activeCall && session?.access_token && (
+        <LiveCallPanel
+          accessToken={session.access_token}
+          prospectCompany={activeCall.prospectCompany}
+          contactPhone={activeCall.contactPhone}
+          contactEmail={activeCall.contactEmail}
+          onClose={() => setActiveCall(null)}
+        />
+      )}
 
       <BulkImportModal
         open={showImport}

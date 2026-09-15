@@ -9,6 +9,23 @@
 export const RAPTOR_API_URL: string =
   import.meta.env.VITE_RAPTOR_API_URL || 'https://websites-api-5wmu.onrender.com';
 
+// The LOCAL desktop app's backend (raptor/api/server.py), not the hosted
+// one above. Only reachable when the desktop app is actually running on
+// this machine — that's a hard requirement for calls, since mic capture
+// only exists there. Requires https://shoonyaorigins.com to be added to
+// that server's RAPTOR_ALLOWED_ORIGINS (CORS) for this to work from a
+// plain browser tab rather than an Electron shell.
+export const RAPTOR_LOCAL_API_URL: string =
+  import.meta.env.VITE_RAPTOR_LOCAL_API_URL || 'http://localhost:8765';
+
+// Matches raptor-ui's App.js convention exactly (CLIENT_ID = localStorage
+// 'raptor_client_id' || 'default') — the desktop backend's multi-tenant
+// "client_id" concept is separate from Supabase auth (contacts/deals use
+// owner_id = auth.uid()), so for a single-account setup this just needs
+// to match whatever the desktop app is already using.
+export const RAPTOR_CLIENT_ID: string =
+  (typeof window !== 'undefined' && window.localStorage.getItem('raptor_client_id')) || 'default';
+
 export const SUPABASE_URL: string =
   import.meta.env.VITE_SUPABASE_URL || 'https://pcdbtcpctlnvdtbrrqoo.supabase.co';
 
