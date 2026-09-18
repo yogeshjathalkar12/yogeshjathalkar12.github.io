@@ -124,6 +124,7 @@
         <ul>
             <li>We do not collect academic records, interests, skills, achievements, or journal entries until a parent or guardian has provided consent.</li>
             <li>Consent is recorded against your account and can be withdrawn by contacting us (see Section 9).</li>
+            <li>Automatic syncing of your course activity into your career profile is also paused until consent is recorded.</li>
             <li>We do not knowingly target advertising at children, and Eklavya carries no advertising today.</li>
         </ul>
         <p><strong>Where this is still a work in progress:</strong> our current consent mechanism records that consent was given, but does not yet independently verify that the person giving it is actually the account holder's parent or guardian (for example, via a confirmation link emailed to the parent). Treat this section as describing our intent and design direction, not a completed, audited compliance guarantee.</p>
@@ -152,16 +153,34 @@
             <li>If you're affiliated with a school through the underlying learning platform, that school's administrators can see your enrollment and academic activity within their own school's courses — but not your Eklavya career profile, journal, or AI conversations.</li>
         </ul>
 
-        <h2>7. Data retention</h2>
-        <p>We keep your profile data for as long as your account is active. Raw AI conversation transcripts are deleted automatically after 30 days. If you delete your account, we will delete your personal data within a reasonable period, except where we're required to retain records by law.</p>
+        <h2>7. Data retention and deletion</h2>
+        <p>We keep your profile data for as long as your account is active. Raw AI conversation transcripts are deleted automatically after 30 days.</p>
+        <p>Students can delete their account themselves from the <strong>Account</strong> tab in the app. This permanently removes your login and everything linked to it — profile, career records, journal, progress, and messages you sent — and cannot be undone. Teacher and administrator accounts own shared content (courses, exams, audit history) and are deleted by the platform administrator on request instead. Some records may be kept where the law requires it.</p>
 
         <h2>8. Security</h2>
         <p>Data is stored using row-level access controls so that, even at the database layer, most tables can only be read by their owning user. Sensitive credentials (encryption keys, institutional AI provider keys) are never hardcoded in our code or written to logs.</p>
 
-        <h2>9. Your rights and how to reach us</h2>
-        <p>You (or, for a minor, their parent/guardian) can request a copy of the data we hold, ask us to correct it, ask us to delete it, or withdraw parental consent at any time by emailing <strong>privacy@shoonyaorigins.com</strong>.</p>
+        <h2>9. Service providers and where your data is stored</h2>
+        <p>Eklavya relies on the following third parties to operate. Each processes data on our behalf only as needed to provide the service:</p>
+        <table>
+            <tr><th>Provider</th><th>What it does for Eklavya</th></tr>
+            <tr><td>Supabase</td><td>Hosts the database and handles sign-in. Your account, profile, and all stored records live here (Asia-Pacific region).</td></tr>
+            <tr><td>Render</td><td>Runs Eklavya's application server (Singapore region). Requests pass through it to reach the database.</td></tr>
+            <tr><td>Google</td><td>Signs you in ("Continue with Google"). We receive your name, email address, and profile picture as Google provides them.</td></tr>
+            <tr><td>OpenAI or Anthropic</td><td>Processes messages you send to AI features so they can respond, as described in Section 5.</td></tr>
+        </table>
+        <p>This means your data is processed outside India. We do not sell it to any of these providers or anyone else.</p>
 
-        <h2>10. Changes to this policy</h2>
+        <h2>10. Your rights and how to reach us</h2>
+        <p>You (or, for a minor, their parent/guardian) can:</p>
+        <ul>
+            <li><strong>Get a copy of your data</strong> — use <em>Download my data</em> in the Account tab.</li>
+            <li><strong>Delete your account</strong> — use the Account tab (students), as described in Section 7.</li>
+            <li><strong>Correct your data</strong> — edit or remove any profile entry directly in the app.</li>
+            <li><strong>Withdraw parental consent, ask a question, or raise a complaint</strong> — email <strong>privacy@shoonyaorigins.com</strong>. This is also our point of contact for grievances, and we will respond within a reasonable time.</li>
+        </ul>
+
+        <h2>11. Changes to this policy</h2>
         <p>We'll update the "Last updated" date at the top of this page whenever this policy changes, and, for material changes, make a reasonable effort to notify active users directly.</p>
     </div>
 
@@ -199,7 +218,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>Copyright 2024 Eklavya Venture. Built by Shoonya Origins for India's Career Guidance.</p>
+            <p>Copyright 2026 Eklavya Venture. Built by Shoonya Origins for India's Career Guidance.</p>
             <p>This venture is incubated under Shoonya Origins.</p>
         </div>
     </footer>
