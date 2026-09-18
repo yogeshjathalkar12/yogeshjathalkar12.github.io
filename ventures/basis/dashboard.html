@@ -1314,6 +1314,23 @@ function escapeHtml(str) {
 // ── REPORT AN ISSUE ─────────────────────────────────
 let reportCoords = { lat: 18.5204, lng: 73.8567 };
 let reportPhotoUrl = null;
+let reportPhotoUploading = false;
+
+// Uploads to the existing public 'basis-images' Storage bucket (the same
+// one the anonymous report flow already uses) under a per-user path, so
+// training/review tooling can fetch it by URL later.
+async function uploadReportPhoto(file) {
+  if (!supabaseClient || !state.user) throw new Error('Not signed in');
+  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+  const path = `reports/${state.user.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const { error } = await supabaseClient.storage.from('basis-images').upload(path, file, {
+    contentType: file.type || 'image/jpeg',
+    upsert: false
+  });
+  if (error) throw error;
+  const { data } = supabaseClient.storage.from('basis-images').getPublicUrl(path);
+  return data.publicUrl;
+}
 
 function initReportMap() {
   const map = L.map('reportMap').setView([reportCoords.lat, reportCoords.lng], 12);
@@ -1370,6 +1387,8 @@ function wireUploadArea(areaId, onFile) {
 }
 
 async function submitReport() {
+  if (reportPhotoUploading) { showToast('Photo is still uploading — one moment', 'error'); return; }
+
   const btn = document.getElementById('reportSubmitBtn');
   const category = document.getElementById('reportCategory').value;
   const credits = parseInt(document.getElementById('reportCategory').selectedOptions[0].dataset.credits, 10);
@@ -1815,7 +1834,20 @@ document.getElementById('globalSearch').addEventListener('keydown', (e) => {
 });
 
 // ── FILE UPLOAD WIRING ───────────────────────────────
-wireUploadArea('reportUploadArea', (file, dataUrl) => { reportPhotoUrl = dataUrl; /* NOTE: swap for real Storage upload before going live */ });
+wireUploadArea('reportUploadArea', async (file, dataUrl) => {
+  const area = document.getElementById('reportUploadArea');
+  reportPhotoUrl = null;
+  reportPhotoUploading = true;
+  try {
+    reportPhotoUrl = await uploadReportPhoto(file);
+    area.innerHTML = `<img class="upload-preview" src="${dataUrl}" alt="Preview"><p class="upload-text" style="margin-top:0.5rem;"><strong>✓ Uploaded</strong> — click to replace</p>`;
+  } catch (e) {
+    showToast('Photo upload failed — try again', 'error');
+    area.innerHTML = `<p class="upload-text"><strong>Upload failed</strong> — click to retry</p>`;
+  } finally {
+    reportPhotoUploading = false;
+  }
+});
 wireUploadArea('disposalUploadArea', (file, dataUrl) => { /* stored as proof only for this MVP pass */ });
 
 // ── INIT ─────────────────────────────────────────────

@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Moderation — Basis</title>
+
+<!-- ═══ SECURITY: Content Security Policy (matches dashboard.html) ═══ -->
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src 'self' https://fonts.gstatic.com;
+  img-src 'self' data: blob: https:;
+  connect-src 'self' https://*.supabase.co https://*.onrender.com https://*.supabase.in;
+  frame-ancestors 'none';
+  base-uri 'self';
+  form-action 'self';
+" />
+<meta http-equiv="X-Frame-Options" content="DENY" />
+<meta http-equiv="X-Content-Type-Options" content="nosniff" />
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+<meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), payment=(), usb=()" />
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+<style>
+/* ═══ DESIGN TOKENS — identical to dashboard.html / main site ═══ */
+:root {
+  --bg: #F0F7F9; --surface: rgba(224,242,254,0.45); --card: rgba(255,255,255,0.72);
+  --border: rgba(8,145,178,0.13); --border2: rgba(8,145,178,0.28);
+  --accent: #0891B2; --text: #1E293B; --muted: #64748B; --dim: #94A3B8;
+  --safe: #059669; --warning: #B45309; --danger: #9F1239; --heading: #0F172A;
+  --header-bg: rgba(240,247,249,0.88); --accent-tint: rgba(8,145,178,0.05); --accent-tint2: rgba(8,145,178,0.10);
+  --glow-sm: rgba(8,145,178,0.18);
+  --font-display: 'Cormorant Garamond', serif; --font-body: 'Plus Jakarta Sans', sans-serif; --font-mono: 'Space Mono', monospace;
+}
+html[data-theme="dark"] {
+  --bg: #090E1A; --surface: #0D1626; --card: rgba(13,22,38,0.85);
+  --border: rgba(0,212,255,0.10); --border2: rgba(0,212,255,0.20);
+  --accent: #00D4FF; --text: #E2EAF0; --muted: #6B8EAD; --dim: #3D5A7A;
+  --safe: #10B981; --warning: #F59E0B; --danger: #EF4444; --heading: #ffffff;
+  --header-bg: rgba(9,14,26,0.88); --accent-tint: rgba(0,212,255,0.04); --accent-tint2: rgba(0,212,255,0.08);
+  --glow-sm: rgba(0,212,255,0.25);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; transition: background .35s ease, color .35s ease; }
+a { color: inherit; }
+
+header { position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border); background: var(--header-bg); backdrop-filter: blur(20px); }
+.header-inner { max-width: 1400px; margin: 0 auto; padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.logo { font-family: var(--font-mono); font-size: 20px; font-weight: 700; letter-spacing: 3px; text-decoration: none; color: var(--text); }
+.logo span { color: var(--accent); }
+.logo-sub { font-family: var(--font-mono); font-size: 10px; color: var(--dim); letter-spacing: 2px; text-transform: uppercase; margin-left: 10px; padding-left: 10px; border-left: 1px solid var(--border2); }
+.header-actions { display: flex; align-items: center; gap: 10px; }
+.theme-toggle, .link-btn { width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 14px; }
+.theme-toggle:hover, .link-btn:hover { border-color: var(--accent); color: var(--accent); }
+.back-link { font-family: var(--font-mono); font-size: 11px; color: var(--muted); text-decoration: none; letter-spacing: 1px; border: 1px solid var(--border); border-radius: 6px; padding: 8px 14px; }
+.back-link:hover { color: var(--accent); border-color: var(--accent); }
+
+.wrap { max-width: 1400px; margin: 0 auto; padding: 28px 24px 80px; }
+.page-title { font-family: var(--font-display); font-size: 30px; font-weight: 700; color: var(--heading); margin-bottom: 6px; }
+.page-sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+
+.layout { display: grid; grid-template-columns: 320px 1fr; gap: 24px; align-items: start; }
+@media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+
+/* ─── QUEUE LIST ─────────────────────────────────────── */
+.queue-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+.queue-head { padding: 16px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.queue-head h3 { font-family: var(--font-body); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+.queue-count { font-family: var(--font-mono); font-size: 11px; background: var(--accent-tint2); color: var(--accent); padding: 3px 9px; border-radius: 20px; }
+.queue-list { max-height: 74vh; overflow-y: auto; }
+.queue-item { display: flex; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background .2s ease; }
+.queue-item:hover { background: var(--accent-tint); }
+.queue-item.active { background: var(--accent-tint2); border-left: 3px solid var(--accent); }
+.queue-thumb { width: 48px; height: 48px; border-radius: 8px; object-fit: cover; background: var(--surface); flex-shrink: 0; }
+.queue-meta { min-width: 0; }
+.queue-cat { font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.queue-sub { font-family: var(--font-mono); font-size: 10px; color: var(--dim); margin-top: 3px; }
+.queue-empty { padding: 40px 20px; text-align: center; color: var(--muted); font-size: 13px; }
+
+/* ─── REVIEW WORKSPACE ───────────────────────────────── */
+.review-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 24px; min-height: 400px; }
+.review-empty { display: flex; align-items: center; justify-content: center; min-height: 400px; color: var(--muted); font-size: 14px; text-align: center; padding: 40px; }
+.review-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+.review-tag { font-family: var(--font-mono); font-size: 11px; color: var(--accent); letter-spacing: 1px; text-transform: uppercase; }
+.review-title { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--heading); margin-top: 4px; }
+.review-conf { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+
+.canvas-wrap { position: relative; display: inline-block; max-width: 100%; border-radius: 10px; overflow: hidden; background: #000; user-select: none; }
+.canvas-wrap img { display: block; max-width: 100%; height: auto; max-height: 62vh; user-select: none; -webkit-user-drag: none; }
+.box-overlay { position: absolute; border: 2px solid; box-sizing: border-box; cursor: move; }
+.box-overlay .box-label { position: absolute; top: -22px; font-family: var(--font-mono); font-size: 10px; padding: 2px 5px; border-radius: 3px; color: #fff; white-space: nowrap; display: flex; align-items: center; gap: 4px; max-width: max-content; }
+.box-overlay .box-del { cursor: pointer; font-weight: 700; padding: 0 2px; }
+.box-overlay .box-cls { font-family: var(--font-body); font-size: 10px; border: none; border-radius: 3px; padding: 1px 2px; background: rgba(255,255,255,0.9); color: #111; max-width: 110px; }
+.box-overlay .box-handle { position: absolute; right: -5px; bottom: -5px; width: 12px; height: 12px; border-radius: 50%; background: #fff; border: 2px solid; cursor: nwse-resize; }
+
+.hint { font-size: 12px; color: var(--dim); margin: 14px 0; }
+.action-row { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+.btn { font-family: var(--font-body); font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 12px 22px; border-radius: 8px; border: none; cursor: pointer; transition: all .25s ease; }
+.btn-approve { background: var(--safe); color: #fff; }
+.btn-correct { background: var(--accent); color: #fff; box-shadow: 0 0 20px var(--glow-sm); }
+.btn-reject { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+.btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border2); }
+.btn:hover { transform: translateY(-2px); }
+.btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+.gate { display: flex; align-items: center; justify-content: center; min-height: 60vh; text-align: center; padding: 40px; }
+.gate h2 { font-family: var(--font-display); font-size: 26px; margin-bottom: 10px; color: var(--heading); }
+.gate p { color: var(--muted); font-size: 14px; max-width: 420px; }
+
+.toast { position: fixed; bottom: 2rem; right: 2rem; z-index: 9000; background: var(--card); backdrop-filter: blur(16px); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 10px; padding: 1rem 1.4rem; font-size: .82rem; color: var(--text); transform: translateY(120%); transition: transform .4s cubic-bezier(.16,1,.3,1); max-width: 340px; box-shadow: 0 20px 50px rgba(0,0,0,.15); }
+.toast.show { transform: translateY(0); }
+.toast.error { border-left-color: var(--danger); }
+.toast.success { border-left-color: var(--safe); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div style="display:flex; align-items:center;">
+      <a href="/index.html" class="logo">BA<span>S</span>IS</a>
+      <span class="logo-sub">Moderation</span>
+    </div>
+    <div class="header-actions">
+      <a href="/dashboard.html" class="back-link">← Dashboard</a>
+      <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div id="gateView" style="display:none;" class="gate">
+    <div>
+      <h2>Moderator access required</h2>
+      <p id="gateMessage">Checking your access…</p>
+    </div>
+  </div>
+
+  <div id="mainView" style="display:none;">
+    <div class="page-title">Label Review Queue</div>
+    <div class="page-sub">Confirm or correct the AI's bounding boxes before they're used to retrain the shared model.</div>
+
+    <div class="layout">
+      <div class="queue-card">
+        <div class="queue-head">
+          <h3>Pending</h3>
+          <span class="queue-count" id="queueCount">0</span>
+        </div>
+        <div class="queue-list" id="queueList"><div class="queue-empty">Loading…</div></div>
+      </div>
+
+      <div class="review-card" id="reviewCard">
+        <div class="review-empty">Select an item from the queue to begin reviewing.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// CONFIG — shared with dashboard.html via the same localStorage keys,
+// so setting it once in Settings there applies here too.
+// ═══════════════════════════════════════════════════════════════
+const BASIS_API_URL = localStorage.getItem('basis_api_url') || 'https://basis-backend.onrender.com/api/basis';
+const SUPABASE_URL  = localStorage.getItem('basis_sb_url')  || 'https://vtxhqqiugnzdnfifykcc.supabase.co';
+const SUPABASE_KEY  = localStorage.getItem('basis_sb_key')  || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0eGhxcWl1Z256ZG5maWZ5a2NjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1NzI0NjYsImV4cCI6MjA5MTE0ODQ2Nn0.aKmv8a8uKVotRDZvorF_QZSOuBHER3PywIcxywmONJA';
+const supabaseClient = SUPABASE_URL.startsWith('http') ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
+// Must stay in sync with basis-backend/model.py's CLASS_NAMES order — the
+// index IS the class id stored in every box.
+const CLASS_NAMES = ['Pothole','Garbage','Dumpster','Road Crack','Water Logging','Manhole','Street Light Broken','Sidewalk Damage','Graffiti','Billboard Damage','Soil Erosion'];
+const CLASS_COLORS = ['#E6194B','#3CB44B','#CC9A00','#4363D8','#F58231','#911EB4','#1FA8C9','#C2185B','#7CB342','#FF6F91','#469990'];
+// Mirrors basis-backend/review_queue.py's CATEGORY_TO_CLASSES — used only to
+// pick a sensible default class when a moderator draws a brand-new box.
+const CATEGORY_TO_CLASSES = {
+  'Pothole / Road Damage': ['Pothole','Road Crack'],
+  'Garbage / Illegal Dumping': ['Garbage','Dumpster'],
+  'Sewage / Drainage Problem': ['Water Logging','Manhole'],
+  'Broken Infrastructure': ['Sidewalk Damage','Street Light Broken','Billboard Damage'],
+  'Traffic Law Violation': [],
+  'Littering': ['Garbage'],
+  'Streetlight Failure': ['Street Light Broken'],
+  'Other': [],
+};
+
+// ── THEME ──────────────────────────────────────────────────────
+const themeBtn = document.getElementById('themeToggle');
+if (localStorage.getItem('basis-theme') === 'dark') { document.documentElement.setAttribute('data-theme','dark'); themeBtn.textContent = '☀️'; }
+themeBtn.addEventListener('click', () => {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  themeBtn.textContent = isDark ? '🌙' : '☀️';
+  localStorage.setItem('basis-theme', isDark ? 'light' : 'dark');
+});
+
+// ── TOAST ──────────────────────────────────────────────────────
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast ' + type + ' show';
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+// ── AUTH ───────────────────────────────────────────────────────
+async function getAuthHeader() {
+  if (!supabaseClient) return null;
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) return null;
+  return { 'Authorization': `Bearer ${session.access_token}`, 'Content-Type': 'application/json' };
+}
+
+// ── STATE ──────────────────────────────────────────────────────
+const state = { queue: [], selected: null, boxes: [], originalBoxes: [], dragging: null };
+
+function showGate(message) {
+  document.getElementById('gateView').style.display = 'flex';
+  document.getElementById('mainView').style.display = 'none';
+  document.getElementById('gateMessage').textContent = message;
+}
+function showMain() {
+  document.getElementById('gateView').style.display = 'none';
+  document.getElementById('mainView').style.display = 'block';
+}
+
+// ── LOAD QUEUE ─────────────────────────────────────────────────
+async function loadQueue() {
+  const headers = await getAuthHeader();
+  if (!headers) { showGate('Sign in first, then reopen this page.'); return; }
+
+  let res;
+  try {
+    res = await fetch(`${BASIS_API_URL}/moderation/queue`, { headers });
+  } catch (e) {
+    showGate('Could not reach the Basis backend. Check BASIS_API_URL in Settings on the Dashboard.');
+    return;
+  }
+
+  if (res.status === 403) { showGate("You're signed in, but this account isn't a moderator yet. Ask an existing moderator to add you."); return; }
+  if (res.status === 401) { showGate('Session expired — sign in again.'); return; }
+  if (!res.ok) { showGate('Failed to load the review queue.'); return; }
+
+  state.queue = await res.json();
+  showMain();
+  renderQueueList();
+}
+
+function renderQueueList() {
+  document.getElementById('queueCount').textContent = state.queue.length;
+  const list = document.getElementById('queueList');
+  if (!state.queue.length) {
+    list.innerHTML = '<div class="queue-empty">Queue is empty — nothing waiting for review.</div>';
+    return;
+  }
+  list.innerHTML = state.queue.map(item => `
+    <div class="queue-item ${state.selected && state.selected.id === item.id ? 'active' : ''}" data-id="${item.id}">
+      <img class="queue-thumb" src="${item.image_url}" loading="lazy" onerror="this.style.opacity=0.2">
+      <div class="queue-meta">
+        <div class="queue-cat">${escapeHtml(item.tagged_category)}</div>
+        <div class="queue-sub">${(item.ai_boxes||[]).length} AI box(es) · ${new Date(item.created_at).toLocaleDateString('en-IN')}</div>
+      </div>
+    </div>
+  `).join('');
+  list.querySelectorAll('.queue-item').forEach(el => {
+    el.addEventListener('click', () => selectItem(el.dataset.id));
+  });
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str ?? '';
+  return div.innerHTML;
+}
+
+// ── SELECT + RENDER REVIEW WORKSPACE ────────────────────────────
+function selectItem(id) {
+  const item = state.queue.find(q => q.id === id);
+  if (!item) return;
+  state.selected = item;
+  state.originalBoxes = (item.ai_boxes || []).map(b => ({ ...b }));
+  state.boxes = state.originalBoxes.map(b => ({ ...b }));
+  renderQueueList();
+  renderReviewCard();
+}
+
+function renderReviewCard() {
+  const item = state.selected;
+  const card = document.getElementById('reviewCard');
+  const confText = item.ai_confidence != null ? `${Math.round(item.ai_confidence * 100)}% AI confidence` : 'No confident AI match';
+
+  card.innerHTML = `
+    <div class="review-top">
+      <div>
+        <div class="review-tag">Tagged as</div>
+        <div class="review-title">${escapeHtml(item.tagged_category)}</div>
+      </div>
+      <div class="review-conf">${confText}</div>
+    </div>
+    <div class="canvas-wrap" id="canvasWrap">
+      <img id="reviewImg" src="${item.image_url}" alt="Reported issue">
+    </div>
+    <div class="hint">Drag a box to move it, use the corner handle to resize, or click-drag on empty space to draw a new one. Pick a class from each box's dropdown.</div>
+    <div class="action-row">
+      <button class="btn btn-approve" id="btnApprove">✓ Approve AI Boxes</button>
+      <button class="btn btn-correct" id="btnCorrect">Save Correction &amp; Approve</button>
+      <button class="btn btn-reject" id="btnReject">✕ Reject</button>
+      <button class="btn btn-ghost" id="btnReset">Reset to AI</button>
+    </div>
+  `;
+
+  const img = document.getElementById('reviewImg');
+  const draw = () => renderBoxes();
+  if (img.complete) draw(); else img.addEventListener('load', draw, { once: true });
+
+  document.getElementById('btnApprove').addEventListener('click', () => submitDecision('approve'));
+  document.getElementById('btnCorrect').addEventListener('click', () => submitDecision('correct'));
+  document.getElementById('btnReject').addEventListener('click', () => submitDecision('reject'));
+  document.getElementById('btnReset').addEventListener('click', () => { state.boxes = state.originalBoxes.map(b => ({ ...b })); renderBoxes(); });
+}
+
+// ── BOX OVERLAY EDITOR ───────────────────────────────────────────
+function renderBoxes() {
+  const wrap = document.getElementById('canvasWrap');
+  const img = document.getElementById('reviewImg');
+  if (!wrap || !img) return;
+  wrap.querySelectorAll('.box-overlay').forEach(el => el.remove());
+
+  const w = img.clientWidth, h = img.clientHeight;
+  state.boxes.forEach((box, idx) => {
+    const el = document.createElement('div');
+    el.className = 'box-overlay';
+    const color = CLASS_COLORS[box.cls % CLASS_COLORS.length];
+    el.style.borderColor = color;
+    el.style.left   = ((box.x - box.w / 2) * w) + 'px';
+    el.style.top    = ((box.y - box.h / 2) * h) + 'px';
+    el.style.width  = (box.w * w) + 'px';
+    el.style.height = (box.h * h) + 'px';
+
+    const label = document.createElement('div');
+    label.className = 'box-label';
+    label.style.background = color;
+    // Right-align the label for boxes in the right half so its dropdown
+    // never overflows past the image edge on a narrow viewport.
+    if (box.x > 0.5) { label.style.right = '-2px'; } else { label.style.left = '-2px'; }
+    const sel = document.createElement('select');
+    sel.className = 'box-cls';
+    sel.innerHTML = CLASS_NAMES.map((n, i) => `<option value="${i}" ${i === box.cls ? 'selected' : ''}>${n}</option>`).join('');
+    sel.addEventListener('mousedown', e => e.stopPropagation());
+    sel.addEventListener('change', () => { box.cls = parseInt(sel.value, 10); renderBoxes(); });
+    const del = document.createElement('span');
+    del.className = 'box-del'; del.textContent = '✕';
+    del.addEventListener('mousedown', e => { e.stopPropagation(); state.boxes.splice(idx, 1); renderBoxes(); });
+    label.appendChild(sel); label.appendChild(del);
+    el.appendChild(label);
+
+    const handle = document.createElement('div');
+    handle.className = 'box-handle';
+    handle.style.borderColor = color;
+    el.appendChild(handle);
+
+    el.addEventListener('mousedown', e => startDrag(e, box, 'move'));
+    handle.addEventListener('mousedown', e => startDrag(e, box, 'resize'));
+
+    wrap.appendChild(el);
+  });
+}
+
+function startDrag(e, box, mode) {
+  e.preventDefault(); e.stopPropagation();
+  const img = document.getElementById('reviewImg');
+  const rect = img.getBoundingClientRect();
+  const startX = e.clientX, startY = e.clientY;
+  const start = { x: box.x, y: box.y, w: box.w, h: box.h };
+
+  function onMove(ev) {
+    const dx = (ev.clientX - startX) / rect.width;
+    const dy = (ev.clientY - startY) / rect.height;
+    if (mode === 'move') {
+      box.x = clamp(start.x + dx, box.w / 2, 1 - box.w / 2);
+      box.y = clamp(start.y + dy, box.h / 2, 1 - box.h / 2);
+    } else {
+      box.w = clamp(start.w + dx, 0.01, 1);
+      box.h = clamp(start.h + dy, 0.01, 1);
+      box.x = clamp(box.x, box.w / 2, 1 - box.w / 2);
+      box.y = clamp(box.y, box.h / 2, 1 - box.h / 2);
+    }
+    renderBoxes();
+  }
+  function onUp() { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); }
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+}
+
+function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+// Click-drag on empty canvas space draws a brand-new box.
+document.addEventListener('mousedown', e => {
+  const wrap = e.target.closest && e.target.closest('#canvasWrap');
+  if (!wrap || e.target.id !== 'reviewImg') return; // only start a new box from the bare image, not from an existing overlay
+  const img = document.getElementById('reviewImg');
+  const rect = img.getBoundingClientRect();
+  const startX = e.clientX, startY = e.clientY;
+
+  const defaultClasses = CATEGORY_TO_CLASSES[state.selected.tagged_category] || [];
+  const defaultCls = defaultClasses.length ? CLASS_NAMES.indexOf(defaultClasses[0]) : 0;
+  const newBox = { cls: defaultCls, x: 0, y: 0, w: 0, h: 0 };
+  let added = false;
+
+  function onMove(ev) {
+    const x0 = clamp((startX - rect.left) / rect.width, 0, 1);
+    const y0 = clamp((startY - rect.top) / rect.height, 0, 1);
+    const x1 = clamp((ev.clientX - rect.left) / rect.width, 0, 1);
+    const y1 = clamp((ev.clientY - rect.top) / rect.height, 0, 1);
+    newBox.x = (x0 + x1) / 2; newBox.y = (y0 + y1) / 2;
+    newBox.w = Math.abs(x1 - x0); newBox.h = Math.abs(y1 - y0);
+    if (!added && (newBox.w > 0.01 && newBox.h > 0.01)) { state.boxes.push(newBox); added = true; }
+    if (added) renderBoxes();
+  }
+  function onUp() {
+    document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp);
+    if (added && (newBox.w < 0.015 || newBox.h < 0.015)) { state.boxes.pop(); renderBoxes(); } // discard accidental clicks
+  }
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+});
+
+// ── SUBMIT DECISION ──────────────────────────────────────────────
+async function submitDecision(action) {
+  const item = state.selected;
+  if (!item) return;
+  const headers = await getAuthHeader();
+  if (!headers) { showToast('Session expired — sign in again', 'error'); return; }
+
+  const body = { action };
+  if (action === 'correct') {
+    if (!state.boxes.length) { showToast('Draw at least one box, or use Reject instead', 'error'); return; }
+    // Strip stale ai-only fields (confidence, class_name) — once a human has
+    // touched a box, only cls/x/y/w/h are meaningful ground truth.
+    body.boxes = state.boxes.map(b => ({ cls: b.cls, x: b.x, y: b.y, w: b.w, h: b.h }));
+  }
+
+  try {
+    const res = await fetch(`${BASIS_API_URL}/moderation/review/${item.id}`, {
+      method: 'POST', headers, body: JSON.stringify(body)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Request failed' }));
+      throw new Error(err.detail || 'Request failed');
+    }
+    showToast(`Item ${action === 'reject' ? 'rejected' : 'approved'}`, 'success');
+    state.queue = state.queue.filter(q => q.id !== item.id);
+    state.selected = null;
+    document.getElementById('reviewCard').innerHTML = '<div class="review-empty">Select an item from the queue to begin reviewing.</div>';
+    renderQueueList();
+  } catch (e) {
+    showToast(e.message || 'Could not save review', 'error');
+  }
+}
+
+window.addEventListener('resize', () => { if (state.selected) renderBoxes(); });
+
+// ── INIT ───────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  if (!supabaseClient) { showGate('Supabase is not configured on this page.'); return; }
+  // Same race-condition guard used in dashboard.html: wait for the first
+  // auth event instead of trusting an immediate getSession() call.
+  supabaseClient.auth.onAuthStateChange((_event, session) => {
+    if (!session) { showGate('Sign in on the main site first, then reopen this page.'); return; }
+    loadQueue();
+  });
+});
+</script>
+</body>
+</html>
