@@ -131,6 +131,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="rx-footer.css">
 
 <!-- ═══════════════════════════════════════════════════
      SUPABASE CLIENT
@@ -141,6 +142,7 @@
 <link rel="icon" type="image/x-icon" href="icon.ico">
 </head>
 <body>
+<script>try{if(localStorage.getItem('raptor-theme')==='dark')document.body.classList.add('dark-mode')}catch(e){}</script>
 
 <!-- TRUST BAR: crawlable, conversion-boosting signal -->
 <div class="trust-bar">
@@ -164,6 +166,7 @@
 <nav style="background-color: rgba(52, 49, 49, 0.57);">
   <div class="nav-logo">Raptor</div>
   <ul class="nav-links">
+    <li><a href="/ventures/raptor/features/">Features</a></li>
     <li><a href="/ventures/raptor/pricing/">Pricing</a></li>
     <li><a href="/ventures/raptor/tools/">Tools</a></li>
     <li><a href="/about/blogs/">Blog</a></li>
@@ -653,7 +656,7 @@
 </div>
 
 <!-- WHO -->
-<div class="who-section">
+<div class="who-section" id="who">
   <div class="who-inner">
     <div class="label reveal">Built For</div>
     <h2 class="big-title reveal">Serious<br><em>Builders.</em></h2>
@@ -797,6 +800,81 @@
   </div>
 </div>
 
+<!-- EXPLORE EVERY FEATURE -->
+<div class="cap-section" id="explore">
+  <div class="cap-inner">
+    <div class="cap-header">
+      <div>
+        <div class="label reveal">Explore</div>
+        <h2 class="big-title reveal">Every Feature.<br><em>Its Own Page.</em></h2>
+      </div>
+      <p class="prose reveal">Ten capabilities, one loop. Read how each one works, what it needs, and what it never sends off your machine.</p>
+    </div>
+    <div class="cap-grid">
+      <a class="cap-item reveal" href="/ventures/raptor/features/company-dna.html">
+        <div class="cap-index">01 · Foundation</div>
+        <h3>Company DNA</h3>
+        <p>Teach Raptor your business once, from your website and your own documents.</p>
+      </a>
+      <a class="cap-item reveal" href="/ventures/raptor/features/autonomous-prospecting.html">
+        <div class="cap-index">02 · Hunting</div>
+        <h3>Autonomous Prospecting</h3>
+        <p>Find, enrich and rank ideal-fit companies, with the reasons shown.</p>
+      </a>
+      <a class="cap-item reveal" href="/ventures/raptor/features/competitive-intelligence.html">
+        <div class="cap-index">03 · Intelligence</div>
+        <h3>Competitive Intelligence</h3>
+        <p>Discover competitors and keep a living battle card on each one.</p>
+      </a>
+      <a class="cap-item reveal" href="/ventures/raptor/features/ai-pitch-studio.html">
+        <div class="cap-index">04 · Precision</div>
+        <h3>AI Pitch Studio</h3>
+        <p>Personalised pitches, fact-checked against your DNA before you see them.</p>
+      </a>
+      <a class="cap-item reveal" href="/ventures/raptor/features/live-call-intelligence.html">
+        <div class="cap-index">05 · Execution</div>
+        <h3>Live Call Intelligence</h3>
+        <p>Local transcription and one useful suggestion at a time, live.</p>
+      </a>
+      <a class="cap-item reveal" href="/ventures/raptor/features/self-learning-engine.html">
+        <div class="cap-index">06 · Evolution</div>
+        <h3>Self-Learning Engine</h3>
+        <p>Measures what wins and steers the next pitch, channel and timing.</p>
+      </a>
+      <a class="cap-item reveal" href="/ventures/raptor/features/outreach-automation.html">
+        <div class="cap-index">07 · Reach</div>
+        <h3>Outreach Automation</h3>
+        <p>Email and WhatsApp campaigns, sequences and follow-ups at a human pace.</p>
+      </a>
+      <a class="cap-item reveal" href="/ventures/raptor/features/free-crm.html">
+        <div class="cap-index">08 · Pipeline</div>
+        <h3>Free CRM</h3>
+        <p>Contacts, deals, tickets and analytics, connected to everything else.</p>
+      </a>
+      <a class="cap-item reveal" href="/ventures/raptor/features/sales-arsenal.html">
+        <div class="cap-index">09 · Tools</div>
+        <h3>Sales Arsenal</h3>
+        <p>Twenty-one sales tools: nine free calculators and twelve in-app utilities.</p>
+      </a>
+      <a class="cap-item reveal" href="/ventures/raptor/features/local-first-privacy.html">
+        <div class="cap-index">10 · Sovereignty</div>
+        <h3>Local-First & Private</h3>
+        <p>Your data and your AI stay on your machine. What leaves is listed.</p>
+      </a>
+      <a class="cap-item reveal" href="/ventures/raptor/why-raptor.html">
+        <div class="cap-index">11 · Compare</div>
+        <h3>Why Raptor</h3>
+        <p>How one learning loop differs from a stack of separate tools, including where it may not fit yet.</p>
+      </a>
+      <a class="cap-item reveal" href="/ventures/raptor/pricing/">
+        <div class="cap-index">12 · Plans</div>
+        <h3>Pricing</h3>
+        <p>Start free with the CRM and 21 tools. Plans for solo founders through to on-premise enterprise.</p>
+      </a>
+    </div>
+  </div>
+</div>
+
 <!-- CTA -->
 <div class="cta-section">
   <div class="cta-glow"></div>
@@ -821,25 +899,53 @@
     <span class="cta-micro-item">Stable v1.0</span>
   </div>
 </div>
-<footer class="main-footer">
-    <div class="footer-inner">
-        <div class="footer-brand">Raptor · Shoonya<span>Origins</span></div>
-        
-        <div class="footer-links" aria-label="Footer navigation">
-            <a href="https://www.linkedin.com/in/yogesh-jathalkar-67b179208/" target="_blank">LinkedIn</a>
-            <a href="/about">About</a>
-            <a href="/about/blogs" target="_blank">Blogs</a>
-            <a href="mailto:yogeshjathalkar@gmail.com">Contact Us</a>
-            <a href="/about/privacy.html">Privacy Policy</a>
-            <a href="/about/terms.html">Terms of Service</a>
-            <a href="/about/disclaimer.html">Legal Disclaimer</a>
-        </div>
-
-        <div class="footer-meta">
-            <p>&copy; 2026 Shoonya Origins. All Rights Reserved.</p>
-            <p class="footer-location">System Active · Pune, India</p>
-        </div>
+<footer class="rx-footer">
+  <div class="rx-footer-grid">
+    <div class="rx-col rx-col-brand">
+      <a class="rx-brand-link" href="/ventures/raptor/"><img src="/ventures/raptor/logo.png" alt="" width="40" height="40"><span class="rx-footer-wordmark">Raptor</span></a>
+      <p class="rx-tagline">The self-learning AI sales brain for B2B teams.</p>
+      <p class="rx-byline">By Shoonya Origins &middot; Pune, India</p>
     </div>
+    <div class="rx-col">
+      <h4>About Raptor</h4>
+      <a href="/ventures/raptor/why-raptor.html">Why Raptor</a>
+      <a href="/ventures/raptor/#loop">How It Works</a>
+      <a href="/ventures/raptor/#who">Who It's For</a>
+      <a href="/ventures/raptor/pricing/">Pricing</a>
+      <a href="/about/">About Shoonya Origins</a>
+    </div>
+    <div class="rx-col">
+      <h4>Features</h4>
+      <a href="/ventures/raptor/features/company-dna.html">Company DNA</a>
+      <a href="/ventures/raptor/features/autonomous-prospecting.html">Autonomous Prospecting</a>
+      <a href="/ventures/raptor/features/competitive-intelligence.html">Competitive Intelligence</a>
+      <a href="/ventures/raptor/features/ai-pitch-studio.html">AI Pitch Studio</a>
+      <a href="/ventures/raptor/features/live-call-intelligence.html">Live Call Intelligence</a>
+      <a href="/ventures/raptor/features/self-learning-engine.html">Self-Learning Engine</a>
+      <a href="/ventures/raptor/features/outreach-automation.html">Outreach Automation</a>
+      <a href="/ventures/raptor/features/free-crm.html">Free CRM</a>
+      <a href="/ventures/raptor/features/sales-arsenal.html">Sales Arsenal</a>
+      <a href="/ventures/raptor/features/local-first-privacy.html">Local-First &amp; Private</a>
+      <a href="/ventures/raptor/features/">All features &rarr;</a>
+    </div>
+    <div class="rx-col">
+      <h4>Legal</h4>
+      <a href="/ventures/raptor/terms.html">Terms &amp; Conditions</a>
+      <a href="/ventures/raptor/privacy.html">Privacy Policy</a>
+      <a href="/about/disclaimer.html">Legal Disclaimer</a>
+    </div>
+    <div class="rx-col">
+      <h4>My Account</h4>
+      <a href="/ventures/raptor/?auth=login">Log In</a>
+      <a href="/ventures/raptor/?auth=signup">Create Account</a>
+      <a href="https://github.com/yogeshjathalkar12/raptor/releases/download/v0.1.1/Raptor.Setup.0.1.1.exe">Download for Windows</a>
+      <a href="mailto:contact@shoonyaorigins.com">Contact Us</a>
+    </div>
+  </div>
+  <div class="rx-bottom">
+    <p>Copyright 2026 Raptor. Built by Shoonya Origins for B2B sales teams.</p>
+    <p>This venture is incubated under Shoonya Origins.</p>
+  </div>
 </footer>
 
 <!-- ═══════════════════════════════════════════════════

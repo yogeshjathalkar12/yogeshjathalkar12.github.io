@@ -1687,3 +1687,9 @@ body:has(.auth-overlay.active) #pro-ai-agent {
   .compare-table { display: none; }
 }
 
+/* feature cards on the landing page are links */
+a.cap-item { display: block; text-decoration: none; color: inherit; }
+
+/* five header links now (Features added): keep them on one line */
+.nav-links { gap: 1.6rem; }
+.nav-links a { white-space: nowrap; letter-spacing: 0.14em; }

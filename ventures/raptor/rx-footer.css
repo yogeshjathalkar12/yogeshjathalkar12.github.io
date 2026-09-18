@@ -1,0 +1,86 @@
+/* Raptor shared footer — self-contained (own variables, own selectors) so the
+   same markup drops into any pre-login page regardless of that page's CSS.
+   Light by default; follows body.dark-mode, or add class "rx-dark" to force dark. */
+
+.rx-footer {
+  --rf-bg: #faf7f4;
+  --rf-text: #1c1018;
+  --rf-muted: #5b4f5a;
+  --rf-faint: #7a6d79;
+  --rf-line: rgba(0, 0, 0, 0.12);
+  --rf-accent: #6d28d9;
+  --rf-grad: linear-gradient(135deg, #6d28d9, #be185d);
+  position: relative; z-index: 2;
+  background: var(--rf-bg); color: var(--rf-muted);
+  border-top: 1px solid var(--rf-line);
+  padding: 4rem 4rem 2rem;
+  font-family: 'DM Mono', 'IBM Plex Mono', ui-monospace, monospace;
+  text-align: left;
+  /* reset anything a host page's bare `footer { ... }` rule may have set */
+  display: block; font-size: 16px; line-height: 1.6; letter-spacing: normal;
+  flex-direction: row; justify-content: normal; align-items: normal; gap: 0;
+}
+body.dark-mode .rx-footer,
+.rx-footer.rx-dark {
+  --rf-bg: #030303;
+  --rf-text: #f4f4f5;
+  --rf-muted: #a1a1aa;
+  --rf-faint: #8a8a93;
+  --rf-line: rgba(255, 255, 255, 0.12);
+  --rf-accent: #a855f7;
+  --rf-grad: linear-gradient(135deg, #a855f7, #ec4899);
+}
+
+.rx-footer *, .rx-footer *::before, .rx-footer *::after { box-sizing: border-box; }
+
+.rx-footer-grid {
+  max-width: 1200px; margin: 0 auto;
+  display: grid; gap: 2.5rem;
+  grid-template-columns: 1.3fr 1fr 1.25fr 1fr 1fr;
+}
+
+.rx-brand-link { display: inline-flex; align-items: center; gap: 0.65rem; text-decoration: none; }
+.rx-brand-link img { width: 40px; height: 40px; border-radius: 10px; display: block; }
+.rx-footer-wordmark {
+  font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 0.1em; line-height: 1;
+  color: var(--rf-accent);
+}
+@supports (-webkit-background-clip: text) {
+  .rx-footer-wordmark { background: var(--rf-grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+}
+.rx-tagline {
+  font-family: 'Instrument Serif', Georgia, serif; font-style: italic;
+  font-size: 1.1rem; line-height: 1.5; color: var(--rf-muted);
+  margin: 0.9rem 0 0; max-width: 260px;
+}
+.rx-byline { margin: 0.9rem 0 0; font-size: 0.7rem; letter-spacing: 0.08em; color: var(--rf-faint); }
+
+.rx-col h4 {
+  margin: 0 0 1.1rem; font-size: 0.68rem; font-weight: 500;
+  letter-spacing: 0.22em; text-transform: uppercase; color: var(--rf-text);
+}
+.rx-col a {
+  display: block; margin: 0 0 0.7rem;
+  font-size: 0.8rem; line-height: 1.4; color: var(--rf-muted);
+  text-decoration: none; transition: color 0.2s;
+}
+.rx-col a:hover { color: var(--rf-accent); }
+.rx-col a.rx-brand-link { display: inline-flex; margin: 0; }
+.rx-footer a:focus-visible { outline: 2px solid var(--rf-accent); outline-offset: 3px; }
+
+.rx-bottom {
+  max-width: 1200px; margin: 3rem auto 0; padding-top: 1.6rem;
+  border-top: 1px solid var(--rf-line);
+  text-align: center; font-size: 0.72rem; line-height: 1.9; color: var(--rf-faint);
+}
+.rx-bottom p { margin: 0; }
+
+@media (max-width: 1000px) {
+  .rx-footer { padding: 3.2rem 2rem 2rem; }
+  .rx-footer-grid { grid-template-columns: 1fr 1fr; }
+  .rx-col-brand { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+  .rx-footer { padding: 3rem 1.5rem 2rem; }
+  .rx-footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+}

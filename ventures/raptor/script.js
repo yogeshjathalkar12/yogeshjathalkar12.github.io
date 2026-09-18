@@ -17,6 +17,7 @@ lamp.addEventListener('click', () => {
   lamp.classList.add('pulled');
   setTimeout(() => {
     document.body.classList.toggle('dark-mode');
+    try { localStorage.setItem('raptor-theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light'); } catch (e) {}
     lamp.classList.remove('pulled');
     isAnimating = false;
   }, 250);
@@ -426,4 +427,8 @@ document.addEventListener('DOMContentLoaded', () => {
     showView('forgot-success');
     setTimeout(() => { window.location.reload(); }, 1500); // reload → user logs in fresh with new password
   });
+
+  // Deep link from the feature/legal pages: /ventures/raptor/?auth=login or ?auth=signup
+  const authParam = new URLSearchParams(window.location.search).get('auth');
+  if (authParam === 'login' || authParam === 'signup') openAuth(authParam);
 });
