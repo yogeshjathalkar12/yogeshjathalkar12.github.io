@@ -531,7 +531,7 @@
         </div>
         <div class="nav-right">
             <button class="theme-toggle" id="themeToggle">Dark Mode</button>
-            <button class="btn-primary" onclick="document.getElementById('signupPanel').style.display='flex'; window.scrollTo(0, 0);">Get Started</button>
+            <a class="btn-primary" href="app/" style="text-decoration:none; display:inline-block;">Get Started</a>
         </div>
     </nav>
 
@@ -540,8 +540,8 @@
         <h1>Continuous Career Guidance for India's Youth</h1>
         <p>Eklavya helps students build an evolving profile of their interests, skills, and achievements from age 12 through professional life, and uses that to surface scholarships, colleges, internships, and career opportunities that actually fit them. Built directly into a real learning platform, so course activity, quiz performance, and practice sessions strengthen your profile automatically — not just what you type into a form.</p>
         <div class="hero-buttons">
-            <button class="btn-primary" onclick="document.getElementById('loginPanel').style.display='flex'; window.scrollTo(0, 0);">Log In</button>
-            <button class="btn-ghost" onclick="document.getElementById('signupPanel').style.display='flex'; window.scrollTo(0, 0);">Create Account</button>
+            <a class="btn-primary" href="app/" style="text-decoration:none; display:inline-block;">Log In</a>
+            <a class="btn-ghost" href="app/">Create Account</a>
         </div>
     </div>
 
@@ -703,54 +703,6 @@
         </div>
     </div>
 
-    <!-- AUTH PANELS -->
-    <div id="loginPanel" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 2000;">
-        <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 40px; max-width: 420px; width: 90%;">
-            <h3 style="font-size: 24px; font-weight: 800; margin-bottom: 8px;">Log In</h3>
-            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;">Access your career profile and recommendations</p>
-
-            <div style="margin-bottom: 16px;">
-                <label style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-main); display: block; margin-bottom: 8px;">Email</label>
-                <input type="email" placeholder="you@example.com" style="width: 100%; padding: 10px 12px; border: 1px solid var(--glass-border); border-radius: 8px; font-size: 14px; background: rgba(255,255,255,0.4);">
-            </div>
-
-            <div style="margin-bottom: 24px;">
-                <label style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-main); display: block; margin-bottom: 8px;">Password</label>
-                <input type="password" placeholder="••••••••" style="width: 100%; padding: 10px 12px; border: 1px solid var(--glass-border); border-radius: 8px; font-size: 14px; background: rgba(255,255,255,0.4);">
-            </div>
-
-            <button class="btn-primary" style="width: 100%; margin-bottom: 12px;">Log In</button>
-            <p style="font-size: 13px; text-align: center; color: var(--text-muted);">Don't have an account? <span onclick="document.getElementById('loginPanel').style.display='none'; document.getElementById('signupPanel').style.display='flex';" style="color: var(--primary); cursor: pointer; font-weight: 700;">Sign up</span></p>
-            <p style="font-size: 12px; text-align: center; color: var(--text-light); cursor: pointer; margin-top: 12px;" onclick="document.getElementById('loginPanel').style.display='none';">Close</p>
-        </div>
-    </div>
-
-    <div id="signupPanel" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 2000;">
-        <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 40px; max-width: 420px; width: 90%;">
-            <h3 style="font-size: 24px; font-weight: 800; margin-bottom: 8px;">Create Account</h3>
-            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;">Start your career journey with Eklavya</p>
-
-            <div style="margin-bottom: 16px;">
-                <label style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-main); display: block; margin-bottom: 8px;">Full Name</label>
-                <input type="text" placeholder="Your name" style="width: 100%; padding: 10px 12px; border: 1px solid var(--glass-border); border-radius: 8px; font-size: 14px; background: rgba(255,255,255,0.4);">
-            </div>
-
-            <div style="margin-bottom: 16px;">
-                <label style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-main); display: block; margin-bottom: 8px;">Email</label>
-                <input type="email" placeholder="you@example.com" style="width: 100%; padding: 10px 12px; border: 1px solid var(--glass-border); border-radius: 8px; font-size: 14px; background: rgba(255,255,255,0.4);">
-            </div>
-
-            <div style="margin-bottom: 24px;">
-                <label style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-main); display: block; margin-bottom: 8px;">Password</label>
-                <input type="password" placeholder="••••••••" style="width: 100%; padding: 10px 12px; border: 1px solid var(--glass-border); border-radius: 8px; font-size: 14px; background: rgba(255,255,255,0.4);">
-            </div>
-
-            <button class="btn-primary" style="width: 100%; margin-bottom: 12px;">Create Account</button>
-            <p style="font-size: 13px; text-align: center; color: var(--text-muted);">Already have an account? <span onclick="document.getElementById('signupPanel').style.display='none'; document.getElementById('loginPanel').style.display='flex';" style="color: var(--primary); cursor: pointer; font-weight: 700;">Log in</span></p>
-            <p style="font-size: 12px; text-align: center; color: var(--text-light); cursor: pointer; margin-top: 12px;" onclick="document.getElementById('signupPanel').style.display='none';">Close</p>
-        </div>
-    </div>
-
     <footer class="site-footer">
         <div class="footer-grid">
             <div class="footer-col footer-brand">
@@ -780,8 +732,8 @@
             </div>
             <div class="footer-col">
                 <h4>My Account</h4>
-                <a onclick="document.getElementById('loginPanel').style.display='flex';">Log In</a>
-                <a onclick="document.getElementById('signupPanel').style.display='flex';">Create Account</a>
+                <a href="app/">Log In</a>
+                <a href="app/">Create Account</a>
             </div>
         </div>
         <div class="footer-bottom">
@@ -804,23 +756,6 @@
         const savedTheme = localStorage.getItem('theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
         document.getElementById('themeToggle').textContent = savedTheme === 'dark' ? 'Light Mode' : 'Dark Mode';
-
-        // Close panels when clicking outside
-        document.getElementById('loginPanel').addEventListener('click', function(e) {
-            if (e.target === this) this.style.display = 'none';
-        });
-        document.getElementById('signupPanel').addEventListener('click', function(e) {
-            if (e.target === this) this.style.display = 'none';
-        });
-
-        // Auto-open the login/signup panel when arriving via #login or
-        // #signup (used by the footer links on terms.html, privacy.html,
-        // and the feature pages, since those don't duplicate this modal).
-        if (window.location.hash === '#login') {
-            document.getElementById('loginPanel').style.display = 'flex';
-        } else if (window.location.hash === '#signup') {
-            document.getElementById('signupPanel').style.display = 'flex';
-        }
     </script>
 </body>
 </html>
