@@ -19,7 +19,7 @@ const RoverEngine = {
         { target: 'hero-target',   text: "System initialized. Hello! I am your Shoonya Explorer.", btn: "Let's Go!" },
         { target: 'ecosystem',     text: "This is our primary multi-disciplinary grid. Zero standard wrappers.", btn: "Show Me Health" },
         { target: 'card-aura',     text: "Aura is our non-invasive medical intelligence portal.", btn: "Scan Infrastructure" },
-        { target: 'card-construct',text: "CONSTRUCT operates autonomous heavy vehicular navigation systems.", btn: "Check Marketing AI" },
+        { target: 'card-rta',text: "rta operates autonomous heavy vehicular navigation systems.", btn: "Check Marketing AI" },
         { target: 'card-raptor',   text: "Raptor deploys automated target acquisition algorithms.", btn: "Review Updates" },
         { target: 'updates',       text: "Our core pipeline updates stream here.", btn: "Finish Tour" }
     ],
@@ -196,7 +196,7 @@ const RoverEngine = {
             const el = document.getElementById(thinkingId);
             if (el) el.remove();
 
-            let finalReply = "I'm sorry, my current data files don't have information on that. Could you ask about Aura, Construct, or our tools?";
+            let finalReply = "I'm sorry, my current data files don't have information on that. Could you ask about Aura, rta, or our tools?";
             let bestMatchCount = 0;
 
             this.knowledgeBase.forEach(record => {
@@ -217,7 +217,7 @@ const RoverEngine = {
                 'Aura is our non-invasive': 'card-aura',
                 'Raptor is our AI':         'card-raptor',
                 'Shakti focuses':           'card-shakti',
-                'Construct and Basis':      'card-construct',
+                'rta and Basis':      'card-rta',
                 'Aether Labs':              'card-aether'
             };
 

@@ -33,7 +33,7 @@ const CHECK_ORDER = ['bounce_rate', 'complaint_rate', 'spf', 'dmarc', 'dkim', 'b
 // Same pattern as CrmAnalytics.tsx — Recharts can throw on odd data shapes,
 // and one bad chart shouldn't take the whole dashboard down with it.
 class ChartErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
-  constructor(props: { children: React.ReactNode }) {
+  rtaor(props: { children: React.ReactNode }) {
     super(props);
     this.state = { hasError: false };
   }

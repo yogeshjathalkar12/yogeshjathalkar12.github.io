@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
         userInput.value = '';
 
         // Match logic
-        let finalReply = "I am a local knowledge assistant. Try asking about our ventures like Aura, Construct, or Raptor.";
+        let finalReply = "I am a local knowledge assistant. Try asking about our ventures like Aura, rta, or Raptor.";
         let bestMatchCount = 0;
 
         knowledgeBase.forEach(record => {

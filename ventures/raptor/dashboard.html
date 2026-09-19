@@ -1501,7 +1501,7 @@ async function generatePixel() {
   let campaignId, pixelHtml;
   try {
     // The backend owns credit deduction (deduct_credit) and returns
-    // the canonical html_tag — we don't construct the tracking URL
+    // the canonical html_tag — we don't rta the tracking URL
     // ourselves, so it can never drift from the real /track/ route.
     const res = await fetch(`${RAPTOR_API_URL}/api/raptor/generate-tracker?campaign_id=${encodeURIComponent(campaignIdCandidate)}&display_name=${encodeURIComponent(nameRaw)}`, {
       method: 'GET',

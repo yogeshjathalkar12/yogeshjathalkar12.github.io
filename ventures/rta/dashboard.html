@@ -356,9 +356,9 @@ body.dark-mode .db-tool-input { background: rgba(15,23,42,0.5); border-color: #3
 // CONFIG — placeholders until RTA's own Supabase
 // project + Render deployment exist. Matches index.html.
 // ═══════════════════════════════════════════════════
-let CONSTRUCT_API_URL = localStorage.getItem('construct_api_url') || 'https://construct-backend-nkx2.onrender.com';
-let SUPABASE_URL_VAL  = localStorage.getItem('construct_sb_url')  || 'https://gcebaoinxjqfuzqudubp.supabase.co';
-let SUPABASE_KEY_VAL  = localStorage.getItem('construct_sb_key')  || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjZWJhb2lueGpxZnV6cXVkdWJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4MjIyMTAsImV4cCI6MjA5ODM5ODIxMH0.pJm__HfJuOAzTl-m5J739mXNlLaPKaCeZdYmbFEs87o';
+let rta_API_URL = localStorage.getItem('rta_api_url') || 'https://rta-backend-nkx2.onrender.com';
+let SUPABASE_URL_VAL  = localStorage.getItem('rta_sb_url')  || 'https://gcebaoinxjqfuzqudubp.supabase.co';
+let SUPABASE_KEY_VAL  = localStorage.getItem('rta_sb_key')  || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjZWJhb2lueGpxZnV6cXVkdWJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4MjIyMTAsImV4cCI6MjA5ODM5ODIxMH0.pJm__HfJuOAzTl-m5J739mXNlLaPKaCeZdYmbFEs87o';
 
 const supabaseClient = (SUPABASE_URL_VAL.startsWith('http'))
   ? window.supabase.createClient(SUPABASE_URL_VAL, SUPABASE_KEY_VAL)
@@ -392,11 +392,11 @@ async function loadUserData() {
     });
   });
 
-  if (!session) { window.location.href = '/ventures/construct/'; return; }
+  if (!session) { window.location.href = '/ventures/rta/'; return; }
   state.user = session.user;
 
   const { data, error } = await supabaseClient
-    .from('construct_users')
+    .from('rta_users')
     .select('credits, total_credits, plan')
     .eq('user_id', state.user.id)
     .single();
@@ -404,11 +404,11 @@ async function loadUserData() {
   if (!error && data) {
     state.credits = data.credits ?? 50;
   } else {
-    // First-time user row. SECURITY NOTE: only safe if construct_users
+    // First-time user row. SECURITY NOTE: only safe if rta_users
     // RLS restricts INSERT/SELECT to auth.uid() = user_id -- verify
     // this in Supabase before relying on it, same as Raptor's setup.
     state.credits = 50;
-    await supabaseClient.from('construct_users').upsert({
+    await supabaseClient.from('rta_users').upsert({
       user_id: state.user.id, email: state.user.email,
       credits: 50, total_credits: 50, plan: 'Free'
     });
@@ -419,7 +419,7 @@ async function loadUserData() {
   renderCredits();
 
   supabaseClient.auth.onAuthStateChange((event) => {
-    if (event === 'SIGNED_OUT') window.location.href = '/ventures/construct/';
+    if (event === 'SIGNED_OUT') window.location.href = '/ventures/rta/';
   });
 }
 
@@ -436,7 +436,7 @@ async function getAuthHeader() {
   if (!supabaseClient) return null;
   const { data: { session } } = await supabaseClient.auth.getSession();
   if (!session) {
-    window.location.href = '/ventures/construct/';
+    window.location.href = '/ventures/rta/';
     return null;
   }
   return { 'Authorization': `Bearer ${session.access_token}` };
@@ -448,7 +448,7 @@ async function getAuthHeader() {
 
 function handleUnauthorized() {
   if (supabaseClient) supabaseClient.auth.signOut();
-  window.location.href = '/ventures/construct/';
+  window.location.href = '/ventures/rta/';
 }
 
 // ── File input UX: show selected filename ──
@@ -493,7 +493,7 @@ document.getElementById('specBtn').addEventListener('click', async () => {
   formData.append('file', file);
 
   try {
-    const res = await fetch(`${CONSTRUCT_API_URL}/api/construct/spec-diver`, {
+    const res = await fetch(`${rta_API_URL}/api/rta/spec-diver`, {
       method: 'POST', headers, body: formData
     });
     if (res.status === 401) { handleUnauthorized(); return; }
@@ -526,7 +526,7 @@ document.getElementById('riskBtn').addEventListener('click', async () => {
   formData.append('file', file);
 
   try {
-    const res = await fetch(`${CONSTRUCT_API_URL}/api/construct/risk-radar`, {
+    const res = await fetch(`${rta_API_URL}/api/rta/risk-radar`, {
       method: 'POST', headers, body: formData
     });
     if (res.status === 401) { handleUnauthorized(); return; }
@@ -558,7 +558,7 @@ document.getElementById('oshaBtn').addEventListener('click', async () => {
   headers['Content-Type'] = 'application/json';
 
   try {
-    const res = await fetch(`${CONSTRUCT_API_URL}/api/construct/osha-checklist`, {
+    const res = await fetch(`${rta_API_URL}/api/rta/osha-checklist`, {
       method: 'POST', headers, body: JSON.stringify({ task_description: task })
     });
     if (res.status === 401) { handleUnauthorized(); return; }
@@ -588,7 +588,7 @@ document.getElementById('sitelogBtn').addEventListener('click', async () => {
   headers['Content-Type'] = 'application/json';
 
   try {
-    const res = await fetch(`${CONSTRUCT_API_URL}/api/construct/sitelog-pro`, {
+    const res = await fetch(`${rta_API_URL}/api/rta/sitelog-pro`, {
       method: 'POST', headers, body: JSON.stringify({ notes })
     });
     if (res.status === 401) { handleUnauthorized(); return; }

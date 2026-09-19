@@ -467,7 +467,7 @@ body.dark-mode .main-footer { background: rgba(15, 23, 42, 0.5); }
             .sys-monitor { width: 82vw; max-width: 300px; }
         }
 
-    .construct-launch {
+    .rta-launch {
     position: relative;
     width: 100%;
     padding: 6rem 4rem 6rem 4rem;
@@ -610,7 +610,7 @@ body.dark-mode .cl-title {
 .cl-target span { color: var(--safety-yellow); }
 
 @media (max-width: 768px) {
-    .construct-launch { padding: 4rem 1.5rem; }
+    .rta-launch { padding: 4rem 1.5rem; }
     .cl-countdown { flex-wrap: nowrap; }
     .cl-block { padding: 1.2rem 1rem; min-width: 70px; }
     .cl-sep { font-size: 1.8rem; }
@@ -1417,7 +1417,7 @@ body.dark-mode .otp-box { background: rgba(15, 23, 42, 0.5); border-color: #3341
   border: 1px solid rgba(220, 38, 38, 0.15);
 }
 
-.diff-column.construct {
+.diff-column.rta {
   background: rgba(251, 191, 36, 0.05);
   border: 1px solid rgba(251, 191, 36, 0.2);
 }
