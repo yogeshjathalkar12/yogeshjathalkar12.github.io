@@ -31,8 +31,8 @@ AOS.init({ duration: 800, once: false, mirror: true });
         const toggleLabel = document.getElementById('toggleLabel');
 
         // Drop your own icon files here — same convention as Raptor's assets folder
-        const MENU_ICON_SRC = 'assets/menu-icon.png';
-        const CLOSE_ICON_SRC = 'assets/close-icon.png';
+        const MENU_ICON_SRC = 'favicon1.png';
+        const CLOSE_ICON_SRC = 'favicon1.png';
 
         function setSidebarOpen(open) {
             sysMonitor.classList.toggle('sidebar-open', open);
