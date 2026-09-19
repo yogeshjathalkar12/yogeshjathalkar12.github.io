@@ -322,7 +322,7 @@ AOS.init({ duration: 800, once: false, mirror: true });
             }
         });
 
-    // Construct Launch Countdown
+    // RTA Launch Countdown
 (function() {
     const target = new Date('2026-03-27T14:00:00+05:30').getTime();
     function pad(n) { return String(n).padStart(2, '0'); }

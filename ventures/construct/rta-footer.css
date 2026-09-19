@@ -1,0 +1,80 @@
+/* RTA shared footer — self-contained (own variables, own selectors) so the same
+   markup drops into any page regardless of that page's CSS, same approach as
+   Raptor's rx-footer.css. Light by default; follows body.dark-mode, or add the
+   class "rta-dark" to force dark on always-dark pages. */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
+
+.rta-footer {
+  --rf-bg: #ffffff;
+  --rf-text: #0f172a;
+  --rf-muted: #64748b;
+  --rf-faint: #94a3b8;
+  --rf-line: rgba(15, 23, 42, 0.12);
+  --rf-accent: #fbbf24;
+  --rf-accent-text: #b45309;
+  position: relative; z-index: 2;
+  background: var(--rf-bg); color: var(--rf-muted);
+  border-top: 4px solid var(--rf-accent);
+  padding: 4rem 2rem 2rem;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  text-align: left;
+  /* reset anything a host page's bare `footer { ... }` rule may have set */
+  display: block; font-size: 16px; line-height: 1.6; letter-spacing: normal;
+  flex-direction: row; justify-content: normal; align-items: normal; gap: 0;
+  width: 100%; margin: 0;
+}
+body.dark-mode .rta-footer,
+.rta-footer.rta-dark {
+  --rf-bg: #0b1120;
+  --rf-text: #f8fafc;
+  --rf-muted: #94a3b8;
+  --rf-faint: #64748b;
+  --rf-line: rgba(255, 255, 255, 0.12);
+  --rf-accent-text: #fbbf24;
+}
+.rta-footer *, .rta-footer *::before, .rta-footer *::after { box-sizing: border-box; }
+
+.rta-footer-grid {
+  max-width: 1200px; margin: 0 auto;
+  display: grid; gap: 2.5rem;
+  grid-template-columns: 1.3fr 1fr 1.25fr 1fr 1fr;
+}
+
+.rta-brand-link { display: inline-flex; align-items: center; gap: 0.7rem; text-decoration: none; }
+.rta-brand-link img { width: 44px; height: 44px; display: block; }
+.rta-wordmark {
+  font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 700;
+  font-size: 1.6rem; letter-spacing: 0.18em; line-height: 1; color: var(--rf-text);
+}
+.rta-tagline { margin: 1rem 0 0; font-size: 0.95rem; line-height: 1.6; color: var(--rf-muted); max-width: 260px; }
+
+.rta-col h4 {
+  margin: 0 0 1.1rem; font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--rf-text);
+}
+.rta-col a {
+  display: block; margin: 0 0 0.6rem; font-size: 0.92rem; font-weight: 400;
+  color: var(--rf-muted); text-decoration: none; transition: color 0.2s ease;
+}
+.rta-col a:hover { color: var(--rf-accent-text); }
+.rta-soon {
+  margin: 0.9rem 0 0; font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--rf-faint);
+}
+
+.rta-bottom {
+  max-width: 1200px; margin: 3rem auto 0; padding-top: 1.5rem;
+  border-top: 1px solid var(--rf-line); text-align: center;
+}
+.rta-bottom p { margin: 0 0 0.4rem; font-size: 0.85rem; color: var(--rf-muted); }
+.rta-bottom .rta-social { margin-bottom: 0.9rem; }
+.rta-bottom .rta-social a {
+  display: inline; margin: 0 0.7rem; font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--rf-muted); text-decoration: none;
+}
+.rta-bottom .rta-social a:hover { color: var(--rf-accent-text); }
+.rta-bottom .rta-loc { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.65rem; letter-spacing: 0.1em; color: var(--rf-accent-text); }
+
+@media (max-width: 1000px) { .rta-footer-grid { grid-template-columns: 1fr 1fr; } .rta-col.rta-brand { grid-column: 1 / -1; } }
+@media (max-width: 560px) { .rta-footer { padding: 3rem 1.25rem 1.5rem; } .rta-footer-grid { grid-template-columns: 1fr; } }

@@ -617,7 +617,7 @@ body.dark-mode .cl-title {
     .cl-free-tier { flex-direction: column; gap: 1rem; text-align: center; }
 }
 /* ═══════════════════════════════════════════════════
-   AUTH MODAL — matches Construct's safety-yellow / glass
+   AUTH MODAL — matches RTA's safety-yellow / glass
    design system (same structural pattern as Raptor's auth)
    ═══════════════════════════════════════════════════ */
 
