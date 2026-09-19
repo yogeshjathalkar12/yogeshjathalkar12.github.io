@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Detection | Basis</title>
+<meta name="description" content="A computer-vision model looks at submitted photos and draws a box around the problem. It is a suggestion, not a verdict: a human moderator confirms it...">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://shoonyaorigins.com/ventures/basis/features/ai-detection.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Basis by Shoonya Origins">
+<meta property="og:title" content="AI Detection | Basis">
+<meta property="og:description" content="A computer-vision model looks at submitted photos and draws a box around the problem. It is a suggestion, not a verdict: a human moderator confirms it...">
+<meta property="og:url" content="https://shoonyaorigins.com/ventures/basis/features/ai-detection.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" type="image/png" href="/images/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../basis-site.css">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://shoonyaorigins.com/ventures/basis/"}, {"@type": "ListItem", "position": 2, "name": "Features", "item": "https://shoonyaorigins.com/ventures/basis/features/"}, {"@type": "ListItem", "position": 3, "name": "AI Detection"}]}</script>
+<script>try{if(localStorage.getItem('basis-theme')==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+</head>
+<body class="bx">
+<a class="skip-link" href="#main">Skip to content</a>
+<nav class="bx-nav" aria-label="Main">
+  <a class="bx-logo" href="../">BA<span>S</span>IS</a>
+  <ul class="bx-links" id="bxLinks">
+    <li><a href="../features/" aria-current="page">Features</a></li>
+    <li><a href="../why-basis.html">Why Basis</a></li>
+    <li><a href="../features/free-tools.html">Free Tools</a></li>
+    <li><a href="../#report">Report an Issue</a></li>
+    <li class="bx-mobile-only"><a href="../?auth=login">Sign in</a></li>
+  </ul>
+  <div class="bx-actions">
+    <button class="bx-toggle" id="themeToggle" type="button" aria-pressed="false" title="Toggle theme">&#127769;</button>
+    <a class="bx-signin" href="../?auth=login">Sign in</a>
+    <button class="bx-menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="bxLinks">Menu</button>
+  </div>
+</nav>
+<main id="main">
+<div class="wrap"><div class="breadcrumb"><a href="../">Home</a> / <a href="../features/">Features</a> / AI Detection</div></div>
+<header class="wrap hero-x">
+  <div class="label">Feature 02 &middot; Computer vision &middot; <span class="pill pill-live">Live</span></div>
+  <h1 class="big-title">AI Detection</h1>
+  <p class="lede">A computer-vision model looks at submitted photos and draws a box around the problem. It is a suggestion, not a verdict: a human moderator confirms it before it is used to teach the model anything.</p>
+  <div class="hero-cta">
+    <a class="btn-main" href="../#report">Report an issue</a>
+    <a class="btn-ghost" href="../features/">All features</a>
+  </div>
+</header>
+<section class="sec"><div class="wrap">
+  <div class="label">The problem</div>
+  <p class="problem reveal">Thousands of photos cannot be looked at by hand, and a photo is only useful if you know where in it the problem is.<small>Basis uses an object-detection model to find the problem in the frame, so photos can be sorted, checked and learned from at scale.</small></p>
+</div></section>
+<section class="sec"><div class="wrap">
+  <div class="label">How it works</div>
+  <h2>Step by step.</h2>
+  <div class="steps"><div class="step reveal"><div class="step-num">01</div><div><h3>A photo comes in</h3><p>When a signed-in citizen files a report with a photo, the photo is stored and queued for analysis. Filing the report never waits on the analysis.</p></div></div><div class="step reveal"><div class="step-num">02</div><div><h3>The model looks for known problems</h3><p>A YOLOv8 object-detection model scans the image and returns boxes with a confidence score for each thing it recognises.</p></div></div><div class="step reveal"><div class="step-num">03</div><div><h3>Boxes are matched to the category</h3><p>The citizen's chosen category is compared with what the model saw, so a pothole report with a pothole box is easy to tell from one where the model found nothing.</p></div></div><div class="step reveal"><div class="step-num">04</div><div><h3>A moderator takes it from there</h3><p>Every result, including no detection at all, goes to the human review queue.</p></div></div></div>
+</div></section>
+<section class="sec"><div class="wrap">
+  <div class="label">What you get</div>
+  <h2>The details.</h2>
+  <div class="cards"><div class="card reveal"><h3>Eleven things it looks for</h3><p>Pothole, garbage, dumpster, road crack, water logging, manhole, broken street light, sidewalk damage, graffiti, billboard damage and soil erosion.</p></div><div class="card reveal"><h3>Boxes and confidence</h3><p>Each detection has a position and a confidence score, so uncertain results are visible rather than hidden.</p></div><div class="card reveal"><h3>Honest about its limits</h3><p>Traffic violations and the catch-all category are not things the model can see yet. Those reports rely on human review.</p></div><div class="card reveal"><h3>One shared model</h3><p>The same model serves the citizen app and the internal street-survey tooling, and improves through review.</p></div></div>
+  <div class="note reveal">Detection currently runs on reports filed from signed-in accounts. Anonymous submissions are not yet analysed by the model.</div>
+</div></section>
+<section class="sec"><div class="wrap">
+  <div class="label">At a glance</div>
+  <dl class="facts reveal"><div class="fact"><dt>Model</dt><dd>YOLOv8 object detection</dd></div><div class="fact"><dt>Recognises</dt><dd>11 classes of urban issue</dd></div><div class="fact"><dt>Output</dt><dd>Bounding boxes with confidence scores</dd></div><div class="fact"><dt>Runs on</dt><dd>Signed-in reports today</dd></div></dl>
+</div></section>
+<section class="sec"><div class="wrap">
+  <div class="label">Works with</div>
+  <div class="cards compact"><a class="card reveal" href="../features/review-and-learning.html"><div class="card-top"><span class="card-tag">Human in the loop</span><span class="pill pill-rolling">Rolling out</span></div><h3>Human Review &amp; Continuous Learning</h3><p>Moderators confirm or correct the AI. Corrections teach the model.</p><span class="more">Read more &rarr;</span></a><a class="card reveal" href="../features/anonymous-reporting.html"><div class="card-top"><span class="card-tag">Reporting</span><span class="pill pill-live">Live</span></div><h3>Anonymous Reporting</h3><p>Photo, pin, category. No account, name or phone number.</p><span class="more">Read more &rarr;</span></a><a class="card reveal" href="../features/rover-network.html"><div class="card-top"><span class="card-tag">Roadmap</span><span class="pill pill-planned">Planned</span></div><h3>Rover Network</h3><p>Autonomous ground rovers as a physical verification layer.</p><span class="more">Read more &rarr;</span></a></div>
+</div></section>
+<section class="sec"><div class="wrap">
+  <div class="cta-band reveal">
+    <h2>See what it finds</h2>
+    <p>Report a problem and see it through to review.</p>
+    <div class="hero-cta"><a class="btn-main" href="../#report">Report an issue</a><a class="btn-ghost" href="../features/">All features</a></div>
+    <div class="cta-micro">Free for citizens &middot; Mumbai &amp; Pune</div>
+  </div>
+</div></section>
+<section class="sec"><div class="wrap">
+  <div class="label">Explore every feature</div>
+  <div class="chips"><a href="../features/anonymous-reporting.html">Anonymous Reporting</a><a href="../features/ai-detection.html" aria-current="page">AI Detection</a><a href="../features/review-and-learning.html">Human Review &amp; Continuous Learning</a><a href="../features/city-credits.html">City Credits</a><a href="../features/marketplace.html">Marketplace</a><a href="../features/partner-shops.html">Partner Shops &amp; Vouchers</a><a href="../features/free-tools.html">Free Tools</a><a href="../features/government-briefs.html">Government Briefs</a><a href="../features/rover-network.html">Rover Network</a><a href="../features/">All features</a></div>
+</div></section>
+</main>
+<footer class="bx-footer">
+  <div class="bx-footer-grid">
+    <div class="bx-col bx-col-brand">
+      <a class="bx-brand-link" href="../"><span class="bx-wordmark">BA<span>S</span>IS</span></a>
+      <p class="bx-tagline">Urban intelligence that turns citizen reports into evidence.</p>
+      <p class="bx-byline">By Shoonya Origins &middot; Pune, India</p>
+    </div>
+    <div class="bx-col">
+      <h4>About Basis</h4>
+      <a href="../why-basis.html">Why Basis</a>
+      <a href="../#how-it-works">How It Works</a>
+      <a href="../why-basis.html#who">Who It&#39;s For</a>
+      <a href="../#cities">Where It&#39;s Live</a>
+      <a href="/about/">About Shoonya Origins</a>
+    </div>
+    <div class="bx-col bx-col-features">
+      <h4>Features</h4>
+      <div class="bx-list">
+      <a href="../features/anonymous-reporting.html">Anonymous Reporting</a>
+      <a href="../features/ai-detection.html">AI Detection</a>
+      <a href="../features/review-and-learning.html">Human Review &amp; Continuous Learning</a>
+      <a href="../features/city-credits.html">City Credits</a>
+      <a href="../features/marketplace.html">Marketplace</a>
+      <a href="../features/partner-shops.html">Partner Shops &amp; Vouchers</a>
+      <a href="../features/free-tools.html">Free Tools</a>
+      <a href="../features/government-briefs.html">Government Briefs</a>
+      <a href="../features/rover-network.html">Rover Network</a>
+      <a href="../features/">All features &rarr;</a>
+      </div>
+    </div>
+    <div class="bx-col">
+      <h4>Free Tools</h4>
+      <a href="../safety_tools/">Safety &amp; Structure</a>
+      <a href="../environment_tools/">Environment &amp; Resources</a>
+      <a href="../civic_tools/">Civic Intelligence</a>
+    </div>
+    <div class="bx-col">
+      <h4>Legal</h4>
+      <a href="../terms.html">Terms &amp; Conditions</a>
+      <a href="../privacy.html">Privacy Policy</a>
+      <a href="/about/disclaimer.html">Legal Disclaimer</a>
+    </div>
+    <div class="bx-col">
+      <h4>My Account</h4>
+      <a href="../?auth=login">Log In</a>
+      <a href="../?auth=signup">Create Account</a>
+      <a href="../dashboard.html">Dashboard</a>
+      <a href="../#report">Report an Issue</a>
+      <a href="mailto:yogeshjathalkar@gmail.com">Contact Us</a>
+    </div>
+  </div>
+  <div class="bx-bottom">
+    <p>Copyright 2026 Basis. Built by Shoonya Origins for the citizens of Mumbai &amp; Pune.</p>
+    <p>This venture is incubated under Shoonya Origins.</p>
+  </div>
+</footer>
+<script src="../basis-site.js"></script>
+</body>
+</html>

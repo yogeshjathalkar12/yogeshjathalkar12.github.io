@@ -1,0 +1,96 @@
+/* Basis shared footer — self-contained (own variables, own selectors) so the
+   same markup drops into any Basis page regardless of that page's CSS.
+   Light by default; follows html[data-theme="dark"]. */
+
+.bx-footer {
+  --bf-bg: #E9F2F5;
+  --bf-text: #0F172A;
+  --bf-muted: #475569;
+  --bf-faint: #64748B;
+  --bf-line: rgba(8, 145, 178, 0.20);
+  --bf-accent: #0891B2;
+  position: relative; z-index: 2;
+  background: var(--bf-bg); color: var(--bf-muted);
+  border-top: 1px solid var(--bf-line);
+  padding: 4rem 2rem 2rem;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  text-align: left;
+  /* reset anything a host page's bare `footer { ... }` rule may have set */
+  display: block; font-size: 16px; line-height: 1.6; letter-spacing: normal;
+  flex-direction: row; justify-content: normal; align-items: normal; gap: 0;
+  margin: 0; width: auto;
+}
+html[data-theme="dark"] .bx-footer {
+  --bf-bg: #060B16;
+  --bf-text: #E2EAF0;
+  --bf-muted: #8BA4BD;
+  --bf-faint: #5F7C99;
+  --bf-line: rgba(0, 212, 255, 0.14);
+  --bf-accent: #00D4FF;
+}
+
+.bx-footer *, .bx-footer *::before, .bx-footer *::after { box-sizing: border-box; }
+
+.bx-footer-grid {
+  max-width: 1200px; margin: 0 auto;
+  display: grid; gap: 2.5rem 2rem;
+  grid-template-columns: 1.4fr 1fr 1.25fr 1fr 1fr 1fr;
+}
+
+.bx-brand-link { display: inline-block; text-decoration: none; margin: 0; }
+.bx-wordmark {
+  font-family: 'Space Mono', ui-monospace, monospace; font-weight: 700;
+  font-size: 1.7rem; letter-spacing: 0.32em; line-height: 1; text-transform: uppercase;
+  color: var(--bf-text);
+}
+.bx-wordmark span { color: var(--bf-accent); }
+.bx-tagline {
+  font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-weight: 600;
+  font-size: 1.2rem; line-height: 1.45; color: var(--bf-muted);
+  margin: 1rem 0 0; max-width: 260px;
+}
+.bx-byline {
+  margin: 0.9rem 0 0; font-family: 'Space Mono', ui-monospace, monospace;
+  font-size: 0.68rem; letter-spacing: 0.08em; color: var(--bf-faint);
+}
+
+.bx-col h4 {
+  margin: 0 0 1.1rem; font-family: 'Space Mono', ui-monospace, monospace;
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--bf-text);
+}
+.bx-col a {
+  display: block; margin: 0 0 0.7rem;
+  font-size: 0.84rem; line-height: 1.4; color: var(--bf-muted);
+  text-decoration: none; transition: color 0.2s;
+}
+.bx-col a:hover { color: var(--bf-accent); }
+.bx-col a.bx-brand-link { display: inline-block; margin: 0; }
+.bx-footer a:focus-visible { outline: 2px solid var(--bf-accent); outline-offset: 3px; }
+
+.bx-bottom {
+  max-width: 1200px; margin: 3rem auto 0; padding-top: 1.5rem;
+  border-top: 1px solid var(--bf-line);
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem 2rem;
+}
+.bx-bottom p {
+  margin: 0; font-family: 'Space Mono', ui-monospace, monospace;
+  font-size: 0.68rem; letter-spacing: 0.04em; color: var(--bf-faint); line-height: 1.7;
+}
+
+@media (max-width: 1100px) {
+  /* Brand on top, Features full-width in balanced columns, then the short
+     columns side by side - avoids one tall column stretching the whole row. */
+  .bx-footer-grid { grid-template-columns: repeat(4, 1fr); }
+  .bx-col { order: 2; }
+  .bx-col-brand { grid-column: 1 / -1; order: 0; }
+  .bx-col-features { grid-column: 1 / -1; order: 1; }
+  .bx-list { columns: 3; column-gap: 2rem; }
+  .bx-list a { break-inside: avoid; }
+}
+@media (max-width: 640px) {
+  .bx-footer { padding: 3rem 1.25rem 1.5rem; }
+  .bx-footer-grid { grid-template-columns: repeat(2, 1fr); gap: 2rem 1.25rem; }
+  .bx-list { columns: 1; }
+  .bx-bottom { flex-direction: column; }
+}
