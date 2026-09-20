@@ -4,9 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex">
-<meta http-equiv="refresh" content="0; url=/ventures/aura/app/#/timeline">
 <title>Opening your vault | Aura</title>
-<script>window.location.replace('/ventures/aura/app/#/timeline');</script>
+<script>
+// This page used to be the dashboard. Sign-in links created back then (email confirmations, Google) still point HERE and
+// bring the login in the address bar (#access_token=...). Redirecting straight to the app would throw that login away and
+// show a second login form, so hand it to the callback page, which finishes the sign-in first.
+(function () {
+  var h = window.location.hash, s = window.location.search;
+  if (/access_token=|error=|error_description=|[?&]code=/.test(h + s)) {
+    window.location.replace('/ventures/aura/auth-callback.html' + s + h);
+  } else {
+    window.location.replace('/ventures/aura/app/#/timeline');
+  }
+})();
+</script>
+<noscript><meta http-equiv="refresh" content="0; url=/ventures/aura/app/#/timeline"></noscript>
 <style>body{font-family:'Segoe UI',system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;background:#f0fdf4;color:#022c22;text-align:center;padding:24px}a{color:#059669;font-weight:700}</style>
 </head>
 <body>
