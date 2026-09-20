@@ -1,0 +1,37 @@
+/* Aura shared footer. Used by EVERY Aura page (new and old), so it is self-contained:
+   its own colours, no dependency on the host page's CSS. Generated from aura-site/, do not edit in the repo. */
+.aura-footer {
+  --af-bg: #f7fbf8; --af-fg: #1f2937; --af-muted: #4b5563; --af-line: rgba(5, 150, 105, 0.22);
+  --af-accent: #059669; --af-accent-2: #f97316;
+  background: var(--af-bg); color: var(--af-fg);
+  border-top: 1px solid var(--af-line);
+  padding: 56px 6% 28px;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 0.92rem; line-height: 1.5; text-align: left;
+}
+[data-theme='dark'] .aura-footer {
+  --af-bg: #04101a; --af-fg: #e5efe9; --af-muted: #9db0a7; --af-line: rgba(52, 211, 153, 0.18); --af-accent: #34d399;
+}
+.aura-footer *, .aura-footer *::before, .aura-footer *::after { box-sizing: border-box; font-family: inherit; margin: 0; padding: 0; }
+.aura-footer a { color: var(--af-muted); text-decoration: none; transition: color 0.2s; }
+.aura-footer a:hover, .aura-footer a:focus-visible { color: var(--af-accent); }
+.aura-footer a:focus-visible { outline: 2px solid var(--af-accent); outline-offset: 3px; border-radius: 3px; }
+
+.af-inner { max-width: 1280px; margin: 0 auto; }
+.af-grid { display: grid; grid-template-columns: 1.5fr repeat(5, 1fr); gap: 36px 28px; }
+.af-brand .af-logo { display: inline-block; font-size: 1.9rem; font-weight: 800; letter-spacing: -1px; color: var(--af-fg); }
+.af-brand .af-logo span { color: var(--af-accent); }
+.af-tagline { font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-size: 1.3rem; line-height: 1.3; color: var(--af-muted); margin: 14px 0 16px; max-width: 26ch; }
+.af-by { font-size: 0.78rem; letter-spacing: 0.06em; color: var(--af-muted); }
+
+.af-col h4 { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--af-fg); margin-bottom: 16px; }
+.af-col ul { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+.af-col a { font-size: 0.88rem; }
+.af-col a.af-more { color: var(--af-accent); font-weight: 600; }
+
+.af-bottom { margin-top: 44px; padding-top: 22px; border-top: 1px solid var(--af-line); display: flex; flex-direction: column; gap: 8px; text-align: center; font-size: 0.8rem; color: var(--af-muted); }
+.af-bottom .af-legal-line { font-size: 0.76rem; max-width: 92ch; margin: 0 auto; opacity: 0.9; }
+
+@media (max-width: 1100px) { .af-grid { grid-template-columns: repeat(3, 1fr); } .af-brand { grid-column: 1 / -1; } }
+@media (max-width: 640px) { .aura-footer { padding: 40px 6% 24px; } .af-grid { grid-template-columns: repeat(2, 1fr); gap: 30px 20px; } }
+@media (max-width: 380px) { .af-grid { grid-template-columns: 1fr; } }
