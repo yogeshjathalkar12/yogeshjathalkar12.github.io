@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Signing you in | Aura</title>
+<style>
+  :root { --bg: #f0fdf4; --fg: #022c22; --muted: #374151; --primary: #059669; --line: rgba(5,150,105,.25); }
+  @media (prefers-color-scheme: dark) { :root { --bg: #020617; --fg: #ecfdf5; --muted: #a3b3ab; --primary: #34d399; --line: rgba(52,211,153,.25); } }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+  body { min-height: 100vh; display: grid; place-items: center; background: var(--bg); color: var(--fg); padding: 24px; }
+  .box { text-align: center; max-width: 420px; }
+  .logo { font-size: 1.8rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 22px; } .logo span { color: var(--primary); }
+  .spinner { width: 34px; height: 34px; margin: 0 auto 16px; border: 3px solid var(--line); border-top-color: var(--primary); border-radius: 50%; animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  p { color: var(--muted); line-height: 1.55; }
+  a.btn { display: inline-block; margin-top: 18px; padding: 10px 22px; border-radius: 999px; background: var(--primary); color: #fff; font-weight: 700; text-decoration: none; }
+  #err { display: none; } .failed #err { display: block; } .failed .spinner, .failed #msg { display: none; }
+  @media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 3s; } }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+<div class="box" id="box" role="status" aria-live="polite">
+  <div class="logo">Aura<span>.</span></div>
+  <div class="spinner"></div>
+  <p id="msg">Signing you in&hellip;</p>
+  <div id="err">
+    <p id="errText">We could not sign you in.</p>
+    <a class="btn" href="/ventures/aura/?auth=login">Back to log in</a>
+  </div>
+</div>
+<script>
+// Landing spot for sign-in links that leave Aura and come back: "Continue with Google" and email-confirmation links.
+// Supabase returns the login inside the address (#access_token=...). The Supabase client parses it asynchronously, so we
+// WAIT for it to finish before moving on. Checking too early (as the old dashboard did) looks like "not logged in"
+// and bounces the user back to the landing page.
+(function () {
+  var APP = '/ventures/aura/app/#/timeline';
+  var url = localStorage.getItem('aura_sb_url') || 'https://wguodgtcgyarugivowyl.supabase.co';
+  var key = localStorage.getItem('aura_sb_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndndW9kZ3RjZ3lhcnVnaXZvd3lsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4MjIzNjgsImV4cCI6MjA5ODM5ODM2OH0.UVBFAcGGNKQYBHLKJCDOcJ7NkgNbF23bkMpihIgJfvg';
+  var finished = false;
+
+  function fail(text) {
+    if (finished) return; finished = true;
+    document.getElementById('errText').textContent = text;
+    document.getElementById('box').className = 'box failed';
+  }
+  function succeed() {
+    if (finished) return; finished = true;
+    window.location.replace(APP);     // replace: the back button must not return to this page
+  }
+
+  var raw = window.location.hash.replace(/^#/, '') + '&' + window.location.search.replace(/^\?/, '');
+  var params = new URLSearchParams(raw);
+
+  // The provider (or Supabase) reported a problem, e.g. the user pressed Cancel on the Google screen.
+  if (params.get('error') || params.get('error_description')) {
+    var d = (params.get('error_description') || '').replace(/\+/g, ' ');
+    fail(d && d.length < 200 ? 'Sign-in did not complete: ' + d : 'Sign-in did not complete.');
+    return;
+  }
+  if (!window.supabase) { fail('Could not load the sign-in service. Check your connection and try again.'); return; }
+
+  var client = window.supabase.createClient(url, key);   // detectSessionInUrl (default) reads the tokens from the address
+  client.auth.onAuthStateChange(function (event, session) { if (session) succeed(); });
+  // getSession() resolves only after the client has finished reading the tokens from the address. If there is still
+  // no session then, the tokens were rejected (expired, already used, or forged): say so instead of spinning.
+  var hadTokens = /access_token|code=/.test(raw);
+  client.auth.getSession().then(function (r) {
+    if (r.data && r.data.session) { succeed(); return; }
+    if (hadTokens) setTimeout(function () { fail('We could not verify your sign-in. Please try again.'); }, 800);
+  });
+
+  // Opened directly, with no sign-in in progress.
+  if (!/access_token|code=/.test(raw)) {
+    setTimeout(function () { client.auth.getSession().then(function (r) { if (!(r.data && r.data.session)) fail('There is no sign-in in progress.'); }); }, 1200);
+  }
+  // Safety net: never spin forever.
+  setTimeout(function () { fail('Signing in took too long. Please try again.'); }, 15000);
+})();
+</script>
+</body>
+</html>

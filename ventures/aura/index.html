@@ -1159,6 +1159,20 @@
       ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
       : null;
 
+    // Where signed-in users go: the Aura app. Sign-in flows that leave the site and come back
+    // (Google, email-confirmation links) return to a small page that waits for the login to finish first.
+    const APP_HOME = '/ventures/aura/app/#/timeline';
+    const AUTH_CALLBACK = window.location.origin + '/ventures/aura/auth-callback.html';
+
+    // Coming back from Google or an email link, the login arrives in the address bar (#access_token=...).
+    // If Supabase sends the user HERE instead of the callback page (it does that whenever a redirect URL is not on its
+    // allow-list and falls back to the Site URL), finish the sign-in and go straight to the app.
+    if (supabaseClient && /access_token=|[?&]code=/.test(window.location.hash + window.location.search)) {
+      supabaseClient.auth.onAuthStateChange((event, session) => {
+        if (session) window.location.replace(APP_HOME);
+      });
+    }
+
     // ═══════════════════════════════════════════════════
     // AUTH MODAL LOGIC — ported from the Raptor auth flow.
     // All views already exist in the DOM (hidden via CSS).
@@ -1219,6 +1233,13 @@
       const wantedAuth = new URLSearchParams(window.location.search).get('auth');
       if (wantedAuth === 'login' || wantedAuth === 'signup') openAuth(wantedAuth);
 
+      // A sign-in that did not complete (for example the user pressed Cancel on the Google screen).
+      const returnedError = new URLSearchParams(window.location.hash.replace(/^#/, '')).get('error_description');
+      if (returnedError) {
+        openAuth('login');
+        showError('loginError', 'Sign-in did not complete: ' + returnedError.replace(/\+/g, ' '));
+      }
+
       // ── OTP box behavior: auto-advance + backspace + paste ──
       const otpBoxes = Array.from(document.querySelectorAll('.otp-box'));
       otpBoxes.forEach((box, i) => {
@@ -1267,7 +1288,7 @@
         btn.disabled = false; btn.textContent = 'Log in';
         if (error) { showError('loginError', error.message); return; }
 
-        window.location.href = 'dashboard.html';
+        window.location.href = APP_HOME;
       });
 
       // ── SIGN UP ──
@@ -1297,7 +1318,7 @@
             // this is where Supabase sends the user after they click the
             // confirmation link in their inbox. Must also be added to
             // Supabase → Authentication → URL Configuration → Redirect URLs.
-            emailRedirectTo: window.location.origin + '/ventures/aura/dashboard.html'
+            emailRedirectTo: AUTH_CALLBACK
           }
         });
         btn.disabled = false; btn.textContent = 'Create account';
@@ -1306,7 +1327,7 @@
         // If Supabase returned a live session, email confirmation is OFF
         // for this project -- the account is immediately usable.
         if (data.session) {
-          window.location.href = 'dashboard.html';
+          window.location.href = APP_HOME;
           return;
         }
 
@@ -1324,7 +1345,7 @@
         }
         supabaseClient.auth.signInWithOAuth({
           provider: 'google',
-          options: { redirectTo: window.location.origin + '/ventures/aura/dashboard.html' }
+          options: { redirectTo: AUTH_CALLBACK }
         });
       }
       document.getElementById('googleLoginBtn').addEventListener('click', googleAuth);
