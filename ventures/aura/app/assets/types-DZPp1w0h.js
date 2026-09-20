@@ -1,0 +1,1 @@
+var e={prescription:`Prescription`,lab_report:`Lab report`,discharge_summary:`Discharge summary`,scan:`Scan`,other:`Other`},t={log_only:`Log only`,log_and_view:`Log & view`,manage_delegates:`Full access`};export{t as n,e as t};
