@@ -347,3 +347,11 @@ table.tbl { width: 100%; border-collapse: collapse; min-width: 640px; }
   .rx-actions { gap: 0.4rem; }
   .rx-toggle, .rx-menu-btn { padding: 0.5rem 0.6rem; font-size: 0.62rem; letter-spacing: 0.08em; }
 }
+
+.hero-note { margin-top: 1.1rem; font-size: 0.72rem; letter-spacing: 0.06em; color: var(--dim); }
+.hero-note a { color: var(--purple); }
+.codeblock {
+  background: var(--surface); border: 1px solid var(--border); padding: 1rem 1.2rem;
+  margin: 1.2rem 0 0; overflow-x: auto; max-width: 760px;
+  font-family: 'DM Mono', monospace; font-size: 0.85rem; color: var(--white);
+}
