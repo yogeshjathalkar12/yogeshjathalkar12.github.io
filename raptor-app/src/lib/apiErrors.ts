@@ -1,12 +1,12 @@
 export class UnauthorizedError extends Error {
-  rtaor() {
+  constructor() {
     super('Session expired');
     this.name = 'UnauthorizedError';
   }
 }
 
 export class OutOfCreditsError extends Error {
-  rtaor() {
+  constructor() {
     super('Out of credits');
     this.name = 'OutOfCreditsError';
   }
@@ -14,7 +14,7 @@ export class OutOfCreditsError extends Error {
 
 export class ApiError extends Error {
   status: number;
-  rtaor(message: string, status: number) {
+  constructor(message: string, status: number) {
     super(message);
     this.name = 'ApiError';
     this.status = status;

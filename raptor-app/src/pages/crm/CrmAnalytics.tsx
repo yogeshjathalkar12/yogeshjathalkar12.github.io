@@ -19,7 +19,7 @@ const COLORS = ['#3b82f6', '#eab308', '#f97316', '#22c55e', '#ef4444'];
 
 // Simple Error Boundary to catch Recharts rendering failures
 class ChartErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
-  rtaor(props: { children: React.ReactNode }) {
+  constructor(props: { children: React.ReactNode }) {
     super(props);
     this.state = { hasError: false };
   }

@@ -328,7 +328,7 @@ export default function DiagnosticsTool() {
               {!hdrResult ? (
                 <div className="arsenal-empty">
                   <div className="arsenal-empty-icon">◌</div>
-                  <div className="arsenal-empty-text">Paste headers to rerta the routing path.</div>
+                  <div className="arsenal-empty-text">Paste headers to reconstruct the routing path.</div>
                 </div>
               ) : !hdrResult.hop_count ? (
                 <div className="arsenal-empty"><div className="arsenal-empty-text">No Received: hops found in that text.</div></div>
