@@ -7,6 +7,7 @@ const TABS = [
   { path: '/whatsapp/broadcasts', label: 'Broadcasts' },
   { path: '/whatsapp/sequences', label: 'Sequences' },
   { path: '/whatsapp/triggers', label: 'Triggers' },
+  { path: '/whatsapp/guide', label: 'Guide' },
 ];
 
 export default function WhatsappLayout() {

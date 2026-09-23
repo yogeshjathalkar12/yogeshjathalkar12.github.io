@@ -8,6 +8,7 @@ const TABS = [
   { path: '/email/followups', label: 'Follow-ups' },
   { path: '/email/sequences', label: 'Sequences' },
   { path: '/email/analytics', label: 'Analytics' },
+  { path: '/email/guide', label: 'Guide' },
 ];
 
 export default function EmailLayout() {

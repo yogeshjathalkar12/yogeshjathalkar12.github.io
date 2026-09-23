@@ -23,6 +23,7 @@ import CrmCampaigns from './pages/crm/CrmCampaigns';
 import CrmTickets from './pages/crm/CrmTickets';
 import CrmAnalytics from './pages/crm/CrmAnalytics';
 import CrmMarketing from './pages/crm/CrmMarketing';
+import CrmGuide from './pages/crm/CrmGuide';
 
 /* desktop sync files */
 import SyncLayout from './layouts/SyncLayout';
@@ -41,6 +42,7 @@ import EmailFollowups from './pages/email/EmailFollowups';
 import EmailSequences from './pages/email/EmailSequences';
 import EmailSegments from './pages/email/EmailSegments';
 import EmailAnalytics from './pages/email/EmailAnalytics';
+import EmailGuide from './pages/email/EmailGuide';
 
 /* whatsapp files */
 import WhatsappLayout from './layouts/WhatsappLayout';
@@ -51,6 +53,7 @@ import WaTriggers from './pages/whatsapp/WaTriggers';
 import WaInbox from './pages/whatsapp/WaInbox';
 import WaFlows from './pages/whatsapp/WaFlows';
 import WaFlowBuilder from './pages/whatsapp/WaFlowBuilder';
+import WhatsappGuide from './pages/whatsapp/WhatsappGuide';
 
 /* playground */
 import Playground from './pages/playground/Playground';
@@ -89,6 +92,7 @@ export default function App() {
                       <Route path="tickets" element={<CrmTickets />} />
                       <Route path="analytics" element={<CrmAnalytics />} />
                       <Route path="marketing" element={<CrmMarketing />} />
+                      <Route path="guide" element={<CrmGuide />} />
                     </Route>
 
                     <Route path="/sync" element={<SyncLayout />}>
@@ -109,6 +113,7 @@ export default function App() {
                       <Route path="sequences" element={<EmailSequences />} />
                       <Route path="segments" element={<EmailSegments />} />
                       <Route path="analytics" element={<EmailAnalytics />} />
+                      <Route path="guide" element={<EmailGuide />} />
                     </Route>
 
                     <Route path="/whatsapp" element={<WhatsappLayout />}>
@@ -120,6 +125,7 @@ export default function App() {
                       <Route path="broadcasts" element={<WaBroadcasts />} />
                       <Route path="sequences" element={<WaSequences />} />
                       <Route path="triggers" element={<WaTriggers />} />
+                      <Route path="guide" element={<WhatsappGuide />} />
                     </Route>
 
                     <Route path="/playground" element={<Playground />} />

@@ -15,6 +15,7 @@ export default function CrmLayout() {
           { name: 'Tickets', path: '/crm/tickets' },
           { name: 'Analytics', path: '/crm/analytics' },
           { name: 'Marketing', path: '/crm/marketing' },
+          { name: 'Guide', path: '/crm/guide' },
         ].map((tab) => (
           <NavLink
             key={tab.name}
