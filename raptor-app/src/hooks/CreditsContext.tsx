@@ -6,6 +6,9 @@ interface CreditsContextValue {
   credits: number | null;
   totalCredits: number;
   plan: string;
+  /** False until the plan has been read once, so screens don't flash a
+   *  "Free" state at someone who is actually on Pro. */
+  planLoaded: boolean;
   /** Call with the `credits_left` value returned by a paid backend action —
    *  the backend is the only writer of credits, this just reflects it. */
   syncFromServer: (creditsLeft: number) => void;
@@ -21,6 +24,7 @@ export function CreditsProvider({ children }: { children: ReactNode }) {
   const [credits, setCredits] = useState<number | null>(null);
   const [totalCredits, setTotalCredits] = useState(50);
   const [plan, setPlan] = useState('Free');
+  const [planLoaded, setPlanLoaded] = useState(false);
 
   const refresh = useCallback(async () => {
     if (!user) return;
@@ -34,6 +38,7 @@ export function CreditsProvider({ children }: { children: ReactNode }) {
       setCredits(data.credits ?? 50);
       setTotalCredits(data.total_credits ?? 50);
       setPlan(data.plan ?? 'Free');
+      setPlanLoaded(true);
     } else {
       // First-time user — mirrors the upsert dashboard.html did on first
       // login (covers first-time Google OAuth signups too, since those
@@ -43,6 +48,7 @@ export function CreditsProvider({ children }: { children: ReactNode }) {
       await supabase
         .from('raptor_users')
         .upsert({ user_id: user.id, email: user.email, credits: 50, total_credits: 50, plan: 'Free' });
+      setPlanLoaded(true);
     }
   }, [user]);
 
@@ -58,7 +64,7 @@ export function CreditsProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <CreditsContext.Provider value={{ credits, totalCredits, plan, syncFromServer, refresh }}>
+    <CreditsContext.Provider value={{ credits, totalCredits, plan, planLoaded, syncFromServer, refresh }}>
       {children}
     </CreditsContext.Provider>
   );

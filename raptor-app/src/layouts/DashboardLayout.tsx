@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from '../hooks/AuthContext';
 import { useCredits } from '../hooks/CreditsContext';
@@ -13,6 +13,14 @@ export function DashboardLayout() {
   const { isLight, toggle } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
+
+  // Screens that lock a feature behind Pro (Email automation) ask for the
+  // upgrade dialog with this event instead of owning a payment flow.
+  useEffect(() => {
+    const open = () => setShowPayment(true);
+    window.addEventListener('raptor:open-payment', open);
+    return () => window.removeEventListener('raptor:open-payment', open);
+  }, []);
 
   const displayName = (user?.user_metadata?.full_name || user?.email || 'User').split(' ')[0];
   const fullName = user?.user_metadata?.full_name || displayName;
