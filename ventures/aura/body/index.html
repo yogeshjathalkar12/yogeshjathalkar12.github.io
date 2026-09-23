@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D Body Explorer | Aura</title>
+<meta name="description" content="Explore the human body in 3D, free and with no sign-in. Zoom continuously from the whole body to individual structures, peel away layers and search 2,800 anatomical structures.">
+<link rel="canonical" href="https://shoonyaorigins.com/ventures/aura/body/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Aura by Shoonya Origins">
+<meta property="og:title" content="3D Body Explorer | Aura">
+<meta property="og:description" content="Explore the human body in 3D, free and with no sign-in. Zoom continuously from the whole body to individual structures, peel away layers and search 2,800 anatomical structures.">
+<meta property="og:url" content="https://shoonyaorigins.com/ventures/aura/body/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/ventures/aura/assets/aura-site.css">
+<link rel="stylesheet" href="/ventures/aura/assets/aura-footer.css">
+<script src="/ventures/aura/assets/aura-site.js"></script>
+<link rel="stylesheet" href="/ventures/aura/assets/aura-body.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.171.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.171.0/examples/jsm/"}}</script>
+<script type="module" src="/ventures/aura/assets/aura-body.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="ambient" aria-hidden="true"></div>
+<header class="site-nav">
+  <a class="logo" href="/ventures/aura/" aria-label="Aura home">Aura<span>.</span></a>
+  <nav class="nav-links" aria-label="Main"><a href="/ventures/aura/features/">Features</a><a href="/ventures/aura/how-it-works.html">How it works</a><a href="/ventures/aura/pricing.html">Pricing</a><a href="/ventures/aura/security.html">Security</a><a href="/ventures/aura/contact.html">Contact</a></nav>
+  <div class="nav-right">
+    <a class="btn-link" href="/ventures/aura/?auth=login">Log in</a>
+    <a class="btn btn-primary" href="/ventures/aura/?auth=signup">Create your vault</a>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle dark mode">☾</button>
+  </div>
+</header>
+<main id="main">
+  <section class="hero">
+    <div class="crumbs"><a href="/ventures/aura/">Aura</a> / <a href="/ventures/aura/features/">Features</a> / 3D Body Explorer</div>
+    <div class="eyebrow">Free · No sign-in</div>
+    <h1>Explore the human body in <em>3D</em></h1>
+    <p class="lead">Rotate a full anatomical model, zoom smoothly from the whole body down to individual structures, peel away layers, and search around 2,800 named parts.</p>
+    <div class="hero-ctas"><a class="btn btn-primary" href="/ventures/aura/?auth=signup">Create your vault</a></div>
+  </section>
+  <div class="container wide">
+<div class="bx" id="bx">
+  <div class="bx-stage" id="bx-stage">
+    <canvas id="bx-canvas" role="img" aria-label="Interactive 3D human anatomy. Drag to rotate, scroll to zoom."></canvas>
+    <div class="bx-labels" id="bx-labels" aria-hidden="true"></div>
+    <div class="bx-hud"><div class="chip">View <strong id="bx-zoom">-</strong></div><div class="chip">Detail <strong id="bx-detail">-</strong></div></div>
+    <div class="bx-hint">Drag to rotate &middot; Scroll to zoom to the cursor<br>Right-drag to pan &middot; Click a structure</div>
+    <div class="bx-tip" id="bx-tip"></div>
+    <div class="bx-loading" id="bx-loading"><span>Loading anatomy&hellip;</span></div>
+    <div class="bx-fail" id="bx-fail"><div><h2>3D view unavailable</h2><p data-msg></p></div></div>
+    <div class="bx-attrib"><span class="long">Generic educational anatomy. Not medical advice, and not your own anatomy.
+      Models: BodyParts3D &ndash; The Database Center for Life Science &ndash; CC-BY-SA 2.1 Japan;
+      Z-Anatomy &ndash; The open source atlas of anatomy &ndash; CC-BY-SA 4.0. Modified: some structures removed, geometry simplified and compressed.
+      Shared under <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>.</span>
+      <span class="short">Educational, not medical advice. BodyParts3D (DBCLS, CC-BY-SA 2.1 Japan) &middot; Z-Anatomy (CC-BY-SA 4.0), modified.</span>
+      <a href="#credits">Full credits</a></div>
+  </div>
+  <aside class="bx-panel">
+    <div class="bx-card bx-search"><h3>Find a structure</h3>
+      <input id="bx-search" type="search" placeholder="e.g. femur, aorta, biceps" autocomplete="off" aria-label="Search anatomy">
+      <ul id="bx-results" class="bx-results"></ul></div>
+    <div class="bx-card"><h3>Layers</h3><div id="bx-layers"></div>
+      <div class="bx-row"><span>Depth</span><span>outer &rarr; deep</span></div>
+      <input id="bx-peel" class="bx-slider" type="range" min="0" max="100" value="0" aria-label="Peel away outer layers">
+      <label class="bx-layer"><input type="checkbox" id="bx-auto"><span>Peel layers as you zoom in</span></label>
+      <label class="bx-layer"><input type="checkbox" id="bx-labels-cb" checked><span>Show labels</span></label></div>
+    <div class="bx-card bx-sel"><h3>Selected</h3><div id="bx-selected"></div>
+      <div class="bx-btns"><button class="btn btn-ghost" id="bx-showall" type="button" hidden>Show hidden structures</button></div></div>
+    <div class="bx-card"><div class="bx-btns" style="margin-top:0"><button class="btn btn-ghost" id="bx-reset" type="button">Reset view</button></div>
+      <p class="bx-note" style="margin-top:8px"><span id="bx-count">-</span> structures</p></div>
+  </aside>
+</div>
+<noscript><p>The 3D Body Explorer needs JavaScript and WebGL. Please enable JavaScript or try a recent browser.</p></noscript>
+<h2>How to explore</h2>
+<ul class="checklist"><li><strong>Rotate:</strong> drag. <strong>Zoom:</strong> scroll or pinch. The zoom goes toward whatever is under your cursor, and more detail loads as you get closer.</li><li><strong>Pan:</strong> right-drag, or two-finger drag. <strong>Reset view</strong> returns to the whole body.</li><li><strong>Layers:</strong> switch body systems on and off, or drag <em>Depth</em> to peel from outer layers to deep ones. <em>Peel layers as you zoom in</em> does it for you.</li><li><strong>Click</strong> a structure to name it, zoom to it, or hide it. <strong>Search</strong> to fly straight to any of the named structures.</li><li>On a phone, use the layer toggles to keep it smooth. Full detail is heavy, so it only loads when you zoom in.</li></ul>
+<div class="note warn"><h3>Educational only</h3><p>This is a generic anatomical model, not your own body, and it does not diagnose anything. It is not medical advice. See our <a href="/ventures/aura/legal/disclaimer.html">Legal Disclaimer</a>.</p></div>
+<h2>Credits and licence</h2>
+<p><span id="credits"></span>The 3D models are derived from two open projects, and must be credited as follows:</p>
+<ul class="plain"><li>"BodyParts3D - The Database Center for Life Science - CC-BY-SA 2.1 Japan"</li><li>"Z-Anatomy - The open source atlas of anatomy - CC-BY-SA 4.0"</li></ul>
+<p>We changed them: some structures were removed, and the geometry was simplified and compressed for the web. The modified models are shared under the same licence, <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a> (the BodyParts3D part under <a href="https://creativecommons.org/licenses/by-sa/2.1/jp/" target="_blank" rel="noopener">CC BY-SA 2.1 Japan</a>). Read the original notice: <a href="https://wguodgtcgyarugivowyl.supabase.co/storage/v1/object/public/aura-body/License.txt" target="_blank" rel="noopener">License.txt</a>.</p>
+<p>Some parts of the original Z-Anatomy model set are non-commercial or have no stated licence (for example the kidney model, the inner ear and the cortical brain surfaces), so they are not included here. That is why a few structures, such as the kidneys and the surface of the brain, are missing.</p>
+<div class="cta-band"><h2>Keep your own health record</h2><p>The body explorer is free. Your vault is where your own symptoms, documents and medications live.</p><div class="hero-ctas"><a class="btn btn-primary" href="/ventures/aura/?auth=signup">Create your vault</a><a class="btn btn-ghost" href="/ventures/aura/features/">All features</a></div></div>
+  </div>
+</main>
+<!-- AURA-FOOTER:START -->
+<footer class="aura-footer" role="contentinfo">
+  <div class="af-inner">
+    <div class="af-grid">
+      <div class="af-brand">
+        <a class="af-logo" href="/ventures/aura/" aria-label="Aura home">Aura<span>.</span></a>
+        <p class="af-tagline">Your lifetime health vault.</p>
+        <p class="af-by">By <a href="https://shoonyaorigins.com/" target="_blank" rel="noopener">Shoonya Origins</a> · Pune, India</p>
+      </div>
+      <nav class="af-col" aria-label="About Aura"><h4>About Aura</h4><ul><li><a href="/ventures/aura/why-aura.html">Why Aura</a></li><li><a href="/ventures/aura/how-it-works.html">How It Works</a></li><li><a href="/ventures/aura/who-its-for.html">Who It&#x27;s For</a></li><li><a href="/ventures/aura/pricing.html">Pricing</a></li><li><a href="/ventures/aura/charaka/">Project Charaka</a></li><li><a href="https://shoonyaorigins.com/" target="_blank" rel="noopener">About Shoonya Origins</a></li></ul></nav><nav class="af-col" aria-label="Your Vault"><h4>Your Vault</h4><ul><li><a href="/ventures/aura/body/">3D Body Explorer</a></li><li><a href="/ventures/aura/features/timeline.html">Health Timeline</a></li><li><a href="/ventures/aura/features/documents.html">Medical Cabinet</a></li><li><a href="/ventures/aura/features/medications.html">Medications</a></li><li><a href="/ventures/aura/features/family-access.html">Family Access</a></li><li><a href="/ventures/aura/features/sharing.html">Share with a Doctor</a></li><li><a href="/ventures/aura/tools/">Free Health Tools</a></li></ul></nav><nav class="af-col" aria-label="Intelligence"><h4>Intelligence</h4><ul><li><a href="/ventures/aura/services/EVM.html">EVM Technology</a></li><li><a href="/ventures/aura/services/prediction.html">Predictive Health</a></li><li><a href="/ventures/aura/services/environment.html">Environmental Intel</a></li><li><a href="/ventures/aura/services/nutrition.html">Nutrition Analytics</a></li><li><a href="/ventures/aura/services/trainer.html">Personalized Trainer</a></li><li><a href="/ventures/aura/services/neonatal.html">Neonatal Care</a></li><li><a href="/ventures/aura/services/Elderly.html">Elderly Care</a></li><li><a href="/ventures/aura/services/personalized-care.html">Personalized Care</a></li><li><a href="/ventures/aura/services/mobile.html">Aura Mobile App</a></li><li><a href="/ventures/aura/features/" class="af-more">All features →</a></li></ul></nav><nav class="af-col" aria-label="Legal"><h4>Legal</h4><ul><li><a href="/ventures/aura/legal/terms.html">Terms &amp; Conditions</a></li><li><a href="/ventures/aura/legal/privacy.html">Privacy Policy</a></li><li><a href="/ventures/aura/legal/disclaimer.html">Legal Disclaimer</a></li><li><a href="/ventures/aura/security.html">Security &amp; Data Protection</a></li></ul></nav><nav class="af-col" aria-label="My Account"><h4>My Account</h4><ul><li><a href="/ventures/aura/?auth=login">Log In</a></li><li><a href="/ventures/aura/?auth=signup">Create Account</a></li><li><a href="/ventures/aura/app/#/timeline">Open My Vault</a></li><li><a href="/ventures/aura/contact.html">Contact Us</a></li></ul></nav>
+    </div>
+    <div class="af-bottom">
+      <p>&copy; 2026 Aura. Built by Shoonya Origins. <a href="mailto:contact@shoonyaorigins.com">contact@shoonyaorigins.com</a></p>
+      <p class="af-legal-line">Aura is a personal health record tool. It is not a medical device and does not give medical advice, diagnosis or treatment. In an emergency, call your local emergency number (112 in India).</p>
+    </div>
+  </div>
+</footer>
+<!-- AURA-FOOTER:END -->
+</body>
+</html>
