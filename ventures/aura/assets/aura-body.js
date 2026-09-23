@@ -7,7 +7,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
 // ── configuration ───────────────────────────────────────────────────────────────────────────────────
-const DEFAULT_MODELS = 'https://wguodgtcgyarugivowyl.supabase.co/storage/v1/object/public/aura-body/';
+const DEFAULT_MODELS = 'https://cdn.jsdelivr.net/gh/yogeshjathalkar12/aura-body-models@v1/';
 const THREE_VER = '0.171.0';
 const DRACO_PATH = `https://cdn.jsdelivr.net/npm/three@${THREE_VER}/examples/jsm/libs/draco/gltf/`;
 // ?models=... is for local testing only; it may not point at some other website.

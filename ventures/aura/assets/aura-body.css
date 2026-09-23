@@ -56,3 +56,6 @@
 
 .bx-attrib .short { display: none; }
 @media (max-width: 640px) { .bx-attrib .long { display: none; } .bx-attrib .short { display: inline; } .bx-attrib { font-size: 10px; padding: 6px 10px; } }
+
+/* buttons set their own display, which would otherwise override the hidden attribute */
+.bx [hidden] { display: none !important; }
