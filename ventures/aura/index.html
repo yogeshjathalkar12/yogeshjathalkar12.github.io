@@ -563,6 +563,10 @@
         }
     </style>
 <link rel="stylesheet" href="/ventures/aura/assets/aura-footer.css">
+<!-- AURA-BODY-HEAD:START -->
+<link rel="stylesheet" href="/ventures/aura/assets/aura-body.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.171.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.171.0/examples/jsm/"}}</script>
+<!-- AURA-BODY-HEAD:END -->
 </head>
 <body>
 
@@ -600,6 +604,73 @@
             <span>You approve every share</span>
         </div>
     </header>
+
+<!-- AURA-BODY:START -->
+<section class="body-home" id="body-explorer" aria-labelledby="body-home-title">
+  <div class="body-home-head">
+    <div class="eyebrow">Free &middot; No sign-in</div>
+    <h2 id="body-home-title">Explore the human body in 3D</h2>
+    <p>Rotate a full anatomical model, zoom smoothly from the whole body down to individual structures, peel away layers and search around 2,800 named parts.</p>
+    <a class="btn-ghost" href="/ventures/aura/body/">Open the full explorer &rarr;</a>
+  </div>
+  <div class="bx" id="bx">
+  <div class="bx-stage" id="bx-stage">
+    <canvas id="bx-canvas" role="img" aria-label="Interactive 3D human anatomy. Drag to rotate, scroll to zoom."></canvas>
+    <div class="bx-labels" id="bx-labels" aria-hidden="true"></div>
+    <div class="bx-hud"><div class="chip">View <strong id="bx-zoom">-</strong></div><div class="chip">Detail <strong id="bx-detail">-</strong></div></div>
+    <div class="bx-hint">Drag to rotate &middot; Scroll to zoom to the cursor<br>Right-drag to pan &middot; Click a structure</div>
+    <div class="bx-tip" id="bx-tip"></div>
+    <div class="bx-loading" id="bx-loading"><span>Loading anatomy&hellip;</span></div>
+    <div class="bx-fail" id="bx-fail"><div><h2>3D view unavailable</h2><p data-msg></p></div></div>
+    <div class="bx-attrib"><span class="long">Generic educational anatomy. Not medical advice, and not your own anatomy.
+      Models: BodyParts3D &ndash; The Database Center for Life Science &ndash; CC-BY-SA 2.1 Japan;
+      Z-Anatomy &ndash; The open source atlas of anatomy &ndash; CC-BY-SA 4.0. Modified: some structures removed, geometry simplified and compressed.
+      Shared under <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>.</span>
+      <span class="short">Educational, not medical advice. BodyParts3D (DBCLS, CC-BY-SA 2.1 Japan) &middot; Z-Anatomy (CC-BY-SA 4.0), modified.</span>
+      <a href="/ventures/aura/body/#credits">Full credits</a></div>
+  </div>
+  <aside class="bx-panel">
+    <div class="bx-card bx-search"><h3>Find a structure</h3>
+      <input id="bx-search" type="search" placeholder="e.g. femur, aorta, biceps" autocomplete="off" aria-label="Search anatomy">
+      <ul id="bx-results" class="bx-results"></ul></div>
+    <div class="bx-card"><h3>Layers</h3><div id="bx-layers"></div>
+      <div class="bx-row"><span>Depth</span><span>outer &rarr; deep</span></div>
+      <input id="bx-peel" class="bx-slider" type="range" min="0" max="100" value="0" aria-label="Peel away outer layers">
+      <label class="bx-layer"><input type="checkbox" id="bx-auto"><span>Peel layers as you zoom in</span></label>
+      <label class="bx-layer"><input type="checkbox" id="bx-labels-cb" checked><span>Show labels</span></label></div>
+    <div class="bx-card bx-sel"><h3>Selected</h3><div id="bx-selected"></div>
+      <div class="bx-btns"><button class="btn btn-ghost" id="bx-showall" type="button" hidden>Show hidden structures</button></div></div>
+    <div class="bx-card"><div class="bx-btns" style="margin-top:0"><button class="btn btn-ghost" id="bx-reset" type="button">Reset view</button></div>
+      <p class="bx-note" style="margin-top:8px"><span id="bx-count">-</span> structures</p></div>
+  </aside>
+</div>
+<noscript><p>The 3D Body Explorer needs JavaScript and WebGL. Please enable JavaScript or try a recent browser.</p></noscript>
+  <p class="body-home-note">Educational only. A generic anatomical model, not your own body, and not medical advice.
+    <a href="/ventures/aura/body/#credits">Credits and licence</a></p>
+</section>
+<script type="module">
+/* Load the 3D explorer only when this section is about to scroll into view, and only take over the mouse and touch after a click,
+   so the landing page still scrolls normally. */
+const bx = document.getElementById('bx'), stage = document.getElementById('bx-stage');
+if (bx && stage) {
+  stage.classList.add('bx-idle');
+  const act = document.createElement('button'); act.type = 'button'; act.className = 'bx-activate';
+  act.innerHTML = '<span>Click to explore in 3D</span><small>Drag to rotate &middot; scroll to zoom</small>';
+  const done = document.createElement('button'); done.type = 'button'; done.className = 'bx-done'; done.textContent = 'Done'; done.hidden = true;
+  stage.append(act, done);
+  const setActive = (on) => { stage.classList.toggle('bx-idle', !on); act.hidden = on; done.hidden = !on; };
+  act.addEventListener('click', () => setActive(true));
+  done.addEventListener('click', () => setActive(false));
+  addEventListener('keydown', (e) => { if (e.key === 'Escape') setActive(false); });
+  let started = false;
+  const start = () => { if (started) return; started = true; import('/ventures/aura/assets/aura-body.js').catch((e) => console.error(e)); };
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { start(); io.disconnect(); } }, { rootMargin: '400px' });
+    io.observe(bx);
+  } else start();
+}
+</script>
+<!-- AURA-BODY:END -->
 
     <!-- ═══════════════ ORBIT SIGNATURE VISUAL ═══════════════ -->
     <div class="orbit-wrap" data-aos="zoom-in" data-aos-delay="200">
