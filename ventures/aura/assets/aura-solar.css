@@ -1,0 +1,82 @@
+/* Aura landing page: the "solar system" of features and products around the Vault, in CSS 3D (a tilted plane; every body is turned back to face the viewer). */
+.sys-holder { container-type: inline-size; width: 100%; }
+.sys-wrap { --u: calc(min(100cqw, 1000px) / 1000); --tilt: 58deg; display: flex; flex-direction: column; align-items: center; padding: 10px 0 0; }
+.sys-stage { position: relative; width: calc(1000 * var(--u)); height: calc(600 * var(--u)); perspective: calc(1900 * var(--u)); perspective-origin: 50% 35%; }
+.sys-scene { position: absolute; inset: 0; transform-style: preserve-3d; transform: rotateX(var(--tilt)); }
+
+.sys-orbit {
+  position: absolute; left: 50%; top: 50%; border-radius: 50%; transform-style: preserve-3d;
+  width: calc(var(--r) * 2 * var(--u)); height: calc(var(--r) * 2 * var(--u));
+  margin: calc(var(--r) * var(--u) * -1) 0 0 calc(var(--r) * var(--u) * -1);
+  border: 1px dashed var(--ring, var(--glass-border));
+  animation: sys-spin var(--t) linear infinite; animation-direction: var(--dir, normal);
+}
+.sys-orbit.o1 { --r: 175; --t: 60s; --ring: rgba(5, 150, 105, 0.7); --c: #059669; --c2: #34d399; }
+.sys-orbit.belt { --r: 250; --t: 150s; --dir: reverse; border: 0; }
+.sys-orbit.o2 { --r: 322; --t: 110s; --dir: reverse; --ring: rgba(14, 165, 233, 0.65); --c: #0284c7; --c2: #38bdf8; }
+.sys-orbit.o3 { --r: 405; --t: 170s; --ring: rgba(249, 115, 22, 0.62); --c: #ea580c; --c2: #fbbf24; }
+@keyframes sys-spin { to { transform: rotateZ(360deg); } }
+
+.sys-planet { position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform-style: preserve-3d; transform: rotateZ(var(--a)) translateX(calc(var(--r) * var(--u))); }
+.sys-body { position: absolute; left: 0; top: 0; width: 0; height: 0; animation: sys-face var(--t) linear infinite; animation-direction: var(--dir, normal); }
+@keyframes sys-face {
+  from { transform: rotateZ(calc(var(--a) * -1)) rotateX(calc(var(--tilt) * -1)); }
+  to   { transform: rotateZ(calc(var(--a) * -1 - 360deg)) rotateX(calc(var(--tilt) * -1)); }
+}
+.sys-node { position: absolute; left: 0; top: 0; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: calc(6 * var(--u)); text-decoration: none; color: var(--text-main); }
+.sys-dot {
+  display: grid; place-items: center; border-radius: 50%; color: #fff; font-weight: 800; letter-spacing: 0.02em;
+  width: calc(var(--s, 58) * var(--u)); height: calc(var(--s, 58) * var(--u)); font-size: max(11px, calc(var(--s, 58) * 0.3 * var(--u)));
+  background: radial-gradient(circle at 32% 28%, var(--c2), var(--c) 68%);
+  box-shadow: inset -6px -8px 14px rgba(0, 0, 0, 0.22), 0 10px 24px color-mix(in srgb, var(--c) 40%, transparent);
+  transition: transform 0.25s ease;
+}
+.sys-name {
+  font-size: max(10px, calc(13 * var(--u))); font-weight: 700; white-space: nowrap; padding: 3px 10px; border-radius: 999px;
+  background: var(--glass-hover); border: 1px solid var(--glass-border);
+}
+.sys-node:hover .sys-dot, .sys-node:focus-visible .sys-dot { transform: scale(1.18); }
+.sys-node:focus-visible .sys-name { outline: 2px solid var(--primary); }
+.sys-stage:hover .sys-orbit, .sys-stage:hover .sys-body, .sys-stage:focus-within .sys-orbit, .sys-stage:focus-within .sys-body { animation-play-state: paused; }
+.sys-wrap.sys-off .sys-orbit, .sys-wrap.sys-off .sys-body { animation-play-state: paused; }
+
+.sys-rock {
+  position: absolute; left: 50%; top: 50%; border-radius: 50%; background: var(--rock, rgba(100, 116, 139, 0.55));
+  width: calc(var(--sz) * var(--u)); height: calc(var(--sz) * var(--u)); margin: calc(var(--sz) * var(--u) * -0.5) 0 0 calc(var(--sz) * var(--u) * -0.5);
+  transform: rotateZ(var(--a)) translateX(calc((var(--r) + var(--j)) * var(--u))) translateZ(calc(var(--z) * var(--u)));
+}
+[data-theme="dark"] .sys-rock { --rock: rgba(203, 213, 225, 0.5); }
+
+.sys-sun {
+  position: absolute; left: 50%; top: 50%; width: calc(150 * var(--u)); height: calc(150 * var(--u)); border-radius: 50%;
+  transform: translate(-50%, -50%) rotateX(calc(var(--tilt) * -1)); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; text-align: center;
+  background: radial-gradient(circle at 32% 28%, #6ee7b7, #059669 62%, #047857);
+  box-shadow: 0 0 0 calc(10 * var(--u)) rgba(52, 211, 153, 0.18), 0 0 calc(70 * var(--u)) rgba(52, 211, 153, 0.55);
+  animation: sys-pulse 4s ease-in-out infinite;
+}
+@keyframes sys-pulse { 50% { box-shadow: 0 0 0 calc(16 * var(--u)) rgba(52, 211, 153, 0.12), 0 0 calc(95 * var(--u)) rgba(52, 211, 153, 0.7); } }
+.sys-sun small { font-size: max(9px, calc(11 * var(--u))); letter-spacing: 0.16em; text-transform: uppercase; opacity: 0.85; }
+.sys-sun b { font-size: max(15px, calc(26 * var(--u))); font-weight: 800; line-height: 1.1; }
+
+.sys-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 22px; margin: 4px 16px 0; font-size: 0.78rem; font-weight: 600; color: var(--text-muted); }
+.sys-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 7px; vertical-align: -1px; }
+
+.sys-key { display: none; }
+@media (max-width: 760px) {
+  .sys-wrap { --u: calc(min(100cqw, 450px) / 450); --tilt: 62deg; }
+  .sys-stage { width: calc(450 * var(--u)); height: calc(410 * var(--u)); }
+  .sys-orbit.o1 { --r: 88; }
+  .sys-orbit.belt { --r: 124; }
+  .sys-orbit.o2 { --r: 158; }
+  .sys-orbit.o3 { --r: 190; }
+  .sys-sun { width: calc(96 * var(--u)); height: calc(96 * var(--u)); }
+  .sys-dot { width: calc(var(--s, 58) * 0.8 * var(--u)); height: calc(var(--s, 58) * 0.8 * var(--u)); font-size: max(10px, calc(var(--s, 58) * 0.26 * var(--u))); }
+  .o2 .sys-name, .o3 .sys-name { display: none; }
+  .sys-key { display: block; margin: 8px 18px 0; max-width: 420px; text-align: center; font-size: 0.72rem; line-height: 1.7; color: var(--text-muted); }
+  .sys-key span { display: block; margin-top: 4px; }
+  .sys-key i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+  .sys-key b { color: var(--text-main); }
+  .sys-key a { color: var(--primary-dark); text-decoration: underline; text-underline-offset: 2px; }
+}
+@media (prefers-reduced-motion: reduce) { .sys-orbit, .sys-body, .sys-sun { animation: none !important; } .sys-body { transform: rotateZ(calc(var(--a) * -1)) rotateX(calc(var(--tilt) * -1)); } }
+@media print { .sys-wrap { display: none; } }
