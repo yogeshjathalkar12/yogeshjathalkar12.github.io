@@ -567,10 +567,19 @@
 <link rel="stylesheet" href="/ventures/aura/assets/aura-body.css?v=ef896ae3">
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.171.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.171.0/examples/jsm/"}}</script>
 <!-- AURA-BODY-HEAD:END -->
+<!-- AURA-BG-HEAD:START -->
+<link rel="stylesheet" href="/ventures/aura/assets/aura-bg.css?v=b84bd105">
+<script type="module" src="/ventures/aura/assets/aura-bg.js?v=e1efa235"></script>
+<!-- AURA-BG-HEAD:END -->
 </head>
 <body>
 
     <div class="ambient-flow"></div>
+<!-- AURA-BG:START -->
+    <div class="aura-grid" aria-hidden="true"></div>
+    <canvas class="aura-bg-body" id="aura-bg-canvas" aria-hidden="true"></canvas>
+    <button type="button" class="aura-bg-toggle" id="aura-bg-toggle" aria-pressed="true" title="Show or hide the faint 3D body behind the page"><i class="dot"></i><span>3D body backdrop: on</span></button>
+    <!-- AURA-BG:END -->
 
     <nav data-aos="fade-down" data-aos-duration="800">
         <a href="#" class="logo">Aura<span>.</span></a>

@@ -1,0 +1,27 @@
+/* Aura landing page backdrop: faint grid lines + a very faint 3D human body with an on/off button. Only used on the landing page. */
+:root { --grid-line: rgba(5, 150, 105, 0.10); --bg-body-opacity: 0.12; }
+[data-theme="dark"] { --grid-line: rgba(52, 211, 153, 0.08); --bg-body-opacity: 0.16; }
+
+.aura-grid {
+  position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background-image: linear-gradient(to right, var(--grid-line) 1px, transparent 1px), linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+.aura-bg-body {
+  position: fixed; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;
+  opacity: 0; transition: opacity 0.6s ease;
+}
+.aura-bg-body.on { opacity: var(--bg-body-opacity); }
+
+.aura-bg-toggle {
+  position: fixed; left: 16px; bottom: 16px; z-index: 40; display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 14px; border-radius: 999px; cursor: pointer; font: 600 12.5px 'Plus Jakarta Sans', sans-serif;
+  color: var(--text-main); background: var(--glass-bg); border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+}
+.aura-bg-toggle:hover { background: var(--glass-hover); }
+.aura-bg-toggle:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.aura-bg-toggle .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); }
+.aura-bg-toggle[aria-pressed="true"] .dot { background: var(--primary); box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.2); }
+@media (max-width: 600px) { .aura-grid { background-size: 40px 40px; } .aura-bg-toggle { left: 10px; bottom: 10px; } }
+@media print { .aura-grid, .aura-bg-body, .aura-bg-toggle { display: none; } }
