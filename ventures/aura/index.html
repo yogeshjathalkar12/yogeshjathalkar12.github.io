@@ -568,8 +568,8 @@
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.171.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.171.0/examples/jsm/"}}</script>
 <!-- AURA-BODY-HEAD:END -->
 <!-- AURA-BG-HEAD:START -->
-<link rel="stylesheet" href="/ventures/aura/assets/aura-bg.css?v=b84bd105">
-<script type="module" src="/ventures/aura/assets/aura-bg.js?v=6c3c287a"></script>
+<link rel="stylesheet" href="/ventures/aura/assets/aura-bg.css?v=55db5807">
+<script type="module" src="/ventures/aura/assets/aura-bg.js?v=9f1b60f8"></script>
 <!-- AURA-BG-HEAD:END -->
 </head>
 <body>
@@ -672,7 +672,7 @@ if (bx && stage) {
   done.addEventListener('click', () => setActive(false));
   addEventListener('keydown', (e) => { if (e.key === 'Escape') setActive(false); });
   let started = false;
-  const start = () => { if (started) return; started = true; import('/ventures/aura/assets/aura-body.js?v=23750c99').catch((e) => console.error(e)); };
+  const start = () => { if (started) return; started = true; import('/ventures/aura/assets/aura-body.js?v=965e38b2').catch((e) => console.error(e)); };
   if ('IntersectionObserver' in window) {
     const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { start(); io.disconnect(); } }, { rootMargin: '400px' });
     io.observe(bx);

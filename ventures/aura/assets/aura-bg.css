@@ -1,6 +1,6 @@
 /* Aura landing page backdrop: faint grid lines + a very faint 3D human body with an on/off button. Only used on the landing page. */
-:root { --grid-line: rgba(5, 150, 105, 0.10); --bg-body-opacity: 0.12; }
-[data-theme="dark"] { --grid-line: rgba(52, 211, 153, 0.08); --bg-body-opacity: 0.16; }
+:root { --grid-line: rgba(5, 150, 105, 0.10); --bg-body-opacity: 0.17; }
+[data-theme="dark"] { --grid-line: rgba(52, 211, 153, 0.08); --bg-body-opacity: 0.21; }
 
 .aura-grid {
   position: fixed; inset: 0; z-index: -1; pointer-events: none;

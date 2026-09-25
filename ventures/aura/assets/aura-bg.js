@@ -1,11 +1,11 @@
-// Aura landing page backdrop: a faint, slowly turning 3D human body behind the page (muscles, lowest detail, about 1 MB).
+// Aura landing page backdrop: a faint, slowly turning 3D human body behind the page (the explorer's starting layers, lowest detail, about 3.4 MB).
 // Models: BodyParts3D (DBCLS, CC BY-SA 2.1 Japan) and Z-Anatomy (CC BY-SA 4.0), modified; credited on the 3D Body Explorer page. Generic educational anatomy.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
 const MODELS = 'https://cdn.jsdelivr.net/gh/yogeshjathalkar12/aura-body-models@v2/';
-const FILES = ['muscular.lod0.glb'];                                   // muscles, like the explorer's starting view
+const FILES = ['skeletal', 'visceral', 'cardiovascular', 'nervous', 'joints', 'lymphatic'].map((k) => k + '.lod0.glb');   // the same layers the explorer starts with (no muscles)
 const HIDE = /penis|penile|scrot|testis|testic|epididym|glans|spermatic|prostat|genital|cremast|cavernos|spongios|urethra/i;   // never shown in the backdrop
 const KEY = 'aura-bg-body';
 const canvas = document.getElementById('aura-bg-canvas'), btn = document.getElementById('aura-bg-toggle');
