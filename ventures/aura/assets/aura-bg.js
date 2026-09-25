@@ -1,11 +1,12 @@
-// Aura landing page backdrop: a faint, slowly turning 3D human body behind the page (skeleton + organs, lowest detail, about 0.8 MB).
+// Aura landing page backdrop: a faint, slowly turning 3D human body behind the page (muscles, lowest detail, about 1 MB).
 // Models: BodyParts3D (DBCLS, CC BY-SA 2.1 Japan) and Z-Anatomy (CC BY-SA 4.0), modified; credited on the 3D Body Explorer page. Generic educational anatomy.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
 const MODELS = 'https://cdn.jsdelivr.net/gh/yogeshjathalkar12/aura-body-models@v2/';
-const FILES = ['skeletal.lod0.glb', 'visceral.lod0.glb'];
+const FILES = ['muscular.lod0.glb'];                                   // muscles, like the explorer's starting view
+const HIDE = /penis|penile|scrot|testis|testic|epididym|glans|spermatic|prostat|genital|cremast|cavernos|spongios|urethra/i;   // never shown in the backdrop
 const KEY = 'aura-bg-body';
 const canvas = document.getElementById('aura-bg-canvas'), btn = document.getElementById('aura-bg-toggle');
 if (canvas && btn) {
@@ -46,7 +47,7 @@ if (canvas && btn) {
     const draco = new DRACOLoader().setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.171.0/examples/jsm/libs/draco/gltf/');
     const loader = new GLTFLoader().setDRACOLoader(draco);
     Promise.all(FILES.map((f) => loader.loadAsync(MODELS + f))).then((gs) => {
-      for (const g of gs) body.add(g.scene);
+      for (const g of gs) { g.scene.traverse((o) => { if (o.isMesh && HIDE.test(o.userData.za_name || o.name || '')) o.visible = false; }); body.add(g.scene); }
       state = 'ready'; draco.dispose(); canvas.classList.toggle('on', want); run();
     }).catch(giveUp);
   }

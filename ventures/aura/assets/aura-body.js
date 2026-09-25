@@ -20,13 +20,13 @@ const MODELS = modelsBase();
 
 // outermost -> deepest. `rank` drives the depth slider (peeling).
 const SYSTEMS = {
-  muscular:       { label: 'Muscles',            rank: 0, color: '#d96a5b', on: false },
+  muscular:       { label: 'Muscles',            rank: 0, color: '#d96a5b', on: true },
   lymphatic:      { label: 'Lymphatic',          rank: 1, color: '#7ec8a4', on: false },
   joints:         { label: 'Joints & ligaments', rank: 2, color: '#9aa9b8', on: false },
-  nervous:        { label: 'Nervous system',     rank: 3, color: '#f2d15c', on: true },
-  cardiovascular: { label: 'Circulation',        rank: 4, color: '#d64545', on: true },
-  visceral:       { label: 'Organs',             rank: 5, color: '#e59a7a', on: true },
-  skeletal:       { label: 'Skeleton',           rank: 6, color: '#e9e3d1', on: true },
+  nervous:        { label: 'Nervous system',     rank: 3, color: '#f2d15c', on: false },
+  cardiovascular: { label: 'Circulation',        rank: 4, color: '#d64545', on: false },
+  visceral:       { label: 'Organs',             rank: 5, color: '#e59a7a', on: false },
+  skeletal:       { label: 'Skeleton',           rank: 6, color: '#e9e3d1', on: false },
 };
 const NSYS = Object.keys(SYSTEMS).length;
 const $ = (id) => document.getElementById(id);
