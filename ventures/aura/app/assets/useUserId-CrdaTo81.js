@@ -1,1 +1,0 @@
-import{r as e}from"./index-J68SV1t9.js";function t(){let{user:t}=e();if(!t)throw Error(`useUserId used outside an authenticated route`);return t.id}export{t};

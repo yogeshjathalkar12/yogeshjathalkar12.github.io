@@ -20,10 +20,17 @@
   @media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 3s; } }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<!-- VAPUS-BRAND:START -->
+<link rel="icon" href="/ventures/aura/assets/vapus-favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/ventures/aura/assets/vapus-favicon-32.png">
+<link rel="apple-touch-icon" href="/ventures/aura/assets/vapus-apple-touch-icon.png">
+<link rel="stylesheet" href="/ventures/aura/assets/aura-brand.css">
+<meta property="og:image" content="https://shoonyaorigins.com/ventures/aura/assets/vapus-share.png">
+<!-- VAPUS-BRAND:END -->
 </head>
 <body>
 <div class="box" id="box" role="status" aria-live="polite">
-  <div class="logo">Vapus<span>.</span></div>
+  <div class="logo"><img class="vapus-logo" src="/ventures/aura/assets/vapus-logo.png" alt="Vapus" width="131" height="50"></div>
   <div class="spinner"></div>
   <p id="msg">Signing you in&hellip;</p>
   <div id="err">
