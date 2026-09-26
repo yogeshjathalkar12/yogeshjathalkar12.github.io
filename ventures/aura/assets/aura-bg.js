@@ -1,4 +1,4 @@
-// Aura landing page backdrop: a faint, slowly turning 3D human body behind the page (the explorer's starting layers, lowest detail, about 3.4 MB).
+// Vapus landing page backdrop: a faint, slowly turning 3D human body behind the page (the explorer's starting layers, lowest detail, about 3.4 MB).
 // Models: BodyParts3D (DBCLS, CC BY-SA 2.1 Japan) and Z-Anatomy (CC BY-SA 4.0), modified; credited on the 3D Body Explorer page. Generic educational anatomy.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';

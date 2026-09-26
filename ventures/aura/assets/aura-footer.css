@@ -1,4 +1,4 @@
-/* Aura shared footer. Used by EVERY Aura page (new and old), so it is self-contained:
+/* Vapus shared footer. Used by EVERY Vapus page (new and old), so it is self-contained:
    its own colours, no dependency on the host page's CSS. Generated from aura-site/, do not edit in the repo. */
 .aura-footer {
   --af-bg: #f7fbf8; --af-fg: #1f2937; --af-muted: #4b5563; --af-line: rgba(5, 150, 105, 0.22);

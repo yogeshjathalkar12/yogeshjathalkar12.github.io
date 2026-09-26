@@ -1,4 +1,4 @@
-/* Aura 3D Body Explorer. Loaded only by /ventures/aura/body/. */
+/* Vapus 3D Body Explorer. Loaded only by /ventures/aura/body/. */
 .container.wide { max-width: 1320px; }
 .bx { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
 .bx-stage { position: relative; height: min(76vh, 760px); min-height: 460px; border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border);

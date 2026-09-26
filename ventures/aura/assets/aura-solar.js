@@ -1,4 +1,4 @@
-// Aura landing page "solar system": builds the asteroid belt, tilts the scene slightly with the pointer, and pauses when off screen.
+// Vapus landing page "solar system": builds the asteroid belt, tilts the scene slightly with the pointer, and pauses when off screen.
 (() => {
   const wrap = document.querySelector('.sys-wrap'), stage = document.getElementById('sys-stage'), belt = document.getElementById('sys-belt');
   if (!wrap || !stage) return;

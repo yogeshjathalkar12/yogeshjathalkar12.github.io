@@ -1,4 +1,4 @@
-/* Aura landing page: the "solar system" of features and products around the Vault, in CSS 3D (a tilted plane; every body is turned back to face the viewer). */
+/* Vapus landing page: the "solar system" of features and products around the Vault, in CSS 3D (a tilted plane; every body is turned back to face the viewer). */
 .sys-holder { container-type: inline-size; width: 100%; }
 .sys-wrap { --u: calc(min(100cqw, 1000px) / 1000); --tilt: 58deg; display: flex; flex-direction: column; align-items: center; padding: 10px 0 0; }
 .sys-stage { position: relative; width: calc(1000 * var(--u)); height: calc(600 * var(--u)); perspective: calc(1900 * var(--u)); perspective-origin: 50% 35%; }

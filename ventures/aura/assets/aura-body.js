@@ -1,4 +1,4 @@
-// Aura 3D Body Explorer.  Public page, no sign-in.  three.js + Draco, models streamed by level of detail.
+// Vapus 3D Body Explorer.  Public page, no sign-in.  three.js + Draco, models streamed by level of detail.
 // Models: BodyParts3D (DBCLS, CC BY-SA 2.1 Japan) and Z-Anatomy (CC BY-SA 4.0), modified: some structures removed,
 // geometry simplified and compressed.  Generic educational anatomy. Not medical advice.
 import * as THREE from 'three';

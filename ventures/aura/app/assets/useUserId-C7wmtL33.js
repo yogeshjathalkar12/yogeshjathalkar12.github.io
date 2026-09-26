@@ -1,1 +1,0 @@
-import{r as e}from"./index-DBJNe4am.js";function t(){let{user:t}=e();if(!t)throw Error(`useUserId used outside an authenticated route`);return t.id}export{t};

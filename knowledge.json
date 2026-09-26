@@ -1,7 +1,7 @@
 [
     {
         "tags": ["aura", "health", "vitals", "medical", "doctor", "sensor"],
-        "response": "Aura is our non-invasive health portal. It utilizes advanced sensor fusion algorithms to predict physiological vitals locally. Click the Aura card to view the open tools!"
+        "response": "Vapus is our non-invasive health portal. It utilizes advanced sensor fusion algorithms to predict physiological vitals locally. Click the Vapus card to view the open tools!"
     },
     {
         "tags": ["raptor", "marketing", "sales", "clients", "growth", "engine"],
@@ -12,8 +12,8 @@
         "response": "Shakti focuses on unmanned defense tech. Note: this is for informational research only; we do not host tactical software on this public site."
     },
     {
-        "tags": ["rta", "basis", "infrastructure", "city", "urban", "heavy"],
-        "response": "rta and Basis handle our autonomous infrastructure and smart city management. They are designed for heavy vehicular navigation and sustainable construction."
+        "tags": ["rta", "basis", "alaka", "infrastructure", "city", "urban", "heavy"],
+        "response": "rta and Alaka handle our autonomous infrastructure and smart city management. They are designed for heavy vehicular navigation and sustainable construction."
     },
     {
         "tags": ["aether", "quantum", "physics", "labs", "research"],

@@ -1,5 +1,5 @@
-// Theme toggle for Aura site pages. Uses the same storage key and attribute as the landing page,
-// so the choice carries across every Aura page and the app.
+// Theme toggle for Vapus site pages. Uses the same storage key and attribute as the landing page,
+// so the choice carries across every Vapus page and the app.
 (function () {
   var KEY = 'aura_theme', root = document.documentElement;
   function saved() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
