@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Moderation — Basis</title>
+<title>Moderation — Alaka</title>
 
 <!-- ═══ SECURITY: Content Security Policy (matches dashboard.html) ═══ -->
 <meta http-equiv="Content-Security-Policy" content="
@@ -118,13 +118,17 @@ header { position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--
 .toast.error { border-left-color: var(--danger); }
 .toast.success { border-left-color: var(--safe); }
 </style>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="basis-footer.css">
 </head>
 <body>
 
 <header>
   <div class="header-inner">
     <div style="display:flex; align-items:center;">
-      <a href="/index.html" class="logo">BA<span>S</span>IS</a>
+      <a href="/index.html" class="logo" aria-label="Alaka"><img class="alaka-logo-img" src="alaka-logo.png" alt="Alaka" width="88" height="32"></a>
       <span class="logo-sub">Moderation</span>
     </div>
     <div class="header-actions">
@@ -238,7 +242,7 @@ async function loadQueue() {
   try {
     res = await fetch(`${BASIS_API_URL}/moderation/queue`, { headers });
   } catch (e) {
-    showGate('Could not reach the Basis backend. Check BASIS_API_URL in Settings on the Dashboard.');
+    showGate('Could not reach the Alaka backend. Check BASIS_API_URL in Settings on the Dashboard.');
     return;
   }
 

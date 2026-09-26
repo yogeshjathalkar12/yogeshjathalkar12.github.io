@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Dashboard — Basis</title>
+<title>Dashboard — Alaka</title>
 
 <!-- ═══ SECURITY: Content Security Policy (matches main site) ═══ -->
 <meta http-equiv="Content-Security-Policy" content="
@@ -31,7 +31,7 @@
 
 <style>
 /* ═══════════════════════════════════════════════════════════════
-   DESIGN TOKENS — identical to the Basis main site (try.html)
+   DESIGN TOKENS — identical to the Alaka main site (try.html)
    ═══════════════════════════════════════════════════════════════ */
 :root {
   --bg:        #F0F7F9;
@@ -450,6 +450,10 @@ textarea.form-control { resize: vertical; min-height: 84px; }
   .form-row-2 { grid-template-columns: 1fr; }
 }
 </style>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="basis-footer.css">
 </head>
 <body>
 
@@ -458,7 +462,7 @@ textarea.form-control { resize: vertical; min-height: 84px; }
 
 <!-- ═══════════ TOPBAR ═══════════ -->
 <header class="topbar">
-  <a href="/index.html" class="topbar-logo">BA<span>S</span>IS</a>
+  <a href="/index.html" class="topbar-logo" aria-label="Alaka"><img class="alaka-logo-img" src="alaka-logo.png" alt="Alaka" width="83" height="30"></a>
 
   <div class="topbar-search">
     <span class="topbar-search-icon">⌕</span>
@@ -545,7 +549,7 @@ textarea.form-control { resize: vertical; min-height: 84px; }
 
     <!-- ───── HOME / OVERVIEW ───── -->
     <div class="panel active" id="panel-home">
-      <div class="page-eyebrow">Basis · Citizen wallet</div>
+      <div class="page-eyebrow">Alaka · Citizen wallet</div>
       <div class="page-title" id="homeGreeting">Welcome back.</div>
 
       <div class="stat-row">
@@ -1035,7 +1039,7 @@ textarea.form-control { resize: vertical; min-height: 84px; }
 
 <script>
 // ═══════════════════════════════════════════════════════════════
-// CONFIG — Basis's own project. Defaults to the real Supabase
+// CONFIG — Alaka's own project. Defaults to the real Supabase
 // project already wired into the main site (try.html / index.html)
 // so login works out of the box. BASIS_API_URL is a placeholder —
 // point it at wherever basis_router.py is deployed (e.g. Render).
@@ -1168,7 +1172,7 @@ async function loadUserData() {
     return;
   }
 
-  // Same race-condition guard as the Raptor/Aura dashboards: a user
+  // Same race-condition guard as the Raptor/Vapus dashboards: a user
   // arriving via Google OAuth lands here with tokens still resolving
   // in the URL fragment. Wait for the first onAuthStateChange event
   // instead of trusting an immediate getSession() call.
@@ -1192,7 +1196,7 @@ async function loadUserData() {
   });
 
   await loadWallet();
-  logActivity('report', 'Signed in to your Basis wallet.', true);
+  logActivity('report', 'Signed in to your Alaka wallet.', true);
 
   supabaseClient.auth.onAuthStateChange((event) => {
     if (event === 'SIGNED_OUT') window.location.href = '/index.html';

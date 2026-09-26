@@ -94,3 +94,12 @@ html[data-theme="dark"] .bx-footer {
   .bx-list { columns: 1; }
   .bx-bottom { flex-direction: column; }
 }
+
+/* ── Alaka logo image (headers, footers, tools + app screens) ──
+   The artwork is dark teal; on dark themes it is flipped to white. */
+.alaka-logo-img { display: inline-block; height: 40px; width: auto; vertical-align: middle; }
+html[data-theme="dark"] .alaka-logo-img { filter: brightness(0) invert(1); }
+.logo .alaka-logo-img { height: 34px; }
+.bx-logo .alaka-logo-img { height: 36px; display: block; }
+.topbar-logo .alaka-logo-img { height: 30px; }
+.bx-brand-link .alaka-logo-img { height: 46px; display: block; }
