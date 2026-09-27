@@ -22,7 +22,8 @@
         html { scroll-behavior: smooth; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-main); color: var(--text-main); overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
         nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 6%; background: var(--glass-bg); backdrop-filter: blur(16px); border-bottom: 1px solid var(--glass-border); position: sticky; top: 0; z-index: 1000; }
-        .logo { font-size: 24px; font-weight: 800; color: var(--text-main); text-decoration: none; letter-spacing: -1px; }
+        .logo { display: inline-flex; align-items: center; gap: 10px; font-size: 21px; font-weight: 800; color: var(--text-main); text-decoration: none; letter-spacing: 0.04em; text-transform: uppercase; }
+        .logo-mark { height: 30px; width: auto; display: block; }
         .logo span { color: var(--primary); }
         .nav-center { display: flex; gap: 3rem; align-items: center; }
         .nav-link { font-size: 14px; font-weight: 600; color: var(--text-muted); text-decoration: none; transition: color 0.3s; }
@@ -69,10 +70,13 @@
         @media (max-width: 768px) { .nav-center { display: none; } .footer-grid { grid-template-columns: 1fr; } }
         .hidden { display: none; }
     </style>
+    <link rel="icon" type="image/x-icon" href="/ventures/eklavya/favicon.ico">
+    <link rel="icon" type="image/png" sizes="256x256" href="/ventures/eklavya/favicon.png">
+    <link rel="apple-touch-icon" href="/ventures/eklavya/apple-touch-icon.png">
 </head>
 <body>
     <nav>
-        <a class="logo" href="../index.html"><span>Eklavya</span></a>
+        <a class="logo" href="../index.html"><img class="logo-mark" src="/ventures/eklavya/assets/logo.png" alt="" /><span>Eklavya</span></a>
         <div class="nav-center">
             <a class="nav-link" href="../index.html#problem">The Problem</a>
             <a class="nav-link" href="../index.html#solution">The Solution</a>
@@ -140,7 +144,7 @@
     <footer class="site-footer">
         <div class="footer-grid">
             <div class="footer-col footer-brand">
-                <a class="logo" href="../index.html"><span>Eklavya</span></a>
+                <a class="logo" href="../index.html"><img class="logo-mark" src="/ventures/eklavya/assets/logo.png" alt="" /><span>Eklavya</span></a>
                 <p class="footer-tagline">Continuous career guidance for India's youth.</p>
             </div>
             <div class="footer-col">
