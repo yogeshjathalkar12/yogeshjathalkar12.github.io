@@ -5,7 +5,6 @@ import { ToastProvider } from './hooks/ToastContext';
 import { CreditsProvider } from './hooks/CreditsContext';
 import { ThemeProvider } from './hooks/ThemeContext';
 import { RequireAuth } from './components/RequireAuth';
-import Login from './pages/Login';
 import DashboardHome from './pages/DashboardHome';
 import { DashboardLayout } from './layouts/DashboardLayout';
 import { TOOLS } from './tools/registry';
@@ -76,8 +75,6 @@ export default function App() {
               <NotificationsProvider>
                 <NotificationOverlay />
                 <Routes>
-                  <Route path="/login" element={<Login />} />
-
                   <Route element={<RequireAuth><DashboardLayout /></RequireAuth>}>
                     <Route path="/dashboard" element={<DashboardHome />} />
 

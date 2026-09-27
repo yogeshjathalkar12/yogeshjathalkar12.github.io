@@ -1,5 +1,4 @@
 import { useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { useCredits } from './CreditsContext';
@@ -15,7 +14,7 @@ interface AuthedFetchOptions extends RequestInit {
  * Every tool page used to hand-write this exact sequence:
  *   1. pull the bearer token off the Supabase session
  *   2. attach it + Content-Type
- *   3. on 401: sign out, toast, redirect to login
+ *   3. on 401: sign out, toast, redirect to the landing page's login
  *   4. on 402: surface "out of credits" (each tool did this slightly
  *      differently — some toasted, some showed an upgrade wall)
  *   5. on non-ok: try to parse `{ detail }` for an error message
@@ -33,14 +32,13 @@ export function useAuthedFetch() {
   const { signOut } = useAuth();
   const { syncFromServer } = useCredits();
   const { showToast } = useToast();
-  const navigate = useNavigate();
 
   const authedFetch = useCallback(
     async <T = unknown>(url: string, options: AuthedFetchOptions = {}): Promise<T> => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         showToast('Session expired — please log in again', 'error');
-        setTimeout(() => navigate('/login'), 1200);
+        setTimeout(() => { window.location.href = 'https://shoonyaorigins.com/ventures/raptor/?auth=login'; }, 1200);
         throw new UnauthorizedError();
       }
 
@@ -64,8 +62,7 @@ export function useAuthedFetch() {
 
       if (res.status === 401) {
         showToast('Session expired — please log in again', 'error');
-        await signOut();
-        setTimeout(() => navigate('/login'), 1200);
+        await signOut(); // hard-redirects to the landing page itself, see AuthContext
         throw new UnauthorizedError();
       }
 
@@ -90,7 +87,7 @@ export function useAuthedFetch() {
       }
       return json;
     },
-    [signOut, syncFromServer, showToast, navigate]
+    [signOut, syncFromServer, showToast]
   );
 
   return { authedFetch };
