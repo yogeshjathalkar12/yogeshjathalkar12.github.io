@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Moderation — Alaka</title>
+<title>Moderation — Coral</title>
 
 <!-- ═══ SECURITY: Content Security Policy (matches dashboard.html) ═══ -->
 <meta http-equiv="Content-Security-Policy" content="
@@ -128,11 +128,11 @@ header { position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--
 <header>
   <div class="header-inner">
     <div style="display:flex; align-items:center;">
-      <a href="/index.html" class="logo" aria-label="Alaka"><img class="alaka-logo-img" src="alaka-logo.png" alt="Alaka" width="88" height="32"></a>
+      <a href="/index.html" class="logo" aria-label="Coral"><img class="alaka-logo-img" src="coral-logo.png" alt="Coral" width="172" height="32"></a>
       <span class="logo-sub">Moderation</span>
     </div>
     <div class="header-actions">
-      <a href="/dashboard.html" class="back-link">← Dashboard</a>
+      <a href="/ventures/basis/dashboard.html" class="back-link">← Dashboard</a>
       <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
     </div>
   </div>
@@ -242,7 +242,7 @@ async function loadQueue() {
   try {
     res = await fetch(`${BASIS_API_URL}/moderation/queue`, { headers });
   } catch (e) {
-    showGate('Could not reach the Alaka backend. Check BASIS_API_URL in Settings on the Dashboard.');
+    showGate('Could not reach the Coral backend. Check BASIS_API_URL in Settings on the Dashboard.');
     return;
   }
 

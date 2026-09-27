@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Dashboard — Alaka</title>
+<title>Dashboard — Coral</title>
 
 <!-- ═══ SECURITY: Content Security Policy (matches main site) ═══ -->
 <meta http-equiv="Content-Security-Policy" content="
@@ -31,7 +31,7 @@
 
 <style>
 /* ═══════════════════════════════════════════════════════════════
-   DESIGN TOKENS — identical to the Alaka main site (try.html)
+   DESIGN TOKENS — identical to the Coral main site (try.html)
    ═══════════════════════════════════════════════════════════════ */
 :root {
   --bg:        #F0F7F9;
@@ -462,7 +462,7 @@ textarea.form-control { resize: vertical; min-height: 84px; }
 
 <!-- ═══════════ TOPBAR ═══════════ -->
 <header class="topbar">
-  <a href="/index.html" class="topbar-logo" aria-label="Alaka"><img class="alaka-logo-img" src="alaka-logo.png" alt="Alaka" width="83" height="30"></a>
+  <a href="/index.html" class="topbar-logo" aria-label="Coral"><img class="alaka-logo-img" src="coral-logo.png" alt="Coral" width="161" height="30"></a>
 
   <div class="topbar-search">
     <span class="topbar-search-icon">⌕</span>
@@ -549,7 +549,7 @@ textarea.form-control { resize: vertical; min-height: 84px; }
 
     <!-- ───── HOME / OVERVIEW ───── -->
     <div class="panel active" id="panel-home">
-      <div class="page-eyebrow">Alaka · Citizen wallet</div>
+      <div class="page-eyebrow">Coral · Citizen wallet</div>
       <div class="page-title" id="homeGreeting">Welcome back.</div>
 
       <div class="stat-row">
@@ -1039,7 +1039,7 @@ textarea.form-control { resize: vertical; min-height: 84px; }
 
 <script>
 // ═══════════════════════════════════════════════════════════════
-// CONFIG — Alaka's own project. Defaults to the real Supabase
+// CONFIG — Coral's own project. Defaults to the real Supabase
 // project already wired into the main site (try.html / index.html)
 // so login works out of the box. BASIS_API_URL is a placeholder —
 // point it at wherever basis_router.py is deployed (e.g. Render).
@@ -1196,7 +1196,7 @@ async function loadUserData() {
   });
 
   await loadWallet();
-  logActivity('report', 'Signed in to your Alaka wallet.', true);
+  logActivity('report', 'Signed in to your Coral wallet.', true);
 
   supabaseClient.auth.onAuthStateChange((event) => {
     if (event === 'SIGNED_OUT') window.location.href = '/index.html';

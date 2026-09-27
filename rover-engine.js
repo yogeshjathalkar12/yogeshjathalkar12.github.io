@@ -217,7 +217,7 @@ const RoverEngine = {
                 'Vapus is our non-invasive': 'card-aura',
                 'Raptor is our AI':         'card-raptor',
                 'Shakti focuses':           'card-shakti',
-                'rta and Alaka':      'card-rta',
+                'rta and Coral':      'card-rta',
                 'Aether Labs':              'card-aether'
             };
 
