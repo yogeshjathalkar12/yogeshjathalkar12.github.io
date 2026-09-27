@@ -13,12 +13,12 @@
   <priority>1.00</priority>
 </url>
 <url>
-  <loc>https://shoonyaorigins.com/ventures/aura/tools/</loc>
+  <loc>https://shoonyaorigins.com/ventures/vapus/tools/</loc>
   <lastmod>2026-04-19T04:58:42+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>https://shoonyaorigins.com/ventures/aura/</loc>
+  <loc>https://shoonyaorigins.com/ventures/vapus/</loc>
   <lastmod>2026-04-19T04:58:42+00:00</lastmod>
   <priority>0.80</priority>
 </url>
@@ -33,12 +33,12 @@
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>https://shoonyaorigins.com/ventures/basis/civic_tools/</loc>
+  <loc>https://shoonyaorigins.com/ventures/coral/civic_tools/</loc>
   <lastmod>2026-04-19T04:58:42+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>https://shoonyaorigins.com/ventures/basis/</loc>
+  <loc>https://shoonyaorigins.com/ventures/coral/</loc>
   <lastmod>2026-04-19T04:58:42+00:00</lastmod>
   <priority>0.80</priority>
 </url>
@@ -73,12 +73,12 @@
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>https://shoonyaorigins.com/ventures/aura/tools/tools2/</loc>
+  <loc>https://shoonyaorigins.com/ventures/vapus/tools/tools2/</loc>
   <lastmod>2026-04-19T04:58:42+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
-  <loc>https://shoonyaorigins.com/ventures/aura/charaka/</loc>
+  <loc>https://shoonyaorigins.com/ventures/vapus/charaka/</loc>
   <lastmod>2026-04-19T04:58:42+00:00</lastmod>
   <priority>0.64</priority>
 </url>
@@ -138,12 +138,12 @@
   <priority>0.64</priority>
 </url>
 <url>
-  <loc>https://shoonyaorigins.com/ventures/basis/safety_tools/</loc>
+  <loc>https://shoonyaorigins.com/ventures/coral/safety_tools/</loc>
   <lastmod>2026-04-19T04:58:42+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
-  <loc>https://shoonyaorigins.com/ventures/basis/environment_tools/</loc>
+  <loc>https://shoonyaorigins.com/ventures/coral/environment_tools/</loc>
   <lastmod>2026-04-19T04:58:42+00:00</lastmod>
   <priority>0.64</priority>
 </url>
@@ -230,67 +230,67 @@
   <priority>0.40</priority>
 </url>
 <url>
-  <loc>https://shoonyaorigins.com/ventures/basis/features/</loc>
+  <loc>https://shoonyaorigins.com/ventures/coral/features/</loc>
   <lastmod>2026-09-19T00:00:00+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>https://shoonyaorigins.com/ventures/basis/why-basis.html</loc>
+  <loc>https://shoonyaorigins.com/ventures/coral/why-basis.html</loc>
   <lastmod>2026-09-19T00:00:00+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>https://shoonyaorigins.com/ventures/basis/features/anonymous-reporting.html</loc>
+  <loc>https://shoonyaorigins.com/ventures/coral/features/anonymous-reporting.html</loc>
   <lastmod>2026-09-19T00:00:00+00:00</lastmod>
   <priority>0.70</priority>
 </url>
 <url>
-  <loc>https://shoonyaorigins.com/ventures/basis/features/ai-detection.html</loc>
+  <loc>https://shoonyaorigins.com/ventures/coral/features/ai-detection.html</loc>
   <lastmod>2026-09-19T00:00:00+00:00</lastmod>
   <priority>0.70</priority>
 </url>
 <url>
-  <loc>https://shoonyaorigins.com/ventures/basis/features/review-and-learning.html</loc>
+  <loc>https://shoonyaorigins.com/ventures/coral/features/review-and-learning.html</loc>
   <lastmod>2026-09-19T00:00:00+00:00</lastmod>
   <priority>0.70</priority>
 </url>
 <url>
-  <loc>https://shoonyaorigins.com/ventures/basis/features/city-credits.html</loc>
+  <loc>https://shoonyaorigins.com/ventures/coral/features/city-credits.html</loc>
   <lastmod>2026-09-19T00:00:00+00:00</lastmod>
   <priority>0.70</priority>
 </url>
 <url>
-  <loc>https://shoonyaorigins.com/ventures/basis/features/marketplace.html</loc>
+  <loc>https://shoonyaorigins.com/ventures/coral/features/marketplace.html</loc>
   <lastmod>2026-09-19T00:00:00+00:00</lastmod>
   <priority>0.70</priority>
 </url>
 <url>
-  <loc>https://shoonyaorigins.com/ventures/basis/features/partner-shops.html</loc>
+  <loc>https://shoonyaorigins.com/ventures/coral/features/partner-shops.html</loc>
   <lastmod>2026-09-19T00:00:00+00:00</lastmod>
   <priority>0.70</priority>
 </url>
 <url>
-  <loc>https://shoonyaorigins.com/ventures/basis/features/free-tools.html</loc>
+  <loc>https://shoonyaorigins.com/ventures/coral/features/free-tools.html</loc>
   <lastmod>2026-09-19T00:00:00+00:00</lastmod>
   <priority>0.70</priority>
 </url>
 <url>
-  <loc>https://shoonyaorigins.com/ventures/basis/features/government-briefs.html</loc>
+  <loc>https://shoonyaorigins.com/ventures/coral/features/government-briefs.html</loc>
   <lastmod>2026-09-19T00:00:00+00:00</lastmod>
   <priority>0.70</priority>
 </url>
 <url>
-  <loc>https://shoonyaorigins.com/ventures/basis/features/rover-network.html</loc>
+  <loc>https://shoonyaorigins.com/ventures/coral/features/rover-network.html</loc>
   <lastmod>2026-09-19T00:00:00+00:00</lastmod>
   <priority>0.70</priority>
 </url>
 <url>
-  <loc>https://shoonyaorigins.com/ventures/basis/terms.html</loc>
+  <loc>https://shoonyaorigins.com/ventures/coral/terms.html</loc>
   <lastmod>2026-09-19T00:00:00+00:00</lastmod>
   <priority>0.40</priority>
 </url>
 <url>
-  <loc>https://shoonyaorigins.com/ventures/basis/privacy.html</loc>
+  <loc>https://shoonyaorigins.com/ventures/coral/privacy.html</loc>
   <lastmod>2026-09-19T00:00:00+00:00</lastmod>
   <priority>0.40</priority>
 </url>

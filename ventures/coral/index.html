@@ -1,0 +1,2263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XV0W5ZV0RQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XV0W5ZV0RQ');
+</script>
+
+<!-- ═══ SECURITY: Content Security Policy ════════════════════
+  Allows only trusted sources. Blocks inline XSS, rogue scripts,
+  clickjacking, and data exfiltration to unknown domains.
+-->
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://unpkg.com https://www.google-analytics.com https://cdn.jsdelivr.net;
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com;
+  font-src 'self' https://fonts.gstatic.com;
+  img-src 'self' data: https://*.tile.openstreetmap.org https://www.google-analytics.com;
+  connect-src 'self' https://spring-mud-eaa0shoonya-api.yogeshjathalkar.workers.dev https://www.google-analytics.com https://*.supabase.co;
+  frame-ancestors 'none';
+  base-uri 'self';
+  form-action 'self';
+" />
+<!-- Prevent clickjacking -->
+<meta http-equiv="X-Frame-Options" content="DENY" />
+<!-- Stop MIME sniffing -->
+<meta http-equiv="X-Content-Type-Options" content="nosniff" />
+<!-- Referrer control -->
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+<!-- Disable browser features not needed -->
+<meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), payment=(), usb=()" />
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- ═══ SUPABASE CLIENT — powers the Rewards login/signup ═══════
+  Replace SUPABASE_URL + SUPABASE_ANON_KEY near the bottom of this
+  file with Coral's own Supabase project values before going live.
+-->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Coral — Urban Intelligence Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   LIGHT MODE — DEFAULT
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  --bg:        #F0F7F9;
+  --surface:   rgba(224, 242, 254, 0.45);
+  --card:      rgba(255, 255, 255, 0.72);
+  --border:    rgba(8, 145, 178, 0.13);
+  --border2:   rgba(8, 145, 178, 0.28);
+  --accent:    #0891B2;
+  --accent2:   #0F172A;
+  --accent3:   #334155;
+  --steel:     #1E3A5F;
+  --text:      #1E293B;
+  --muted:     #64748B;
+  --dim:       #94A3B8;
+  --safe:      #059669;
+  --warning:   #B45309;
+  --danger:    #9F1239;
+  --heading:       #0F172A;
+  --header-bg:     rgba(240, 247, 249, 0.88);
+  --accent-tint:   rgba(8, 145, 178, 0.05);
+  --accent-tint2:  rgba(8, 145, 178, 0.10);
+  --glow-sm:       rgba(8, 145, 178, 0.18);
+  --glow-lg:       rgba(8, 145, 178, 0.32);
+  --city-ghost:    rgba(8, 145, 178, 0.05);
+  --pipe-section:  rgba(8, 145, 178, 0.02);
+  --promise-grad:  linear-gradient(180deg, transparent, rgba(8,145,178,0.04), transparent);
+  --form-input-bg: rgba(255, 255, 255, 0.7);
+  --form-focus-bg: #ffffff;
+  --form-focus-sh: rgba(8, 145, 178, 0.10);
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body:    'Plus Jakarta Sans', sans-serif;
+  --font-mono:    'Space Mono', monospace;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DARK MODE
+   ═══════════════════════════════════════════════════════════════ */
+html[data-theme="dark"] {
+  --bg:        #090E1A;
+  --surface:   #0D1626;
+  --card:      rgba(13, 22, 38, 0.85);
+  --border:    rgba(0, 212, 255, 0.10);
+  --border2:   rgba(0, 212, 255, 0.20);
+  --accent:    #00D4FF;
+  --accent2:   #0A1628;
+  --accent3:   #1B3A5C;
+  --steel:     #2C4A6E;
+  --text:      #E2EAF0;
+  --muted:     #6B8EAD;
+  --dim:       #3D5A7A;
+  --safe:      #10B981;
+  --warning:   #F59E0B;
+  --danger:    #EF4444;
+  --heading:       #ffffff;
+  --header-bg:     rgba(9, 14, 26, 0.88);
+  --accent-tint:   rgba(0, 212, 255, 0.04);
+  --accent-tint2:  rgba(0, 212, 255, 0.08);
+  --glow-sm:       rgba(0, 212, 255, 0.25);
+  --glow-lg:       rgba(0, 212, 255, 0.45);
+  --city-ghost:    rgba(0, 212, 255, 0.04);
+  --pipe-section:  rgba(0, 212, 255, 0.02);
+  --promise-grad:  linear-gradient(180deg, transparent, rgba(0,212,255,0.03), transparent);
+  --form-input-bg: rgba(255, 255, 255, 0.04);
+  --form-focus-bg: rgba(0, 212, 255, 0.04);
+  --form-focus-sh: rgba(0, 212, 255, 0.08);
+}
+
+/* ─── AMBIENT LAYERS ─────────────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(circle at 20% 0%,  rgba(8, 145, 178, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 100%, rgba(15, 23, 42, 0.04)  0%, transparent 50%);
+  transition: background 0.4s ease;
+}
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(8, 145, 178, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(8, 145, 178, 0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  transition: background-image 0.4s ease;
+}
+html[data-theme="dark"] body::before {
+  background:
+    radial-gradient(ellipse 60% 50% at 10% 0%,  rgba(0,212,255,0.07)  0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 90% 80%,  rgba(0,90,140,0.10)   0%, transparent 60%),
+    radial-gradient(ellipse 30% 30% at 50% 50%,  rgba(10,22,40,0.6)    0%, transparent 80%);
+}
+html[data-theme="dark"] body::after {
+  background-image:
+    linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.7;
+  transition: background 0.35s ease, color 0.35s ease;
+}
+.z1 { position: relative; z-index: 1; }
+.container { max-width: 1140px; margin: 0 auto; padding: 0 28px; position: relative; z-index: 1; }
+
+/* ─── HEADER ─────────────────────────────────────────────────── */
+header {
+  position: sticky; top: 0; z-index: 200;
+  border-bottom: 1px solid var(--border);
+  background: var(--header-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  padding: 0;
+  transition: background 0.35s ease, border-color 0.35s ease;
+}
+.header-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  height: 64px; gap: 16px;
+}
+.logo {
+  font-family: var(--font-mono);
+  font-size: 32px; font-weight: 700;
+  color: var(--text);
+  letter-spacing: 5px; text-transform: uppercase;
+  text-decoration: none; flex-shrink: 0;
+}
+.logo span { color: var(--accent); }
+.nav-links {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+}
+.nav-free-tag {
+  font-family: 'Times New Roman', Times, serif;
+  color: #059669;
+  font-size: 12px;
+  margin-right: 8px;
+  letter-spacing: 1px;
+}
+@media (max-width: 1000px) { .nav-free-tag { display: none; } }
+.nav-links a {
+  font-family: var(--font-body);
+  font-size: 11px; font-weight: 600;
+  color: var(--muted); text-decoration: none;
+  border: 1px solid var(--border);
+  padding: 6px 10px; border-radius: 4px;
+  letter-spacing: 1px; text-transform: uppercase;
+  transition: all 0.25s ease;
+}
+.nav-links a:hover, .nav-links a.active {
+  color: var(--accent); border-color: var(--accent);
+  background: var(--accent-tint);
+}
+.nav-links a.nav-cta {
+  background: var(--accent); color: #fff;
+  border-color: var(--accent); font-weight: 700;
+}
+.nav-links a.nav-cta:hover { background: transparent; color: var(--accent); }
+.theme-toggle {
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.25s ease;
+  color: var(--muted);
+  font-size: 15px;
+}
+.theme-toggle:hover { border-color: var(--accent); background: var(--accent-tint); }
+
+/* ─── HERO ───────────────────────────────────────────────────── */
+.hero {
+  min-height: 92vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+  padding: 120px 0 80px;
+}
+.hero-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px; font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 6px; text-transform: uppercase;
+  margin-bottom: 28px;
+  display: flex; align-items: center; gap: 12px;
+}
+.hero-eyebrow::before, .hero-eyebrow::after {
+  content: ''; display: block; width: 40px; height: 1px;
+  background: var(--accent); opacity: 0.5;
+}
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(48px, 8.5vw, 96px);
+  font-weight: 700; line-height: 1.05;
+  color: var(--heading); margin-bottom: 28px;
+}
+.hero h1 em { font-style: normal; color: var(--accent); text-shadow: 0 0 60px var(--glow-sm); }
+.hero-sub {
+  font-size: 17px; color: var(--muted);
+  max-width: 640px; margin: 0 auto 48px;
+  line-height: 1.85; font-weight: 400;
+}
+.hero-actions { display: flex; gap: 14px; align-items: center; justify-content: center; flex-wrap: wrap; }
+.btn-primary {
+  font-family: var(--font-body);
+  font-size: 12px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  padding: 16px 32px; border-radius: 6px;
+  background: var(--accent); color: #fff;
+  border: none; cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 30px var(--glow-sm);
+  text-decoration: none; display: inline-block;
+}
+.btn-primary:hover { transform: translateY(-3px); box-shadow: 0 0 50px var(--glow-lg); }
+.btn-ghost {
+  font-family: var(--font-body);
+  font-size: 12px; font-weight: 600;
+  letter-spacing: 2px; text-transform: uppercase;
+  padding: 15px 32px; border-radius: 6px;
+  background: transparent; color: var(--text);
+  border: 1px solid var(--border2);
+  cursor: pointer; transition: all 0.3s ease;
+  text-decoration: none; display: inline-block;
+}
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+.hero-stats {
+  display: flex; gap: 40px; margin-top: 80px;
+  border-top: 1px solid var(--border);
+  padding-top: 40px;
+  justify-content: center; flex-wrap: wrap;
+}
+.stat-item { text-align: center; }
+.stat-num {
+  font-family: var(--font-display);
+  font-size: 38px; font-weight: 700;
+  color: var(--accent); display: block; line-height: 1;
+}
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 10px; color: var(--muted);
+  letter-spacing: 2px; text-transform: uppercase;
+  margin-top: 6px; display: block;
+}
+
+/* ─── SECTION COMMONS ────────────────────────────────────────── */
+section { padding: 100px 0; }
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 10px; font-weight: 700;
+  color: var(--accent); letter-spacing: 5px;
+  text-transform: uppercase; margin-bottom: 16px; display: block;
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(32px, 5vw, 52px);
+  font-weight: 700; color: var(--heading);
+  line-height: 1.15; margin-bottom: 16px;
+}
+.section-sub { font-size: 16px; color: var(--muted); max-width: 580px; line-height: 1.8; }
+.divider {
+  width: 100%; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border2), transparent);
+}
+
+/* ─── IMAGE ICON ─────────────────────────────────────────────── */
+.img-icon { width: 52px; height: 52px; object-fit: contain; display: block; margin-bottom: 24px; }
+.img-icon-sm { width: 32px; height: 32px; object-fit: contain; display: block; }
+.img-icon-detect { width: 48px; height: 48px; object-fit: contain; display: block; margin-bottom: 16px; }
+.img-icon-tech { width: 36px; height: 36px; object-fit: contain; display: block; margin: 0 auto 10px; }
+.img-icon-upload { width: 40px; height: 40px; object-fit: contain; display: block; margin: 0 auto 10px; }
+
+/* ─── HOW IT WORKS ───────────────────────────────────────────── */
+.steps-track {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 2px; margin-top: 64px;
+  border: 1px solid var(--border);
+  border-radius: 16px; overflow: hidden;
+}
+.step-block {
+  background: var(--card); backdrop-filter: blur(16px);
+  padding: 0; position: relative;
+  transition: background 0.4s ease;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.step-block:hover .step-cover img { transform: scale(1.06); }
+.step-block + .step-block { border-left: 1px solid var(--border); }
+.step-cover { position: relative; width: 100%; height: 180px; overflow: hidden; flex-shrink: 0; }
+.step-cover img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.step-cover::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.50) 0%, rgba(0,0,0,0.15) 100%); pointer-events: none; }
+.step-cover-label { position: absolute; top: 14px; left: 18px; z-index: 2; font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.85); text-transform: uppercase; letter-spacing: 2px; }
+.step-body { padding: 28px 32px 36px; flex: 1; background: var(--card); transition: background 0.4s ease; }
+.step-block:hover .step-body { background: var(--accent-tint); }
+.step-num { font-family: var(--font-mono); font-size: 10px; color: var(--dim); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 14px; display: block; }
+.step-block h3 { font-family: var(--font-display); font-size: 24px; font-weight: 700; color: var(--heading); margin-bottom: 12px; }
+.step-block p { font-size: 14px; color: var(--muted); line-height: 1.75; }
+
+/* ─── DETECTION GRID ─────────────────────────────────────────── */
+.detection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 64px; }
+.detect-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 0; position: relative; overflow: hidden; transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; flex-direction: column; }
+.detect-card:hover { transform: translateY(-8px); border-color: var(--border2); box-shadow: 0 24px 60px var(--accent-tint2); }
+.detect-card:hover .detect-cover img { transform: scale(1.06); }
+.detect-cover { position: relative; width: 100%; height: 200px; overflow: hidden; flex-shrink: 0; }
+.detect-cover img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.detect-cover::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.40) 0%, transparent 60%); pointer-events: none; }
+.detect-tag { position: absolute; top: 14px; left: 14px; z-index: 2; font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 5px 11px; border-radius: 4px; display: inline-block; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.tag-cv    { background: rgba(8,145,178,0.80);  color: #fff; border: 1px solid rgba(255,255,255,0.25); }
+.tag-ai    { background: rgba(5,150,105,0.85);  color: #fff; border: 1px solid rgba(255,255,255,0.25); }
+.tag-crowd { background: rgba(180,83,9,0.85);   color: #fff; border: 1px solid rgba(255,255,255,0.25); }
+.detect-body { padding: 24px 24px 28px; flex: 1; display: flex; flex-direction: column; }
+.detect-card h3 { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--heading); margin-bottom: 10px; }
+.detect-card p { font-size: 13px; color: var(--muted); line-height: 1.7; flex: 1; }
+.detect-tech { font-family: var(--font-mono); font-size: 10px; color: var(--dim); margin-top: 18px; letter-spacing: 1px; }
+
+/* ─── PIPELINE ───────────────────────────────────────────────── */
+.pipeline-section { background: var(--pipe-section); }
+.pipeline-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; margin-top: 64px; }
+.pipeline-visual { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 36px; font-family: var(--font-mono); font-size: 12px; }
+.pipe-row { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 8px; margin-bottom: 6px; transition: background 0.25s ease; }
+.pipe-row:hover { background: var(--accent-tint); }
+.pipe-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.pipe-dot.cyan  { background: var(--accent);  box-shadow: 0 0 8px var(--accent); }
+.pipe-dot.green { background: var(--safe);    box-shadow: 0 0 8px var(--safe); }
+.pipe-dot.amber { background: var(--warning); box-shadow: 0 0 8px var(--warning); }
+.pipe-dot.red   { background: var(--danger);  box-shadow: 0 0 8px var(--danger); }
+.pipe-label { color: var(--text); font-weight: 700; flex: 1; }
+.pipe-sub   { color: var(--dim); font-size: 10px; }
+.pipe-badge { font-size: 9px; padding: 2px 8px; border-radius: 3px; font-weight: 700; letter-spacing: 1px; }
+.badge-live { background: rgba(5,150,105,0.12);  color: var(--safe); }
+.badge-ai   { background: var(--accent-tint2);   color: var(--accent); }
+.badge-anon { background: rgba(180,83,9,0.10);   color: var(--warning); }
+.badge-gov  { background: rgba(100,116,139,0.15); color: var(--muted); }
+html[data-theme="dark"] .badge-live { background: rgba(16,185,129,0.15); }
+html[data-theme="dark"] .badge-anon { background: rgba(245,158,11,0.12); }
+html[data-theme="dark"] .badge-gov  { background: rgba(44,74,110,0.5); }
+.pipeline-text h3 { font-family: var(--font-display); font-size: clamp(26px, 3vw, 36px); font-weight: 700; color: var(--heading); margin-bottom: 18px; line-height: 1.2; }
+.pipeline-text p { font-size: 15px; color: var(--muted); line-height: 1.85; margin-bottom: 16px; }
+.promise-list { list-style: none; margin-top: 24px; display: flex; flex-direction: column; gap: 12px; }
+.promise-list li { display: flex; align-items: flex-start; gap: 12px; font-size: 14px; color: var(--muted); }
+.promise-list li::before { content: '›'; color: var(--accent); font-size: 18px; font-weight: 700; flex-shrink: 0; line-height: 1.2; }
+
+/* ─── CITIES ─────────────────────────────────────────────────── */
+.cities-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 64px; }
+.city-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 40px; position: relative; overflow: hidden; transition: all 0.4s ease; }
+.city-card:hover { border-color: var(--border2); box-shadow: 0 20px 60px var(--accent-tint2); }
+.city-bg-text { position: absolute; right: 20px; bottom: -10px; font-family: var(--font-display); font-size: 100px; font-weight: 700; color: var(--city-ghost); line-height: 1; pointer-events: none; user-select: none; }
+.city-status { font-family: var(--font-mono); font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; padding: 4px 10px; border-radius: 3px; margin-bottom: 24px; display: inline-flex; align-items: center; gap: 6px; }
+.status-active { background: rgba(5,150,105,0.10); color: var(--safe); }
+.status-active::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--safe); animation: pulse 2s infinite; }
+.status-soon { background: rgba(180,83,9,0.10); color: var(--warning); }
+html[data-theme="dark"] .status-active { background: rgba(16,185,129,0.12); }
+html[data-theme="dark"] .status-soon   { background: rgba(245,158,11,0.12); }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+.city-card h2 { font-family: var(--font-display); font-size: 40px; font-weight: 700; color: var(--heading); margin-bottom: 8px; }
+.city-card h4 { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 20px; font-weight: 400; }
+.city-card p { font-size: 14px; color: var(--muted); line-height: 1.75; }
+.city-metrics { display: flex; gap: 24px; margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--border); }
+.city-metric-val { font-family: var(--font-display); font-size: 26px; font-weight: 700; color: var(--accent); display: block; line-height: 1; }
+.city-metric-label { font-family: var(--font-mono); font-size: 9px; color: var(--dim); text-transform: uppercase; letter-spacing: 1.5px; }
+
+/* ─── MAP ────────────────────────────────────────────────────── */
+#map { height: 250px; width: 100%; border-radius: 10px; border: 1px solid var(--border2); z-index: 1; }
+.leaflet-container { background: var(--surface) !important; font-family: var(--font-body); }
+.location-btn-wrap { margin-bottom: 10px; }
+.btn-locate { font-family: var(--font-body); font-size: 12px; font-weight: 600; letter-spacing: 1px; padding: 10px 20px; border-radius: 6px; background: var(--accent-tint2); color: var(--accent); border: 1px solid var(--border2); cursor: pointer; transition: all 0.25s ease; display: inline-flex; align-items: center; gap: 8px; width: 100%; justify-content: center; }
+.btn-locate:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* ─── TECH STRIP ─────────────────────────────────────────────── */
+.tech-strip { margin-top: 64px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.tech-pill { position: relative; border-radius: 12px; overflow: hidden; height: 140px; border: 1px solid var(--border); transition: all 0.3s ease; cursor: default; }
+.tech-pill:hover { border-color: var(--border2); transform: translateY(-4px); box-shadow: 0 12px 40px var(--accent-tint2); }
+.tech-pill:hover img { transform: scale(1.08); }
+.tech-pill img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s cubic-bezier(0.2,0.8,0.2,1); display: block; }
+.tech-pill::after { content: ''; position: absolute; inset: 0; background: linear-gradient(170deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 100%); pointer-events: none; }
+.tech-pill-text { position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column; justify-content: flex-end; padding: 16px 16px; }
+.tech-pill h4 { font-family: var(--font-mono); font-size: 11px; color: #fff; font-weight: 700; letter-spacing: 1px; margin-bottom: 4px; }
+.tech-pill p { font-size: 11px; color: rgba(255,255,255,0.72); line-height: 1.4; }
+
+/* ─── PROMISE SECTION ────────────────────────────────────────── */
+.promise-section { text-align: center; background: var(--promise-grad); padding: 120px 0; }
+.promise-title { font-family: var(--font-display); font-size: clamp(42px, 7vw, 80px); font-weight: 700; color: var(--heading); line-height: 1.1; margin-bottom: 28px; }
+.promise-title em { font-style: normal; color: var(--accent); }
+.promise-desc { font-size: 17px; color: var(--muted); max-width: 580px; margin: 0 auto 48px; line-height: 1.85; }
+.promise-signature { font-family: var(--font-mono); font-size: 11px; color: var(--dim); letter-spacing: 3px; text-transform: uppercase; margin-top: 32px; }
+.promise-signature strong { color: var(--accent); }
+
+/* ─── REPORT SECTION ─────────────────────────────────────────── */
+.report-section { padding: 80px 0; }
+.report-wrap { display: grid; grid-template-columns: 1fr 1.2fr; gap: 64px; align-items: start; }
+.report-form-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 40px; }
+.report-form-card h3 { font-family: var(--font-display); font-size: 28px; font-weight: 700; color: var(--heading); margin-bottom: 6px; }
+.report-form-card .sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
+.form-label { font-family: var(--font-body); font-size: 10px; font-weight: 800; color: var(--dim); letter-spacing: 2px; text-transform: uppercase; }
+.form-control { background: var(--form-input-bg); border: 1px solid var(--border); color: var(--text); font-family: var(--font-body); font-size: 14px; padding: 12px 16px; width: 100%; border-radius: 8px; transition: all 0.3s ease; outline: none; }
+.form-control:focus { border-color: var(--accent); background: var(--form-focus-bg); box-shadow: 0 0 0 4px var(--form-focus-sh); }
+.form-control option { background: var(--surface); color: var(--text); }
+/* ─── SECURITY: validation error state ── */
+.form-control.error { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(159,18,57,0.10); }
+.field-error { font-size: 11px; color: var(--danger); margin-top: 4px; font-family: var(--font-mono); letter-spacing: 0.5px; display: none; }
+.field-error.visible { display: block; }
+.upload-area { border: 1px dashed var(--border2); border-radius: 10px; padding: 32px; text-align: center; cursor: pointer; transition: all 0.3s ease; margin-bottom: 18px; background: var(--accent-tint); }
+.upload-area:hover { border-color: var(--accent); background: var(--accent-tint2); }
+.upload-text { font-size: 13px; color: var(--muted); }
+.upload-text strong { color: var(--accent); }
+.anon-note { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 10px; color: var(--dim); letter-spacing: 1px; text-transform: uppercase; padding: 10px 0; border-top: 1px solid var(--border); margin-top: 4px; }
+.report-info h3 { font-family: var(--font-display); font-size: 32px; font-weight: 700; color: var(--heading); margin-bottom: 16px; }
+.report-info p { font-size: 15px; color: var(--muted); line-height: 1.85; margin-bottom: 20px; }
+.flow-steps { margin-top: 32px; display: flex; flex-direction: column; gap: 0; }
+.flow-step { display: flex; gap: 20px; align-items: flex-start; padding-bottom: 28px; position: relative; }
+.flow-step:not(:last-child)::before { content: ''; position: absolute; left: 15px; top: 36px; width: 1px; bottom: 0; background: linear-gradient(180deg, var(--border2), transparent); }
+.flow-step-num { width: 32px; height: 32px; flex-shrink: 0; border: 1px solid var(--border2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: var(--accent); }
+.flow-step-content h4 { font-family: var(--font-body); font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.flow-step-content p { font-size: 13px; color: var(--dim); line-height: 1.65; }
+
+/* ─── IMPACT ─────────────────────────────────────────────────── */
+.impact-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; margin-top: 64px; background: var(--border); border-radius: 16px; overflow: hidden; }
+.impact-cell { background: var(--card); padding: 36px 28px; text-align: center; transition: background 0.3s ease; }
+.impact-cell:hover { background: var(--accent-tint); }
+.impact-num { font-family: var(--font-display); font-size: 44px; font-weight: 700; color: var(--accent); display: block; line-height: 1; }
+.impact-label { font-size: 13px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
+
+/* ─── FOOTER ─────────────────────────────────────────────────── */
+.main-footer { border-top: 1px solid var(--border); background: var(--surface); padding: 48px 0 32px; }
+.main-footer .footer-inner { max-width: 1140px; margin: 0 auto; padding: 0 28px; display: flex; flex-direction: column; align-items: center; gap: 28px; }
+.main-footer .footer-brand { font-family: var(--font-mono); font-size: 18px; font-weight: 700; color: var(--text); letter-spacing: 3px; text-transform: uppercase; }
+.main-footer .footer-brand span { color: var(--accent); }
+.main-footer .footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 24px; }
+.main-footer .footer-links a { font-family: var(--font-body); font-size: 13px; color: var(--muted); text-decoration: none; transition: color 0.2s ease; }
+.main-footer .footer-links a:hover { color: var(--accent); }
+.main-footer .footer-meta { text-align: center; border-top: 1px solid var(--border); padding-top: 20px; width: 100%; }
+.main-footer .footer-meta p { font-family: var(--font-mono); font-size: 10px; color: var(--dim); letter-spacing: 1px; }
+.main-footer .footer-location { margin-top: 4px; color: var(--accent) !important; }
+
+/* ─── SCROLL ANIMATIONS ──────────────────────────────────────── */
+.reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s cubic-bezier(0.4,0,0.2,1), transform 0.7s cubic-bezier(0.4,0,0.2,1); }
+.reveal.visible { opacity: 1; transform: none; }
+.reveal-d1 { transition-delay: 0.1s; }
+.reveal-d2 { transition-delay: 0.2s; }
+.reveal-d3 { transition-delay: 0.3s; }
+
+/* ─── REWARDS NAV TRIGGER ────────────────────────────────────── */
+.nav-links a.nav-rewards {
+  color: var(--accent); border-color: var(--border2);
+}
+.nav-links a.nav-rewards:hover { background: var(--accent-tint2); }
+.user-chip {
+  display: none; align-items: center; gap: 8px;
+  font-family: var(--font-mono); font-size: 11px; color: var(--text);
+  border: 1px solid var(--border2); border-radius: 4px;
+  padding: 6px 12px; letter-spacing: 0.5px;
+}
+.user-chip .credits { color: var(--accent); font-weight: 700; }
+.user-chip .logout-link { color: var(--muted); cursor: pointer; text-decoration: underline; margin-left: 4px; }
+.user-chip .logout-link:hover { color: var(--danger); }
+
+/* ─── REWARDS TEASER CARD ────────────────────────────────────── */
+.rewards-teaser {
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 16px; padding: 32px 36px; margin-top: 40px;
+  display: flex; align-items: center; gap: 28px; flex-wrap: wrap;
+  position: relative; overflow: hidden;
+}
+.rewards-teaser::before {
+  content: ''; position: absolute; right: -40px; top: -40px;
+  width: 160px; height: 160px; border-radius: 50%;
+  background: radial-gradient(circle, var(--glow-sm) 0%, transparent 70%);
+  pointer-events: none;
+}
+.rewards-teaser-icon {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  color: var(--accent); letter-spacing: 3px; text-transform: uppercase;
+  display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+}
+.rewards-teaser-icon::before {
+  content: ''; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 8px var(--accent);
+}
+.rewards-teaser-body { flex: 1; min-width: 240px; }
+.rewards-teaser-body h3 {
+  font-family: var(--font-display); font-size: 24px; font-weight: 700;
+  color: var(--heading); margin-bottom: 8px; line-height: 1.25;
+}
+.rewards-teaser-body p { font-size: 14px; color: var(--muted); line-height: 1.7; max-width: 480px; }
+.rewards-teaser-actions { display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; }
+/* ─── NEW: LIVE FEATURE CARDS (credits / marketplace / partner shops) ─── */
+.feature-live-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin-top: 28px; }
+.feature-live-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 28px 26px; transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1); position: relative; overflow: hidden; }
+.feature-live-card:hover { transform: translateY(-6px); border-color: var(--border2); box-shadow: 0 20px 50px var(--accent-tint2); }
+.feature-live-icon { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 18px; }
+.feature-live-icon.credits { background: var(--accent-tint2); color: var(--accent); }
+.feature-live-icon.market  { background: rgba(5,150,105,0.10); color: var(--safe); }
+.feature-live-icon.shop    { background: rgba(180,83,9,0.10); color: var(--warning); }
+.feature-live-card h4 { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--heading); margin-bottom: 10px; }
+.feature-live-card p { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 16px; }
+.feature-live-tag { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; padding: 5px 10px; border-radius: 5px; }
+.feature-live-tag.on { background: rgba(5,150,105,0.10); color: var(--safe); }
+.feature-live-tag.on::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--safe); animation: pulse 2s infinite; }
+html[data-theme="dark"] .feature-live-tag.on { background: rgba(16,185,129,0.14); }
+
+.rewards-teaser-actions small {
+  font-family: var(--font-mono); font-size: 10px; color: var(--dim);
+  text-align: center; letter-spacing: 0.5px;
+}
+
+/* ─── AUTH MODAL ─────────────────────────────────────────────── */
+.auth-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(9, 14, 26, 0.55);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.auth-overlay.active { opacity: 1; pointer-events: auto; }
+.auth-modal {
+  position: relative; width: 100%; max-width: 420px;
+  max-height: 90vh; overflow-y: auto;
+  background: var(--bg); border: 1px solid var(--border2);
+  border-radius: 18px; padding: 44px 36px 36px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.35);
+  transform: translateY(12px) scale(0.98);
+  transition: transform 0.3s cubic-bezier(0.2,0.8,0.2,1);
+}
+.auth-overlay.active .auth-modal { transform: translateY(0) scale(1); }
+.auth-close {
+  position: absolute; top: 18px; right: 18px;
+  width: 30px; height: 30px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--card);
+  color: var(--muted); font-size: 14px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s ease;
+}
+.auth-close:hover { color: var(--accent); border-color: var(--accent); }
+.auth-view { display: none; }
+.auth-view.active { display: block; }
+.auth-eyebrow {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  color: var(--accent); letter-spacing: 3px; text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.auth-title {
+  font-family: var(--font-display); font-size: 30px; font-weight: 700;
+  color: var(--heading); margin-bottom: 8px; line-height: 1.15;
+}
+.auth-sub { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 26px; }
+.auth-sub strong { color: var(--accent); font-weight: 700; }
+.auth-error {
+  display: none; font-size: 12px; color: var(--danger);
+  background: rgba(159,18,57,0.08); border: 1px solid rgba(159,18,57,0.25);
+  border-radius: 8px; padding: 10px 14px; margin-bottom: 18px;
+}
+.auth-error.show { display: block; }
+.auth-form { display: flex; flex-direction: column; gap: 16px; }
+.auth-field { display: flex; flex-direction: column; gap: 6px; }
+.auth-label {
+  font-family: var(--font-body); font-size: 10px; font-weight: 800;
+  color: var(--dim); letter-spacing: 2px; text-transform: uppercase;
+}
+.auth-input {
+  background: var(--form-input-bg); border: 1px solid var(--border);
+  color: var(--text); font-family: var(--font-body); font-size: 14px;
+  padding: 12px 16px; width: 100%; border-radius: 8px;
+  transition: all 0.3s ease; outline: none;
+}
+.auth-input:focus { border-color: var(--accent); background: var(--form-focus-bg); box-shadow: 0 0 0 4px var(--form-focus-sh); }
+.auth-row-between { display: flex; align-items: center; justify-content: space-between; margin-top: -6px; }
+.auth-link {
+  background: none; border: none; padding: 0; cursor: pointer;
+  font-family: var(--font-body); font-size: 12px; color: var(--muted);
+  text-decoration: underline; transition: color 0.2s ease;
+}
+.auth-link.accent { color: var(--accent); font-weight: 600; }
+.auth-link:hover { color: var(--accent); }
+.auth-submit {
+  font-family: var(--font-body); font-size: 12px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  padding: 14px 24px; border-radius: 8px;
+  background: var(--accent); color: #fff; border: none;
+  cursor: pointer; transition: all 0.3s ease;
+  box-shadow: 0 0 24px var(--glow-sm); margin-top: 4px;
+}
+.auth-submit:hover { transform: translateY(-2px); box-shadow: 0 0 40px var(--glow-lg); }
+.auth-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.auth-divider {
+  display: flex; align-items: center; gap: 12px; margin: 22px 0;
+  font-family: var(--font-mono); font-size: 10px; color: var(--dim);
+  letter-spacing: 1px; text-transform: uppercase;
+}
+.auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.auth-google-btn {
+  width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;
+  font-family: var(--font-body); font-size: 13px; font-weight: 600; color: var(--text);
+  background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 12px; cursor: pointer; transition: all 0.25s ease;
+}
+.auth-google-btn:hover { border-color: var(--border2); background: var(--accent-tint); }
+.auth-google-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+.auth-switch { text-align: center; font-size: 13px; color: var(--muted); margin-top: 22px; }
+.auth-back-row {
+  font-family: var(--font-mono); font-size: 11px; color: var(--muted);
+  letter-spacing: 0.5px; cursor: pointer; margin-bottom: 18px;
+  transition: color 0.2s ease;
+}
+.auth-back-row:hover { color: var(--accent); }
+.otp-row { display: flex; gap: 8px; }
+.otp-box {
+  width: 100%; aspect-ratio: 1; text-align: center;
+  font-family: var(--font-mono); font-size: 18px; font-weight: 700;
+  background: var(--form-input-bg); border: 1px solid var(--border);
+  color: var(--text); border-radius: 8px; outline: none;
+  transition: all 0.25s ease;
+}
+.otp-box:focus { border-color: var(--accent); background: var(--form-focus-bg); box-shadow: 0 0 0 4px var(--form-focus-sh); }
+.auth-success-icon {
+  width: 56px; height: 56px; border-radius: 50%; margin: 0 auto 20px;
+  background: rgba(5,150,105,0.10); color: var(--safe);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; font-weight: 700;
+}
+
+/* ─── RESPONSIVE ─────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .steps-track { grid-template-columns: 1fr; }
+  .step-block + .step-block { border-left: none; border-top: 1px solid var(--border); }
+  .pipeline-wrap { grid-template-columns: 1fr; gap: 40px; }
+  .cities-grid { grid-template-columns: 1fr; }
+  .tech-strip { grid-template-columns: repeat(2, 1fr); }
+  .impact-grid { grid-template-columns: repeat(2, 1fr); }
+  .report-wrap { grid-template-columns: 1fr; gap: 40px; }
+}
+@media (max-width: 600px) {
+  .nav-links { display: none; }
+  .hero h1 { font-size: 44px; }
+  .hero-stats { gap: 24px; }
+  .detection-grid { grid-template-columns: 1fr; }
+  .tech-strip { grid-template-columns: 1fr 1fr; }
+  .impact-grid { grid-template-columns: 1fr 1fr; }
+  .main-footer .footer-links { gap: 12px 16px; }
+  .rewards-teaser { flex-direction: column; align-items: flex-start; padding: 26px; }
+  .rewards-teaser-actions { width: 100%; }
+  .rewards-teaser-actions .btn-primary { width: 100%; text-align: center; }
+  .auth-modal { padding: 36px 24px 28px; }
+  .user-chip { font-size: 10px; padding: 5px 10px; gap: 6px; }
+}
+</style>
+<link rel="stylesheet" href="basis-footer.css" />
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+</head>
+<body>
+
+<!-- ═══ HEADER ════════════════════════════════════════════════ -->
+<header>
+  <div class="container">
+    <div class="header-inner">
+      <a href="#" class="logo" aria-label="Coral"><img class="alaka-logo-img" src="coral-logo.png" alt="Coral" width="182" height="34"></a>
+      <nav class="nav-links" aria-label="Main navigation">
+        <span class="nav-free-tag">FREE TOOLS FOR EVERYONE</span>
+        <a href="features/">Features</a>
+        <a href="https://shoonyaorigins.com/ventures/coral/safety_tools/">Safety Tools</a>
+        <a href="https://shoonyaorigins.com/ventures/coral/civic_tools/">Civic Tools</a>
+        <a href="https://shoonyaorigins.com/ventures/coral/environment_tools/">Environment Tools</a>
+        <a href="#report">Report Issue</a>
+        <a href="#" class="nav-rewards" data-open-auth="login" id="navSignIn">Sign In</a>
+      </nav>
+      <span class="user-chip" id="userChip">
+        <span>Hi, <span id="userChipName">there</span></span>
+        <span class="credits" id="userChipCredits">0 credits</span>
+        <span class="logout-link" id="logoutLink">Log out</span>
+      </span>
+      <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ HERO ══════════════════════════════════════════════════ -->
+<section class="hero z1">
+  <div class="container">
+    <div class="hero-eyebrow">Urban Intelligence Platform</div>
+    <h1>
+      The Bridge Between<br />
+      <em>Mumbai & Pune</em><br />
+      and Their Government.
+    </h1>
+    <p class="hero-sub">
+      Citizens report. Our AI sees. Government acts. Coral transforms everyday frustrations — potholes, broken pipes, illegal dumping — into structured, anonymous intelligence that compels institutional change.
+    </p>
+    <div class="hero-actions">
+      <a href="#report" class="btn-primary">Report an Issue</a>
+      <a href="#how-it-works" class="btn-ghost">See How It Works</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <span class="stat-num">2</span>
+        <span class="stat-label">Cities Live</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num" id="liveReportCount">—</span>
+        <span class="stat-label">Citizen Reports</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">0</span>
+        <span class="stat-label">Data Sold. Ever.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+<div class="divider"></div>
+
+<!-- ═══ HOW IT WORKS ══════════════════════════════════════════ -->
+<section id="how-it-works">
+  <div class="container">
+    <span class="section-label reveal">Process</span>
+    <h2 class="section-title reveal reveal-d1">Three steps to a better city.</h2>
+    <p class="section-sub reveal reveal-d2">We are not government. But we're building the tools for a more responsive one.</p>
+    <div class="steps-track reveal reveal-d3">
+      <div class="step-block">
+        <div class="step-cover">
+          <img src="images/icon-camera.webp" alt="Citizens Report" />
+          <span class="step-cover-label">Step 01</span>
+        </div>
+        <div class="step-body">
+          <span class="step-num">Step 01</span>
+          <h3>Citizens Report</h3>
+          <p>You spot a pothole, a broken streetlight, a clogged drain. Tap the app, snap a photo, tag the location. It takes 15 seconds. Your identity stays hidden — always.</p>
+        </div>
+      </div>
+      <div class="step-block">
+        <div class="step-cover">
+          <img src="images/icon-brain.webp" alt="AI Validates" />
+          <span class="step-cover-label">Step 02</span>
+        </div>
+        <div class="step-body">
+          <span class="step-num">Step 02</span>
+          <h3>AI Validates & Clusters</h3>
+          <p>Our computer vision pipeline — built on OpenCV and custom-trained models — classifies the issue, confirms its severity, and groups it with related reports from across the city. Noise becomes signal.</p>
+        </div>
+      </div>
+      <div class="step-block">
+        <div class="step-cover">
+          <img src="images/icon-government.webp" alt="Government Receives" />
+          <span class="step-cover-label">Step 03</span>
+        </div>
+        <div class="step-body">
+          <span class="step-num">Step 03</span>
+          <h3>Government Receives Intelligence</h3>
+          <p>When a threshold of reports is crossed, anonymised, aggregated intelligence is delivered directly to the relevant civic body — BMC, PMC — with location clusters, severity scores, and photographic evidence.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ DETECTION SUITE ═══════════════════════════════════════ -->
+<section id="detection">
+  <div class="container">
+    <span class="section-label reveal">Detection Suite</span>
+    <h2 class="section-title reveal reveal-d1">What Coral can see.</h2>
+    <p class="section-sub reveal reveal-d2">Powered by OpenCV and deep neural networks trained on Indian urban environments. Because potholes in Pune look different from potholes in London.</p>
+    <div class="detection-grid">
+      <div class="detect-card reveal">
+        <div class="detect-cover"><img src="images/icon-pothole.webp" alt="Pothole Detection" /><span class="detect-tag tag-cv">Computer Vision</span></div>
+        <div class="detect-body"><h3>Pothole Detection</h3><p>Photo-based depth estimation and surface analysis flags road damage before it becomes an accident. Severity classified as Minor, Serious, or Critical.</p><div class="detect-tech">OpenCV · Depth Estimation · Geo-clustering</div></div>
+      </div>
+      <div class="detect-card reveal reveal-d1">
+        <div class="detect-cover"><img src="images/icon-garbage.webp" alt="Illegal Dumping" /><span class="detect-tag tag-cv">Computer Vision</span></div>
+        <div class="detect-body"><h3>Illegal Dumping & Garbage</h3><p>Detects unauthorised waste accumulation in public spaces. Recurring hotspots are flagged automatically to solid waste management departments.</p><div class="detect-tech">Object Detection · Temporal Heatmaps</div></div>
+      </div>
+      <div class="detect-card reveal reveal-d2">
+        <div class="detect-cover"><img src="images/icon-sewage.webp" alt="Sewage Issues" /><span class="detect-tag tag-cv">Computer Vision</span></div>
+        <div class="detect-body"><h3>Sewage & Drainage Issues</h3><p>Identifies open manholes, overflowing drains, and pipeline leakages. Automated alerts prevent contamination crises before they spread.</p><div class="detect-tech">Anomaly Detection · Risk Scoring</div></div>
+      </div>
+      <div class="detect-card reveal">
+        <div class="detect-cover"><img src="images/icon-infrastructure.webp" alt="Broken Infrastructure" /><span class="detect-tag tag-cv">Computer Vision</span></div>
+        <div class="detect-body"><h3>Broken Infrastructure</h3><p>Bent railings, cracked walls, collapsed barriers, and shattered street furniture are catalogued and routed to the responsible municipal body.</p><div class="detect-tech">Structural CV · Damage Grading</div></div>
+      </div>
+      <div class="detect-card reveal reveal-d1">
+        <div class="detect-cover"><img src="images/icon-traffic.webp" alt="Traffic Violations" /><span class="detect-tag tag-cv">Computer Vision</span></div>
+        <div class="detect-body"><h3>Traffic Law Violations</h3><p>Citizen-submitted footage analysed for signal jumping, wrong-way driving, and illegal parking. Evidence packaged for traffic authorities — not for surveillance.</p><div class="detect-tech">Motion Tracking · Event Detection</div></div>
+      </div>
+      <div class="detect-card reveal reveal-d2">
+        <div class="detect-cover"><img src="images/icon-litter.webp" alt="Littering" /><span class="detect-tag tag-cv">Computer Vision</span></div>
+        <div class="detect-body"><h3>Littering Tracking</h3><p>Pattern analysis identifies high-littering zones and recurring offenders (anonymised) to help deploy targeted awareness and enforcement campaigns.</p><div class="detect-tech">Behaviour Analysis · Zone Mapping</div></div>
+      </div>
+      <div class="detect-card reveal">
+        <div class="detect-cover"><img src="images/icon-pattern.webp" alt="Pattern Recognition" /><span class="detect-tag tag-ai">AI Insight</span></div>
+        <div class="detect-body"><h3>Pattern Recognition & Forecasting</h3><p>Across thousands of reports, AI identifies systemic failure zones — not just isolated issues — and predicts where the next breakdown will occur before it does.</p><div class="detect-tech">LSTM · Spatial Clustering · Predictive AI</div></div>
+      </div>
+      <div class="detect-card reveal reveal-d1">
+        <div class="detect-cover"><img src="images/icon-anonymous.webp" alt="Anonymous Intelligence" /><span class="detect-tag tag-crowd">Crowdsourced</span></div>
+        <div class="detect-body"><h3>Anonymous Collective Intelligence</h3><p>Individual reports are meaningless. Thousands of them are a mandate. We aggregate citizen voices anonymously until the data is undeniable — then we hand it to those who can fix it.</p><div class="detect-tech">Threshold Alerts · Anonymisation Engine</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ DATA PIPELINE ═════════════════════════════════════════ -->
+<section class="pipeline-section" id="pipeline">
+  <div class="container">
+    <div class="pipeline-wrap">
+      <div class="pipeline-visual reveal">
+        <div style="font-family: var(--font-mono); font-size: 10px; color: var(--dim); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border);">LIVE PIPELINE — MUMBAI NODE</div>
+        <div class="pipe-row"><div class="pipe-dot cyan"></div><span class="pipe-label">Citizen Report Ingested</span><span class="pipe-badge badge-live">● LIVE</span></div>
+        <div class="pipe-row"><div class="pipe-dot green"></div><span class="pipe-label">Image Validated by CV</span><span class="pipe-badge badge-ai">AI</span></div>
+        <div class="pipe-row"><div class="pipe-dot amber"></div><span class="pipe-label">PII Stripped — Anonymised</span><span class="pipe-badge badge-anon">ANON</span></div>
+        <div class="pipe-row"><div class="pipe-dot red"></div><span class="pipe-label">Issue Classified + Scored</span><span class="pipe-badge badge-ai">AI</span></div>
+        <div class="pipe-row"><div class="pipe-dot cyan"></div><span class="pipe-label">Cluster Threshold Check</span><span class="pipe-sub">Requires 15+ matching reports</span></div>
+        <div class="pipe-row"><div class="pipe-dot green"></div><span class="pipe-label">Intelligence Report Generated</span><span class="pipe-badge badge-ai">AI</span></div>
+        <div class="pipe-row"><div class="pipe-dot amber"></div><span class="pipe-label">Routed to Civic Authority</span><span class="pipe-badge badge-gov">BMC / PMC</span></div>
+      </div>
+      <div class="pipeline-text reveal reveal-d1">
+        <span class="section-label" style="margin-bottom:12px;">Data Architecture</span>
+        <h3>Your photo becomes a government brief.</h3>
+        <p>Every report travels through a multi-stage pipeline that strips personal information before it ever touches our servers. We don't know who you are. We never want to.</p>
+        <p>What reaches the government is structured, scored intelligence — not a raw complaint. We translate public frustration into institutional language that cannot be ignored.</p>
+        <ul class="promise-list">
+          <li>No names, no phone numbers, no personal identifiers leave your device</li>
+          <li>AI severity scoring prevents false reports from corrupting the dataset</li>
+          <li>Cluster thresholds mean only verified, widespread problems are escalated</li>
+          <li>All government dispatches are timestamped and tracked for resolution</li>
+          <li>Data is never sold, licensed, or shared with advertisers. Ever.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ PRIVACY PLEDGE ════════════════════════════════════════ -->
+<section id="privacy-pledge" style="padding: 100px 0; background: var(--pipe-section);">
+  <div class="container">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;">
+      <div class="reveal">
+        <span class="section-label" style="margin-bottom: 12px;">Data Philosophy</span>
+        <h2 class="section-title">We take your complaint.<br />Not your identity.</h2>
+        <p style="font-size: 16px; color: var(--muted); line-height: 1.85; margin-bottom: 20px;">Coral was built on a single non-negotiable principle: your participation should cost you nothing — not your name, not your number, not your address, not your data. We have no interest in who you are. We are only interested in what you saw.</p>
+        <p style="font-size: 16px; color: var(--muted); line-height: 1.85; margin-bottom: 32px;">Every complaint you submit is stripped of all personal identifiers the moment it leaves your device. What arrives at our servers is a problem — a location, a category, a photograph of broken infrastructure — not a person. That is how it should be, and that is how it will always be.</p>
+        <p style="font-size: 15px; color: var(--muted); line-height: 1.85;">We built this for you. Not to profile you, not to monetise you — but because someone has to turn the everyday frustrations of millions of Indians into institutional change. That is our only purpose.</p>
+      </div>
+      <div class="reveal reveal-d1">
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 28px 28px; display: flex; gap: 20px; align-items: flex-start; transition: all 0.3s ease;">
+            <div style="width: 40px; height: 40px; flex-shrink: 0; background: var(--accent-tint2); border: 1px solid var(--border2); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px;">🚫</div>
+            <div><h4 style="font-family: var(--font-body); font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px;">No name. No phone. No account.</h4><p style="font-size: 13px; color: var(--muted); line-height: 1.65;">We do not ask for — and will never ask for — any personal identifier. Anonymous participation is not a feature. It is the foundation.</p></div>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 28px 28px; display: flex; gap: 20px; align-items: flex-start; transition: all 0.3s ease;">
+            <div style="width: 40px; height: 40px; flex-shrink: 0; background: rgba(5,150,105,0.08); border: 1px solid rgba(5,150,105,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px;">🔒</div>
+            <div><h4 style="font-family: var(--font-body); font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px;">Your data is never sold. Not to anyone. Ever.</h4><p style="font-size: 13px; color: var(--muted); line-height: 1.65;">We are not an advertising business. We are not a data broker. Your complaints exist solely to compel better governance — that is their only destination.</p></div>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 28px 28px; display: flex; gap: 20px; align-items: flex-start; transition: all 0.3s ease;">
+            <div style="width: 40px; height: 40px; flex-shrink: 0; background: rgba(8,145,178,0.08); border: 1px solid rgba(8,145,178,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px;">🌍</div>
+            <div><h4 style="font-family: var(--font-body); font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px;">Your complaint becomes civic change.</h4><p style="font-size: 13px; color: var(--muted); line-height: 1.65;">What you give us — 15 seconds and a photograph — we convert into structured, government-grade intelligence that forces measurable action in the real world.</p></div>
+          </div>
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 28px 28px; display: flex; gap: 20px; align-items: flex-start; transition: all 0.3s ease;">
+            <div style="width: 40px; height: 40px; flex-shrink: 0; background: rgba(180,83,9,0.08); border: 1px solid rgba(180,83,9,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px;">🤝</div>
+            <div><h4 style="font-family: var(--font-body); font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px;">Built for citizens. Accountable to citizens.</h4><p style="font-size: 13px; color: var(--muted); line-height: 1.65;">We exist because broken cities hurt real people. Every design decision at Coral is made with one question: does this serve the person on the street, or does it serve us?</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ CITIES ════════════════════════════════════════════════ -->
+<section id="cities">
+  <div class="container">
+    <span class="section-label reveal">Coverage</span>
+    <h2 class="section-title reveal reveal-d1">Where Coral is live.</h2>
+    <p class="section-sub reveal reveal-d2">We start focused. Two cities. Every ward. Zero tolerance for broken infrastructure.</p>
+    <div class="cities-grid">
+      <div class="city-card reveal">
+        <div class="city-bg-text">MUM</div>
+        <div class="city-status status-active">Active Now</div>
+        <h2>Mumbai</h2>
+        <h4>Maharashtra · Western Coast</h4>
+        <p>Home to 20 million Mumbaikars navigating monsoon-battered roads, overflowing drains, and infrastructure that struggles to keep pace with the city's ambition. Coral is active across all 24 wards of the BMC.</p>
+        <div class="city-metrics">
+          <div><span class="city-metric-val">24</span><span class="city-metric-label">BMC Wards</span></div>
+          <div><span class="city-metric-val">20M+</span><span class="city-metric-label">Citizens Served</span></div>
+          <div><span class="city-metric-val">Active</span><span class="city-metric-label">Status</span></div>
+        </div>
+      </div>
+      <div class="city-card reveal reveal-d1">
+        <div class="city-bg-text">PNQ</div>
+        <div class="city-status status-active">Active Now</div>
+        <h2>Pune</h2>
+        <h4>Maharashtra · Deccan Plateau</h4>
+        <p>A rapidly expanding tech and education hub facing growing pains — traffic congestion, expanding civic limits, and infrastructure planning that hasn't caught up with population growth. Coral serves all 15 PMC zones.</p>
+        <div class="city-metrics">
+          <div><span class="city-metric-val">15</span><span class="city-metric-label">PMC Zones</span></div>
+          <div><span class="city-metric-val">7M+</span><span class="city-metric-label">Citizens Served</span></div>
+          <div><span class="city-metric-val">Active</span><span class="city-metric-label">Status</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="tech-strip reveal" style="margin-top: 48px;">
+      <div class="tech-pill"><img src="images/tech-opencv.webp" alt="OpenCV" /><div class="tech-pill-text"><h4>OpenCV</h4><p>Computer vision backbone for image classification</p></div></div>
+      <div class="tech-pill"><img src="images/tech-ai.webp" alt="Custom AI Models" /><div class="tech-pill-text"><h4>Custom AI Models</h4><p>Trained on Indian road and urban conditions</p></div></div>
+      <div class="tech-pill"><img src="images/tech-geo.webp" alt="Geo-Clustering" /><div class="tech-pill-text"><h4>Geo-Clustering</h4><p>Spatial grouping of related reports by zone</p></div></div>
+      <div class="tech-pill"><img src="images/tech-privacy.webp" alt="Privacy Engine" /><div class="tech-pill-text"><h4>Privacy Engine</h4><p>On-device PII stripping before transmission</p></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ ROVER ROLLOUT ═════════════════════════════════════════ -->
+<section id="rollout" style="padding: 100px 0;">
+  <div class="container">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; margin-bottom: 72px;">
+      <div id="videoBlock" style="position: relative; border-radius: 20px; overflow: hidden; border: 1px solid var(--border2); box-shadow: 0 24px 80px var(--glow-sm); cursor: pointer; background: var(--surface); aspect-ratio: 16/9;">
+        <div id="playOverlay" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; background: transparent; transition: background 0.3s ease; z-index: 2;">
+          <div style="width: 64px; height: 64px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 12px rgba(8,145,178,0.20);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#fff"><polygon points="5,3 19,12 5,21"/></svg>
+          </div>
+          <span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted);">Watch How It Works</span>
+        </div>
+        <video id="basisVideo" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: none;" controls>
+          <source src="images/ad_video.webm" type="video/webm" />
+        </video>
+      </div>
+      <div class="reveal">
+        <span class="section-label" style="margin-bottom: 12px;">Expansion Roadmap</span>
+        <h2 class="section-title">Data everywhere.<br />Rovers where it matters first.</h2>
+        <p class="section-sub" style="margin-bottom: 0;">We are already collecting citizen intelligence from across India. Our physical autonomous rover programme — the ground-level verification layer — launches first in Mumbai and Pune, then expands nationally.</p>
+      </div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 64px;" class="reveal reveal-d1">
+      <div class="detect-card">
+        <div class="detect-cover"><img src="images/icon-camera.webp" alt="All-India Data Collection" /><span class="detect-tag tag-cv" style="top:14px; left:14px;">Phase 00 · Now</span></div>
+        <div class="detect-body">
+          <h3 style="font-size: 20px;">All-India Data Collection</h3>
+          <p>Citizen reports are being received from across India right now. Every city, every state. The intelligence platform is live and processing — no geography is excluded from the data layer.</p>
+          <div class="detect-tech" style="margin-top: 18px;"><span style="font-family: var(--font-mono); font-size: 10px; color: var(--accent); letter-spacing: 1px; padding: 6px 12px; background: var(--accent-tint); border: 1px solid var(--border2); border-radius: 6px; display: inline-block;">● ACTIVE NATIONWIDE</span></div>
+        </div>
+      </div>
+      <div class="detect-card">
+        <div class="detect-cover"><img src="images/icon-mumbai.webp" alt="Rover Launch" /><span class="detect-tag tag-crowd" style="top:14px; left:14px;">Phase 01 · 6 Months</span></div>
+        <div class="detect-body">
+          <h3 style="font-size: 20px;">Rover Launch — Mumbai & Pune</h3>
+          <p>Our autonomous ground rovers — equipped with multi-sensor arrays, high-resolution cameras, and real-time CV processing — begin physical patrols in Mumbai and Pune. Ground truth verification at city scale.</p>
+          <div class="detect-tech" style="margin-top: 18px;"><span style="font-family: var(--font-mono); font-size: 10px; color: var(--warning); letter-spacing: 1px; padding: 6px 12px; background: rgba(180,83,9,0.06); border: 1px solid rgba(180,83,9,0.2); border-radius: 6px; display: inline-block;">⏳ DEPLOYING SOON</span></div>
+        </div>
+      </div>
+      <div class="detect-card">
+        <div class="detect-cover"><img src="images/icon-india.webp" alt="National Rover Expansion" /><span class="detect-tag" style="top:14px; left:14px; background: rgba(100,116,139,0.80); color:#fff; border: 1px solid rgba(255,255,255,0.25);">Phase 02 · 12 Months</span></div>
+        <div class="detect-body">
+          <h3 style="font-size: 20px;">National Rover Expansion</h3>
+          <p>All major Indian cities come online with physical rover coverage. Delhi, Bengaluru, Chennai, Hyderabad, Kolkata — every major urban centre gets the full Coral ground-intelligence layer within one year of launch.</p>
+          <div class="detect-tech" style="margin-top: 18px;"><span style="font-family: var(--font-mono); font-size: 10px; color: var(--dim); letter-spacing: 1px; padding: 6px 12px; background: rgba(100,116,139,0.06); border: 1px solid rgba(100,116,139,0.15); border-radius: 6px; display: inline-block;">◎ COMING IN 12 MONTHS</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="reveal" style="background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 36px 40px; display: flex; align-items: center; gap: 0; position: relative; overflow: hidden;">
+      <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--warning), var(--dim));"></div>
+      <div style="flex: 1; text-align: center; padding: 0 20px; border-right: 1px solid var(--border);">
+        <div style="font-family: var(--font-mono); font-size: 9px; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px;">Today</div>
+        <div style="font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--heading); margin-bottom: 4px;">India-Wide</div>
+        <div style="font-size: 12px; color: var(--muted);">Data layer active across all cities</div>
+      </div>
+      <div style="flex: 1; text-align: center; padding: 0 20px; border-right: 1px solid var(--border);">
+        <div style="font-family: var(--font-mono); font-size: 9px; color: var(--warning); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px;">6 Months</div>
+        <div style="font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--heading); margin-bottom: 4px;">Mumbai · Pune</div>
+        <div style="font-size: 12px; color: var(--muted);">Physical rovers begin ground patrols</div>
+      </div>
+      <div style="flex: 1; text-align: center; padding: 0 20px;">
+        <div style="font-family: var(--font-mono); font-size: 9px; color: var(--dim); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px;">12 Months</div>
+        <div style="font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--heading); margin-bottom: 4px;">All Major Cities</div>
+        <div style="font-size: 12px; color: var(--muted);">National rover network fully operational</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ REPORT WIDGET ═════════════════════════════════════════ -->
+<section class="report-section" id="report">
+  <div class="container">
+    <div class="report-wrap">
+      <div class="report-form-card reveal">
+        <h3>Report an Issue</h3>
+        <p class="sub">Takes 15 seconds. Completely anonymous. Could fix a road.</p>
+
+        <div class="form-group">
+          <label class="form-label" for="citySelect">City</label>
+          <select class="form-control" id="citySelect">
+            <option value="">Select your city</option>
+            <option value="Mumbai">Mumbai</option>
+            <option value="Pune">Pune</option>
+            <option value="Other">Other City</option>
+          </select>
+          <span class="field-error" id="cityError">Please select a city.</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="issueSelect">Issue Type</label>
+          <select class="form-control" id="issueSelect">
+            <option value="">What did you spot?</option>
+            <option value="Pothole / Road Damage">Pothole / Road Damage</option>
+            <option value="Garbage / Illegal Dumping">Garbage / Illegal Dumping</option>
+            <option value="Sewage / Drainage Problem">Sewage / Drainage Problem</option>
+            <option value="Broken Infrastructure">Broken Infrastructure</option>
+            <option value="Traffic Law Violation">Traffic Law Violation</option>
+            <option value="Littering">Littering</option>
+            <option value="Streetlight Failure">Streetlight Failure</option>
+            <option value="Other">Other</option>
+          </select>
+          <span class="field-error" id="issueError">Please select an issue type.</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Location Picker</label>
+          <div class="location-btn-wrap">
+            <button class="btn-locate" id="locateBtn" type="button" aria-label="Use my live location">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8" stroke-dasharray="2 2"/></svg>
+              Use My Live Location
+            </button>
+          </div>
+          <div id="map"></div>
+          <input type="text" class="form-control" id="locationInput" placeholder="Or type a landmark here..." style="margin-top: 10px;" maxlength="200" autocomplete="off" />
+        </div>
+
+        <div class="upload-area" id="uploadArea" role="button" aria-label="Upload photo" tabindex="0">
+          <div style="font-size: 32px; margin-bottom: 10px;">📷</div>
+          <p class="upload-text"><strong>Tap to add a photo</strong><br/>JPG, PNG, or HEIC — max 10MB</p>
+        </div>
+        <span class="field-error" id="photoError">Please attach a photo.</span>
+
+        <button class="btn-primary" id="submitBtn" style="width:100%; border-radius:8px; font-size:13px; padding:16px;" type="button">
+          Submit Anonymously →
+        </button>
+        <div class="anon-note">
+          <span style="font-size:14px;">🔒</span>
+          Your identity is never stored or transmitted
+        </div>
+      </div>
+
+      <div class="report-info reveal reveal-d1">
+        <span class="section-label" style="margin-bottom:12px;">Why it matters</span>
+        <h3>Your report is not a complaint.<br/>It's evidence.</h3>
+        <p>A single report gets filed and forgotten. A hundred reports from the same junction become a case that forces a response. Coral exists to turn isolated frustration into collective, verified, government-grade evidence.</p>
+        <p>We don't send you angry letters. We don't run campaigns. We build data sets that civic authorities cannot dismiss.</p>
+        <div class="flow-steps">
+          <div class="flow-step">
+            <div class="flow-step-num">1</div>
+            <div class="flow-step-content"><h4>You report in 15 seconds</h4><p>Photo + location + category. That's all we need. No account, no name, no phone number.</p></div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-step-num">2</div>
+            <div class="flow-step-content"><h4>AI validates and scores your report</h4><p>Computer vision confirms the issue is real, classifies its type, and assigns a severity score.</p></div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-step-num">3</div>
+            <div class="flow-step-content"><h4>It clusters with similar reports</h4><p>Your report joins others from the same area. When the threshold is crossed, the cluster becomes a brief.</p></div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-step-num">4</div>
+            <div class="flow-step-content"><h4>Government receives a formal intelligence report</h4><p>BMC or PMC receives structured data — location, severity, photographic evidence, frequency — with a resolution deadline tracked publicly.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rewards-teaser reveal">
+      <div class="rewards-teaser-body">
+        <div class="rewards-teaser-icon">Alternate Route</div>
+        <h3>Want credit for the reports you file — literally?</h3>
+        <p>Anonymous reporting stays free and identity-free, always. But if you create a free Coral account, every report you file earns you <strong style="color:var(--accent);">city credits</strong> — redeemable for vouchers, event passes, and discounts on sustainable goods in our marketplace. Shops and cafés near you can even give you credits for disposing waste correctly.</p>
+      </div>
+      <div class="rewards-teaser-actions">
+        <button class="btn-primary" style="border-radius:8px;" data-open-auth="signup">Create Free Account →</button>
+        <small>Takes 30 seconds · No credit card</small>
+      </div>
+    </div>
+
+    <div class="feature-live-grid reveal reveal-d1">
+      <div class="feature-live-card">
+        <div class="feature-live-icon credits">⬡</div>
+        <h4>Sign in, start earning</h4>
+        <p>Create a free account and every report or verified disposal now earns real, spendable <strong style="color:var(--accent);">city credits</strong> — tracked live in your own Coral wallet.</p>
+        <span class="feature-live-tag on">Live now</span>
+      </div>
+      <div class="feature-live-card">
+        <div class="feature-live-icon market">⛁</div>
+        <h4>Buy sustainable products</h4>
+        <p>Spend credits in the Coral marketplace on eco-friendly goods listed directly by local shops — no cash needed, just the credits you've already earned.</p>
+        <span class="feature-live-tag on">Live now</span>
+      </div>
+      <div class="feature-live-card">
+        <div class="feature-live-icon shop">⌂</div>
+        <h4>Shops can join &amp; issue vouchers</h4>
+        <p>Local businesses can register as Coral partners, list products, and issue their own discount vouchers — reaching citizens who are already earning credits nearby.</p>
+        <span class="feature-live-tag on">Live now</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ IMPACT NUMBERS ════════════════════════════════════════ -->
+<section style="padding: 80px 0;">
+  <div class="container">
+    <span class="section-label reveal" style="text-align:center; display:block;">Impact — Live Data</span>
+    <span class="section-label reveal" style="text-align:center; display:block; font-size:medium; color:#059669;">"BE THE FIRST ONE TO GENERATE THE REPORT."</span>
+    <div class="impact-grid reveal reveal-d1">
+      <div class="impact-cell">
+        <span class="impact-num" id="impactReportCount">—</span>
+        <div class="impact-label">Citizen Reports<br/>Processed</div>
+      </div>
+      <div class="impact-cell">
+        <span class="impact-num">00</span>
+        <div class="impact-label">Government Briefs<br/>Delivered</div>
+      </div>
+      <div class="impact-cell">
+        <span class="impact-num">39</span>
+        <div class="impact-label">Municipal Wards<br/>Covered</div>
+      </div>
+      <div class="impact-cell">
+        <span class="impact-num">0%</span>
+        <div class="impact-label">User Data<br/>Compromised</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ PROMISE ═══════════════════════════════════════════════ -->
+<section class="promise-section">
+  <div class="container">
+    <span class="section-label reveal" style="display:block; text-align:center;">Our Commitment</span>
+    <h2 class="promise-title reveal reveal-d1">
+      Mumbai and Pune<br />
+      will work <em>better</em>.<br />
+      That's a promise.
+    </h2>
+    <p class="promise-desc reveal reveal-d2">
+      We're not a petition platform. We're not a grievance forum. We are a technology infrastructure company that uses AI, computer vision, and the collective voice of citizens to make Indian cities systematically, measurably better — one report at a time.
+    </p>
+    <div class="hero-actions reveal reveal-d3">
+      <a href="#report" class="btn-primary">Start Reporting</a>
+      <a href="features/government-briefs.html" class="btn-ghost">Government Access →</a>
+    </div>
+    <div class="promise-signature reveal" style="margin-top: 40px;">
+      Built by <strong>Shoonya Origins</strong> · Coral Division · Mumbai & Pune
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ════════════════════════════════════════════════ -->
+<footer class="bx-footer">
+  <div class="bx-footer-grid">
+    <div class="bx-col bx-col-brand">
+      <a class="bx-brand-link" href="./" aria-label="Coral"><img class="alaka-logo-img" src="./coral-logo.png" alt="Coral" width="215" height="40"></a>
+      <p class="bx-tagline">Urban intelligence that turns citizen reports into evidence.</p>
+      <p class="bx-byline">By Shoonya Origins &middot; Pune, India</p>
+    </div>
+    <div class="bx-col">
+      <h4>About Coral</h4>
+      <a href="./why-basis.html">Why Coral</a>
+      <a href="./#how-it-works">How It Works</a>
+      <a href="./why-basis.html#who">Who It&#39;s For</a>
+      <a href="./#cities">Where It&#39;s Live</a>
+      <a href="/about/">About Shoonya Origins</a>
+    </div>
+    <div class="bx-col bx-col-features">
+      <h4>Features</h4>
+      <div class="bx-list">
+      <a href="./features/anonymous-reporting.html">Anonymous Reporting</a>
+      <a href="./features/ai-detection.html">AI Detection</a>
+      <a href="./features/review-and-learning.html">Human Review &amp; Continuous Learning</a>
+      <a href="./features/city-credits.html">City Credits</a>
+      <a href="./features/marketplace.html">Marketplace</a>
+      <a href="./features/partner-shops.html">Partner Shops &amp; Vouchers</a>
+      <a href="./features/free-tools.html">Free Tools</a>
+      <a href="./features/government-briefs.html">Government Briefs</a>
+      <a href="./features/rover-network.html">Rover Network</a>
+      <a href="./features/">All features &rarr;</a>
+      </div>
+    </div>
+    <div class="bx-col">
+      <h4>Free Tools</h4>
+      <a href="./safety_tools/">Safety &amp; Structure</a>
+      <a href="./environment_tools/">Environment &amp; Resources</a>
+      <a href="./civic_tools/">Civic Intelligence</a>
+    </div>
+    <div class="bx-col">
+      <h4>Legal</h4>
+      <a href="./terms.html">Terms &amp; Conditions</a>
+      <a href="./privacy.html">Privacy Policy</a>
+      <a href="/about/disclaimer.html">Legal Disclaimer</a>
+    </div>
+    <div class="bx-col">
+      <h4>My Account</h4>
+      <a href="./?auth=login">Log In</a>
+      <a href="./?auth=signup">Create Account</a>
+      <a href="./dashboard.html">Dashboard</a>
+      <a href="./#report">Report an Issue</a>
+      <a href="mailto:yogeshjathalkar@gmail.com">Contact Us</a>
+    </div>
+  </div>
+  <div class="bx-bottom">
+    <p>Copyright 2026 Coral. Built by Shoonya Origins for the citizens of Mumbai &amp; Pune.</p>
+    <p>This venture is incubated under Shoonya Origins.</p>
+  </div>
+</footer>
+
+<!-- ═══ SCRIPTS ═══════════════════════════════════════════════ -->
+<script>
+// ════════════════════════════════════════════════════════════════
+// SECURITY MODULE
+// ════════════════════════════════════════════════════════════════
+
+// ─── 1. CSRF TOKEN ────────────────────────────────────────────
+// Generates a unique token per session stored in sessionStorage.
+// Sent with every form submission so the backend can verify the
+// request originated from this page and not an external site.
+function generateCSRFToken() {
+  const arr = new Uint8Array(32);
+  crypto.getRandomValues(arr);
+  return Array.from(arr, b => b.toString(16).padStart(2, '0')).join('');
+}
+const CSRF_TOKEN = (function() {
+  let token = sessionStorage.getItem('basis_csrf');
+  if (!token) {
+    token = generateCSRFToken();
+    sessionStorage.setItem('basis_csrf', token);
+  }
+  return token;
+})();
+
+// ─── 2. CLIENT-SIDE RATE LIMITER ──────────────────────────────
+// Allows max 3 submissions per 10-minute window per browser session.
+// Prevents rapid-fire spam submissions without any server load.
+const RateLimit = (function() {
+  const KEY = 'basis_rl';
+  const MAX = 3;
+  const WINDOW_MS = 10 * 60 * 1000; // 10 minutes
+
+  function getState() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      return raw ? JSON.parse(raw) : { count: 0, windowStart: Date.now() };
+    } catch { return { count: 0, windowStart: Date.now() }; }
+  }
+
+  function saveState(state) {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch {}
+  }
+
+  return {
+    check() {
+      let state = getState();
+      const now = Date.now();
+      // Reset window if expired
+      if (now - state.windowStart > WINDOW_MS) {
+        state = { count: 0, windowStart: now };
+        saveState(state);
+      }
+      return state.count < MAX;
+    },
+    increment() {
+      let state = getState();
+      const now = Date.now();
+      if (now - state.windowStart > WINDOW_MS) {
+        state = { count: 1, windowStart: now };
+      } else {
+        state.count += 1;
+      }
+      saveState(state);
+    },
+    remaining() {
+      const state = getState();
+      const now = Date.now();
+      if (now - state.windowStart > WINDOW_MS) return MAX;
+      return Math.max(0, MAX - state.count);
+    }
+  };
+})();
+
+// ─── 3. INPUT SANITISER ───────────────────────────────────────
+// Strips HTML tags and dangerous characters from all text inputs
+// before they are sent to the backend or inserted into the DOM.
+// This prevents XSS and SQL injection via the frontend layer.
+function sanitise(str) {
+  if (typeof str !== 'string') return '';
+  return str
+    .replace(/[<>'"&]/g, c => ({ '<':'&lt;', '>':'&gt;', "'":"&#39;", '"':'&quot;', '&':'&amp;' }[c]))
+    .replace(/[\x00-\x1F\x7F]/g, '') // strip control chars
+    .trim()
+    .slice(0, 500); // hard max length
+}
+
+// ─── 4. ALLOWLIST VALIDATOR ───────────────────────────────────
+// Only accepts values that match the exact options in the dropdowns.
+// Rejects anything injected or tampered with via DevTools.
+const ALLOWED_CITIES = ['Mumbai', 'Pune', 'Other'];
+const ALLOWED_ISSUES = [
+  'Pothole / Road Damage', 'Garbage / Illegal Dumping',
+  'Sewage / Drainage Problem', 'Broken Infrastructure',
+  'Traffic Law Violation', 'Littering', 'Streetlight Failure', 'Other'
+];
+
+function isAllowedCity(val) { return ALLOWED_CITIES.includes(val); }
+function isAllowedIssue(val) { return ALLOWED_ISSUES.includes(val); }
+
+// ─── 5. FILE VALIDATOR ────────────────────────────────────────
+// Validates file type by checking the actual magic bytes (file header),
+// not just the extension or MIME type — both of which can be spoofed.
+// Also enforces 10MB size limit.
+async function validateFile(file) {
+  if (!file) return { ok: false, reason: 'No file selected.' };
+  if (file.size > 10 * 1024 * 1024) return { ok: false, reason: 'File exceeds 10MB limit.' };
+
+  // Read first 12 bytes to check magic numbers
+  const header = await file.slice(0, 12).arrayBuffer();
+  const bytes = new Uint8Array(header);
+
+  const isJpeg = bytes[0] === 0xFF && bytes[1] === 0xD8 && bytes[2] === 0xFF;
+  const isPng  = bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4E && bytes[3] === 0x47;
+  const isHeic = bytes[4] === 0x66 && bytes[5] === 0x74 && bytes[6] === 0x79 && bytes[7] === 0x70;
+  const isWebp = bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50;
+
+  if (!isJpeg && !isPng && !isHeic && !isWebp) {
+    return { ok: false, reason: 'Invalid file type. JPG, PNG, HEIC, or WebP only.' };
+  }
+  return { ok: true };
+}
+
+// ─── 6. COORDINATE VALIDATOR ──────────────────────────────────
+// Ensures lat/lng are real numbers within valid geographic bounds
+// before sending to the backend. Prevents coordinate injection.
+function validateCoords(lat, lng) {
+  const la = parseFloat(lat);
+  const lo = parseFloat(lng);
+  if (isNaN(la) || isNaN(lo)) return false;
+  if (la < -90 || la > 90) return false;
+  if (lo < -180 || lo > 180) return false;
+  return true;
+}
+
+// ─── 7. FORM FIELD VALIDATOR ──────────────────────────────────
+function showError(fieldId, errorId, show) {
+  const field = document.getElementById(fieldId);
+  const error = document.getElementById(errorId);
+  if (field) field.classList.toggle('error', show);
+  if (error) error.classList.toggle('visible', show);
+}
+
+function clearErrors() {
+  ['citySelect','issueSelect','uploadArea'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('error');
+  });
+  ['cityError','issueError','photoError'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('visible');
+  });
+}
+
+// ─── 8. DOUBLE-SUBMIT PREVENTION ──────────────────────────────
+let isSubmitting = false;
+
+// ════════════════════════════════════════════════════════════════
+// END SECURITY MODULE
+// ════════════════════════════════════════════════════════════════
+
+// ─── SUPABASE CONFIG ──────────────────────────────────────────
+const SUPABASE_URL = 'https://vtxhqqiugnzdnfifykcc.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0eGhxcWl1Z256ZG5maWZ5a2NjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1NzI0NjYsImV4cCI6MjA5MTE0ODQ2Nn0.aKmv8a8uKVotRDZvorF_QZSOuBHER3PywIcxywmONJA';
+const SUPABASE_TABLE = 'basis_reports';
+
+// ─── THEME TOGGLE ─────────────────────────────────────────────
+const themeBtn = document.getElementById('themeToggle');
+themeBtn.addEventListener('click', () => {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  themeBtn.textContent = isDark ? '🌙' : '☀️';
+  localStorage.setItem('basis-theme', isDark ? 'light' : 'dark');
+});
+(function() {
+  const saved = localStorage.getItem('basis-theme');
+  if (saved === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    themeBtn.textContent = '☀️';
+  }
+})();
+
+// ─── SCROLL REVEAL ────────────────────────────────────────────
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ─── ANIMATED COUNTER ─────────────────────────────────────────
+function animateCount(el, target) {
+  const dur = 1800;
+  const step = (ts) => {
+    if (!step.start) step.start = ts;
+    const prog = Math.min((ts - step.start) / dur, 1);
+    const eased = 1 - Math.pow(1 - prog, 3);
+    el.textContent = Math.round(eased * target).toLocaleString();
+    if (prog < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+// ─── SUPABASE LIVE REPORT COUNT ───────────────────────────────
+async function fetchReportCount() {
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?select=count`,
+      {
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Prefer': 'count=exact',
+          'Range': '0-0'
+        }
+      }
+    );
+    const contentRange = res.headers.get('content-range');
+    if (contentRange) {
+      const total = parseInt(contentRange.split('/')[1], 10);
+      if (!isNaN(total)) {
+        const heroEl = document.getElementById('liveReportCount');
+        const impactEl = document.getElementById('impactReportCount');
+        animateCount(heroEl, total);
+        animateCount(impactEl, total);
+        return total;
+      }
+    }
+  } catch (e) {
+    console.warn('Could not fetch report count:', e);
+    document.getElementById('liveReportCount').textContent = '0';
+    document.getElementById('impactReportCount').textContent = '0';
+  }
+}
+
+async function subscribeToReports() {
+  await fetchReportCount();
+  setInterval(async () => { await fetchReportCount(); }, 30000);
+}
+subscribeToReports();
+
+// ─── MAP INIT ─────────────────────────────────────────────────
+let selectedFile = null;
+let marker;
+let currentCoords = { lat: 18.5204, lng: 73.8567 };
+
+const map = L.map('map').setView([19.0760, 72.8777], 11);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap'
+}).addTo(map);
+
+// 1. Define the blue icon using purely code (SVG)
+const bluePinIcon = L.divIcon({
+  html: `<svg viewBox="0 0 24 24" width="36" height="36" xmlns="http://www.w3.org/2000/svg"><path fill="#007BFF" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`,
+  className: '', // This removes Leaflet's default styling, no CSS required
+  iconSize: [36, 36],
+  iconAnchor: [18, 36] // Anchors the bottom tip perfectly to the map coordinate
+});
+
+// 2. Initialize your marker with the new icon
+marker = L.marker([19.0760, 72.8777], { 
+  draggable: true, 
+  icon: bluePinIcon 
+}).addTo(map);
+
+marker.on('dragend', function() {
+  const pos = marker.getLatLng();
+  currentCoords = { lat: pos.lat, lng: pos.lng };
+});
+
+// ─── CITY SELECTOR MAP PANNING ────────────────────────────────
+document.getElementById('citySelect').addEventListener('change', function(e) {
+  const selectedCity = e.target.value;
+  let targetLat, targetLng;
+
+  if (selectedCity === 'Mumbai') {
+    targetLat = 19.0760;
+    targetLng = 72.8777;
+  } else if (selectedCity === 'Pune') {
+    targetLat = 18.5204;
+    targetLng = 73.8567;
+  } else {
+    // If they select "Other City" or empty, don't move the map
+    return; 
+  }
+
+  // 1. Update your global coordinates state
+  currentCoords = { lat: targetLat, lng: targetLng };
+  
+  // 2. Smoothly animate the map to the new city (Zoom level 11)
+  map.flyTo([targetLat, targetLng], 11, {
+    animate: true,
+    duration: 1.5 // 1.5 seconds for a smooth transition
+  });
+  
+  // 3. Move the pin to the new center
+  marker.setLatLng([targetLat, targetLng]);
+});
+
+// ─── LIVE LOCATION BUTTON ─────────────────────────────────────
+document.getElementById('locateBtn').addEventListener('click', function() {
+  const btn = this;
+  btn.textContent = 'Locating...';
+  btn.disabled = true;
+
+  if (!navigator.geolocation) {
+    btn.textContent = 'Location not supported — Drag pin manually';
+    btn.disabled = false;
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const { latitude, longitude } = pos.coords;
+      
+      // Validate before using
+      if (!validateCoords(latitude, longitude)) {
+        btn.textContent = 'Invalid coordinates — Drag pin manually';
+        btn.disabled = false;
+        return;
+      }
+      
+      currentCoords = { lat: latitude, lng: longitude };
+      map.setView([latitude, longitude], 16);
+      marker.setLatLng([latitude, longitude]);
+      
+      // Updated success text to remind users they can refine the location
+      btn.textContent = '✓ Location Found — Drag pin to adjust';
+      btn.style.background = 'rgba(5,150,105,0.1)';
+      btn.style.color = 'var(--safe)';
+      btn.style.borderColor = 'var(--safe)';
+      btn.disabled = false;
+    },
+    (error) => {
+      // Handles permission denial and other errors, updating text accordingly
+      if (error.code === error.PERMISSION_DENIED) {
+        btn.textContent = 'Location Blocked — Drag pin manually';
+        alert("Location access is currently blocked. To use your live location, please click the lock icon 🔒 in your browser's address bar, allow location access, and try again. Alternatively, you can drag the map pin manually.");
+      } else {
+        btn.textContent = 'Could Not Locate — Drag pin manually';
+      }
+      btn.disabled = false;
+    },
+    { enableHighAccuracy: true, timeout: 8000 }
+  );
+});
+
+// ─── FILE UPLOAD ──────────────────────────────────────────────
+const uploadArea = document.getElementById('uploadArea');
+
+uploadArea.addEventListener('click', () => {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/jpeg,image/png,image/heic,image/webp';
+  input.onchange = async e => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const validation = await validateFile(file);
+    if (!validation.ok) {
+      uploadArea.innerHTML = `<div style="font-size:28px;margin-bottom:8px;">⚠️</div><p class="upload-text"><strong>${sanitise(validation.reason)}</strong></p>`;
+      uploadArea.style.borderColor = 'var(--danger)';
+      selectedFile = null;
+      return;
+    }
+
+    selectedFile = file;
+    document.getElementById('photoError').classList.remove('visible');
+    uploadArea.innerHTML = `
+      <div style="font-size:32px; margin-bottom:10px;">✅</div>
+      <p class="upload-text"><strong>${sanitise(file.name)}</strong><br/>Ready to submit</p>
+    `;
+    uploadArea.style.borderColor = 'var(--safe)';
+  };
+  input.click();
+});
+
+// Keyboard accessibility for upload area
+uploadArea.addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); uploadArea.click(); }
+});
+
+// ─── SUBMIT ───────────────────────────────────────────────────
+const workerUrl = "https://spring-mud-eaa0shoonya-api.yogeshjathalkar.workers.dev/";
+
+document.getElementById('submitBtn').addEventListener('click', async function() {
+  if (isSubmitting) return; // double-submit guard
+
+  clearErrors();
+
+  // Rate limit check
+  if (!RateLimit.check()) {
+    alert(`You've submitted ${3} reports in the last 10 minutes. Please wait before submitting again.`);
+    return;
+  }
+
+  // Collect and sanitise values
+  const city      = sanitise(document.getElementById('citySelect').value);
+  const issueType = sanitise(document.getElementById('issueSelect').value);
+  const locationText = sanitise(document.getElementById('locationInput').value);
+
+  // Validate using allowlists
+  let hasError = false;
+
+  if (!city || !isAllowedCity(city)) {
+    showError('citySelect', 'cityError', true);
+    hasError = true;
+  }
+  if (!issueType || !isAllowedIssue(issueType)) {
+    showError('issueSelect', 'issueError', true);
+    hasError = true;
+  }
+  if (!selectedFile) {
+    document.getElementById('photoError').classList.add('visible');
+    hasError = true;
+  }
+  if (!validateCoords(currentCoords.lat, currentCoords.lng)) {
+    alert('Invalid location. Please drag the map pin to your location.');
+    hasError = true;
+  }
+
+  if (hasError) return;
+
+  // Re-validate file before sending (in case of tampering between select and submit)
+  const fileCheck = await validateFile(selectedFile);
+  if (!fileCheck.ok) {
+    alert(fileCheck.reason);
+    return;
+  }
+
+  isSubmitting = true;
+  const btn = this;
+  btn.textContent = 'Transmitting...';
+  btn.disabled = true;
+
+  // --- THE FIX: Combine text and GPS into one single string ---
+  let combinedLocation = `GPS: ${currentCoords.lat.toFixed(6)}, ${currentCoords.lng.toFixed(6)}`;
+  if (locationText) {
+    // If they typed a landmark, append the GPS to it
+    combinedLocation = `${locationText} (${combinedLocation})`;
+  }
+
+  const formData = new FormData();
+  formData.append("image", selectedFile);
+  formData.append("city", city);
+  formData.append("issueType", issueType);
+  // Send the combined string as 'location' so it fits your existing database column perfectly
+  formData.append("location", combinedLocation); 
+  formData.append("csrf_token", CSRF_TOKEN); // backend should verify this
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000); // 15s timeout
+
+    const response = await fetch(workerUrl, {
+      method: "POST",
+      body: formData,
+      signal: controller.signal
+    });
+
+    clearTimeout(timeout);
+
+    if (response.ok) {
+      RateLimit.increment();
+      btn.textContent = '✓ Report Submitted';
+      btn.style.background = 'var(--safe)';
+      setTimeout(() => { fetchReportCount(); }, 1500);
+      setTimeout(() => { location.reload(); }, 3000);
+    } else {
+      const status = response.status;
+      if (status === 429) {
+        btn.textContent = 'Too many requests — try later';
+      } else if (status === 403) {
+        btn.textContent = 'Submission blocked';
+      } else {
+        btn.textContent = 'Error — Try Again';
+      }
+      btn.style.background = 'var(--danger)';
+      btn.disabled = false;
+      isSubmitting = false;
+    }
+  } catch (e) {
+    if (e.name === 'AbortError') {
+      btn.textContent = 'Timed out — Try Again';
+    } else {
+      btn.textContent = 'Error — Try Again';
+    }
+    btn.style.background = 'var(--danger)';
+    btn.disabled = false;
+    isSubmitting = false;
+  }
+});
+
+// ─── VIDEO PLAY ON TAP ────────────────────────────────────────
+const videoBlock   = document.getElementById('videoBlock');
+const basisVideo   = document.getElementById('basisVideo');
+const playOverlay  = document.getElementById('playOverlay');
+
+if (videoBlock) {
+  videoBlock.addEventListener('click', function() {
+    basisVideo.style.display = 'block';
+    playOverlay.style.display = 'none';
+    basisVideo.load();
+    const playPromise = basisVideo.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(err => { console.warn('Autoplay blocked:', err); });
+    }
+  });
+  basisVideo.addEventListener('click', function(e) { e.stopPropagation(); });
+}
+</script>
+
+<!-- ═══ AUTH MODAL — Coral Rewards ══════════════════════════════
+     All views live in the DOM, hidden via CSS, swapped by JS.
+     No page reload except after a successful password reset.
+     ═══════════════════════════════════════════════════════════ -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-modal">
+    <button class="auth-close" id="authClose" aria-label="Close">✕</button>
+
+    <!-- VIEW 1: LOGIN -->
+    <div class="auth-view active" data-view="login">
+      <div class="auth-eyebrow">Coral Rewards</div>
+      <h2 class="auth-title">Welcome Back</h2>
+      <p class="auth-sub">Sign in to check your <strong>credits</strong> and report history.</p>
+
+      <div class="auth-error" id="loginError">Invalid email or password.</div>
+
+      <form class="auth-form" id="loginForm">
+        <div class="auth-field">
+          <label class="auth-label" for="loginEmail">Email</label>
+          <input class="auth-input" type="email" id="loginEmail" placeholder="you@example.com" required autocomplete="email">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label" for="loginPassword">Password</label>
+          <input class="auth-input" type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        <div class="auth-row-between">
+          <span></span>
+          <button type="button" class="auth-link accent" data-goto="forgot-email">Forgot password?</button>
+        </div>
+        <button type="submit" class="auth-submit" id="loginSubmitBtn">Log In</button>
+      </form>
+
+      <div class="auth-divider">Or</div>
+
+      <button class="auth-google-btn" id="googleLoginBtn">
+        <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continue with Google
+      </button>
+
+      <p class="auth-switch">New to Coral? <button type="button" class="auth-link accent" data-goto="signup">Create a free account</button></p>
+    </div>
+
+    <!-- VIEW 2: SIGN UP -->
+    <div class="auth-view" data-view="signup">
+      <div class="auth-eyebrow">Coral Rewards</div>
+      <h2 class="auth-title">Create Account</h2>
+      <p class="auth-sub">Start earning <strong>credits</strong> for every report you file.</p>
+
+      <div class="auth-error" id="signupError">Something went wrong. Please try again.</div>
+
+      <form class="auth-form" id="signupForm">
+        <div class="auth-field">
+          <label class="auth-label" for="signupName">Full Name</label>
+          <input class="auth-input" type="text" id="signupName" placeholder="Your name" required autocomplete="name">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label" for="signupEmail">Email</label>
+          <input class="auth-input" type="email" id="signupEmail" placeholder="you@example.com" required autocomplete="email">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label" for="signupPassword">Password</label>
+          <input class="auth-input" type="password" id="signupPassword" placeholder="At least 8 characters" required minlength="8" autocomplete="new-password">
+        </div>
+        <button type="submit" class="auth-submit" id="signupSubmitBtn">Create Account</button>
+      </form>
+
+      <div class="auth-divider">Or</div>
+
+      <button class="auth-google-btn" id="googleSignupBtn">
+        <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continue with Google
+      </button>
+
+      <p class="auth-switch">Already have an account? <button type="button" class="auth-link accent" data-goto="login">Log in</button></p>
+    </div>
+
+    <!-- VIEW 3: FORGOT PASSWORD — STEP 1: EMAIL -->
+    <div class="auth-view" data-view="forgot-email">
+      <div class="auth-back-row" data-goto="login">← Back to login</div>
+      <div class="auth-eyebrow">Reset Password</div>
+      <h2 class="auth-title">Forgot Password?</h2>
+      <p class="auth-sub">Enter your email and we'll send a <strong>one-time code</strong> to verify it's you.</p>
+
+      <div class="auth-error" id="forgotEmailError">We couldn't find an account with that email.</div>
+
+      <form class="auth-form" id="forgotEmailForm">
+        <div class="auth-field">
+          <label class="auth-label" for="forgotEmail">Email</label>
+          <input class="auth-input" type="email" id="forgotEmail" placeholder="you@example.com" required autocomplete="email">
+        </div>
+        <button type="submit" class="auth-submit" id="forgotEmailSubmitBtn">Send OTP</button>
+      </form>
+    </div>
+
+    <!-- VIEW 4: FORGOT PASSWORD — STEP 2: OTP -->
+    <div class="auth-view" data-view="forgot-otp">
+      <div class="auth-back-row" data-goto="forgot-email">← Back</div>
+      <div class="auth-eyebrow">Reset Password</div>
+      <h2 class="auth-title">Enter Code</h2>
+      <p class="auth-sub">We sent a 6-digit code to <strong id="otpEmailDisplay">your email</strong>.</p>
+
+      <div class="auth-error" id="otpError">Incorrect or expired code. Please try again.</div>
+
+      <form class="auth-form" id="otpForm">
+        <div class="auth-field">
+          <label class="auth-label">One-Time Code</label>
+          <div class="otp-row">
+            <input class="otp-box" type="text" inputmode="numeric" maxlength="1" data-otp-index="0" required>
+            <input class="otp-box" type="text" inputmode="numeric" maxlength="1" data-otp-index="1" required>
+            <input class="otp-box" type="text" inputmode="numeric" maxlength="1" data-otp-index="2" required>
+            <input class="otp-box" type="text" inputmode="numeric" maxlength="1" data-otp-index="3" required>
+            <input class="otp-box" type="text" inputmode="numeric" maxlength="1" data-otp-index="4" required>
+            <input class="otp-box" type="text" inputmode="numeric" maxlength="1" data-otp-index="5" required>
+          </div>
+        </div>
+        <div class="auth-row-between">
+          <span></span>
+          <button type="button" class="auth-link accent" id="resendOtpBtn">Resend code</button>
+        </div>
+        <button type="submit" class="auth-submit" id="otpSubmitBtn">Verify Code</button>
+      </form>
+    </div>
+
+    <!-- VIEW 5: FORGOT PASSWORD — STEP 3: NEW PASSWORD -->
+    <div class="auth-view" data-view="forgot-newpass">
+      <div class="auth-eyebrow">Reset Password</div>
+      <h2 class="auth-title">Set New Password</h2>
+      <p class="auth-sub">Code verified. Choose a <strong>new password</strong> for your account.</p>
+
+      <div class="auth-error" id="newPassError">Passwords don't match or are too short.</div>
+
+      <form class="auth-form" id="newPassForm">
+        <div class="auth-field">
+          <label class="auth-label" for="newPassword">New Password</label>
+          <input class="auth-input" type="password" id="newPassword" placeholder="At least 8 characters" required minlength="8" autocomplete="new-password">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label" for="confirmPassword">Confirm Password</label>
+          <input class="auth-input" type="password" id="confirmPassword" placeholder="Re-enter password" required minlength="8" autocomplete="new-password">
+        </div>
+        <button type="submit" class="auth-submit" id="newPassSubmitBtn">Update Password</button>
+      </form>
+    </div>
+
+    <!-- VIEW 6: SUCCESS -->
+    <div class="auth-view" data-view="forgot-success">
+      <div style="text-align:center; padding: 1rem 0;">
+        <div class="auth-success-icon">✓</div>
+        <h2 class="auth-title" style="text-align:center;">Password Updated</h2>
+        <p class="auth-sub" style="text-align:center; margin: 0 auto 2rem;">Reloading so you can log in with your <strong>new password</strong>...</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// SUPABASE CONFIG — Coral's OWN project, not any other venture's.
+// Fill these in from Supabase dashboard → Settings → API.
+// Until filled in, the forms below run in a harmless "demo mode"
+// (no real accounts created) so you can see the UI work.
+// ═══════════════════════════════════════════════════════════════
+//const SUPABASE_URL = '';
+//const SUPABASE_ANON_KEY = '';
+const supabaseClient = (SUPABASE_URL.startsWith('http'))
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
+
+// Where a signed-in user lands. Update once the rewards dashboard
+// page exists — for now this can safely stay pointed at the homepage.
+const DASHBOARD_URL = '/ventures/coral/dashboard.html';
+
+document.addEventListener('DOMContentLoaded', () => {
+  const overlay = document.getElementById('authOverlay');
+  const closeBtn = document.getElementById('authClose');
+  const views = document.querySelectorAll('.auth-view');
+  let resetFlowEmail = '';
+
+  function openAuth(viewName = 'login') {
+    overlay.classList.add('active');
+    showView(viewName);
+    document.body.style.overflow = 'hidden';
+  }
+  function closeAuth() {
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  document.querySelectorAll('[data-open-auth]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      openAuth(el.dataset.openAuth);
+    });
+  });
+
+  // Footer links (?auth=login / ?auth=signup) open the auth modal directly.
+  const authParam = new URLSearchParams(window.location.search).get('auth');
+  if (authParam === 'login' || authParam === 'signup') openAuth(authParam);
+
+  closeBtn.addEventListener('click', closeAuth);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeAuth(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && overlay.classList.contains('active')) closeAuth(); });
+
+  function showView(name) {
+    views.forEach(v => v.classList.toggle('active', v.dataset.view === name));
+    clearErrors();
+  }
+  function clearErrors() {
+    document.querySelectorAll('.auth-error').forEach(e => e.classList.remove('show'));
+  }
+  function showError(id, message) {
+    const el = document.getElementById(id);
+    if (message) el.textContent = message;
+    el.classList.add('show');
+  }
+
+  document.querySelectorAll('[data-goto]').forEach(el => {
+    el.addEventListener('click', () => showView(el.dataset.goto));
+  });
+
+  // ── OTP box behaviour: auto-advance + backspace + paste ──
+  const otpBoxes = Array.from(document.querySelectorAll('.otp-box'));
+  otpBoxes.forEach((box, i) => {
+    box.addEventListener('input', () => {
+      box.value = box.value.replace(/[^0-9]/g, '').slice(0, 1);
+      if (box.value && otpBoxes[i + 1]) otpBoxes[i + 1].focus();
+    });
+    box.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !box.value && otpBoxes[i - 1]) otpBoxes[i - 1].focus();
+    });
+    box.addEventListener('paste', (e) => {
+      e.preventDefault();
+      const digits = (e.clipboardData.getData('text') || '').replace(/[^0-9]/g, '').split('');
+      digits.forEach((d, idx) => { if (otpBoxes[i + idx]) otpBoxes[i + idx].value = d; });
+      const next = otpBoxes[i + digits.length] || otpBoxes[otpBoxes.length - 1];
+      next.focus();
+    });
+  });
+  function getOtpValue() { return otpBoxes.map(b => b.value).join(''); }
+  function clearOtp() { otpBoxes.forEach(b => b.value = ''); otpBoxes[0].focus(); }
+
+  // ── Reflect logged-in state in the header (nav link ↔ user chip) ──
+  function setLoggedInUI(user) {
+    const navSignIn = document.getElementById('navSignIn');
+    const chip = document.getElementById('userChip');
+    if (user) {
+      navSignIn.style.display = 'none';
+      chip.style.display = 'inline-flex';
+      document.getElementById('userChipName').textContent =
+        (user.user_metadata && user.user_metadata.full_name) ? user.user_metadata.full_name.split(' ')[0] : user.email;
+      // TODO: once the credits backend exists, fetch the real balance
+      // instead of this placeholder.
+      document.getElementById('userChipCredits').textContent = '— credits';
+    } else {
+      navSignIn.style.display = '';
+      chip.style.display = 'none';
+    }
+  }
+
+  if (supabaseClient) {
+    supabaseClient.auth.getSession().then(({ data }) => {
+      setLoggedInUI(data.session ? data.session.user : null);
+    });
+    supabaseClient.auth.onAuthStateChange((_event, session) => {
+      setLoggedInUI(session ? session.user : null);
+    });
+  }
+
+  document.getElementById('logoutLink').addEventListener('click', async () => {
+    if (supabaseClient) await supabaseClient.auth.signOut();
+    setLoggedInUI(null);
+  });
+
+  // ── LOGIN ──
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearErrors();
+    const btn = document.getElementById('loginSubmitBtn');
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+
+    btn.disabled = true; btn.textContent = 'Logging in...';
+
+    if (!supabaseClient) {
+      setTimeout(() => {
+        btn.disabled = false; btn.textContent = 'Log In';
+        showError('loginError', 'Rewards login isn\'t connected yet — add SUPABASE_URL and SUPABASE_ANON_KEY near the bottom of index.html once the backend is ready.');
+      }, 400);
+      return;
+    }
+
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    if (error) {
+      btn.disabled = false; btn.textContent = 'Log In';
+      showError('loginError', error.message);
+      return;
+    }
+
+    btn.textContent = 'Redirecting...';
+    window.location.href = DASHBOARD_URL;
+  });
+
+  // ── SIGN UP ──
+  document.getElementById('signupForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearErrors();
+    const btn = document.getElementById('signupSubmitBtn');
+    const name = document.getElementById('signupName').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value;
+
+    btn.disabled = true; btn.textContent = 'Creating account...';
+
+    if (!supabaseClient) {
+      setTimeout(() => {
+        btn.disabled = false; btn.textContent = 'Create Account';
+        showError('signupError', 'Rewards signup isn\'t connected yet — add SUPABASE_URL and SUPABASE_ANON_KEY near the bottom of index.html once the backend is ready.');
+      }, 400);
+      return;
+    }
+
+    const { data, error } = await supabaseClient.auth.signUp({
+      email, password,
+      options: { data: { full_name: name } }
+      // NOTE: add emailRedirectTo here once the rewards dashboard page
+      // exists, e.g. emailRedirectTo: window.location.origin + DASHBOARD_URL
+    });
+    btn.disabled = false; btn.textContent = 'Create Account';
+    if (error) { showError('signupError', error.message); return; }
+
+    if (data.session) {
+      btn.textContent = 'Redirecting...';
+      window.location.href = DASHBOARD_URL;
+      return;
+    }
+
+    // Email confirmation is ON in this Supabase project: no session yet.
+    showView('login');
+    showError('loginError', 'Account created — check your inbox to confirm your email before logging in.');
+  });
+
+  // ── GOOGLE OAUTH (optional — requires enabling the Google provider
+  //    in Supabase → Authentication → Providers first) ──
+  function googleAuth() {
+    if (!supabaseClient) {
+      console.warn('Rewards login isn\'t connected yet — set SUPABASE_URL and SUPABASE_ANON_KEY.');
+      return;
+    }
+    supabaseClient.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin + DASHBOARD_URL }
+    });
+  }
+  document.getElementById('googleLoginBtn').addEventListener('click', googleAuth);
+  document.getElementById('googleSignupBtn').addEventListener('click', googleAuth);
+
+  // ── FORGOT PASSWORD — STEP 1: send OTP to email ──
+  document.getElementById('forgotEmailForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearErrors();
+    const btn = document.getElementById('forgotEmailSubmitBtn');
+    const email = document.getElementById('forgotEmail').value.trim();
+
+    btn.disabled = true; btn.textContent = 'Sending...';
+
+    if (!supabaseClient) {
+      setTimeout(() => {
+        resetFlowEmail = email;
+        document.getElementById('otpEmailDisplay').textContent = email;
+        clearOtp();
+        btn.disabled = false; btn.textContent = 'Send OTP';
+        showView('forgot-otp');
+      }, 400);
+      return;
+    }
+
+    // resetPasswordForEmail() (not signInWithOtp) so the OTP can only be
+    // used for password recovery, never as a plain passwordless login.
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
+    btn.disabled = false; btn.textContent = 'Send OTP';
+    if (error) { showError('forgotEmailError', error.message); return; }
+
+    resetFlowEmail = email;
+    document.getElementById('otpEmailDisplay').textContent = email;
+    clearOtp();
+    showView('forgot-otp');
+  });
+
+  // ── FORGOT PASSWORD — STEP 2: verify OTP ──
+  document.getElementById('otpForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearErrors();
+    const btn = document.getElementById('otpSubmitBtn');
+    const code = getOtpValue();
+
+    if (code.length < 6) { showError('otpError', 'Please enter all 6 digits.'); return; }
+
+    btn.disabled = true; btn.textContent = 'Verifying...';
+
+    if (!supabaseClient) {
+      setTimeout(() => {
+        btn.disabled = false; btn.textContent = 'Verify Code';
+        showView('forgot-newpass');
+      }, 400);
+      return;
+    }
+
+    const { error } = await supabaseClient.auth.verifyOtp({ email: resetFlowEmail, token: code, type: 'recovery' });
+    btn.disabled = false; btn.textContent = 'Verify Code';
+    if (error) { showError('otpError', error.message); clearOtp(); return; }
+
+    showView('forgot-newpass');
+  });
+
+  let resendCooldownActive = false;
+  document.getElementById('resendOtpBtn').addEventListener('click', () => {
+    if (resendCooldownActive) return;
+    if (!supabaseClient) { clearOtp(); return; }
+    supabaseClient.auth.resetPasswordForEmail(resetFlowEmail);
+    clearOtp();
+
+    resendCooldownActive = true;
+    const btn = document.getElementById('resendOtpBtn');
+    const original = btn.textContent;
+    let seconds = 30;
+    btn.textContent = `Resend in ${seconds}s`;
+    const interval = setInterval(() => {
+      seconds--;
+      if (seconds <= 0) {
+        clearInterval(interval);
+        btn.textContent = original;
+        resendCooldownActive = false;
+      } else {
+        btn.textContent = `Resend in ${seconds}s`;
+      }
+    }, 1000);
+  });
+
+  // ── FORGOT PASSWORD — STEP 3: set new password, then reload ──
+  document.getElementById('newPassForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearErrors();
+    const btn = document.getElementById('newPassSubmitBtn');
+    const pass1 = document.getElementById('newPassword').value;
+    const pass2 = document.getElementById('confirmPassword').value;
+
+    if (pass1.length < 8 || pass1 !== pass2) {
+      showError('newPassError', 'Passwords must match and be at least 8 characters.');
+      return;
+    }
+
+    btn.disabled = true; btn.textContent = 'Updating...';
+
+    if (!supabaseClient) {
+      setTimeout(() => {
+        showView('forgot-success');
+        setTimeout(() => { window.location.reload(); }, 1500);
+      }, 400);
+      return;
+    }
+
+    const { error } = await supabaseClient.auth.updateUser({ password: pass1 });
+    btn.disabled = false; btn.textContent = 'Update Password';
+    if (error) { showError('newPassError', error.message); return; }
+
+    showView('forgot-success');
+    setTimeout(() => { window.location.reload(); }, 1500);
+  });
+});
+</script>
+</body>
+</html>

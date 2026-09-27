@@ -1,1 +1,0 @@
-function e(e){return`${window.location.origin}/ventures/aura/app/#${e}`}async function t(e){try{return await navigator.clipboard.writeText(e),!0}catch{return!1}}export{t as n,e as t};
