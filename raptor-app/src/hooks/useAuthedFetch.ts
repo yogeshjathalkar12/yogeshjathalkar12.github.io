@@ -34,7 +34,7 @@ export function useAuthedFetch() {
   const { showToast } = useToast();
 
   const authedFetch = useCallback(
-    async <T = unknown>(url: string, options: AuthedFetchOptions = {}): Promise<T> => {
+    async <T = unknown>(url: string, options: AuthedFetchOptions = {}, _retried = false): Promise<T> => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         showToast('Session expired — please log in again', 'error');
@@ -52,10 +52,23 @@ export function useAuthedFetch() {
             ...options.headers,
           },
         });
-      } catch {
-        // Network/CORS/server-down. Never fabricate a result here — the
-        // caller must treat this the same way the old verify-email flow
-        // did: report failure plainly, charge nothing, log nothing.
+      } catch (err) {
+        // The Render backend spins down after ~15min idle; the first
+        // request after that can fail the connection outright (not just
+        // be slow) while it wakes up. That's indistinguishable from a real
+        // outage to fetch(), so retry once after a short wait before
+        // treating it as one — this is safe to retry because a connection
+        // that never opened never reached the server. Only fires once
+        // (_retried guards against looping if the server is genuinely down).
+        if (!_retried) {
+          await new Promise((r) => setTimeout(r, 3000));
+          return authedFetch<T>(url, options, true);
+        }
+        // Browsers deliberately hide the real reason (CORS/DNS/refused/
+        // timeout) from JS for security — this is the most detail we can
+        // get. Log it for debugging; never fabricate a result here, the
+        // caller must report failure plainly, charge nothing, log nothing.
+        console.error('authedFetch: request to', url, 'failed after retry:', err);
         showToast('Could not reach the server — check your connection', 'error');
         throw new ApiError('Network error', 0);
       }
