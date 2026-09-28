@@ -32,6 +32,12 @@ interface ClusterResponse {
   credits_left?: number;
 }
 
+interface JobStatus {
+  status: 'queued' | 'running' | 'done' | 'failed';
+  result: ClusterResponse | null;
+  error: string | null;
+}
+
 interface ClusterRun {
   k: number;
   fields: string[];
@@ -86,6 +92,41 @@ export default function KmeansTool() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // /cluster returns {job_id, status: "queued"} immediately — the actual
+  // clusters come from polling GET /job/{job_id} once the background task
+  // (see kmeans_router.py's BackgroundTasks pattern) finishes.
+  const MAX_POLL_ATTEMPTS = 60; // ~90s at 1.5s/poll — well past any realistic run time
+
+  const pollJob = async (jobId: string, attempt = 0) => {
+    let job: JobStatus;
+    try {
+      job = await authedFetch<JobStatus>(`${API}/job/${jobId}`, { skipCreditsSync: true });
+    } catch (e) {
+      setLoading(false);
+      if (e instanceof Error) showToast(e.message, 'error');
+      return;
+    }
+
+    if (job.status === 'done' && job.result) {
+      setClusters(job.result.clusters || []);
+      loadHistory();
+      showToast('Clustering complete', 'success');
+      setLoading(false);
+      return;
+    }
+    if (job.status === 'failed') {
+      showToast(job.error || 'Clustering failed', 'error');
+      setLoading(false);
+      return;
+    }
+    if (attempt >= MAX_POLL_ATTEMPTS) {
+      showToast('Clustering is taking longer than expected — check Clustering History shortly', 'error');
+      setLoading(false);
+      return;
+    }
+    setTimeout(() => pollJob(jobId, attempt + 1), 1500);
+  };
+
   const runCluster = async () => {
     const csvText = csvInput.trim();
     const fieldsStr = clusterFields.trim();
@@ -109,18 +150,15 @@ export default function KmeansTool() {
 
     setLoading(true);
     try {
-      const json = await authedFetch<ClusterResponse>(`${API}/cluster`, {
+      const json = await authedFetch<{ job_id: string; status: string; credits_left?: number }>(`${API}/cluster`, {
         method: 'POST',
         body: JSON.stringify({ rows, fields, k: kValue || 3, label_field: labelField.trim() || null }),
       });
-      setClusters(json.clusters || []);
-      loadHistory();
-      showToast('Clustering complete', 'success');
+      pollJob(json.job_id);
     } catch (e) {
+      setLoading(false);
       if (e instanceof OutOfCreditsError) showToast('Out of credits', 'error');
       else if (e instanceof Error) showToast(e.message, 'error');
-    } finally {
-      setLoading(false);
     }
   };
 

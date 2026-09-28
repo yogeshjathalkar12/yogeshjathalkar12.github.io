@@ -31,6 +31,12 @@ interface SimulateResponse {
   credits_left?: number;
 }
 
+interface JobStatus {
+  status: 'queued' | 'running' | 'done' | 'failed';
+  result: SimulateResponse | null;
+  error: string | null;
+}
+
 interface SimRun {
   deal_count: number;
   p10: number;
@@ -77,6 +83,41 @@ export default function MontecarloTool() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // /simulate returns {job_id, status: "queued"} immediately — the actual
+  // result comes from polling GET /job/{job_id} once the background task
+  // (see montecarlo_router.py's BackgroundTasks pattern) finishes.
+  const MAX_POLL_ATTEMPTS = 60; // ~90s at 1.5s/poll — well past any realistic run time
+
+  const pollJob = async (jobId: string, attempt = 0) => {
+    let job: JobStatus;
+    try {
+      job = await authedFetch<JobStatus>(`${API}/job/${jobId}`, { skipCreditsSync: true });
+    } catch (e) {
+      setLoading(false);
+      if (e instanceof Error) showToast(e.message, 'error');
+      return;
+    }
+
+    if (job.status === 'done' && job.result) {
+      setResult(job.result);
+      loadHistory();
+      showToast('Simulation complete', 'success');
+      setLoading(false);
+      return;
+    }
+    if (job.status === 'failed') {
+      showToast(job.error || 'Simulation failed', 'error');
+      setLoading(false);
+      return;
+    }
+    if (attempt >= MAX_POLL_ATTEMPTS) {
+      showToast('Simulation is taking longer than expected — check Past Simulations shortly', 'error');
+      setLoading(false);
+      return;
+    }
+    setTimeout(() => pollJob(jobId, attempt + 1), 1500);
+  };
+
   const runSimulate = async () => {
     const dealsStr = dealsInput.trim();
     if (!dealsStr) return showToast('Enter deals', 'error');
@@ -91,18 +132,15 @@ export default function MontecarloTool() {
 
     setLoading(true);
     try {
-      const json = await authedFetch<SimulateResponse>(`${API}/simulate`, {
+      const json = await authedFetch<{ job_id: string; status: string; credits_left?: number }>(`${API}/simulate`, {
         method: 'POST',
         body: JSON.stringify({ deals, iterations: iterations || 10000, bucket_count: buckets || 20 }),
       });
-      setResult(json);
-      loadHistory();
-      showToast('Simulation complete', 'success');
+      pollJob(json.job_id);
     } catch (e) {
+      setLoading(false);
       if (e instanceof OutOfCreditsError) showToast('Out of credits', 'error');
       else if (e instanceof Error) showToast(e.message, 'error');
-    } finally {
-      setLoading(false);
     }
   };
 
