@@ -49,6 +49,20 @@ const PROVIDER_LABEL: Record<Provider, string> = {
   anthropic: 'Anthropic',
 };
 
+// Where to send someone who doesn't have a key yet. Google/AI Studio is the
+// only one of the three that issues a free key with no billing setup - the
+// note only appears there so people don't expect the same from the other two.
+const PROVIDER_KEY_URL: Record<Provider, string> = {
+  google: 'https://aistudio.google.com/apikey',
+  openai: 'https://platform.openai.com/api-keys',
+  anthropic: 'https://console.anthropic.com/settings/keys',
+};
+const PROVIDER_KEY_FREE: Record<Provider, boolean> = {
+  google: true,
+  openai: false,
+  anthropic: false,
+};
+
 const emptyStep = (): StepDraft => ({ provider: '', template_id: '', variables: {} });
 
 export default function ContentTool() {
@@ -213,6 +227,14 @@ export default function ContentTool() {
             <button className="arsenal-btn" disabled={savingKey} onClick={saveKey}>
               {savingKey ? 'Validating…' : 'Save Key'}
             </button>
+          </div>
+          <div style={{ marginTop: 6, fontSize: 12 }}>
+            <a href={PROVIDER_KEY_URL[newKeyProvider]} target="_blank" rel="noopener noreferrer">
+              Get a {PROVIDER_LABEL[newKeyProvider]} key →
+            </a>
+            {PROVIDER_KEY_FREE[newKeyProvider] && (
+              <span style={{ color: 'var(--dim)' }}> (free, no billing setup required)</span>
+            )}
           </div>
 
           {keys.length > 0 && (
