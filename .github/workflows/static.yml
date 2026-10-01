@@ -35,10 +35,21 @@ jobs:
       - name: Check for broken links with Lychee
         uses: lycheeverse/lychee-action@v2
         with:
-          # This tells it to look at all HTML files in your repo
-          args: './**/*.html' 
+          # This tells it to look at all HTML files in your repo.
+          # raptor-app/ is excluded - it's the React app's SOURCE (see
+          # raptor-app/MANUAL_DEPLOY.md), never served as-is; only its
+          # built output under ventures/raptor/app/ actually goes live,
+          # and that output's root-relative asset links can't be resolved
+          # by Lychee without a --root-dir pointing at the real site root,
+          # which this checkout doesn't set up. ventures/raptor/app itself
+          # stays checked since it's real, deployed HTML.
+          # ventures/sentinel/sampati isn't built yet - arsenal/index.html's
+          # "View Project" button links forward to it on purpose (same
+          # pattern as the other in-evaluation defense projects on that
+          # page); excluded here rather than removed or faked.
+          args: './**/*.html' --exclude-path raptor-app --exclude 'https://shoonyaorigins.com/ventures/sentinel/sampati/'
           # This forces the pipeline to STOP and FAIL if it finds a broken link
-          fail: true 
+          fail: true
       # -------------------------------------------
 
       - name: Setup Pages
