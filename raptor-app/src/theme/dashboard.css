@@ -41,3 +41,23 @@
   .dash-sidebar-item { justify-content: center; padding: 0.9rem; }
   .dash-main { margin-left: 60px; padding: 1.5rem; }
 }
+
+/* Pipeline kanban board - deliberately thicker/more visible than the
+   app-wide 4px scrollbar (theme.css) so a column scrolled off-screen
+   (e.g. "Lost", past Won) is an obvious, noticeable affordance rather
+   than something you only discover by accident. */
+.pipeline-board::-webkit-scrollbar {
+  height: 10px;
+}
+.pipeline-board::-webkit-scrollbar-track {
+  background: var(--surface2);
+  border-radius: 6px;
+}
+.pipeline-board::-webkit-scrollbar-thumb {
+  background: var(--purple);
+  border-radius: 6px;
+}
+.pipeline-board {
+  scrollbar-width: auto;
+  scrollbar-color: var(--purple) var(--surface2);
+}

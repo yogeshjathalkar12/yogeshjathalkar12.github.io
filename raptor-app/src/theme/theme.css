@@ -64,14 +64,25 @@ body {
   min-height: 100vh;
 }
 
+/* THE FIX: `width` only styles a VERTICAL scrollbar's thickness - a
+   horizontally-scrolling element (e.g. the Pipeline kanban board) uses
+   `height` for that same dimension instead, which this rule never set.
+   Without it, a horizontal scroll area falls back to the browser's
+   unstyled default (thin/invisible on some platforms), so there was no
+   visible signal that a column (e.g. "Lost") was scrolled off-screen. */
 ::-webkit-scrollbar {
   width: 4px;
+  height: 4px;
 }
 ::-webkit-scrollbar-track {
   background: var(--surface);
 }
 ::-webkit-scrollbar-thumb {
   background: var(--dim2);
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--dim2) var(--surface);
 }
 
 @keyframes pulse {

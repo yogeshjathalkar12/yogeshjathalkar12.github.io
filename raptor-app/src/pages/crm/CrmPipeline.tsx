@@ -181,7 +181,7 @@ export default function CrmPipeline() {
         </button>
       </div>
 
-      <div style={{ display: 'flex', gap: '1.4rem', overflowX: 'auto', paddingBottom: '1rem', flex: 1, minHeight: 0 }}>
+      <div className="pipeline-board" style={{ display: 'flex', gap: '1.4rem', overflowX: 'auto', paddingBottom: '1rem', flex: 1, minHeight: 0 }}>
         {stages.map(stage => {
           const stageDeals = deals.filter(d => d.stage === stage.key);
           const stageValue = stageDeals.reduce((sum, d) => sum + (Number(d.value) || 0), 0);
