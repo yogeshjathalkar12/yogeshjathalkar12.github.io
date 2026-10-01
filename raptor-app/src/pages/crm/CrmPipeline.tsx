@@ -3,22 +3,21 @@ import { supabase } from '../../lib/supabaseClient';
 import BulkImportModal from '../../components/crm/BulkImportModal';
 import ExportButton from '../../components/crm/ExportButton';
 import LiveCallPanel from '../../components/crm/LiveCallPanel';
+import PipelineStagesModal from '../../components/crm/PipelineStagesModal';
+import DealDetailModal from '../../components/crm/DealDetailModal';
 import { DEALS_IMPORT_SCHEMA } from '../../lib/importSchema';
 import { startCall } from '../../lib/calls';
 import { useAuth } from '../../hooks/AuthContext';
-
-const STAGES = [
-  { key: 'lead', label: 'New Lead' },
-  { key: 'meeting', label: 'Meeting Booked' },
-  { key: 'negotiation', label: 'Negotiating' },
-  { key: 'won', label: 'Won' },
-];
+import { type PipelineStage, loadPipelineStages, stageByKey } from '../../lib/pipelineStages';
 
 export default function CrmPipeline() {
   const { session } = useAuth();
   const [deals, setDeals] = useState<any[]>([]);
+  const [stages, setStages] = useState<PipelineStage[]>([]);
   const [loading, setLoading] = useState(true);
   const [showImport, setShowImport] = useState(false);
+  const [showStageManager, setShowStageManager] = useState(false);
+  const [activeDeal, setActiveDeal] = useState<any | null>(null);
   const [activeCall, setActiveCall] = useState<{
     prospectCompany: string; contactPhone: string | null; contactEmail: string | null;
   } | null>(null);
@@ -49,11 +48,15 @@ export default function CrmPipeline() {
   // Initial load and Realtime Subscription
   useEffect(() => {
     fetchDeals();
+    fetchStages();
 
     // Replicate the realtime listener from crm.html
     const channel = supabase.channel('crm-deals')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'deals' }, () => {
         fetchDeals();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'pipeline_stages' }, () => {
+        fetchStages();
       })
       .subscribe();
 
@@ -61,6 +64,14 @@ export default function CrmPipeline() {
       supabase.removeChannel(channel);
     };
   }, []);
+
+  async function fetchStages() {
+    try {
+      setStages(await loadPipelineStages());
+    } catch (error) {
+      console.error('Failed to load pipeline stages:', error);
+    }
+  }
 
   async function fetchDeals() {
     try {
@@ -98,7 +109,8 @@ export default function CrmPipeline() {
     // 2. Exact backend update from crm.html logic
     try {
       const payload: any = { stage: newStage, updated_at: new Date().toISOString() };
-      if (newStage === 'won' || newStage === 'lost') {
+      const newStageType = stageByKey(stages, newStage)?.type;
+      if (newStageType === 'won' || newStageType === 'lost') {
         payload.closed_at = new Date().toISOString();
       }
 
@@ -157,10 +169,20 @@ export default function CrmPipeline() {
         >
           Bulk Import
         </button>
+        <button
+          onClick={() => setShowStageManager(true)}
+          style={{
+            background: 'transparent', color: 'var(--dim)', border: '1px solid var(--border)', padding: '0.6rem 1.1rem',
+            borderRadius: '4px', cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: '0.65rem',
+            letterSpacing: '0.08em', textTransform: 'uppercase',
+          }}
+        >
+          Customize Pipeline
+        </button>
       </div>
 
       <div style={{ display: 'flex', gap: '1.4rem', overflowX: 'auto', paddingBottom: '1rem', flex: 1, minHeight: 0 }}>
-        {STAGES.map(stage => {
+        {stages.map(stage => {
           const stageDeals = deals.filter(d => d.stage === stage.key);
           const stageValue = stageDeals.reduce((sum, d) => sum + (Number(d.value) || 0), 0);
 
@@ -197,6 +219,7 @@ export default function CrmPipeline() {
                       key={deal.id}
                       draggable
                       onDragStart={(e) => handleDragStart(e, deal.id)}
+                      onClick={() => setActiveDeal(deal)}
                       style={{
                         background: 'var(--surface)',
                         border: '1px solid var(--border)',
@@ -205,7 +228,7 @@ export default function CrmPipeline() {
                         position: 'relative'
                       }}
                     >
-                      <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.5rem', color: deal.stage === 'won' ? 'var(--green)' : 'inherit' }}>
+                      <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.5rem', color: stage.type === 'won' ? 'var(--green)' : 'inherit' }}>
                         ${(Number(deal.value) || 0).toLocaleString()}
                       </div>
                       <div style={{ fontSize: '0.7rem', color: 'var(--white)', margin: '0.3rem 0' }}>{deal.title}</div>
@@ -254,6 +277,19 @@ export default function CrmPipeline() {
         schema={DEALS_IMPORT_SCHEMA}
         onImported={fetchDeals}
       />
+
+      <PipelineStagesModal
+        open={showStageManager}
+        onClose={() => setShowStageManager(false)}
+        stages={stages}
+        dealCountByStage={stages.reduce((acc: Record<string, number>, s) => {
+          acc[s.key] = deals.filter((d) => d.stage === s.key).length;
+          return acc;
+        }, {})}
+        onChanged={async () => { await fetchStages(); await fetchDeals(); }}
+      />
+
+      <DealDetailModal deal={activeDeal} onClose={() => setActiveDeal(null)} onSaved={fetchDeals} />
     </div>
   );
 }

@@ -3,10 +3,12 @@ import { supabase } from '../../lib/supabaseClient';
 import { formatCurrency } from '../../lib/crmHelpers';
 import CampaignModal from '../../components/crm/CampaignModal';
 import RowMenu from '../../components/crm/RowMenu';
+import { type PipelineStage, loadPipelineStages, wonStageKeys } from '../../lib/pipelineStages';
 
 export default function CrmCampaigns() {
   const [campaigns, setCampaigns] = useState<any[]>([]);
   const [deals, setDeals] = useState<any[]>([]);
+  const [stages, setStages] = useState<PipelineStage[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
@@ -18,6 +20,7 @@ export default function CrmCampaigns() {
       .channel('crm-campaigns')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'campaigns' }, fetchAll)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'deals' }, fetchAll)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'pipeline_stages' }, fetchAll)
       .subscribe();
 
     return () => {
@@ -27,14 +30,16 @@ export default function CrmCampaigns() {
 
   async function fetchAll() {
     try {
-      const [campaignsRes, dealsRes] = await Promise.all([
+      const [campaignsRes, dealsRes, stageRows] = await Promise.all([
         supabase.from('campaigns').select('*').order('created_at', { ascending: false }),
         supabase.from('deals').select('id, campaign_id, stage, value'),
+        loadPipelineStages(),
       ]);
       if (campaignsRes.error) throw campaignsRes.error;
       if (dealsRes.error) throw dealsRes.error;
       setCampaigns(campaignsRes.data || []);
       setDeals(dealsRes.data || []);
+      setStages(stageRows);
     } catch (error) {
       console.error('Failed to load campaigns:', error);
     } finally {
@@ -66,7 +71,8 @@ export default function CrmCampaigns() {
 
   function campaignStats(campaignId: string) {
     const campaignDeals = deals.filter((d) => d.campaign_id === campaignId);
-    const won = campaignDeals.filter((d) => d.stage === 'won');
+    const wonKeys = wonStageKeys(stages);
+    const won = campaignDeals.filter((d) => wonKeys.includes(d.stage));
     const wonValue = won.reduce((sum, d) => sum + (Number(d.value) || 0), 0);
     return { totalDeals: campaignDeals.length, wonCount: won.length, wonValue };
   }

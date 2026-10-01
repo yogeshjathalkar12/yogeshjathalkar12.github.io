@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { formatCurrency } from '../../lib/crmHelpers';
 import ExportButton from '../../components/crm/ExportButton';
+import { type PipelineStage, loadPipelineStages } from '../../lib/pipelineStages';
 import {
   BarChart,
   Bar,
@@ -47,6 +48,7 @@ class ChartErrorBoundary extends React.Component<{ children: React.ReactNode }, 
 export default function CrmAnalytics() {
   const [deals, setDeals] = useState<any[]>([]);
   const [contacts, setContacts] = useState<any[]>([]);
+  const [stages, setStages] = useState<PipelineStage[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -60,9 +62,10 @@ export default function CrmAnalytics() {
       setErrorMsg(null);
 
       // Query deals and contacts with graceful fallback on missing tables
-      const [dealsRes, contactsRes] = await Promise.all([
+      const [dealsRes, contactsRes, stageRows] = await Promise.all([
         supabase.from('deals').select('*'),
         supabase.from('contacts').select('*'),
+        loadPipelineStages(),
       ]);
 
       if (dealsRes.error && dealsRes.error.code !== 'PGRST116') {
@@ -74,6 +77,7 @@ export default function CrmAnalytics() {
 
       setDeals(dealsRes.data || []);
       setContacts(contactsRes.data || []);
+      setStages(stageRows);
     } catch (err: any) {
       console.error('Failed to load analytics:', err);
       setErrorMsg(err?.message || 'Failed to fetch analytics data.');
@@ -93,8 +97,9 @@ export default function CrmAnalytics() {
   const safeDeals = Array.isArray(deals) ? deals : [];
   const safeContacts = Array.isArray(contacts) ? contacts : [];
 
-  const wonDeals = safeDeals.filter((d) => d && d.stage === 'won');
-  const closedDeals = safeDeals.filter((d) => d && (d.stage === 'won' || d.stage === 'lost'));
+  const typeByKey: Record<string, string> = Object.fromEntries(stages.map((s) => [s.key, s.type]));
+  const wonDeals = safeDeals.filter((d) => d && typeByKey[d.stage] === 'won');
+  const closedDeals = safeDeals.filter((d) => d && (typeByKey[d.stage] === 'won' || typeByKey[d.stage] === 'lost'));
 
   const conversionRate =
     closedDeals.length > 0 ? Math.round((wonDeals.length / closedDeals.length) * 100) : 0;
@@ -103,25 +108,20 @@ export default function CrmAnalytics() {
   const avgDealSize = wonDeals.length > 0 ? totalWonValue / wonDeals.length : 0;
 
   const avgDaysToClose = 14;
-  const activeDealsCount = safeDeals.filter((d) => d && d.stage !== 'won' && d.stage !== 'lost').length;
+  const activeDealsCount = safeDeals.filter((d) => d && typeByKey[d.stage] === 'open').length;
   const salesVelocity =
     avgDaysToClose > 0
       ? Math.round((activeDealsCount * avgDealSize * (conversionRate / 100)) / avgDaysToClose)
       : 0;
 
-  const stageDataMap: Record<string, { name: string; count: number; value: number }> = {
-    lead: { name: 'New Lead', count: 0, value: 0 },
-    meeting: { name: 'Meeting', count: 0, value: 0 },
-    negotiation: { name: 'Negotiating', count: 0, value: 0 },
-    won: { name: 'Won', count: 0, value: 0 },
-    lost: { name: 'Lost', count: 0, value: 0 },
-  };
+  const stageDataMap: Record<string, { name: string; count: number; value: number }> = Object.fromEntries(
+    stages.map((s) => [s.key, { name: s.label, count: 0, value: 0 }])
+  );
 
   safeDeals.forEach((d) => {
-    if (!d) return;
-    const stageKey = d.stage && d.stage in stageDataMap ? d.stage : 'lead';
-    stageDataMap[stageKey].count += 1;
-    stageDataMap[stageKey].value += Number(d.value) || 0;
+    if (!d || !d.stage || !(d.stage in stageDataMap)) return;
+    stageDataMap[d.stage].count += 1;
+    stageDataMap[d.stage].value += Number(d.value) || 0;
   });
 
   const pipelineChartData = Object.values(stageDataMap);

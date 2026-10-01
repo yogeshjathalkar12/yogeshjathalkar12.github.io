@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
-import Modal, { fieldInputStyle, primaryBtnStyle } from '../../components/crm/Modal';
+import Modal, { fieldLabelStyle, fieldInputStyle, primaryBtnStyle, ghostBtnStyle } from '../../components/crm/Modal';
 import { initials, relativeTime, TYPE_ICON } from '../../lib/crmHelpers';
 import { toolApiBase } from '../../lib/config';
+import { findOrCreateCompany } from '../../lib/crmContacts';
 
 const WHATSAPP_API = toolApiBase('whatsapp');
 
@@ -20,6 +21,17 @@ export default function ContactPanel({ contact, interactions, onClose, onChanged
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // --- Edit mode: name/email/phone/company were previously read-only here
+  // (only `status` had an input) - "edit everything, add things that
+  // weren't added, like mail or a number" was the explicit ask. ---
+  const [editing, setEditing] = useState(false);
+  const [editName, setEditName] = useState('');
+  const [editEmail, setEditEmail] = useState('');
+  const [editPhone, setEditPhone] = useState('');
+  const [editCompanyName, setEditCompanyName] = useState('');
+  const [editSaving, setEditSaving] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
+
   // --- WhatsApp thread state ---
   const [waLinks, setWaLinks] = useState<any[]>([]); // whatsapp_contacts rows linked to this CRM contact (one per connected number)
   const [waAccountId, setWaAccountId] = useState<string>('');
@@ -31,6 +43,8 @@ export default function ContactPanel({ contact, interactions, onClose, onChanged
 
   useEffect(() => {
     setStatus(contact?.status || 'cold');
+    setEditing(false);
+    setEditError(null);
     if (contact) {
       fetchWaLinks();
     } else {
@@ -40,6 +54,46 @@ export default function ContactPanel({ contact, interactions, onClose, onChanged
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contact?.id]);
+
+  function startEditing() {
+    setEditName(contact?.name || '');
+    setEditEmail(contact?.email || '');
+    setEditPhone(contact?.phone || '');
+    setEditCompanyName(contact?.companies?.name || '');
+    setEditError(null);
+    setEditing(true);
+  }
+
+  async function handleSaveEdit(e: React.FormEvent) {
+    e.preventDefault();
+    const trimmedName = editName.trim();
+    if (!trimmedName) {
+      setEditError('Name is required.');
+      return;
+    }
+    setEditSaving(true);
+    setEditError(null);
+    try {
+      const companyId = await findOrCreateCompany(editCompanyName);
+      const { error: updateErr } = await supabase
+        .from('contacts')
+        .update({
+          name: trimmedName,
+          email: editEmail.trim() || null,
+          phone: editPhone.trim() || null,
+          company_id: companyId,
+        })
+        .eq('id', contact.id);
+      if (updateErr) throw updateErr;
+      onChanged();
+      setEditing(false);
+    } catch (err: any) {
+      console.error('Failed to update contact:', err);
+      setEditError(err.message || 'Could not save those changes.');
+    } finally {
+      setEditSaving(false);
+    }
+  }
 
   useEffect(() => {
     if (!waAccountId || !contact?.phone) {
@@ -173,34 +227,77 @@ export default function ContactPanel({ contact, interactions, onClose, onChanged
 
   return (
     <Modal open={!!contact} onClose={onClose} title="" width={480}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.4rem' }}>
-        <div
-          style={{
-            width: 44,
-            height: 44,
-            borderRadius: '50%',
-            background: 'var(--grad)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontFamily: 'Bebas Neue, sans-serif',
-            fontSize: '1rem',
-            color: '#fff',
-            flexShrink: 0,
-          }}
-        >
-          {initials(contact.name)}
-        </div>
-        <div>
-          <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.3rem' }}>{contact.name}</div>
-          <div style={{ fontSize: '0.65rem', color: 'var(--dim)' }}>{contact.companies?.name || 'No company on file'}</div>
-        </div>
-      </div>
+      {editing ? (
+        <form onSubmit={handleSaveEdit} style={{ marginBottom: '1.4rem' }}>
+          <label style={fieldLabelStyle}>Name</label>
+          <input style={fieldInputStyle} value={editName} onChange={(e) => setEditName(e.target.value)} required placeholder="e.g. Jane Doe" />
 
-      <div style={{ display: 'flex', gap: '1.4rem', fontSize: '0.65rem', color: 'var(--dim)', marginBottom: '1.4rem' }}>
-        <div>{contact.email || '—'}</div>
-        <div>{contact.phone || '—'}</div>
-      </div>
+          <label style={fieldLabelStyle}>Email</label>
+          <input style={fieldInputStyle} type="email" value={editEmail} onChange={(e) => setEditEmail(e.target.value)} placeholder="jane@acme.com" />
+
+          <label style={fieldLabelStyle}>Phone</label>
+          <input style={fieldInputStyle} value={editPhone} onChange={(e) => setEditPhone(e.target.value)} placeholder="+1 555 000 0000" />
+
+          <label style={fieldLabelStyle}>Company</label>
+          <input style={fieldInputStyle} value={editCompanyName} onChange={(e) => setEditCompanyName(e.target.value)} placeholder="e.g. Acme Corp" />
+
+          {editError && <div style={{ color: 'var(--red)', fontSize: '0.65rem', marginBottom: '1rem' }}>{editError}</div>}
+
+          <div style={{ display: 'flex', gap: '0.7rem' }}>
+            <button type="button" style={ghostBtnStyle} onClick={() => setEditing(false)} disabled={editSaving}>Cancel</button>
+            <button type="submit" style={primaryBtnStyle} disabled={editSaving}>{editSaving ? 'Saving…' : 'Save'}</button>
+          </div>
+        </form>
+      ) : (
+        <>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.4rem' }}>
+            <div
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: '50%',
+                background: 'var(--grad)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontFamily: 'Bebas Neue, sans-serif',
+                fontSize: '1rem',
+                color: '#fff',
+                flexShrink: 0,
+              }}
+            >
+              {initials(contact.name)}
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.3rem' }}>{contact.name}</div>
+              <div style={{ fontSize: '0.65rem', color: 'var(--dim)' }}>{contact.companies?.name || 'No company on file'}</div>
+            </div>
+            <button
+              onClick={startEditing}
+              style={{
+                background: 'transparent',
+                color: 'var(--dim)',
+                border: '1px solid var(--border)',
+                padding: '0.4rem 0.8rem',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontFamily: 'var(--mono)',
+                fontSize: '0.6rem',
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                flexShrink: 0,
+              }}
+            >
+              Edit
+            </button>
+          </div>
+
+          <div style={{ display: 'flex', gap: '1.4rem', fontSize: '0.65rem', color: 'var(--dim)', marginBottom: '1.4rem' }}>
+            <div>{contact.email || '— no email on file'}</div>
+            <div>{contact.phone || '— no phone on file'}</div>
+          </div>
+        </>
+      )}
 
       <label
         style={{

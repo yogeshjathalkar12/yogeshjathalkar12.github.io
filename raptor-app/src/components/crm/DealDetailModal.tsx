@@ -2,14 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import Modal, { fieldLabelStyle, fieldInputStyle, primaryBtnStyle, ghostBtnStyle } from './Modal';
 import { findOrCreateContact } from '../../lib/crmContacts';
-
-const STAGE_OPTIONS = [
-  { key: 'lead', label: 'New Lead' },
-  { key: 'meeting', label: 'Meeting Booked' },
-  { key: 'negotiation', label: 'Negotiating' },
-  { key: 'won', label: 'Won' },
-  { key: 'lost', label: 'Lost' },
-];
+import { type PipelineStage, loadPipelineStages, stageByKey } from '../../lib/pipelineStages';
 
 interface DealDetailModalProps {
   deal: any | null;
@@ -19,7 +12,8 @@ interface DealDetailModalProps {
 
 export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailModalProps) {
   const [value, setValue] = useState('0');
-  const [stage, setStage] = useState('lead');
+  const [stage, setStage] = useState('');
+  const [stages, setStages] = useState<PipelineStage[]>([]);
   const [campaignId, setCampaignId] = useState('');
   const [campaigns, setCampaigns] = useState<any[]>([]);
   const [contacts, setContacts] = useState<any[]>([]);
@@ -42,6 +36,7 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
       setError(null);
       fetchCampaigns();
       fetchContacts();
+      loadPipelineStages().then(setStages).catch((err) => console.error('Failed to load pipeline stages:', err));
     }
   }, [deal]);
 
@@ -93,7 +88,8 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
         contact_id: finalContactId,
         updated_at: new Date().toISOString(),
       };
-      if (stage === 'won' || stage === 'lost') payload.closed_at = new Date().toISOString();
+      const stageType = stageByKey(stages, stage)?.type;
+      if (stageType === 'won' || stageType === 'lost') payload.closed_at = new Date().toISOString();
       const { error: updateErr } = await supabase.from('deals').update(payload).eq('id', deal.id);
       if (updateErr) throw updateErr;
       onSaved();
@@ -134,8 +130,8 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
 
       <label style={fieldLabelStyle}>Stage</label>
       <select style={fieldInputStyle} value={stage} onChange={(e) => setStage(e.target.value)}>
-        {STAGE_OPTIONS.map((s) => (
-          <option key={s.key} value={s.key}>{s.label}</option>
+        {stages.map((s) => (
+          <option key={s.id} value={s.key}>{s.label}</option>
         ))}
       </select>
 

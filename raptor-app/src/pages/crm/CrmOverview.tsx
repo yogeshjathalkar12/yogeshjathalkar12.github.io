@@ -4,11 +4,13 @@ import { Link } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { formatCurrency, relativeTime, TYPE_ICON } from '../../lib/crmHelpers';
 import NewDealModal from '../../components/crm/NewDealModal';
+import { type PipelineStage, loadPipelineStages } from '../../lib/pipelineStages';
 
 export default function CrmOverview() {
   const [deals, setDeals] = useState<any[]>([]);
   const [contactsCount, setContactsCount] = useState(0);
   const [interactions, setInteractions] = useState<any[]>([]);
+  const [stages, setStages] = useState<PipelineStage[]>([]);
   const [loading, setLoading] = useState(true);
   const [showNewDeal, setShowNewDeal] = useState(false);
 
@@ -20,6 +22,7 @@ export default function CrmOverview() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'deals' }, fetchAll)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'contacts' }, fetchAll)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'interactions' }, fetchAll)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'pipeline_stages' }, fetchAll)
       .subscribe();
 
     return () => {
@@ -29,10 +32,11 @@ export default function CrmOverview() {
 
   async function fetchAll() {
     try {
-      const [dealsRes, contactsRes, interactionsRes] = await Promise.all([
+      const [dealsRes, contactsRes, interactionsRes, stageRows] = await Promise.all([
         supabase.from('deals').select('*, contacts(id, name), companies(id, name)').order('created_at', { ascending: false }),
         supabase.from('contacts').select('id', { count: 'exact', head: true }),
         supabase.from('interactions').select('*, contacts(id, name)').order('created_at', { ascending: false }).limit(5),
+        loadPipelineStages(),
       ]);
 
       if (dealsRes.error) throw dealsRes.error;
@@ -42,6 +46,7 @@ export default function CrmOverview() {
       setDeals(dealsRes.data || []);
       setContactsCount(contactsRes.count || 0);
       setInteractions(interactionsRes.data || []);
+      setStages(stageRows);
     } catch (error) {
       console.error('Failed to load overview:', error);
     } finally {
@@ -49,12 +54,13 @@ export default function CrmOverview() {
     }
   }
 
-  const openDeals = deals.filter((d) => d.stage !== 'won' && d.stage !== 'lost');
+  const typeByKey: Record<string, string> = Object.fromEntries(stages.map((s) => [s.key, s.type]));
+  const openDeals = deals.filter((d) => typeByKey[d.stage] === 'open');
   const openValue = openDeals.reduce((sum, d) => sum + (Number(d.value) || 0), 0);
 
   const now = new Date();
   const wonThisMonth = deals.filter(
-    (d) => d.stage === 'won' && d.closed_at &&
+    (d) => typeByKey[d.stage] === 'won' && d.closed_at &&
       new Date(d.closed_at).getMonth() === now.getMonth() &&
       new Date(d.closed_at).getFullYear() === now.getFullYear()
   );

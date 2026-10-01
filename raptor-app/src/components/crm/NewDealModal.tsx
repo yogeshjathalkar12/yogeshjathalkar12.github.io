@@ -2,13 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import Modal, { fieldLabelStyle, fieldInputStyle, primaryBtnStyle, ghostBtnStyle } from './Modal';
 import { findOrCreateCompany, findOrCreateContact } from '../../lib/crmContacts';
-
-const STAGE_OPTIONS = [
-  { key: 'lead', label: 'New Lead' },
-  { key: 'meeting', label: 'Meeting Booked' },
-  { key: 'negotiation', label: 'Negotiating' },
-  { key: 'won', label: 'Won' },
-];
+import { type PipelineStage, loadPipelineStages } from '../../lib/pipelineStages';
 
 interface NewDealModalProps {
   open: boolean;
@@ -19,7 +13,8 @@ interface NewDealModalProps {
 export default function NewDealModal({ open, onClose, onCreated }: NewDealModalProps) {
   const [title, setTitle] = useState('');
   const [value, setValue] = useState('');
-  const [stage, setStage] = useState('lead');
+  const [stage, setStage] = useState('');
+  const [stages, setStages] = useState<PipelineStage[]>([]);
   const [companyName, setCompanyName] = useState('');
   const [contactName, setContactName] = useState('');
   const [contactEmail, setContactEmail] = useState('');
@@ -31,6 +26,10 @@ export default function NewDealModal({ open, onClose, onCreated }: NewDealModalP
   useEffect(() => {
     if (open) {
       fetchCampaigns();
+      loadPipelineStages().then((rows) => {
+        setStages(rows);
+        setStage((prev) => prev || rows[0]?.key || '');
+      }).catch((err) => console.error('Failed to load pipeline stages:', err));
     }
   }, [open]);
 
@@ -45,7 +44,7 @@ export default function NewDealModal({ open, onClose, onCreated }: NewDealModalP
   }
 
   function reset() {
-    setTitle(''); setValue(''); setStage('lead');
+    setTitle(''); setValue(''); setStage(stages[0]?.key || '');
     setCompanyName(''); setContactName(''); setContactEmail(''); setCampaignId('');
     setError(null);
   }
@@ -102,8 +101,8 @@ export default function NewDealModal({ open, onClose, onCreated }: NewDealModalP
 
         <label style={fieldLabelStyle}>Stage</label>
         <select style={fieldInputStyle} value={stage} onChange={(e) => setStage(e.target.value)}>
-          {STAGE_OPTIONS.map((s) => (
-            <option key={s.key} value={s.key}>{s.label}</option>
+          {stages.map((s) => (
+            <option key={s.id} value={s.key}>{s.label}</option>
           ))}
         </select>
 
