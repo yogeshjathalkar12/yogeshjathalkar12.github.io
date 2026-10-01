@@ -90,7 +90,16 @@ export default function PipelineStagesModal({ open, onClose, stages, dealCountBy
     const count = dealCountByStage[stage.key] || 0;
     if (count > 0) {
       setDeletingStage(stage);
-      setReplacementKey(stages.find((s) => s.id !== stage.id)?.key || '');
+      // Default to the PRECEDING stage (stages is already sort_order-
+      // ascending) - "move deals back one step" is a much saner default
+      // than an arbitrary other stage, since deleting e.g. "Negotiating"
+      // most often means "merge it back into Meeting Booked," not "lose
+      // track of how far these deals had actually gotten." Falls back to
+      // the following stage when deleting the very first one (nothing
+      // precedes it), then any other stage as a last resort.
+      const idx = stages.findIndex((s) => s.id === stage.id);
+      const defaultReplacement = stages[idx - 1] || stages[idx + 1] || stages.find((s) => s.id !== stage.id);
+      setReplacementKey(defaultReplacement?.key || '');
       return;
     }
     const reservedNote = RESERVED_KEYS.has(stage.key)

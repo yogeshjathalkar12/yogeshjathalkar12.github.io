@@ -67,6 +67,28 @@ export default function ContactPanel({ contact, interactions, onClose, onChanged
   async function handleDelete() {
     if (!confirm(`Delete ${contact.name}? This cannot be undone.`)) return;
     try {
+      // THE FIX (2026-10-01): deleting a contact used to surface a raw
+      // Postgres foreign-key-violation error (e.g. "...violates foreign
+      // key constraint calls_contact_id_fkey on table calls") the moment
+      // that contact had ANY call logged, deal attached, reminder,
+      // automation run, or WhatsApp thread - six different tables
+      // reference contacts.id, and Postgres rejects the delete rather
+      // than leave any of them dangling. None of those records are
+      // actually meant to disappear with the contact (call history, deal
+      // history, etc. should survive) - just unlinked from a contact that
+      // no longer exists, same "keep the record, drop the specific link"
+      // spirit as deleting a Campaign elsewhere in this CRM. All six
+      // columns are nullable, so this is safe.
+      await Promise.all([
+        supabase.from('deals').update({ contact_id: null }).eq('contact_id', contact.id),
+        supabase.from('reminders').update({ contact_id: null }).eq('contact_id', contact.id),
+        supabase.from('automation_runs').update({ contact_id: null }).eq('contact_id', contact.id),
+        supabase.from('interactions').update({ contact_id: null }).eq('contact_id', contact.id),
+        supabase.from('calls').update({ contact_id: null }).eq('contact_id', contact.id),
+        supabase.from('whatsapp_contacts').update({ crm_contact_id: null }).eq('crm_contact_id', contact.id),
+        supabase.from('whatsapp_conversations').update({ crm_contact_id: null }).eq('crm_contact_id', contact.id),
+      ]);
+
       const { error: deleteErr } = await supabase.from('contacts').delete().eq('id', contact.id);
       if (deleteErr) throw deleteErr;
       onChanged();
