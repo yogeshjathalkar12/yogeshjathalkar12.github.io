@@ -74,6 +74,18 @@ export function useAuthedFetch() {
       }
 
       if (res.status === 401) {
+        // A token fresh off an OAuth redirect can reach our backend a beat
+        // before Supabase's own auth server has fully settled it - that's
+        // a transient 401 on a genuinely valid session, not an expired
+        // one, and treating it as "logged out" immediately was bouncing
+        // Google sign-ins right after a real, successful login (password
+        // logins don't go through this redirect/exchange step, which is
+        // why only Google was affected). Retry once, briefly, before
+        // concluding the session is actually invalid.
+        if (!_retried) {
+          await new Promise((r) => setTimeout(r, 1000));
+          return authedFetch<T>(url, options, true);
+        }
         showToast('Session expired — please log in again', 'error');
         await signOut(); // hard-redirects to the landing page itself, see AuthContext
         throw new UnauthorizedError();
