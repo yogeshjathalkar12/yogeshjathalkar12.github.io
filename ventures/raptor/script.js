@@ -263,7 +263,24 @@ document.addEventListener('DOMContentLoaded', () => {
         // this is where Supabase sends the user after they click the
         // confirmation link in their inbox. Must also be added to
         // Supabase → Authentication → URL Configuration → Redirect URLs.
-        emailRedirectTo: window.location.origin + '/ventures/raptor/app/#/dashboard'
+        //
+        // THE FIX (2026-10-01): this used to be '.../app/#/dashboard' -
+        // the app uses a HashRouter (so '#/dashboard' is a real in-app
+        // route), and Supabase ALSO delivers the session via a URL hash
+        // fragment ('#access_token=...'). A URL can only have ONE '#' -
+        // appending Supabase's fragment onto a redirectTo that already
+        // has its own produced '.../app/#/dashboard#access_token=...',
+        // which Supabase's own client-side parser can't read (it expects
+        // the hash to BE the token fragment, not have a route path
+        // jammed in front of it) - so the session silently never got
+        // established and the user bounced back to login every time,
+        // no matter what else was fixed. Now points at the bare app URL;
+        // Supabase owns the resulting '#access_token=...' hash cleanly,
+        // and the app's existing catch-all route (App.tsx's `<Route
+        // path="*" element={<Navigate to="/dashboard" />} />`) sends the
+        // user to the dashboard once the session parses - no router
+        // changes needed.
+        emailRedirectTo: window.location.origin + '/ventures/raptor/app/'
       }
     });
     btn.disabled = false; btn.textContent = 'Create Account';
@@ -293,14 +310,21 @@ document.addEventListener('DOMContentLoaded', () => {
       console.warn('Supabase not configured yet — set SUPABASE_URL and SUPABASE_ANON_KEY at the top of this script.');
       return;
     }
-    // redirectTo is explicit so the OAuth flow always lands on the
-    // dashboard, regardless of what Site URL is configured (or
-    // misconfigured) in the Supabase project settings. This must be
-    // added to "Redirect URLs" in Supabase → Authentication → URL
-    // Configuration, or Supabase will refuse the redirect.
+    // redirectTo is explicit so the OAuth flow always lands on the app,
+    // regardless of what Site URL is configured (or misconfigured) in
+    // the Supabase project settings. This must be added to "Redirect
+    // URLs" in Supabase → Authentication → URL Configuration, or
+    // Supabase will refuse the redirect.
+    //
+    // THE FIX (2026-10-01): see the matching comment on emailRedirectTo
+    // above - this used to be '.../app/#/dashboard', which collided with
+    // Supabase's own '#access_token=...' hash fragment (a URL only gets
+    // one '#') and silently broke every Google sign-in. Bare app URL now;
+    // the app's catch-all route sends the user to /dashboard once the
+    // session parses.
     supabaseClient.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.origin + '/ventures/raptor/app/#/dashboard' }
+      options: { redirectTo: window.location.origin + '/ventures/raptor/app/' }
     });
   }
   document.getElementById('googleLoginBtn').addEventListener('click', googleAuth);
