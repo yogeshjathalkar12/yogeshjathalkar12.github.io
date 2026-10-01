@@ -33,7 +33,17 @@
 .dash-sidebar-item.active { color: var(--purple); border-left-color: var(--purple); background: rgba(168,85,247,0.06); }
 .dash-sidebar-icon { font-size: 0.8rem; width: 16px; text-align: center; }
 
-.dash-main { margin-left: 220px; flex: 1; padding: 2.5rem 3rem; }
+/* THE REAL FIX (2026-10-01): a flex item defaults to min-width: auto,
+   meaning it refuses to shrink below its CONTENT's natural width. The
+   Pipeline board's 5 kanban columns are wide enough that this intrinsic
+   width propagated all the way up through .dash-main - which pushed the
+   whole layout wider than the viewport. Since body has overflow-x:
+   hidden (theme.css), that excess was just silently clipped with no
+   scrollbar anywhere, on the topbar AND the page - not something the
+   kanban's own overflow-x:auto could ever fix on its own, because
+   .dash-main itself was never actually letting the available width be
+   constrained in the first place. */
+.dash-main { margin-left: 220px; flex: 1; min-width: 0; padding: 2.5rem 3rem; }
 
 @media (max-width: 900px) {
   .dash-sidebar { width: 60px; }
