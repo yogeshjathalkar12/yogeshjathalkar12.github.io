@@ -1,10 +1,12 @@
 // Shared formatting helpers used across all CRM pages.
 // Keeping these in one place means every page renders money/time/names identically.
 
-export function formatCurrency(value: number | string | null | undefined): string {
-  const n = Number(value) || 0;
-  return '$' + n.toLocaleString();
-}
+// formatCurrency moved to lib/currency.ts (it's currency/locale-aware now,
+// driven by the signed-in user's country setting - see
+// hooks/CurrencyContext.tsx) - re-exported here so every existing
+// `import { formatCurrency } from '../../lib/crmHelpers'` keeps working
+// unchanged.
+export { formatCurrency } from './currency';
 
 export function relativeTime(dateString?: string | null): string {
   if (!dateString) return '—';

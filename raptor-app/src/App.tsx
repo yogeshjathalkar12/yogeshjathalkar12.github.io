@@ -4,8 +4,10 @@ import { AuthProvider } from './hooks/AuthContext';
 import { ToastProvider } from './hooks/ToastContext';
 import { CreditsProvider } from './hooks/CreditsContext';
 import { ThemeProvider } from './hooks/ThemeContext';
+import { CurrencyProvider } from './hooks/CurrencyContext';
 import { RequireAuth } from './components/RequireAuth';
 import DashboardHome from './pages/DashboardHome';
+import Settings from './pages/Settings';
 import { DashboardLayout } from './layouts/DashboardLayout';
 import { TOOLS } from './tools/registry';
 import { NotificationsProvider } from './hooks/NotificationsContext';
@@ -72,11 +74,13 @@ export default function App() {
         <AuthProvider>
           <ToastProvider>
             <CreditsProvider>
+              <CurrencyProvider>
               <NotificationsProvider>
                 <NotificationOverlay />
                 <Routes>
                   <Route element={<RequireAuth><DashboardLayout /></RequireAuth>}>
                     <Route path="/dashboard" element={<DashboardHome />} />
+                    <Route path="/settings" element={<Settings />} />
 
                     <Route path="/crm" element={<CrmLayout />}>
                       <Route index element={<Navigate to="pipeline" replace />} />
@@ -146,6 +150,7 @@ export default function App() {
                   <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Routes>
               </NotificationsProvider>
+              </CurrencyProvider>
             </CreditsProvider>
           </ToastProvider>
         </AuthProvider>

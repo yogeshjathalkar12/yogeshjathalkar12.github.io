@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../hooks/AuthContext';
 import { useCredits } from '../hooks/CreditsContext';
 import { TOOLS } from '../tools/registry';
-import { supabase } from '../lib/supabaseClient'; 
+import { supabase } from '../lib/supabaseClient';
+import { formatCurrency } from '../lib/crmHelpers';
 
 export default function DashboardHome() {
   const { user } = useAuth();
@@ -116,7 +117,7 @@ export default function DashboardHome() {
                       </span>
                     </td>
                     <td style={{ padding: '1rem' }}>
-                      ${(Number(lead.value) || 0).toLocaleString()}
+                      {formatCurrency(lead.value)}
                     </td>
                     <td style={{ padding: '1rem', color: 'var(--dim)' }}>
                       {formatTimeAgo(lead.updated_at)}

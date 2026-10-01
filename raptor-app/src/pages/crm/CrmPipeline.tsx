@@ -10,6 +10,7 @@ import { DEALS_IMPORT_SCHEMA } from '../../lib/importSchema';
 import { startCall } from '../../lib/calls';
 import { useAuth } from '../../hooks/AuthContext';
 import { type PipelineStage, loadPipelineStages, stageByKey } from '../../lib/pipelineStages';
+import { formatCurrency } from '../../lib/crmHelpers';
 
 export default function CrmPipeline() {
   const { session } = useAuth();
@@ -218,7 +219,7 @@ export default function CrmPipeline() {
                   {stage.label}
                 </span>
                 <span style={{ fontSize: '0.55rem', color: 'var(--dim)', background: 'var(--surface)', padding: '0.2rem 0.5rem', border: '1px solid var(--border)' }}>
-                  {stageDeals.length} · ${stageValue.toLocaleString()}
+                  {stageDeals.length} · {formatCurrency(stageValue)}
                 </span>
               </div>
 
@@ -241,7 +242,7 @@ export default function CrmPipeline() {
                       }}
                     >
                       <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.5rem', color: stage.type === 'won' ? 'var(--green)' : 'inherit' }}>
-                        ${(Number(deal.value) || 0).toLocaleString()}
+                        {formatCurrency(deal.value)}
                       </div>
                       <div style={{ fontSize: '0.7rem', color: 'var(--white)', margin: '0.3rem 0' }}>{deal.title}</div>
                       <div style={{ fontSize: '0.6rem', color: 'var(--dim)', marginBottom: '0.5rem' }}>{deal.companies?.name || '—'}</div>

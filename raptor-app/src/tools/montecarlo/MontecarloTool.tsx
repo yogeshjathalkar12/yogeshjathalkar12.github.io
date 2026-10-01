@@ -6,6 +6,7 @@ import { HistoryTable } from '../../components/HistoryTable';
 import { toolApiBase } from '../../lib/config';
 import { findTool } from '../registry';
 import { OutOfCreditsError } from '../../lib/apiErrors';
+import { formatCurrency } from '../../lib/crmHelpers';
 
 const TOOL = findTool('montecarlo')!;
 // NOTE: montecarlo.html hit `${RAPTOR_API_URL}/api/montecarlo` directly (no
@@ -206,15 +207,15 @@ export default function MontecarloTool() {
                 <div className="arsenal-stats" style={{ marginBottom: '1.5rem' }}>
                   <div className="arsenal-stat">
                     <div className="arsenal-stat-label">P10 (Worst)</div>
-                    <div className="arsenal-stat-value">${(result.p10_worst_case || 0).toLocaleString()}</div>
+                    <div className="arsenal-stat-value">{formatCurrency(result.p10_worst_case)}</div>
                   </div>
                   <div className="arsenal-stat">
                     <div className="arsenal-stat-label">P50 (Expected)</div>
-                    <div className="arsenal-stat-value accent">${(result.p50_expected || 0).toLocaleString()}</div>
+                    <div className="arsenal-stat-value accent">{formatCurrency(result.p50_expected)}</div>
                   </div>
                   <div className="arsenal-stat">
                     <div className="arsenal-stat-label">P90 (Best)</div>
-                    <div className="arsenal-stat-value">${(result.p90_best_case || 0).toLocaleString()}</div>
+                    <div className="arsenal-stat-value">{formatCurrency(result.p90_best_case)}</div>
                   </div>
                 </div>
 
@@ -242,10 +243,10 @@ export default function MontecarloTool() {
 
                 <div className="arsenal-console" style={{ fontSize: '0.65rem' }}>
                   <div className="arsenal-console-line"><span className="ts">Deals</span><span className="msg">{result.deal_count}</span></div>
-                  <div className="arsenal-console-line ok"><span className="ts">Expected (naive)</span><span className="msg">${(result.expected_value_naive || 0).toLocaleString()}</span></div>
-                  <div className="arsenal-console-line ok"><span className="ts">Simulated Mean</span><span className="msg">${(result.simulated_mean || 0).toLocaleString()}</span></div>
-                  <div className="arsenal-console-line"><span className="ts">Absolute Worst</span><span className="msg">${(result.absolute_worst || 0).toLocaleString()}</span></div>
-                  <div className="arsenal-console-line"><span className="ts">Absolute Best</span><span className="msg">${(result.absolute_best || 0).toLocaleString()}</span></div>
+                  <div className="arsenal-console-line ok"><span className="ts">Expected (naive)</span><span className="msg">{formatCurrency(result.expected_value_naive)}</span></div>
+                  <div className="arsenal-console-line ok"><span className="ts">Simulated Mean</span><span className="msg">{formatCurrency(result.simulated_mean)}</span></div>
+                  <div className="arsenal-console-line"><span className="ts">Absolute Worst</span><span className="msg">{formatCurrency(result.absolute_worst)}</span></div>
+                  <div className="arsenal-console-line"><span className="ts">Absolute Best</span><span className="msg">{formatCurrency(result.absolute_best)}</span></div>
                 </div>
               </>
             )}
@@ -262,9 +263,9 @@ export default function MontecarloTool() {
             emptyText="No simulations run yet."
             columns={[
               { header: 'Deals', render: (r) => r.deal_count },
-              { header: 'P10', render: (r) => `$${(r.p10 || 0).toLocaleString()}` },
-              { header: 'P50', render: (r) => <strong style={{ color: 'var(--purple)' }}>${(r.p50 || 0).toLocaleString()}</strong> },
-              { header: 'P90', render: (r) => `$${(r.p90 || 0).toLocaleString()}` },
+              { header: 'P10', render: (r) => formatCurrency(r.p10) },
+              { header: 'P50', render: (r) => <strong style={{ color: 'var(--purple)' }}>{formatCurrency(r.p50)}</strong> },
+              { header: 'P90', render: (r) => formatCurrency(r.p90) },
               { header: 'Date', render: (r) => new Date(r.created_at).toLocaleString('en-IN') },
             ]}
           />
