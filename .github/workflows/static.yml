@@ -47,7 +47,7 @@ jobs:
           # "View Project" button links forward to it on purpose (same
           # pattern as the other in-evaluation defense projects on that
           # page); excluded here rather than removed or faked.
-          args: './**/*.html' --exclude-path raptor-app --exclude 'https://shoonyaorigins.com/ventures/sentinel/sampati/'
+          args: "./**/*.html --exclude-path raptor-app --exclude 'https://shoonyaorigins.com/ventures/sentinel/sampati/'"
           # This forces the pipeline to STOP and FAIL if it finds a broken link
           fail: true
       # -------------------------------------------
