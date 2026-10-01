@@ -9,7 +9,12 @@ const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 const STORAGE_KEY = 'raptor_theme_light';
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [isLight, setIsLight] = useState(() => localStorage.getItem(STORAGE_KEY) === '1');
+  const [isLight, setIsLight] = useState(() => {
+    // Light is the default for anyone with no stored preference yet;
+    // an existing explicit choice (light or dark) is still honored.
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored === null ? true : stored === '1';
+  });
 
   useEffect(() => {
     document.body.classList.toggle('light-mode', isLight);
