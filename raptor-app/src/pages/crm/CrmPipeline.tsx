@@ -5,6 +5,7 @@ import ExportButton from '../../components/crm/ExportButton';
 import LiveCallPanel from '../../components/crm/LiveCallPanel';
 import PipelineStagesModal from '../../components/crm/PipelineStagesModal';
 import DealDetailModal from '../../components/crm/DealDetailModal';
+import NewDealModal from '../../components/crm/NewDealModal';
 import { DEALS_IMPORT_SCHEMA } from '../../lib/importSchema';
 import { startCall } from '../../lib/calls';
 import { useAuth } from '../../hooks/AuthContext';
@@ -17,6 +18,7 @@ export default function CrmPipeline() {
   const [loading, setLoading] = useState(true);
   const [showImport, setShowImport] = useState(false);
   const [showStageManager, setShowStageManager] = useState(false);
+  const [showNewDeal, setShowNewDeal] = useState(false);
   const [activeDeal, setActiveDeal] = useState<any | null>(null);
   const [activeCall, setActiveCall] = useState<{
     prospectCompany: string; contactPhone: string | null; contactEmail: string | null;
@@ -179,6 +181,16 @@ export default function CrmPipeline() {
         >
           Customize Pipeline
         </button>
+        <button
+          onClick={() => setShowNewDeal(true)}
+          style={{
+            background: 'var(--grad)', color: '#fff', border: 'none', padding: '0.6rem 1.1rem',
+            borderRadius: '4px', cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: '0.65rem',
+            letterSpacing: '0.08em', textTransform: 'uppercase',
+          }}
+        >
+          + New Deal
+        </button>
       </div>
 
       <div className="pipeline-board" style={{ display: 'flex', gap: '1.4rem', overflowX: 'auto', paddingBottom: '1rem', flex: 1, minHeight: 0, minWidth: 0 }}>
@@ -290,6 +302,8 @@ export default function CrmPipeline() {
       />
 
       <DealDetailModal deal={activeDeal} onClose={() => setActiveDeal(null)} onSaved={fetchDeals} />
+
+      <NewDealModal open={showNewDeal} onClose={() => setShowNewDeal(false)} onCreated={fetchDeals} />
     </div>
   );
 }

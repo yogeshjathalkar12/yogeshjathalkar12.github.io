@@ -64,6 +64,19 @@ export default function ContactPanel({ contact, interactions, onClose, onChanged
     setEditing(true);
   }
 
+  async function handleDelete() {
+    if (!confirm(`Delete ${contact.name}? This cannot be undone.`)) return;
+    try {
+      const { error: deleteErr } = await supabase.from('contacts').delete().eq('id', contact.id);
+      if (deleteErr) throw deleteErr;
+      onChanged();
+      onClose();
+    } catch (err: any) {
+      console.error('Failed to delete contact:', err);
+      alert(err.message || 'Could not delete this contact.');
+    }
+  }
+
   async function handleSaveEdit(e: React.FormEvent) {
     e.preventDefault();
     const trimmedName = editName.trim();
@@ -272,24 +285,42 @@ export default function ContactPanel({ contact, interactions, onClose, onChanged
               <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.3rem' }}>{contact.name}</div>
               <div style={{ fontSize: '0.65rem', color: 'var(--dim)' }}>{contact.companies?.name || 'No company on file'}</div>
             </div>
-            <button
-              onClick={startEditing}
-              style={{
-                background: 'transparent',
-                color: 'var(--dim)',
-                border: '1px solid var(--border)',
-                padding: '0.4rem 0.8rem',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontFamily: 'var(--mono)',
-                fontSize: '0.6rem',
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                flexShrink: 0,
-              }}
-            >
-              Edit
-            </button>
+            <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
+              <button
+                onClick={startEditing}
+                style={{
+                  background: 'transparent',
+                  color: 'var(--dim)',
+                  border: '1px solid var(--border)',
+                  padding: '0.4rem 0.8rem',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontFamily: 'var(--mono)',
+                  fontSize: '0.6rem',
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                }}
+              >
+                Edit
+              </button>
+              <button
+                onClick={handleDelete}
+                style={{
+                  background: 'transparent',
+                  color: 'var(--red)',
+                  border: '1px solid rgba(239,68,68,0.3)',
+                  padding: '0.4rem 0.8rem',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontFamily: 'var(--mono)',
+                  fontSize: '0.6rem',
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                }}
+              >
+                Delete
+              </button>
+            </div>
           </div>
 
           <div style={{ display: 'flex', gap: '1.4rem', fontSize: '0.65rem', color: 'var(--dim)', marginBottom: '1.4rem' }}>
