@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { type OrgMember, PERMISSIONS, loadMembers, resendInvite } from '../../lib/team';
+import { type OrgMember, PERMISSIONS, loadMembers, resendInvite, setMemberManager } from '../../lib/team';
 import InviteMemberModal from './InviteMemberModal';
 import EditPermissionsModal from './EditPermissionsModal';
 import RemoveMemberModal from './RemoveMemberModal';
@@ -50,6 +50,17 @@ export default function TeamSection() {
     }
   }
 
+  async function handleManager(m: OrgMember, managerId: string) {
+    setNotice(null);
+    try {
+      await setMemberManager(m.id, managerId || null);
+      setError(null);
+    } catch (e: any) {
+      setError(e.message || 'Could not change who they report to.');
+    }
+    load();
+  }
+
   const visible = members.filter((m) => m.status !== 'removed');
   const removed = members.filter((m) => m.status === 'removed');
   const emailsByUserId = Object.fromEntries(members.map((m) => [m.user_id, m.email || '']));
@@ -78,6 +89,21 @@ export default function TeamSection() {
               <span style={{ fontSize: '0.55rem', color: STATUS_COLORS[m.status], textTransform: 'uppercase', letterSpacing: '0.06em' }}>{m.status}</span>
             </div>
             <div style={{ fontSize: '0.6rem', color: 'var(--dim)', marginTop: 2 }}>{summarize(m)}</div>
+            {!m.is_owner && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.45rem' }}>
+                <span style={{ fontSize: '0.55rem', color: 'var(--dim2)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Reports to</span>
+                <select
+                  value={m.manager_id || ''}
+                  onChange={(e) => handleManager(m, e.target.value)}
+                  style={{ background: 'var(--surface2)', border: '1px solid var(--border)', color: 'var(--white)', fontFamily: 'var(--mono)', fontSize: '0.58rem', borderRadius: 4, padding: '0.2rem 0.4rem' }}
+                >
+                  <option value="">Owner (top level)</option>
+                  {members.filter((x) => x.status === 'active' && !x.is_owner && x.user_id !== m.user_id).map((x) => (
+                    <option key={x.user_id} value={x.user_id}>{x.email}</option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
           {!m.is_owner && (
             <div style={{ display: 'flex', gap: '0.4rem', flexShrink: 0 }}>

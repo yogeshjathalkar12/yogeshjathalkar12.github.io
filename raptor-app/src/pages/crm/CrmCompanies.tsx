@@ -5,6 +5,7 @@ import { formatCurrency } from '../../lib/crmHelpers';
 import Modal, { fieldLabelStyle, fieldInputStyle, primaryBtnStyle, ghostBtnStyle } from '../../components/crm/Modal';
 import DuplicatesModal from '../../components/crm/DuplicatesModal';
 import OwnerOnly from '../../components/OwnerOnly';
+import RecordHistory from '../../components/crm/RecordHistory';
 
 // Real CRM companies (Supabase `companies` table) - this app never had a
 // dedicated page for them before (they only ever showed up as a name-join
@@ -282,6 +283,8 @@ function CompanyDetailModal({ company, contacts, deals, onClose, onChanged }: { 
               <span>{d.title}</span><span style={{ color: 'var(--purple)' }}>{formatCurrency(d.value)}</span>
             </div>
           ))}
+
+          <RecordHistory table="companies" recordId={company.id} refreshKey={[company.name, company.website_url].join('|')} />
 
           {error && <div style={{ color: 'var(--red)', fontSize: '0.65rem', margin: '1rem 0' }}>{error}</div>}
 

@@ -7,6 +7,9 @@ import LiveCallPanel from '../../components/crm/LiveCallPanel';
 import PipelineStagesModal from '../../components/crm/PipelineStagesModal';
 import DealDetailModal from '../../components/crm/DealDetailModal';
 import OwnerOnly from '../../components/OwnerOnly';
+import AssigneeFilter, { applyAssigneeFilter, useAssigneeFilter } from '../../components/crm/AssigneeFilter';
+import { useMemberLabels } from '../../hooks/useDirectory';
+import { shortName } from '../../lib/team';
 import NewDealModal from '../../components/crm/NewDealModal';
 import { DEALS_IMPORT_SCHEMA } from '../../lib/importSchema';
 import { startCall } from '../../lib/calls';
@@ -17,6 +20,7 @@ import { formatCurrency } from '../../lib/crmHelpers';
 export default function CrmPipeline() {
   const { session } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [assigneeFilter, setAssigneeFilter] = useAssigneeFilter('pipeline');
   const [deals, setDeals] = useState<any[]>([]);
   const [stages, setStages] = useState<PipelineStage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -88,6 +92,8 @@ export default function CrmPipeline() {
 
       if (error) throw error;
       setDeals(data || []);
+      // keep an open deal's detail view in step with what was just saved/assigned
+      setActiveDeal((prev: any) => (prev ? (data || []).find((d: any) => d.id === prev.id) ?? prev : prev));
     } catch (error) {
       console.error('Failed to load deals:', error);
     } finally {
@@ -107,6 +113,8 @@ export default function CrmPipeline() {
     setSearchParams(next, { replace: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deals]);
+
+  const assigneeLabels = useMemberLabels(deals.map((d) => d.assignee_id));
 
   const handleDragStart = (e: React.DragEvent, dealId: string) => {
     e.dataTransfer.setData('dealId', dealId);
@@ -154,6 +162,8 @@ export default function CrmPipeline() {
     return <div style={{ padding: '2rem', color: 'var(--dim)' }}>Syncing pipeline...</div>;
   }
 
+  const shownDeals = applyAssigneeFilter(deals, assigneeFilter, session?.user?.id);
+
   // Flattened rows for export — deals carries nested companies/contacts objects,
   // ExportButton needs plain key/value pairs.
   const exportRows = deals.map((d) => ({
@@ -167,6 +177,7 @@ export default function CrmPipeline() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.6rem', marginBottom: '1rem', flexShrink: 0 }}>
+        <AssigneeFilter value={assigneeFilter} onChange={setAssigneeFilter} />
         <ExportButton
           data={exportRows}
           columns={[
@@ -212,7 +223,7 @@ export default function CrmPipeline() {
 
       <div className="pipeline-board" style={{ display: 'flex', gap: '1.4rem', overflowX: 'auto', paddingBottom: '1rem', flex: 1, minHeight: 0, minWidth: 0 }}>
         {stages.map(stage => {
-          const stageDeals = deals.filter(d => d.stage === stage.key);
+          const stageDeals = shownDeals.filter(d => d.stage === stage.key);
           const stageValue = stageDeals.reduce((sum, d) => sum + (Number(d.value) || 0), 0);
 
           return (
@@ -265,6 +276,9 @@ export default function CrmPipeline() {
                       <div style={{ fontSize: '0.55rem', color: 'var(--dim2)', marginBottom: deal.contacts?.id ? '0.5rem' : 0 }}>
                         {deal.contacts?.name || 'No contact'}
                       </div>
+                      {deal.assignee_id && (
+                        <div style={{ fontSize: '0.5rem', color: 'var(--purple)', margin: '0 0 0.4rem' }}>&rarr; {shortName(assigneeLabels[deal.assignee_id])}</div>
+                      )}
                       {deal.contacts?.id && (
                         <button
                           onClick={(e) => handleCall(e, deal)}

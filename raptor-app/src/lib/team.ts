@@ -12,7 +12,7 @@ export type Permission = 'view_all' | 'create' | 'edit' | 'delete' | 'manage_pip
 export type MemberStatus = 'invited' | 'active' | 'removed';
 
 export const PERMISSIONS: { key: Permission; label: string; hint: string }[] = [
-  { key: 'view_all', label: 'See everyone’s records', hint: 'Off = only records they created or are assigned' },
+  { key: 'view_all', label: 'See everyone’s records', hint: 'Off = their own records, plus those of anyone who reports to them' },
   { key: 'create', label: 'Create records', hint: 'Contacts, deals, notes, calls, attachments' },
   { key: 'edit', label: 'Edit records', hint: 'Change records they can see' },
   { key: 'delete', label: 'Delete records', hint: 'Remove records they can see' },
@@ -24,7 +24,10 @@ export const PERMISSIONS: { key: Permission; label: string; hint: string }[] = [
 export const PRESETS: { name: string; permissions: Permission[] }[] = [
   { name: 'Rep', permissions: ['create', 'edit'] },
   { name: 'Viewer', permissions: [] },
-  { name: 'Manager', permissions: ['view_all', 'create', 'edit', 'delete', 'manage_pipeline'] },
+  // Sees their own records plus those of everyone who reports to them (set
+  // "Reports to" on the Team card) - not the whole organization.
+  { name: 'Manager', permissions: ['create', 'edit', 'delete', 'manage_pipeline'] },
+  { name: 'Org-wide', permissions: ['view_all', 'create', 'edit', 'delete', 'manage_pipeline'] },
 ];
 
 export interface OrgMember {
@@ -34,6 +37,7 @@ export interface OrgMember {
   email: string | null;
   is_owner: boolean;
   status: MemberStatus;
+  manager_id: string | null;
   preset: string | null;
   permissions: Partial<Record<Permission, boolean>>;
   created_at: string;
@@ -99,4 +103,71 @@ export const markExportVerified = () => { exportVerifiedUntil = Date.now() + 10 
 export async function logAudit(action: string, detail: Record<string, any>) {
   const { error } = await supabase.rpc('log_audit', { p_action: action, p_detail: detail });
   if (error) console.error('Audit log write failed:', error);
+}
+
+
+// ---------------------------------------------------------------------------
+// Reporting lines, assignment and record history
+// (db/migrations/2026-10-04_hierarchy_assignment_history.sql)
+// ---------------------------------------------------------------------------
+
+export interface DirectoryEntry {
+  user_id: string;
+  email: string;
+  is_me: boolean;
+  is_owner: boolean;
+  manager_id: string | null;
+  can_assign: boolean;
+  preset: string | null;
+}
+
+/** "jane@acme.com" -> "jane" - what the lists show for a person. */
+export const shortName = (email: string | null | undefined) => (email ? email.split('@')[0] : 'Someone');
+
+function isMissingFunction(err: { code?: string; message?: string } | null): boolean {
+  return !!err && (err.code === 'PGRST202' || err.code === '42883' || /could not find the function/i.test(err.message || ''));
+}
+
+/** The people the caller can see and assign to. Empty (not an error) if the
+ *  database hasn't been upgraded yet - everything then behaves as before. */
+export async function loadDirectory(): Promise<DirectoryEntry[]> {
+  const { data, error } = await supabase.rpc('team_directory');
+  if (error) {
+    if (isMissingFunction(error)) return [];
+    throw error;
+  }
+  return (data || []) as DirectoryEntry[];
+}
+
+export async function loadMemberLabels(ids: string[]): Promise<Record<string, string>> {
+  const unique = Array.from(new Set(ids.filter(Boolean)));
+  if (unique.length === 0) return {};
+  const { data, error } = await supabase.rpc('member_labels', { p_ids: unique });
+  if (error) return {};
+  return Object.fromEntries((data || []).map((r: { user_id: string; email: string }) => [r.user_id, r.email]));
+}
+
+export async function setMemberManager(memberId: string, managerId: string | null) {
+  const { error } = await supabase.from('org_members').update({ manager_id: managerId }).eq('id', memberId);
+  if (error) throw error;
+}
+
+export type HistoryTable = 'contacts' | 'deals' | 'companies';
+
+export interface HistoryEntry {
+  id: string;
+  action: 'create' | 'update' | 'delete';
+  label: string | null;
+  changes: Record<string, { from: unknown; to: unknown }>;
+  actor_id: string | null;
+  created_at: string;
+}
+
+export async function loadRecordHistory(table: HistoryTable, recordId: string): Promise<HistoryEntry[]> {
+  const { data, error } = await supabase.rpc('record_history', { p_table: table, p_record: recordId });
+  if (error) {
+    if (isMissingFunction(error)) return [];
+    throw error;
+  }
+  return (data || []) as HistoryEntry[];
 }

@@ -7,6 +7,8 @@ import { findOrCreateCompany } from '../../lib/crmContacts';
 import CustomFieldsSection from './CustomFieldsSection';
 import AttachmentsSection from './AttachmentsSection';
 import OwnerOnly from '../OwnerOnly';
+import AssigneeSelect from './AssigneeSelect';
+import RecordHistory from './RecordHistory';
 
 const WHATSAPP_API = toolApiBase('whatsapp');
 
@@ -373,8 +375,14 @@ export default function ContactPanel({ contact, interactions, onClose, onChanged
         <option value="hot">Hot</option>
       </select>
 
+      <AssigneeSelect table="contacts" recordId={contact.id} value={contact.assignee_id ?? null} onChanged={onChanged} />
       <CustomFieldsSection entityType="contact" entity={contact} onChanged={onChanged} />
       <AttachmentsSection entityType="contact" entityId={contact.id} />
+      <RecordHistory
+        table="contacts"
+        recordId={contact.id}
+        refreshKey={[contact.updated_at, contact.assignee_id, contact.status, contact.name, contact.email, contact.phone, contact.company_id].join('|')}
+      />
 
       {/* --- WhatsApp thread --- */}
       <div

@@ -54,7 +54,7 @@ export default function RemoveMemberModal({ member, members, onClose, onRemoved 
             {member.email} no longer has access.
           </div>
           <div style={{ fontSize: '0.65rem', color: 'var(--dim)', marginBottom: '1rem' }}>
-            Moved: {result.reassigned?.contacts ?? 0} contact(s), {result.reassigned?.deals ?? 0} deal(s). Automations they created were switched off.
+            Moved: {result.reassigned?.contacts ?? 0} contact(s), {result.reassigned?.deals ?? 0} deal(s). Automations they created were switched off.{result.reassigned?.reports_moved_up ? ` ${result.reassigned.reports_moved_up} person(s) who reported to them now report one level up.` : ''}
           </div>
           {result.warnings?.length > 0 && (
             <div style={{ fontSize: '0.6rem', color: 'var(--dim)', marginBottom: '1rem' }}>Note: {result.warnings.join('; ')}.</div>

@@ -6,6 +6,8 @@ import { type PipelineStage, loadPipelineStages, stageByKey } from '../../lib/pi
 import CustomFieldsSection from './CustomFieldsSection';
 import AttachmentsSection from './AttachmentsSection';
 import OwnerOnly from '../OwnerOnly';
+import AssigneeSelect from './AssigneeSelect';
+import RecordHistory from './RecordHistory';
 
 interface DealDetailModalProps {
   deal: any | null;
@@ -176,8 +178,14 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
         </div>
       )}
 
+      <AssigneeSelect table="deals" recordId={deal.id} value={deal.assignee_id ?? null} onChanged={onSaved} />
       <CustomFieldsSection entityType="deal" entity={deal} onChanged={onSaved} />
       <AttachmentsSection entityType="deal" entityId={deal.id} />
+      <RecordHistory
+        table="deals"
+        recordId={deal.id}
+        refreshKey={[deal.updated_at, deal.assignee_id, deal.stage, deal.value, deal.title].join('|')}
+      />
 
       {error && <div style={{ color: 'var(--red)', fontSize: '0.65rem', marginBottom: '1rem' }}>{error}</div>}
 

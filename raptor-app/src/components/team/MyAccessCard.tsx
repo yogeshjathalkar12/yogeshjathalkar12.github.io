@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { useOrg } from '../../hooks/OrgContext';
 import { useAuth } from '../../hooks/AuthContext';
 import { PERMISSIONS } from '../../lib/team';
+import { useDirectory } from '../../hooks/useDirectory';
 
 // Shown on a team member's dashboard (never the owner's): who they are on
 // this team, exactly what they may do, and how much they can see. The counts
@@ -11,6 +12,7 @@ import { PERMISSIONS } from '../../lib/team';
 export default function MyAccessCard() {
   const { isOwner, status, preset, permissions, can } = useOrg();
   const { user } = useAuth();
+  const { entries } = useDirectory();
   const [contacts, setContacts] = useState<number | null>(null);
   const [deals, setDeals] = useState<number | null>(null);
 
@@ -36,7 +38,12 @@ export default function MyAccessCard() {
   if (isOwner || status !== 'active' || seen === signature) return null;
   const wasUpdated = seen !== null;
 
-  const sees = can('view_all') ? 'Everyone’s records on the team' : 'Only the records you created or were assigned';
+  const teamSize = Math.max(entries.length - 1, 0);
+  const sees = can('view_all')
+    ? 'Everyone’s records on the team'
+    : teamSize > 0
+      ? `Your records and your team’s (${teamSize} ${teamSize === 1 ? 'person' : 'people'})`
+      : 'Only the records you created or were assigned';
 
   return (
     <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 6, padding: '1.4rem', marginBottom: '2rem', maxWidth: 720 }}>

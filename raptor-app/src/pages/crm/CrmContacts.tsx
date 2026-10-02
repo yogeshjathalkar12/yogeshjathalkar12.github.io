@@ -8,6 +8,10 @@ import BulkImportModal from '../../components/crm/BulkImportModal';
 import ExportButton from '../../components/crm/ExportButton';
 import DuplicatesModal from '../../components/crm/DuplicatesModal';
 import OwnerOnly from '../../components/OwnerOnly';
+import AssigneeFilter, { applyAssigneeFilter, useAssigneeFilter } from '../../components/crm/AssigneeFilter';
+import { useMemberLabels } from '../../hooks/useDirectory';
+import { useAuth } from '../../hooks/AuthContext';
+import { shortName } from '../../lib/team';
 import { CONTACTS_IMPORT_SCHEMA } from '../../lib/importSchema';
 
 const STATUS_COLORS: Record<string, { bg: string; fg: string }> = {
@@ -18,6 +22,8 @@ const STATUS_COLORS: Record<string, { bg: string; fg: string }> = {
 
 export default function CrmContacts() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { user } = useAuth();
+  const [assigneeFilter, setAssigneeFilter] = useAssigneeFilter('contacts');
   const [contacts, setContacts] = useState<any[]>([]);
   const [deals, setDeals] = useState<any[]>([]);
   const [interactions, setInteractions] = useState<any[]>([]);
@@ -98,6 +104,9 @@ export default function CrmContacts() {
       (c.phone || '').toLowerCase().includes(q)
   );
 
+  const assigneeLabels = useMemberLabels(contacts.map((c) => c.assignee_id));
+  const rows = applyAssigneeFilter(filtered, assigneeFilter, user?.id);
+
   function activeDealCount(contactId: string) {
     return deals.filter((d) => d.contact_id === contactId && d.stage !== 'won' && d.stage !== 'lost').length;
   }
@@ -133,6 +142,7 @@ export default function CrmContacts() {
             borderRadius: '4px',
           }}
         />
+        <AssigneeFilter value={assigneeFilter} onChange={setAssigneeFilter} />
         <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
           <ExportButton
             data={contacts}
@@ -221,18 +231,19 @@ export default function CrmContacts() {
               <th style={{ padding: '0.9rem 1rem' }}>Company</th>
               <th style={{ padding: '0.9rem 1rem' }}>Last Touch</th>
               <th style={{ padding: '0.9rem 1rem' }}>Status</th>
+              <th style={{ padding: '0.9rem 1rem' }}>Assigned</th>
               <th style={{ padding: '0.9rem 1rem' }}>Active Deals</th>
             </tr>
           </thead>
           <tbody>
-            {filtered.length === 0 ? (
+            {rows.length === 0 ? (
               <tr>
-                <td colSpan={5} style={{ padding: '2rem', textAlign: 'center', color: 'var(--dim)' }}>
+                <td colSpan={6} style={{ padding: '2rem', textAlign: 'center', color: 'var(--dim)' }}>
                   {contacts.length === 0 ? 'No contacts yet.' : 'No contacts match your search.'}
                 </td>
               </tr>
             ) : (
-              filtered.map((c) => {
+              rows.map((c) => {
                 const colors = STATUS_COLORS[c.status || 'cold'] || STATUS_COLORS.cold;
                 return (
                   <tr
@@ -258,6 +269,7 @@ export default function CrmContacts() {
                         {c.status || 'cold'}
                       </span>
                     </td>
+                    <td style={{ padding: '1rem', color: 'var(--dim)' }}>{c.assignee_id ? shortName(assigneeLabels[c.assignee_id]) : '—'}</td>
                     <td style={{ padding: '1rem' }}>{activeDealCount(c.id)}</td>
                   </tr>
                 );
