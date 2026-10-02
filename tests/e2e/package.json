@@ -1,0 +1,12 @@
+{
+  "name": "raptor-health-check",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Daily synthetic checks against the live site - not the app's own unit/build tests. Runs on a schedule (see .github/workflows/daily-health-check.yml), not on every push.",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0"
+  }
+}

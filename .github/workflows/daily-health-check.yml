@@ -1,0 +1,75 @@
+name: Daily health check
+
+# Catches the class of bug that broke login silently for weeks (see the
+# 2026-10-01 incident write-up in tests/e2e/README.md): something that
+# looks fine on push but is actually broken for real users, which nothing
+# else in this repo's pipeline checks for. Runs independently of pushes -
+# a quiet day with no commits is exactly when a sleeping Render backend or
+# an expired test-account password would otherwise go unnoticed.
+#
+# A failed scheduled run emails the repo owner automatically - no extra
+# notification setup needed for that part.
+on:
+  schedule:
+    - cron: '30 0 * * *' # 00:30 UTC daily (~6:00am IST)
+  workflow_dispatch: {} # manual "run now" button in the Actions tab
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: tests/e2e/package-lock.json
+
+      - name: Install dependencies
+        working-directory: tests/e2e
+        run: npm install
+
+      - name: Install Playwright browsers
+        working-directory: tests/e2e
+        run: npx playwright install --with-deps chromium
+
+      - name: Run health check suite
+        working-directory: tests/e2e
+        run: npm test
+        env:
+          HEALTHCHECK_EMAIL: ${{ secrets.HEALTHCHECK_EMAIL }}
+          HEALTHCHECK_PASSWORD: ${{ secrets.HEALTHCHECK_PASSWORD }}
+
+      # A visible, trackable alert (on top of GitHub's own failure email): one
+      # open issue per bad streak - repeat failures comment instead of piling up.
+      - name: Open or update a "health check failing" issue
+        if: failure() && github.event_name == 'schedule'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = 'Daily health check is failing';
+            const run = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const { data: open } = await github.rest.issues.listForRepo({ owner: context.repo.owner, repo: context.repo.repo, state: 'open', labels: 'health-check' });
+            const existing = open.find((i) => i.title === title);
+            if (existing) {
+              await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: existing.number, body: `Still failing: ${run}` });
+            } else {
+              await github.rest.issues.create({ owner: context.repo.owner, repo: context.repo.repo, title, labels: ['health-check'], body: `The scheduled check failed. Open the run, then the playwright-report artifact for screenshots and a trace:
+
+${run}` });
+            }
+
+      - name: Upload failure report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: tests/e2e/playwright-report/
+          retention-days: 14

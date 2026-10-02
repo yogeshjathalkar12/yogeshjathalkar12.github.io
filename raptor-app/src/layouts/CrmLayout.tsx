@@ -10,11 +10,13 @@ export default function CrmLayout() {
           { name: 'Pipeline', path: '/crm/pipeline' },
           { name: 'Contacts', path: '/crm/contacts' },
           { name: 'Companies', path: '/crm/companies' },
+          { name: 'Tasks', path: '/crm/tasks' },
           { name: 'Activity', path: '/crm/activity' },
           { name: 'Automations', path: '/crm/automations' },
           { name: 'Campaigns', path: '/crm/campaigns' },
           { name: 'Tickets', path: '/crm/tickets' },
           { name: 'Analytics', path: '/crm/analytics' },
+          { name: 'Reports', path: '/crm/reports' },
           { name: 'Marketing', path: '/crm/marketing' },
           { name: 'Guide', path: '/crm/guide' },
         ].map((tab) => (

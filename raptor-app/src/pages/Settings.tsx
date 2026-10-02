@@ -5,6 +5,7 @@ import { useOrg } from '../hooks/OrgContext';
 import { supabase } from '../lib/supabaseClient';
 import { COUNTRIES } from '../lib/currency';
 import TeamSection from '../components/team/TeamSection';
+import SecurityCard from '../components/team/SecurityCard';
 
 const cardStyle: React.CSSProperties = {
   background: 'var(--surface)',
@@ -64,7 +65,7 @@ function PasswordCard() {
 
 export default function Settings() {
   const { countryCode, setCountryCode, saving } = useCurrency();
-  const { isOwner } = useOrg();
+  const { isOwner, isAdmin } = useOrg();
   const [justSaved, setJustSaved] = useState(false);
 
   async function handleChange(e: React.ChangeEvent<HTMLSelectElement>) {
@@ -135,7 +136,9 @@ export default function Settings() {
 
       <PasswordCard />
 
-      {isOwner && <TeamSection />}
+      <SecurityCard />
+
+      {(isOwner || isAdmin) && <TeamSection />}
     </div>
   );
 }

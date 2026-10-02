@@ -9,6 +9,7 @@ import AttachmentsSection from './AttachmentsSection';
 import OwnerOnly from '../OwnerOnly';
 import AssigneeSelect from './AssigneeSelect';
 import RecordHistory from './RecordHistory';
+import TasksSection from './TasksSection';
 
 const WHATSAPP_API = toolApiBase('whatsapp');
 
@@ -377,6 +378,8 @@ export default function ContactPanel({ contact, interactions, onClose, onChanged
 
       <AssigneeSelect table="contacts" recordId={contact.id} value={contact.assignee_id ?? null} onChanged={onChanged} />
       <CustomFieldsSection entityType="contact" entity={contact} onChanged={onChanged} />
+      <TasksSection contactId={contact.id} />
+
       <AttachmentsSection entityType="contact" entityId={contact.id} />
       <RecordHistory
         table="contacts"

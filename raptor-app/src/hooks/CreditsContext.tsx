@@ -31,17 +31,20 @@ export function CreditsProvider({ children }: { children: ReactNode }) {
   const refresh = useCallback(async () => {
     if (!user || orgLoading || status !== 'active') return;
 
-    // A member never has (or creates) a plan row of their own: they run on
-    // the organization's - the owner's row, read through org_plan().
-    if (!isOwner) {
+    // Everyone runs on the organization's plan row (keyed by the org id,
+    // which never changes - so it keeps working after ownership is handed
+    // over), read through org_plan(). Only a first-time solo owner falls
+    // through to creating their own row below.
+    {
       const { data: orgRow } = await supabase.rpc('org_plan');
       if (orgRow) {
         setCredits(orgRow.credits ?? 0);
         setTotalCredits(orgRow.total_credits ?? 50);
         setPlan(orgRow.plan ?? 'Free');
+        setPlanLoaded(true);
+        return;
       }
-      setPlanLoaded(true);
-      return;
+      if (!isOwner) { setPlanLoaded(true); return; }
     }
 
     const { data, error } = await supabase

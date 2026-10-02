@@ -8,6 +8,7 @@ import { CurrencyProvider } from './hooks/CurrencyContext';
 import { OrgProvider } from './hooks/OrgContext';
 import { RequireAuth } from './components/RequireAuth';
 import OrgGate from './components/OrgGate';
+import MfaGate from './components/MfaGate';
 import DashboardHome from './pages/DashboardHome';
 import Settings from './pages/Settings';
 import { DashboardLayout } from './layouts/DashboardLayout';
@@ -28,6 +29,8 @@ import CrmTickets from './pages/crm/CrmTickets';
 import CrmAnalytics from './pages/crm/CrmAnalytics';
 import CrmMarketing from './pages/crm/CrmMarketing';
 import CrmGuide from './pages/crm/CrmGuide';
+import CrmTasks from './pages/crm/CrmTasks';
+import CrmReports from './pages/crm/CrmReports';
 
 /* desktop sync files */
 import SyncLayout from './layouts/SyncLayout';
@@ -82,7 +85,7 @@ export default function App() {
               <NotificationsProvider>
                 <NotificationOverlay />
                 <Routes>
-                  <Route element={<RequireAuth><OrgGate><DashboardLayout /></OrgGate></RequireAuth>}>
+                  <Route element={<RequireAuth><MfaGate><OrgGate><DashboardLayout /></OrgGate></MfaGate></RequireAuth>}>
                     <Route path="/dashboard" element={<DashboardHome />} />
                     <Route path="/settings" element={<Settings />} />
 
@@ -92,6 +95,8 @@ export default function App() {
                       <Route path="pipeline" element={<CrmPipeline />} />
                       <Route path="contacts" element={<CrmContacts />} />
                       <Route path="companies" element={<CrmCompanies />} />
+                      <Route path="tasks" element={<CrmTasks />} />
+                      <Route path="reports" element={<CrmReports />} />
                       <Route path="activity" element={<CrmActivity />} />
                       <Route path="automations" element={<CrmAutomations />} />
                       <Route path="campaigns" element={<CrmCampaigns />} />

@@ -1,17 +1,20 @@
 import { useEffect, useState } from 'react';
 import Modal, { fieldLabelStyle, fieldInputStyle, primaryBtnStyle, ghostBtnStyle } from '../crm/Modal';
-import { sendExportOtp, verifyExportOtp, markExportVerified } from '../../lib/team';
+import { type OtpPurpose, sendOtp, verifyOtp, markExportVerified } from '../../lib/team';
 
 interface OtpGateModalProps {
   open: boolean;
   onClose: () => void;
   onVerified: () => void;
+  /** What the code is for. Defaults to a data export. */
+  purpose?: OtpPurpose;
 }
 
 // Step-up check before bulk data leaves the app: a 6-digit code emailed to
 // the owner. Protects against someone using an unattended or hijacked
 // session; every export is also written to the audit log.
-export default function OtpGateModal({ open, onClose, onVerified }: OtpGateModalProps) {
+export default function OtpGateModal({ open, onClose, onVerified, purpose = 'export' }: OtpGateModalProps) {
+  const action = purpose === 'transfer' ? 'hand over ownership' : 'export your data';
   const [code, setCode] = useState('');
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
@@ -22,7 +25,7 @@ export default function OtpGateModal({ open, onClose, onVerified }: OtpGateModal
     setSending(true);
     setError(null);
     try {
-      await sendExportOtp();
+      await sendOtp(purpose);
       setSent(true);
     } catch (err: any) {
       setError(err.message || 'Could not send the code.');
@@ -41,8 +44,8 @@ export default function OtpGateModal({ open, onClose, onVerified }: OtpGateModal
     setVerifying(true);
     setError(null);
     try {
-      await verifyExportOtp(code.trim());
-      markExportVerified();
+      await verifyOtp(purpose, code.trim());
+      if (purpose === 'export') markExportVerified();
       onVerified();
       onClose();
     } catch (err: any) {
@@ -56,7 +59,7 @@ export default function OtpGateModal({ open, onClose, onVerified }: OtpGateModal
     <Modal open={open} onClose={onClose} title="Confirm it's you" width={400}>
       <form onSubmit={handleVerify}>
         <div style={{ fontSize: '0.65rem', color: 'var(--dim)', marginBottom: '1.2rem', lineHeight: 1.6 }}>
-          {sent ? 'We emailed a 6-digit code to your account email. Enter it to export your data.' : sending ? 'Sending a code to your email…' : 'We need to confirm it’s you before exporting data.'}
+          {sent ? 'We emailed a 6-digit code to your account email. Enter it to ' + action + '.' : sending ? 'Sending a code to your email…' : 'We need to confirm it’s you before you ' + action + '.'}
         </div>
         <label style={fieldLabelStyle}>Verification code</label>
         <input
@@ -71,7 +74,7 @@ export default function OtpGateModal({ open, onClose, onVerified }: OtpGateModal
         {error && <div style={{ color: 'var(--red)', fontSize: '0.65rem', marginBottom: '1rem' }}>{error}</div>}
         <div style={{ display: 'flex', gap: '0.7rem' }}>
           <button type="button" style={ghostBtnStyle} onClick={send} disabled={sending}>Resend code</button>
-          <button type="submit" style={primaryBtnStyle} disabled={verifying || code.length !== 6}>{verifying ? 'Checking…' : 'Verify & export'}</button>
+          <button type="submit" style={primaryBtnStyle} disabled={verifying || code.length !== 6}>{verifying ? 'Checking…' : purpose === 'transfer' ? 'Verify' : 'Verify & export'}</button>
         </div>
       </form>
     </Modal>

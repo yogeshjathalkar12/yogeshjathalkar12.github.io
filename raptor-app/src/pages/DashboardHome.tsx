@@ -7,6 +7,7 @@ import { supabase } from '../lib/supabaseClient';
 import { formatCurrency } from '../lib/crmHelpers';
 import { type PipelineStage, loadPipelineStages, openStageKeys, stageByKey } from '../lib/pipelineStages';
 import MyAccessCard from '../components/team/MyAccessCard';
+import MyTasksCard from '../components/MyTasksCard';
 
 export default function DashboardHome() {
   const { user } = useAuth();
@@ -71,6 +72,7 @@ export default function DashboardHome() {
       <h1 className="arsenal-hero-title" style={{ marginBottom: '2rem' }}>Workspace. Welcome, {displayName}.</h1>
 
       <MyAccessCard />
+      <MyTasksCard />
 
       <div className="arsenal-stats" style={{ marginBottom: '3rem' }}>
         <div className="arsenal-stat">

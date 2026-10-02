@@ -20,11 +20,15 @@ interface OrgContextValue {
   orgId: string | null;
   status: MemberStatus;
   isOwner: boolean;
+  /** A co-admin: runs the team day to day (not billing, transfer or the 2FA policy). */
+  isAdmin: boolean;
+  /** The owner switched on "everyone must use two-factor". */
+  requireMfa: boolean;
   /** The preset the owner started from ("Rep", "Viewer", "Manager", "Custom") - display only. */
   preset: string | null;
   /** The member's individual toggles (owners implicitly have everything). */
   permissions: Partial<Record<Permission, boolean>>;
-  /** True for the org owner and for members holding that permission. */
+  /** True for the owner, admins, and members holding that permission. */
   can: (permission: Permission) => boolean;
   refresh: () => Promise<void>;
 }
@@ -37,6 +41,8 @@ interface Membership {
   org_id: string;
   status: MemberStatus;
   is_owner: boolean;
+  is_admin?: boolean;
+  require_mfa?: boolean;
   preset: string | null;
   permissions: Partial<Record<Permission, boolean>>;
 }
@@ -97,15 +103,18 @@ export function OrgProvider({ children }: { children: ReactNode }) {
   const value = useMemo<OrgContextValue>(() => {
     const status: MemberStatus = solo || !membership ? 'active' : membership.status;
     const isOwner = solo || !membership ? true : membership.is_owner && membership.status === 'active';
+    const isAdmin = !solo && !!membership && !!membership.is_admin && membership.status === 'active';
     const permissions = membership?.permissions || {};
     return {
       loading,
       orgId: solo || !membership ? userId : membership.org_id,
       status,
       isOwner,
+      isAdmin,
+      requireMfa: !solo && !!membership?.require_mfa,
       preset: solo || !membership ? null : membership.preset ?? null,
       permissions,
-      can: (p: Permission) => isOwner || (status === 'active' && permissions[p] === true),
+      can: (p: Permission) => isOwner || isAdmin || (status === 'active' && permissions[p] === true),
       refresh,
     };
   }, [loading, solo, membership, userId, refresh]);

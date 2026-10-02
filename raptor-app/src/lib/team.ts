@@ -36,6 +36,7 @@ export interface OrgMember {
   user_id: string;
   email: string | null;
   is_owner: boolean;
+  is_admin: boolean;
   status: MemberStatus;
   manager_id: string | null;
   preset: string | null;
@@ -74,8 +75,29 @@ export const resendInvite = (userId: string) => teamFetch('/resend-invite', { us
 export const removeMember = (userId: string, reassignTo: string) =>
   teamFetch<{ reassigned: Record<string, number>; warnings: string[] }>('/remove', { user_id: userId, reassign_to: reassignTo });
 
-export const sendExportOtp = () => teamFetch('/otp/send', { purpose: 'export' });
-export const verifyExportOtp = (code: string) => teamFetch('/otp/verify', { purpose: 'export', code });
+export type OtpPurpose = 'export' | 'transfer';
+export const sendOtp = (purpose: OtpPurpose) => teamFetch('/otp/send', { purpose });
+export const verifyOtp = (purpose: OtpPurpose, code: string) => teamFetch('/otp/verify', { purpose, code });
+export const sendExportOtp = () => sendOtp('export');
+export const verifyExportOtp = (code: string) => verifyOtp('export', code);
+
+// Bring a removed member back (they accept again from an emailed link).
+export const reinstateMember = (userId: string) => teamFetch('/reinstate', { user_id: userId });
+// Owner only, and only straight after verifyOtp('transfer', ...).
+export const transferOwnership = (userId: string) => teamFetch('/transfer-ownership', { user_id: userId });
+// A member lost their phone: clear their authenticator so they can set up a new one.
+export const resetMemberMfa = (userId: string) => teamFetch<{ removed: number }>('/reset-mfa', { user_id: userId });
+
+/** Owner only (the database refuses anyone else). */
+export async function setMemberAdmin(memberId: string, isAdmin: boolean) {
+  const { error } = await supabase.from('org_members').update({ is_admin: isAdmin }).eq('id', memberId);
+  if (error) throw error;
+}
+
+export async function setRequireMfa(on: boolean) {
+  const { error } = await supabase.rpc('set_require_mfa', { p_on: on });
+  if (error) throw error;
+}
 
 export async function loadMembers(): Promise<OrgMember[]> {
   const { data, error } = await supabase.from('org_members').select('*').order('created_at', { ascending: true });
@@ -170,4 +192,38 @@ export async function loadRecordHistory(table: HistoryTable, recordId: string): 
     throw error;
   }
   return (data || []) as HistoryEntry[];
+}
+
+
+// ---------------------------------------------------------------------------
+// Manager report (db/migrations/2026-10-05_admin_transfer_mfa_tasks_reports.sql)
+// ---------------------------------------------------------------------------
+
+export interface TeamReportRow {
+  user_id: string;
+  email: string;
+  contacts_added: number;
+  deals_created: number;
+  deals_won: number;
+  won_value: number;
+  deals_lost: number;
+  open_deals: number;
+  open_value: number;
+  tasks_done: number;
+  tasks_open: number;
+  tasks_overdue: number;
+  calls_made: number;
+  call_minutes: number;
+  notes_logged: number;
+}
+
+/** One row per person the caller may see (a manager gets their team, an
+ *  owner/admin/org-wide viewer gets everyone). `to` is exclusive. */
+export async function loadTeamReport(from: Date, to: Date): Promise<TeamReportRow[]> {
+  const { data, error } = await supabase.rpc('team_report', { p_from: from.toISOString(), p_to: to.toISOString() });
+  if (error) {
+    if (isMissingFunction(error)) return [];
+    throw error;
+  }
+  return (data || []).map((r: any) => ({ ...r, won_value: Number(r.won_value) || 0, open_value: Number(r.open_value) || 0 })) as TeamReportRow[];
 }

@@ -8,6 +8,7 @@ import AttachmentsSection from './AttachmentsSection';
 import OwnerOnly from '../OwnerOnly';
 import AssigneeSelect from './AssigneeSelect';
 import RecordHistory from './RecordHistory';
+import TasksSection from './TasksSection';
 
 interface DealDetailModalProps {
   deal: any | null;
@@ -180,6 +181,8 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
 
       <AssigneeSelect table="deals" recordId={deal.id} value={deal.assignee_id ?? null} onChanged={onSaved} />
       <CustomFieldsSection entityType="deal" entity={deal} onChanged={onSaved} />
+      <TasksSection dealId={deal.id} />
+
       <AttachmentsSection entityType="deal" entityId={deal.id} />
       <RecordHistory
         table="deals"
