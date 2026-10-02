@@ -21,8 +21,7 @@ export function ToolLayout({ tool, children }: ToolLayoutProps) {
           <p style={{ color: 'var(--dim)', maxWidth: '640px', fontSize: '0.85rem' }}>{tool.description}</p>
 
           <div style={{ display: 'flex', gap: '1.5rem', marginTop: '0.8rem', fontSize: '0.7rem', color: 'var(--dim)', fontFamily: 'var(--mono)' }}>
-            <div>Cost <strong style={{ color: 'var(--white)' }}>{tool.costLabel}</strong></div>
-            <div>Engine <strong style={{ color: 'var(--white)' }}>{tool.engineLabel}</strong></div>
+            <div>Costs <strong style={{ color: 'var(--white)' }}>{tool.costLabel}</strong></div>
             {tool.extraMeta?.map((m) => (
               <div key={m}>{m}</div>
             ))}

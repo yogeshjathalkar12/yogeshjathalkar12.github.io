@@ -32,6 +32,7 @@ const PROTECTED_ROUTES: [string, string][] = [
   ['POST', '/api/raptor/team/transfer-ownership'],
   ['POST', '/api/raptor/team/reset-mfa'],
   ['POST', '/api/billing/create-order'],
+  ['POST', '/api/raptor/diagnostic/bulk-check'],
   ['POST', '/api/raptor/threader/scan-threads'],
   ['POST', '/api/raptor/spintax/compile'],
   ['POST', '/api/raptor/resolver/ranges/upload'],

@@ -4,7 +4,7 @@ import { useAuthedFetch } from '../../hooks/useAuthedFetch';
 import { useToast } from '../../hooks/ToastContext';
 import { toolApiBase } from '../../lib/config';
 import { findTool } from '../registry';
-import { OutOfCreditsError } from '../../lib/apiErrors';
+import { ApiError, OutOfCreditsError } from '../../lib/apiErrors';
 
 const TOOL = findTool('validator')!;
 
@@ -14,7 +14,10 @@ const TOOL = findTool('validator')!;
 // second constant from lib/config.
 const API_ROOT = toolApiBase('_root').replace(/\/_root$/, '');
 
-type VerifyStatus = 'valid' | 'unknown' | 'invalid';
+// 'risky' = the mail server didn't give a clear yes or no (very common - many
+// servers refuse or ignore this kind of check). It must never be shown as a
+// confirmed bad address.
+type VerifyStatus = 'valid' | 'risky' | 'unknown' | 'invalid';
 
 interface VerifyResponse {
   status: VerifyStatus;
@@ -40,7 +43,7 @@ export default function ValidatorTool() {
 
   const runVerify = async () => {
     const emailVal = email.trim();
-    if (!emailVal || !emailVal.includes('@')) return showToast('Enter a valid email address', 'error');
+    if (!emailVal || !emailVal.includes('@')) return showToast('Enter an email address like name@company.com', 'error');
 
     setLoading(true);
     const domain = emailVal.split('@')[1];
@@ -54,16 +57,16 @@ export default function ValidatorTool() {
 
       if (json.status === 'valid') {
         result = 'ok';
-        statusText = '✓ Safe to Send — Mailbox Confirmed';
-        detailHtml = `Domain: ${domain} · MX Records: Found · SMTP Handshake: Accepted`;
-      } else if (json.status === 'unknown') {
+        statusText = '✓ Looks real';
+        detailHtml = `${domain} accepts email and confirmed this address exists.`;
+      } else if (json.status === 'risky' || json.status === 'unknown') {
         result = 'warn';
-        statusText = '⚠ Risky — Domain Exists, Mailbox Uncertain';
-        detailHtml = `Domain: ${domain} · MX Records: Found · SMTP: ${json.error || 'Inconclusive'}`;
+        statusText = '⚠ Couldn’t be sure';
+        detailHtml = `${domain} accepts email, but its server wouldn’t confirm this address. That’s common and doesn’t mean it’s wrong — send with care, and keep an eye on bounces.`;
       } else {
         result = 'fail';
-        statusText = '✗ Do Not Send — Will Hard Bounce';
-        detailHtml = `Domain: ${domain} · Reason: Mailbox rejected by mail server`;
+        statusText = '✗ Don’t send';
+        detailHtml = `${domain} said this address doesn’t exist (or the domain can’t receive email). Sending would bounce.`;
       }
 
       setStatus(result);
@@ -76,12 +79,13 @@ export default function ValidatorTool() {
       if (e instanceof OutOfCreditsError) {
         showToast('Out of credits', 'error');
       } else {
-        // Same principle as the original: never fabricate a pass/fail verdict
-        // when the API itself is unreachable, and don't log it to history —
-        // nothing was actually checked.
-        setStatus('fail');
-        setDetail(`✗ Could Not Verify — API Unreachable — Could not reach the verification server. Check your connection or try again.`);
-        showToast('API request failed — no credit was charged', 'error');
+        // Never fabricate a verdict when the check itself didn't work, and
+        // don't log it to history - nothing was actually checked. Say what
+        // really happened (a rejected request is not the same as being offline).
+        setStatus('warn');
+        const reason = e instanceof ApiError && e.status !== 0 ? e.message : 'We couldn’t reach the checking service. Check your connection and try again.';
+        setDetail(`⚠ Couldn’t check this address — ${reason}`);
+        showToast('The check didn’t complete', 'error');
       }
     } finally {
       setLoading(false);
@@ -92,10 +96,10 @@ export default function ValidatorTool() {
     <ToolLayout tool={TOOL}>
       <div className="arsenal-grid">
         <div className="arsenal-card">
-          <div className="arsenal-card-header"><span className="arsenal-card-title">Ping-Verify Engine</span></div>
+          <div className="arsenal-card-header"><span className="arsenal-card-title">Check an email address</span></div>
           <div className="arsenal-card-body">
             <div className="arsenal-field">
-              <label className="arsenal-label">Target Email Address</label>
+              <label className="arsenal-label">Email address</label>
               <input
                 className="arsenal-input"
                 type="email"
@@ -105,7 +109,7 @@ export default function ValidatorTool() {
               />
             </div>
             <button className="arsenal-btn" disabled={loading} onClick={runVerify}>
-              {loading ? (<><span className="arsenal-spinner" /> Verifying…</>) : 'Verify Email →'}
+              {loading ? (<><span className="arsenal-spinner" /> Checking…</>) : 'Check it →'}
             </button>
 
             {status && (
@@ -118,14 +122,14 @@ export default function ValidatorTool() {
 
         <div className="arsenal-card">
           <div className="arsenal-card-header">
-            <span className="arsenal-card-title">Verification History</span>
+            <span className="arsenal-card-title">Addresses you’ve checked</span>
             <span className="arsenal-card-sub">{history.length} checks</span>
           </div>
           <div className="arsenal-card-body">
             {history.length === 0 ? (
               <div className="arsenal-empty">
                 <div className="arsenal-empty-icon">✉</div>
-                <div className="arsenal-empty-text">No checks yet — run your first verification.</div>
+                <div className="arsenal-empty-text">Nothing checked yet.</div>
               </div>
             ) : (
               <div className="arsenal-console">
@@ -133,7 +137,7 @@ export default function ValidatorTool() {
                   <div key={i} className={`arsenal-console-line ${h.result === 'ok' ? 'ok' : h.result === 'fail' ? 'fail' : ''}`}>
                     <span className="ts">{h.time}</span>
                     <span className="msg">
-                      {h.email} — {h.result === 'ok' ? '✓ Valid' : h.result === 'warn' ? '⚠ Risky' : '✗ Invalid'}
+                      {h.email} — {h.result === 'ok' ? '✓ Looks real' : h.result === 'warn' ? '⚠ Not sure' : '✗ Don’t send'}
                     </span>
                   </div>
                 ))}
@@ -144,13 +148,13 @@ export default function ValidatorTool() {
       </div>
 
       <div className="arsenal-card" style={{ marginTop: '1.5rem' }}>
-        <div className="arsenal-card-header"><span className="arsenal-card-title">Pro Tip</span></div>
+        <div className="arsenal-card-header"><span className="arsenal-card-title">Why check first?</span></div>
         <div className="arsenal-card-body" style={{ fontSize: '0.65rem', color: 'var(--dim)', lineHeight: 1.7 }}>
-          Run verifications before any cold outreach campaign. A bounce rate above 3% can permanently damage your domain sender score with Gmail and Outlook.
+          Check addresses before you email a new list. If more than about 3 in 100 emails bounce, Gmail and Outlook start treating your emails as spam.
           <br /><br />
-          <span style={{ color: 'var(--white)' }}>✓ Safe to send</span> — mailbox confirmed<br />
-          <span style={{ color: 'var(--amber)' }}>⚠ Risky</span> — domain exists, mailbox uncertain<br />
-          <span style={{ color: 'var(--red)' }}>✗ Do not send</span> — will hard bounce
+          <span style={{ color: 'var(--white)' }}>✓ Looks real</span> — the address was confirmed<br />
+          <span style={{ color: 'var(--amber)' }}>⚠ Not sure</span> — the company accepts email but wouldn’t confirm this address<br />
+          <span style={{ color: 'var(--red)' }}>✗ Don’t send</span> — it will bounce
         </div>
       </div>
     </ToolLayout>

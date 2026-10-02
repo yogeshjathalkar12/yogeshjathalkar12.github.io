@@ -7,9 +7,6 @@ import { findTool } from '../registry';
 import { OutOfCreditsError } from '../../lib/apiErrors';
 
 const TOOL = findTool('threader')!;
-// NOTE: threader.html hit `${RAPTOR_API_URL}/api/threader` directly (no
-// `/raptor/` segment). toolApiBase() builds `/api/raptor/threader` —
-// confirm that's actually where the backend route lives.
 const API = toolApiBase('threader');
 
 type Tab = 'scan' | 'history';
@@ -53,9 +50,9 @@ function TreeNode({ node, nodes, depth = 0 }: { node: ThreadNode; nodes: Record<
         <div style={{ fontSize: '0.68rem', color: 'var(--white)' }}>
           {node.subject || '(no subject)'}
           {node.is_bot ? (
-            <span className="arsenal-badge fail" style={{ marginLeft: '0.6rem' }}><span className="dot" />Bot</span>
+            <span className="arsenal-badge fail" style={{ marginLeft: '0.6rem' }}><span className="dot" />Automatic</span>
           ) : node.parent_id ? (
-            <span className="arsenal-badge ok" style={{ marginLeft: '0.6rem' }}><span className="dot" />Human Reply</span>
+            <span className="arsenal-badge ok" style={{ marginLeft: '0.6rem' }}><span className="dot" />Real reply</span>
           ) : null}
         </div>
         <div style={{ fontSize: '0.58rem', color: 'var(--dim2)' }}>
@@ -90,7 +87,7 @@ export default function ThreaderTool() {
 
   const runScan = async () => {
     if (!imapHost.trim() || !imapUser.trim() || !imapPass) {
-      return showToast('Host, username, and app password are required', 'error');
+      return showToast('Fill in the mail server, your email address and an app password', 'error');
     }
     setScanLoading(true);
     try {
@@ -106,7 +103,7 @@ export default function ThreaderTool() {
         }),
       });
       setScanResult(json);
-      showToast('Mailbox scanned successfully', 'success');
+      showToast('Done — your inbox has been checked', 'success');
     } catch (e) {
       if (e instanceof OutOfCreditsError) showToast('Out of credits', 'error');
       else if (e instanceof Error) showToast(e.message, 'error');
@@ -121,7 +118,7 @@ export default function ThreaderTool() {
       const json = await authedFetch<{ scans: ScanHistoryEntry[] }>(`${API}/history`, { skipCreditsSync: true });
       setHistory(json.scans || []);
     } catch {
-      showToast('Could not load history', 'error');
+      showToast('Could not load your past checks', 'error');
     } finally {
       setHistoryLoading(false);
     }
@@ -137,80 +134,80 @@ export default function ThreaderTool() {
   return (
     <ToolLayout tool={TOOL}>
       <div className="arsenal-tabs">
-        <div className={`arsenal-tab${tab === 'scan' ? ' active' : ''}`} onClick={() => switchTab('scan')}>Scan Mailbox</div>
-        <div className={`arsenal-tab${tab === 'history' ? ' active' : ''}`} onClick={() => switchTab('history')}>Scan History</div>
+        <div className={`arsenal-tab${tab === 'scan' ? ' active' : ''}`} onClick={() => switchTab('scan')}>Check my inbox</div>
+        <div className={`arsenal-tab${tab === 'history' ? ' active' : ''}`} onClick={() => switchTab('history')}>Past checks</div>
       </div>
 
       {tab === 'scan' && (
         <div className="arsenal-grid">
           <div className="arsenal-card">
-            <div className="arsenal-card-header"><span className="arsenal-card-title">Mailbox Connection</span></div>
+            <div className="arsenal-card-header"><span className="arsenal-card-title">Connect your email</span></div>
             <div className="arsenal-card-body">
               <div className="arsenal-field-row">
                 <div className="arsenal-field">
-                  <label className="arsenal-label">IMAP Host</label>
+                  <label className="arsenal-label">Mail server</label>
                   <input className="arsenal-input" value={imapHost} onChange={(e) => setImapHost(e.target.value)} placeholder="imap.gmail.com" />
                 </div>
                 <div className="arsenal-field" style={{ maxWidth: 110 }}>
-                  <label className="arsenal-label">Port</label>
+                  <label className="arsenal-label">Port number</label>
                   <input className="arsenal-input" value={imapPort} onChange={(e) => setImapPort(parseInt(e.target.value) || 993)} />
                 </div>
               </div>
               <div className="arsenal-field">
-                <label className="arsenal-label">Username</label>
+                <label className="arsenal-label">Your email address</label>
                 <input className="arsenal-input" value={imapUser} onChange={(e) => setImapUser(e.target.value)} placeholder="hello@shoonyaorigins.com" />
               </div>
               <div className="arsenal-field">
-                <label className="arsenal-label">App Password</label>
+                <label className="arsenal-label">App password</label>
                 <input className="arsenal-input" type="password" value={imapPass} onChange={(e) => setImapPass(e.target.value)} placeholder="••••••••••••••••" />
-                <div className="arsenal-hint">Never stored — used once to open the connection, then discarded. Use an app-specific password, not your real login.</div>
+                <div className="arsenal-hint">Not your normal password. Create an “app password” in your email account’s security settings (Gmail: Google Account → Security → App passwords). It’s used once to read the headers of your emails and is never saved. Mail server for Gmail: imap.gmail.com.</div>
               </div>
               <div className="arsenal-field-row">
                 <div className="arsenal-field">
-                  <label className="arsenal-label">Mailbox</label>
+                  <label className="arsenal-label">Folder to check</label>
                   <input className="arsenal-input" value={imapMailbox} onChange={(e) => setImapMailbox(e.target.value)} />
                 </div>
                 <div className="arsenal-field" style={{ maxWidth: 110 }}>
-                  <label className="arsenal-label">Limit</label>
+                  <label className="arsenal-label">How many emails</label>
                   <input className="arsenal-input" value={imapLimit} onChange={(e) => setImapLimit(parseInt(e.target.value) || 200)} />
                 </div>
               </div>
               <button className="arsenal-btn" disabled={scanLoading} onClick={runScan}>
-                {scanLoading ? (<><span className="arsenal-spinner" /> Connecting to mailbox…</>) : 'Scan Threads →'}
+                {scanLoading ? (<><span className="arsenal-spinner" /> Checking your inbox…</>) : 'Find replies →'}
               </button>
             </div>
           </div>
 
           <div className="arsenal-card">
             <div className="arsenal-card-header">
-              <span className="arsenal-card-title">Reply Tree</span>
-              {scanResult && <span className="arsenal-card-sub">{scanResult.scanned} messages</span>}
+              <span className="arsenal-card-title">Conversations</span>
+              {scanResult && <span className="arsenal-card-sub">{scanResult.scanned} emails checked</span>}
             </div>
             <div className="arsenal-card-body">
               {!scanResult ? (
                 <div className="arsenal-empty">
                   <div className="arsenal-empty-icon">◌</div>
-                  <div className="arsenal-empty-text">Connect a mailbox to build the reply tree.</div>
+                  <div className="arsenal-empty-text">Connect your email to see who replied to you.</div>
                 </div>
               ) : (
                 <>
                   <div className="arsenal-stats" style={{ marginBottom: '1.2rem' }}>
                     <div className="arsenal-stat">
-                      <div className="arsenal-stat-label">Human Replies</div>
+                      <div className="arsenal-stat-label">Real replies</div>
                       <div className="arsenal-stat-value accent">{scanResult.human_replies}</div>
                     </div>
                     <div className="arsenal-stat">
-                      <div className="arsenal-stat-label">Bot Replies Filtered</div>
+                      <div className="arsenal-stat-label">Automatic replies ignored</div>
                       <div className="arsenal-stat-value">{scanResult.bot_replies}</div>
                     </div>
                     <div className="arsenal-stat">
-                      <div className="arsenal-stat-label">Threads</div>
+                      <div className="arsenal-stat-label">Conversations</div>
                       <div className="arsenal-stat-value">{scanResult.roots.length}</div>
                     </div>
                   </div>
                   <div className="arsenal-console" style={{ maxHeight: 420 }}>
                     {rootNodes.length === 0 ? (
-                      <div className="arsenal-console-empty">No threads found.</div>
+                      <div className="arsenal-console-empty">No conversations found in that folder.</div>
                     ) : (
                       rootNodes.map((n, i) => <TreeNode key={i} node={n} nodes={scanResult.nodes} />)
                     )}
@@ -224,15 +221,15 @@ export default function ThreaderTool() {
 
       {tab === 'history' && (
         <div className="arsenal-card">
-          <div className="arsenal-card-header"><span className="arsenal-card-title">Past Scans</span></div>
+          <div className="arsenal-card-header"><span className="arsenal-card-title">Past checks</span></div>
           <div className="arsenal-card-body">
             {historyLoading ? (
               <div className="arsenal-empty"><div className="arsenal-empty-text">Loading…</div></div>
             ) : !history || history.length === 0 ? (
-              <div className="arsenal-empty"><div className="arsenal-empty-text">No scans yet.</div></div>
+              <div className="arsenal-empty"><div className="arsenal-empty-text">You haven’t checked your inbox yet.</div></div>
             ) : (
               <table className="arsenal-table">
-                <thead><tr><th>Mailbox</th><th>Messages</th><th>Human Replies</th><th>Date</th></tr></thead>
+                <thead><tr><th>Folder</th><th>Emails checked</th><th>Real replies</th><th>When</th></tr></thead>
                 <tbody>
                   {history.map((s, i) => (
                     <tr key={i}>

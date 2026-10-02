@@ -44,7 +44,7 @@ export default function TrackerTool() {
 
   const generatePixel = async () => {
     const nameRaw = campaignName.trim();
-    if (!nameRaw) return showToast('Enter a campaign name', 'error');
+    if (!nameRaw) return showToast('Give this email a name first', 'error');
 
     setGenerating(true);
     try {
@@ -66,10 +66,10 @@ export default function TrackerTool() {
       setCampaigns((prev) => [campaign, ...prev]);
       setLastResult(campaign);
       setCampaignName('');
-      showToast('Pixel generated! Embed in your email.', 'success');
+      showToast('Done — now paste the code into your email.', 'success');
     } catch (e) {
       if (e instanceof OutOfCreditsError) showToast('Out of credits', 'error');
-      else showToast('API not connected — could not generate a real pixel', 'error');
+      else showToast('Couldn’t create the tracking code. Please try again in a moment.', 'error');
     } finally {
       setGenerating(false);
     }
@@ -77,12 +77,35 @@ export default function TrackerTool() {
 
   const copyHtml = (html: string) => {
     navigator.clipboard.writeText(html);
-    showToast('HTML tag copied', 'success');
+    showToast('Copied', 'success');
   };
 
   // 30s poll, matching the original's pollCampaignOpens — opens are read
   // through the backend, never queried from Supabase directly client-side,
   // since raptor_opens has no per-user RLS scoping.
+  // On arrival, bring back every email that has already been opened (this
+  // page used to forget everything on refresh). The name is recovered from the
+  // id (a name plus a short random suffix).
+  useEffect(() => {
+    authedFetch<CampaignOpensResponse>(`${API_ROOT}/campaign-opens`, { skipCreditsSync: true })
+      .then((json) => {
+        const restored: Campaign[] = (json.campaigns || []).map((s) => {
+          const pixelUrl = `${API_ROOT}/track/${s.campaign_id}.png`;
+          return {
+            id: s.campaign_id,
+            name: s.campaign_id.replace(/-[a-z0-9]{1,8}$/i, '').replace(/-/g, ' ') || s.campaign_id,
+            opens: s.opens,
+            lastOpen: s.last_open,
+            pixelUrl,
+            pixelHtml: `<img src="${pixelUrl}" width="1" height="1" alt="" style="display:none" />`,
+          };
+        });
+        setCampaigns((prev) => [...prev, ...restored.filter((r) => !prev.some((p) => p.id === r.id))]);
+      })
+      .catch(() => { /* nothing to restore, or offline - the list simply starts empty */ });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     const poll = async () => {
       if (!campaignsRef.current.length) return;
@@ -94,7 +117,7 @@ export default function TrackerTool() {
           prev.map((c) => {
             const match = serverCampaigns.find((s) => s.campaign_id === c.id);
             if (!match || match.opens <= c.opens) return c;
-            showToast(`📬 Email opened — ${c.name}`, 'success');
+            showToast(`📬 Opened — ${c.name}`, 'success');
             return { ...c, opens: match.opens, lastOpen: match.last_open };
           }),
         );
@@ -112,29 +135,29 @@ export default function TrackerTool() {
     <ToolLayout tool={TOOL}>
       <div className="arsenal-grid">
         <div className="arsenal-card">
-          <div className="arsenal-card-header"><span className="arsenal-card-title">Pixel Generator</span></div>
+          <div className="arsenal-card-header"><span className="arsenal-card-title">Track an email</span></div>
           <div className="arsenal-card-body">
             <div className="arsenal-field">
-              <label className="arsenal-label">Campaign / Prospect Name</label>
+              <label className="arsenal-label">Name this email</label>
               <input
                 className="arsenal-input"
                 value={campaignName}
                 onChange={(e) => setCampaignName(e.target.value)}
-                placeholder="e.g. pitch-acmecorp-ceo"
+                placeholder="e.g. Pitch to Acme’s CEO"
               />
             </div>
             <button className="arsenal-btn" disabled={generating} onClick={generatePixel}>
-              {generating ? (<><span className="arsenal-spinner" /> Generating…</>) : 'Generate Pixel →'}
+              {generating ? (<><span className="arsenal-spinner" /> Creating…</>) : 'Create tracking code →'}
             </button>
 
             {lastResult && (
               <div style={{ marginTop: '1rem' }}>
                 <div className="arsenal-field">
-                  <label className="arsenal-label">Pixel URL</label>
+                  <label className="arsenal-label">Tracking image address</label>
                   <div className="arsenal-code-block" style={{ color: 'var(--purple)' }}>{lastResult.pixelUrl}</div>
                 </div>
                 <div className="arsenal-field">
-                  <label className="arsenal-label">HTML Tag (paste into email signature)</label>
+                  <label className="arsenal-label">Code to paste into your email (HTML view or signature)</label>
                   <div className="arsenal-code-block" style={{ wordBreak: 'break-all' }}>
                     {lastResult.pixelHtml}
                     <button className="arsenal-copy-btn" onClick={() => copyHtml(lastResult.pixelHtml)}>Copy</button>
@@ -147,19 +170,19 @@ export default function TrackerTool() {
 
         <div className="arsenal-card">
           <div className="arsenal-card-header">
-            <span className="arsenal-card-title">Live Open Log</span>
-            <span className="arsenal-card-sub">● Polling every 30s</span>
+            <span className="arsenal-card-title">Who opened what</span>
+            <span className="arsenal-card-sub">● Updates every 30 seconds</span>
           </div>
           <div className="arsenal-card-body">
             {campaigns.length === 0 ? (
               <div className="arsenal-empty">
                 <div className="arsenal-empty-icon">◎</div>
-                <div className="arsenal-empty-text">No campaigns yet — generate your first pixel to start tracking.</div>
+                <div className="arsenal-empty-text">Nothing tracked yet — create a tracking code and paste it into an email. Tip: opens in the first few seconds are ignored (email apps preview messages before anyone reads them), and some inboxes hide opens.</div>
               </div>
             ) : (
               <table className="arsenal-table">
                 <thead>
-                  <tr><th>Campaign</th><th>Status</th><th>Last Open</th><th>Opens</th><th>Pixel</th></tr>
+                  <tr><th>Email</th><th>Status</th><th>Last opened</th><th>Times opened</th><th>Code</th></tr>
                 </thead>
                 <tbody>
                   {campaigns.map((c) => (
@@ -168,7 +191,7 @@ export default function TrackerTool() {
                       <td>
                         {c.opens > 0
                           ? <span className="arsenal-badge ok"><span className="dot" />Opened</span>
-                          : <span className="arsenal-badge pending"><span className="dot" />Pending</span>}
+                          : <span className="arsenal-badge pending"><span className="dot" />Not opened yet</span>}
                       </td>
                       <td>{c.lastOpen ? new Date(c.lastOpen).toLocaleString('en-IN', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' }) : '—'}</td>
                       <td>{c.opens}</td>
