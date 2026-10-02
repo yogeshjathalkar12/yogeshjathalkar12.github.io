@@ -60,6 +60,12 @@ export default function CrmCampaigns() {
   async function handleDelete(c: any) {
     if (!confirm(`Delete "${c.name}"? Deals tagged to it stay — they just become untagged.`)) return;
     try {
+      // campaigns.id has no ON DELETE SET NULL/CASCADE from deals.campaign_id -
+      // deleting a campaign with linked deals would otherwise fail with a raw
+      // Postgres foreign-key-violation error. Unlink those deals first so the
+      // "they just become untagged" promise above is actually true.
+      const { error: unlinkError } = await supabase.from('deals').update({ campaign_id: null }).eq('campaign_id', c.id);
+      if (unlinkError) throw unlinkError;
       const { error } = await supabase.from('campaigns').delete().eq('id', c.id);
       if (error) throw error;
       fetchAll();
