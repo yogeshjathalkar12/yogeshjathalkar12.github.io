@@ -4,6 +4,8 @@ import Modal, { fieldLabelStyle, fieldInputStyle, primaryBtnStyle, ghostBtnStyle
 import { initials, relativeTime, TYPE_ICON } from '../../lib/crmHelpers';
 import { toolApiBase } from '../../lib/config';
 import { findOrCreateCompany } from '../../lib/crmContacts';
+import CustomFieldsSection from './CustomFieldsSection';
+import AttachmentsSection from './AttachmentsSection';
 
 const WHATSAPP_API = toolApiBase('whatsapp');
 
@@ -369,6 +371,9 @@ export default function ContactPanel({ contact, interactions, onClose, onChanged
         <option value="active">Active</option>
         <option value="hot">Hot</option>
       </select>
+
+      <CustomFieldsSection entityType="contact" entity={contact} onChanged={onChanged} />
+      <AttachmentsSection entityType="contact" entityId={contact.id} />
 
       {/* --- WhatsApp thread --- */}
       <div

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import BulkImportModal from '../../components/crm/BulkImportModal';
 import ExportButton from '../../components/crm/ExportButton';
@@ -14,6 +15,7 @@ import { formatCurrency } from '../../lib/crmHelpers';
 
 export default function CrmPipeline() {
   const { session } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [deals, setDeals] = useState<any[]>([]);
   const [stages, setStages] = useState<PipelineStage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -91,6 +93,19 @@ export default function CrmPipeline() {
       setLoading(false);
     }
   }
+
+  // GlobalSearch.tsx navigates here with ?open=<id> - once the real fetch
+  // resolves, open that deal and drop the param.
+  useEffect(() => {
+    const openId = searchParams.get('open');
+    if (!openId || deals.length === 0) return;
+    const match = deals.find((d) => d.id === openId);
+    if (match) setActiveDeal(match);
+    const next = new URLSearchParams(searchParams);
+    next.delete('open');
+    setSearchParams(next, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deals]);
 
   const handleDragStart = (e: React.DragEvent, dealId: string) => {
     e.dataTransfer.setData('dealId', dealId);

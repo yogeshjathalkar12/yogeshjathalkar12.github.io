@@ -3,6 +3,8 @@ import { supabase } from '../../lib/supabaseClient';
 import Modal, { fieldLabelStyle, fieldInputStyle, primaryBtnStyle, ghostBtnStyle } from './Modal';
 import { findOrCreateContact } from '../../lib/crmContacts';
 import { type PipelineStage, loadPipelineStages, stageByKey } from '../../lib/pipelineStages';
+import CustomFieldsSection from './CustomFieldsSection';
+import AttachmentsSection from './AttachmentsSection';
 
 interface DealDetailModalProps {
   deal: any | null;
@@ -172,6 +174,9 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
           <button type="button" style={ghostBtnStyle} onClick={() => setAddingContact(false)}>Cancel</button>
         </div>
       )}
+
+      <CustomFieldsSection entityType="deal" entity={deal} onChanged={onSaved} />
+      <AttachmentsSection entityType="deal" entityId={deal.id} />
 
       {error && <div style={{ color: 'var(--red)', fontSize: '0.65rem', marginBottom: '1rem' }}>{error}</div>}
 

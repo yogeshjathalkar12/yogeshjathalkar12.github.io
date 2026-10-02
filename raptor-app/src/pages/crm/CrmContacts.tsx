@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { relativeTime } from '../../lib/crmHelpers';
 import NewContactModal from '../../components/crm/NewContactModal';
 import ContactPanel from '../../components/crm/ContactPanel';
 import BulkImportModal from '../../components/crm/BulkImportModal';
 import ExportButton from '../../components/crm/ExportButton';
+import DuplicatesModal from '../../components/crm/DuplicatesModal';
 import { CONTACTS_IMPORT_SCHEMA } from '../../lib/importSchema';
 
 const STATUS_COLORS: Record<string, { bg: string; fg: string }> = {
@@ -14,6 +16,7 @@ const STATUS_COLORS: Record<string, { bg: string; fg: string }> = {
 };
 
 export default function CrmContacts() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [contacts, setContacts] = useState<any[]>([]);
   const [deals, setDeals] = useState<any[]>([]);
   const [interactions, setInteractions] = useState<any[]>([]);
@@ -21,6 +24,7 @@ export default function CrmContacts() {
   const [search, setSearch] = useState('');
   const [showNewContact, setShowNewContact] = useState(false);
   const [showImport, setShowImport] = useState(false);
+  const [showDuplicates, setShowDuplicates] = useState(false);
   const [activeContact, setActiveContact] = useState<any | null>(null);
 
   useEffect(() => {
@@ -69,6 +73,19 @@ export default function CrmContacts() {
       setLoading(false);
     }
   }
+
+  // GlobalSearch.tsx navigates here with ?open=<id> - once the real fetch
+  // resolves, open that contact and drop the param.
+  useEffect(() => {
+    const openId = searchParams.get('open');
+    if (!openId || contacts.length === 0) return;
+    const match = contacts.find((c) => c.id === openId);
+    if (match) setActiveContact(match);
+    const next = new URLSearchParams(searchParams);
+    next.delete('open');
+    setSearchParams(next, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contacts]);
 
   const q = search.trim().toLowerCase();
   const filtered = contacts.filter(
@@ -126,6 +143,23 @@ export default function CrmContacts() {
             ]}
             filename="contacts"
           />
+          <button
+            onClick={() => setShowDuplicates(true)}
+            style={{
+              background: 'transparent',
+              color: 'var(--dim)',
+              border: '1px solid var(--border)',
+              padding: '0.6rem 1.1rem',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontFamily: 'var(--mono)',
+              fontSize: '0.65rem',
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+            }}
+          >
+            Find Duplicates
+          </button>
           <button
             onClick={() => setShowImport(true)}
             style={{
@@ -246,6 +280,7 @@ export default function CrmContacts() {
         onClose={() => setActiveContact(null)}
         onChanged={fetchAll}
       />
+      <DuplicatesModal kind="contact" open={showDuplicates} onClose={() => setShowDuplicates(false)} onMerged={fetchAll} />
     </div>
   );
 }

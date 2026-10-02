@@ -9,6 +9,7 @@ export default function CrmLayout() {
           { name: 'Overview', path: '/crm/overview' },
           { name: 'Pipeline', path: '/crm/pipeline' },
           { name: 'Contacts', path: '/crm/contacts' },
+          { name: 'Companies', path: '/crm/companies' },
           { name: 'Activity', path: '/crm/activity' },
           { name: 'Automations', path: '/crm/automations' },
           { name: 'Campaigns', path: '/crm/campaigns' },

@@ -6,6 +6,7 @@ import { useTheme } from '../hooks/ThemeContext';
 import { TOOLS } from '../tools/registry';
 import { NotificationBell } from '../components/NotificationBell';
 import { PaymentModal } from './PaymentModal';
+import GlobalSearch from '../components/GlobalSearch';
 
 export function DashboardLayout() {
   const { user, signOut } = useAuth();
@@ -40,6 +41,8 @@ export function DashboardLayout() {
       <header className="dash-topbar">
         <div className="dash-topbar-logo">Raptor</div>
         <div className="dash-topbar-right">
+          <GlobalSearch />
+
           <div className={`dash-credits-pill${(credits ?? 0) <= 5 ? ' warn-low' : ''}`}>
             <div>
               <div className="dash-credits-label">Available Credits</div>

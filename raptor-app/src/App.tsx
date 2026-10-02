@@ -18,6 +18,7 @@ import CrmLayout from './layouts/CrmLayout';
 import CrmOverview from './pages/crm/CrmOverview';
 import CrmPipeline from './pages/crm/CrmPipeline';
 import CrmContacts from './pages/crm/CrmContacts';
+import CrmCompanies from './pages/crm/CrmCompanies';
 import CrmActivity from './pages/crm/CrmActivity';
 import CrmAutomations from './pages/crm/CrmAutomations';
 import CrmCampaigns from './pages/crm/CrmCampaigns';
@@ -87,6 +88,7 @@ export default function App() {
                       <Route path="overview" element={<CrmOverview />} />
                       <Route path="pipeline" element={<CrmPipeline />} />
                       <Route path="contacts" element={<CrmContacts />} />
+                      <Route path="companies" element={<CrmCompanies />} />
                       <Route path="activity" element={<CrmActivity />} />
                       <Route path="automations" element={<CrmAutomations />} />
                       <Route path="campaigns" element={<CrmCampaigns />} />
