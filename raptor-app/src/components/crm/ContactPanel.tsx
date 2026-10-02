@@ -6,6 +6,7 @@ import { toolApiBase } from '../../lib/config';
 import { findOrCreateCompany } from '../../lib/crmContacts';
 import CustomFieldsSection from './CustomFieldsSection';
 import AttachmentsSection from './AttachmentsSection';
+import OwnerOnly from '../OwnerOnly';
 
 const WHATSAPP_API = toolApiBase('whatsapp');
 
@@ -310,7 +311,7 @@ export default function ContactPanel({ contact, interactions, onClose, onChanged
               <div style={{ fontSize: '0.65rem', color: 'var(--dim)' }}>{contact.companies?.name || 'No company on file'}</div>
             </div>
             <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
-              <button
+              <OwnerOnly permission="edit"><button
                 onClick={startEditing}
                 style={{
                   background: 'transparent',
@@ -326,8 +327,8 @@ export default function ContactPanel({ contact, interactions, onClose, onChanged
                 }}
               >
                 Edit
-              </button>
-              <button
+              </button></OwnerOnly>
+              <OwnerOnly permission="delete"><button
                 onClick={handleDelete}
                 style={{
                   background: 'transparent',
@@ -343,7 +344,7 @@ export default function ContactPanel({ contact, interactions, onClose, onChanged
                 }}
               >
                 Delete
-              </button>
+              </button></OwnerOnly>
             </div>
           </div>
 

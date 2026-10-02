@@ -5,6 +5,7 @@ import { findOrCreateContact } from '../../lib/crmContacts';
 import { type PipelineStage, loadPipelineStages, stageByKey } from '../../lib/pipelineStages';
 import CustomFieldsSection from './CustomFieldsSection';
 import AttachmentsSection from './AttachmentsSection';
+import OwnerOnly from '../OwnerOnly';
 
 interface DealDetailModalProps {
   deal: any | null;
@@ -181,12 +182,16 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
       {error && <div style={{ color: 'var(--red)', fontSize: '0.65rem', marginBottom: '1rem' }}>{error}</div>}
 
       <div style={{ display: 'flex', gap: '0.7rem', marginTop: '0.4rem' }}>
-        <button type="button" style={{ ...ghostBtnStyle, color: 'var(--red)', borderColor: 'rgba(239,68,68,0.3)' }} onClick={handleDelete} disabled={saving}>
-          Delete
-        </button>
-        <button type="button" style={primaryBtnStyle} onClick={handleSave} disabled={saving}>
-          {saving ? 'Saving…' : 'Save Changes'}
-        </button>
+        <OwnerOnly permission="delete">
+          <button type="button" style={{ ...ghostBtnStyle, color: 'var(--red)', borderColor: 'rgba(239,68,68,0.3)' }} onClick={handleDelete} disabled={saving}>
+            Delete
+          </button>
+        </OwnerOnly>
+        <OwnerOnly permission="edit">
+          <button type="button" style={primaryBtnStyle} onClick={handleSave} disabled={saving}>
+            {saving ? 'Saving…' : 'Save Changes'}
+          </button>
+        </OwnerOnly>
       </div>
     </Modal>
   );

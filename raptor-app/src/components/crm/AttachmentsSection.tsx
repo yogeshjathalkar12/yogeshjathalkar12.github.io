@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { fieldLabelStyle, ghostBtnStyle } from './Modal';
 import { type Attachment, listAttachments, uploadAttachment, deleteAttachment, getSignedUrl } from '../../lib/attachments';
 import type { CustomFieldEntity } from '../../lib/customFields';
+import { useOrg } from '../../hooks/OrgContext';
+import OwnerOnly from '../OwnerOnly';
 
 function formatSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -20,6 +22,7 @@ export default function AttachmentsSection({ entityType, entityId }: Attachments
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const { orgId } = useOrg();
 
   const load = () => listAttachments(entityType, entityId).then(setFiles).catch((e) => console.error('Failed to load attachments:', e)).finally(() => setLoading(false));
 
@@ -32,7 +35,8 @@ export default function AttachmentsSection({ entityType, entityId }: Attachments
     setBusy(true);
     setError(null);
     try {
-      await uploadAttachment(entityType, entityId, file);
+      if (!orgId) throw new Error('Your organization isn’t loaded yet. Try again in a moment.');
+      await uploadAttachment(entityType, entityId, file, orgId);
       await load();
     } catch (err: any) {
       setError(err.message || 'Could not upload that file.');
@@ -70,9 +74,11 @@ export default function AttachmentsSection({ entityType, entityId }: Attachments
     <div style={{ marginTop: '1.2rem', paddingTop: '0.8rem', borderTop: '1px solid var(--border)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <label style={{ ...fieldLabelStyle, marginBottom: 0 }}>Attachments</label>
-        <button type="button" style={{ ...ghostBtnStyle, flex: 'none', fontSize: '0.5rem', padding: '0.2rem 0.6rem' }} onClick={() => fileRef.current?.click()} disabled={busy}>
-          + Upload
-        </button>
+        <OwnerOnly permission="create">
+          <button type="button" style={{ ...ghostBtnStyle, flex: 'none', fontSize: '0.5rem', padding: '0.2rem 0.6rem' }} onClick={() => fileRef.current?.click()} disabled={busy}>
+            + Upload
+          </button>
+        </OwnerOnly>
         <input type="file" ref={fileRef} onChange={handleUpload} style={{ display: 'none' }} />
       </div>
       {error && <div style={{ color: 'var(--red)', fontSize: '0.6rem', marginTop: '0.4rem' }}>{error}</div>}

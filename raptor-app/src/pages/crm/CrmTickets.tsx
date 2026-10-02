@@ -4,6 +4,7 @@ import { relativeTime } from '../../lib/crmHelpers';
 import NewTicketModal from '../../components/crm/NewTicketModal';
 import BulkImportModal from '../../components/crm/BulkImportModal';
 import ExportButton from '../../components/crm/ExportButton';
+import OwnerOnly from '../../components/OwnerOnly';
 import { TICKETS_IMPORT_SCHEMA } from '../../lib/ticketImportSchema';
 
 const PRIORITY_BADGES: Record<string, { bg: string; fg: string }> = {
@@ -144,7 +145,7 @@ export default function CrmTickets() {
             filename="support-tickets"
           />
 
-          <button
+          <OwnerOnly><button
             onClick={() => setShowImportModal(true)}
             style={{
               background: 'transparent', color: 'var(--dim)', border: '1px solid var(--border)', padding: '0.6rem 1.1rem',
@@ -153,7 +154,7 @@ export default function CrmTickets() {
             }}
           >
             Bulk Import
-          </button>
+          </button></OwnerOnly>
 
           <button
             onClick={() => setShowNewModal(true)}

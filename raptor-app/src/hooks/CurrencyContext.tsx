@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
+import { useOrg } from './OrgContext';
 import { countryByCode, setGlobalCurrency, DEFAULT_COUNTRY_CODE } from '../lib/currency';
 
 interface CurrencyContextValue {
@@ -14,6 +15,7 @@ const STORAGE_KEY = 'raptor_country';
 
 export function CurrencyProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
+  const { loading: orgLoading, status, isOwner } = useOrg();
   const [countryCode, setCountryCodeState] = useState(
     () => localStorage.getItem(STORAGE_KEY) || DEFAULT_COUNTRY_CODE
   );
@@ -30,33 +32,43 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   // Pulls the real saved preference once signed in - overrides the local
   // cache if it disagrees (e.g. a different device set it last).
   useEffect(() => {
-    if (!user) return;
+    if (!user || orgLoading || status !== 'active') return;
+    const apply = (country: string | null | undefined) => {
+      if (country) {
+        setCountryCodeState(country);
+        localStorage.setItem(STORAGE_KEY, country);
+      }
+    };
+    if (!isOwner) {
+      // Members use the organization's region (the owner's saved setting).
+      supabase.rpc('org_plan').then(({ data }) => apply(data?.country));
+      return;
+    }
     supabase
       .from('raptor_users')
       .select('country')
       .eq('user_id', user.id)
       .single()
-      .then(({ data }) => {
-        if (data?.country) {
-          setCountryCodeState(data.country);
-          localStorage.setItem(STORAGE_KEY, data.country);
-        }
-      });
-  }, [user]);
+      .then(({ data }) => apply(data?.country));
+  }, [user, orgLoading, status, isOwner]);
 
   const setCountryCode = useCallback(
     async (code: string) => {
       setCountryCodeState(code);
       localStorage.setItem(STORAGE_KEY, code);
-      if (!user) return;
+      if (!user || !isOwner) return; // only the owner changes the organization's region
       setSaving(true);
       try {
-        await supabase.from('raptor_users').update({ country: code }).eq('user_id', user.id);
+        // Users can't UPDATE raptor_users directly (that would let them edit
+        // their own plan/credits); the owner-only set_org_country() saves just
+        // this column. Falls back to the direct update until that function exists.
+        const { error } = await supabase.rpc('set_org_country', { p_country: code });
+        if (error) await supabase.from('raptor_users').update({ country: code }).eq('user_id', user.id);
       } finally {
         setSaving(false);
       }
     },
-    [user]
+    [user, isOwner]
   );
 
   return (

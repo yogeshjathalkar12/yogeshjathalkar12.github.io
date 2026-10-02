@@ -5,7 +5,9 @@ import { ToastProvider } from './hooks/ToastContext';
 import { CreditsProvider } from './hooks/CreditsContext';
 import { ThemeProvider } from './hooks/ThemeContext';
 import { CurrencyProvider } from './hooks/CurrencyContext';
+import { OrgProvider } from './hooks/OrgContext';
 import { RequireAuth } from './components/RequireAuth';
+import OrgGate from './components/OrgGate';
 import DashboardHome from './pages/DashboardHome';
 import Settings from './pages/Settings';
 import { DashboardLayout } from './layouts/DashboardLayout';
@@ -73,13 +75,14 @@ export default function App() {
     <ThemeProvider>
       <HashRouter>
         <AuthProvider>
+          <OrgProvider>
           <ToastProvider>
             <CreditsProvider>
               <CurrencyProvider>
               <NotificationsProvider>
                 <NotificationOverlay />
                 <Routes>
-                  <Route element={<RequireAuth><DashboardLayout /></RequireAuth>}>
+                  <Route element={<RequireAuth><OrgGate><DashboardLayout /></OrgGate></RequireAuth>}>
                     <Route path="/dashboard" element={<DashboardHome />} />
                     <Route path="/settings" element={<Settings />} />
 
@@ -155,6 +158,7 @@ export default function App() {
               </CurrencyProvider>
             </CreditsProvider>
           </ToastProvider>
+          </OrgProvider>
         </AuthProvider>
       </HashRouter>
     </ThemeProvider>

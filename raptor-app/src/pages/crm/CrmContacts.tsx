@@ -7,6 +7,7 @@ import ContactPanel from '../../components/crm/ContactPanel';
 import BulkImportModal from '../../components/crm/BulkImportModal';
 import ExportButton from '../../components/crm/ExportButton';
 import DuplicatesModal from '../../components/crm/DuplicatesModal';
+import OwnerOnly from '../../components/OwnerOnly';
 import { CONTACTS_IMPORT_SCHEMA } from '../../lib/importSchema';
 
 const STATUS_COLORS: Record<string, { bg: string; fg: string }> = {
@@ -143,7 +144,7 @@ export default function CrmContacts() {
             ]}
             filename="contacts"
           />
-          <button
+          <OwnerOnly permission="delete"><button
             onClick={() => setShowDuplicates(true)}
             style={{
               background: 'transparent',
@@ -159,8 +160,8 @@ export default function CrmContacts() {
             }}
           >
             Find Duplicates
-          </button>
-          <button
+          </button></OwnerOnly>
+          <OwnerOnly><button
             onClick={() => setShowImport(true)}
             style={{
               background: 'transparent',
@@ -176,8 +177,8 @@ export default function CrmContacts() {
             }}
           >
             Bulk Import
-          </button>
-          <button
+          </button></OwnerOnly>
+          <OwnerOnly permission="create"><button
             onClick={() => setShowNewContact(true)}
             style={{
               background: 'var(--grad)',
@@ -193,7 +194,7 @@ export default function CrmContacts() {
             }}
           >
             + New Contact
-          </button>
+          </button></OwnerOnly>
         </div>
       </div>
 

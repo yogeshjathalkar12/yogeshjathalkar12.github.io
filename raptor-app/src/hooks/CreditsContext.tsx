@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
+import { useOrg } from './OrgContext';
 
 interface CreditsContextValue {
   credits: number | null;
@@ -21,13 +22,28 @@ const POLL_INTERVAL_MS = 30000;
 
 export function CreditsProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
+  const { loading: orgLoading, status, isOwner } = useOrg();
   const [credits, setCredits] = useState<number | null>(null);
   const [totalCredits, setTotalCredits] = useState(50);
   const [plan, setPlan] = useState('Free');
   const [planLoaded, setPlanLoaded] = useState(false);
 
   const refresh = useCallback(async () => {
-    if (!user) return;
+    if (!user || orgLoading || status !== 'active') return;
+
+    // A member never has (or creates) a plan row of their own: they run on
+    // the organization's - the owner's row, read through org_plan().
+    if (!isOwner) {
+      const { data: orgRow } = await supabase.rpc('org_plan');
+      if (orgRow) {
+        setCredits(orgRow.credits ?? 0);
+        setTotalCredits(orgRow.total_credits ?? 50);
+        setPlan(orgRow.plan ?? 'Free');
+      }
+      setPlanLoaded(true);
+      return;
+    }
+
     const { data, error } = await supabase
       .from('raptor_users')
       .select('credits, total_credits, plan')
@@ -50,7 +66,7 @@ export function CreditsProvider({ children }: { children: ReactNode }) {
         .upsert({ user_id: user.id, email: user.email, credits: 50, total_credits: 50, plan: 'Free' });
       setPlanLoaded(true);
     }
-  }, [user]);
+  }, [user, orgLoading, status, isOwner]);
 
   useEffect(() => {
     if (!user) return;

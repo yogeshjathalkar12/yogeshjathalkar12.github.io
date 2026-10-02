@@ -1,7 +1,9 @@
 import type React from 'react';
 import { useState } from 'react';
 import { useCurrency } from '../hooks/CurrencyContext';
+import { useOrg } from '../hooks/OrgContext';
 import { COUNTRIES } from '../lib/currency';
+import TeamSection from '../components/team/TeamSection';
 
 const cardStyle: React.CSSProperties = {
   background: 'var(--surface)',
@@ -13,6 +15,7 @@ const cardStyle: React.CSSProperties = {
 
 export default function Settings() {
   const { countryCode, setCountryCode, saving } = useCurrency();
+  const { isOwner } = useOrg();
   const [justSaved, setJustSaved] = useState(false);
 
   async function handleChange(e: React.ChangeEvent<HTMLSelectElement>) {
@@ -50,7 +53,7 @@ export default function Settings() {
         <select
           value={countryCode}
           onChange={handleChange}
-          disabled={saving}
+          disabled={saving || !isOwner}
           style={{
             width: '100%',
             padding: '0.65rem 0.8rem',
@@ -74,7 +77,14 @@ export default function Settings() {
             {saving ? 'Saving…' : '✓ Saved'}
           </div>
         )}
+        {!isOwner && (
+          <div style={{ fontSize: '0.6rem', color: 'var(--dim)', marginTop: '0.8rem' }}>
+            Set by your organization&rsquo;s owner.
+          </div>
+        )}
       </div>
+
+      {isOwner && <TeamSection />}
     </div>
   );
 }

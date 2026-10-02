@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { formatCurrency } from '../../lib/crmHelpers';
 import Modal, { fieldLabelStyle, fieldInputStyle, primaryBtnStyle, ghostBtnStyle } from '../../components/crm/Modal';
 import DuplicatesModal from '../../components/crm/DuplicatesModal';
+import OwnerOnly from '../../components/OwnerOnly';
 
 // Real CRM companies (Supabase `companies` table) - this app never had a
 // dedicated page for them before (they only ever showed up as a name-join
@@ -91,18 +92,22 @@ export default function CrmCompanies() {
           style={{ flex: 1, maxWidth: 320, padding: '0.6rem 0.9rem', background: 'var(--surface2)', border: '1px solid var(--border)', color: 'var(--white)', fontFamily: 'var(--mono)', fontSize: '0.7rem', borderRadius: '4px' }}
         />
         <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
-          <button
-            onClick={() => setShowDuplicates(true)}
-            style={{ background: 'transparent', color: 'var(--dim)', border: '1px solid var(--border)', padding: '0.6rem 1.1rem', borderRadius: '4px', cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: '0.65rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}
-          >
-            Find Duplicates
-          </button>
-          <button
-            onClick={() => setShowNew(true)}
-            style={{ background: 'var(--grad)', color: '#fff', border: 'none', padding: '0.6rem 1.1rem', borderRadius: '4px', cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: '0.65rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}
-          >
-            + New Company
-          </button>
+          <OwnerOnly permission="delete">
+            <button
+              onClick={() => setShowDuplicates(true)}
+              style={{ background: 'transparent', color: 'var(--dim)', border: '1px solid var(--border)', padding: '0.6rem 1.1rem', borderRadius: '4px', cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: '0.65rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}
+            >
+              Find Duplicates
+            </button>
+          </OwnerOnly>
+          <OwnerOnly permission="create">
+            <button
+              onClick={() => setShowNew(true)}
+              style={{ background: 'var(--grad)', color: '#fff', border: 'none', padding: '0.6rem 1.1rem', borderRadius: '4px', cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: '0.65rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}
+            >
+              + New Company
+            </button>
+          </OwnerOnly>
         </div>
       </div>
 
@@ -281,8 +286,8 @@ function CompanyDetailModal({ company, contacts, deals, onClose, onChanged }: { 
           {error && <div style={{ color: 'var(--red)', fontSize: '0.65rem', margin: '1rem 0' }}>{error}</div>}
 
           <div style={{ display: 'flex', gap: '0.7rem', marginTop: '1.2rem' }}>
-            <button type="button" style={ghostBtnStyle} onClick={() => setEditing(true)}>Edit</button>
-            <button type="button" style={{ ...ghostBtnStyle, color: 'var(--red)', borderColor: 'rgba(239,68,68,0.3)' }} onClick={handleDelete} disabled={saving}>Delete</button>
+            <OwnerOnly permission="edit"><button type="button" style={ghostBtnStyle} onClick={() => setEditing(true)}>Edit</button></OwnerOnly>
+            <OwnerOnly permission="delete"><button type="button" style={{ ...ghostBtnStyle, color: 'var(--red)', borderColor: 'rgba(239,68,68,0.3)' }} onClick={handleDelete} disabled={saving}>Delete</button></OwnerOnly>
           </div>
         </>
       )}

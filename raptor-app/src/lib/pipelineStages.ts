@@ -41,6 +41,13 @@ export async function loadPipelineStages(): Promise<PipelineStage[]> {
   if (data && data.length > 0) return sortStages(data as PipelineStage[]);
 
   const { error: seedError } = await supabase.from('pipeline_stages').insert(DEFAULT_STAGES);
+  // 42501 = permission denied: a member without manage_pipeline hit an org
+  // whose owner hasn't opened the CRM yet, so there is nothing to read and
+  // they may not create it. Show the defaults read-only (same keys, so deals
+  // still land in the right column) rather than failing the page.
+  if (seedError && seedError.code === '42501') {
+    return DEFAULT_STAGES.map((s, i) => ({ ...s, id: `default-${s.key}`, owner_id: '', created_at: '', sort_order: i })) as PipelineStage[];
+  }
   if (seedError && seedError.code !== '23505') throw seedError; // 23505 = unique_violation, another tab already seeded
 
   const { data: reloaded, error: reloadError } = await supabase.from('pipeline_stages').select('*');

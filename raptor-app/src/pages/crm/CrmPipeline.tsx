@@ -6,6 +6,7 @@ import ExportButton from '../../components/crm/ExportButton';
 import LiveCallPanel from '../../components/crm/LiveCallPanel';
 import PipelineStagesModal from '../../components/crm/PipelineStagesModal';
 import DealDetailModal from '../../components/crm/DealDetailModal';
+import OwnerOnly from '../../components/OwnerOnly';
 import NewDealModal from '../../components/crm/NewDealModal';
 import { DEALS_IMPORT_SCHEMA } from '../../lib/importSchema';
 import { startCall } from '../../lib/calls';
@@ -177,7 +178,7 @@ export default function CrmPipeline() {
           ]}
           filename="deals"
         />
-        <button
+        <OwnerOnly><button
           onClick={() => setShowImport(true)}
           style={{
             background: 'transparent', color: 'var(--dim)', border: '1px solid var(--border)', padding: '0.6rem 1.1rem',
@@ -186,8 +187,8 @@ export default function CrmPipeline() {
           }}
         >
           Bulk Import
-        </button>
-        <button
+        </button></OwnerOnly>
+        <OwnerOnly permission="manage_pipeline"><button
           onClick={() => setShowStageManager(true)}
           style={{
             background: 'transparent', color: 'var(--dim)', border: '1px solid var(--border)', padding: '0.6rem 1.1rem',
@@ -196,8 +197,8 @@ export default function CrmPipeline() {
           }}
         >
           Customize Pipeline
-        </button>
-        <button
+        </button></OwnerOnly>
+        <OwnerOnly permission="create"><button
           onClick={() => setShowNewDeal(true)}
           style={{
             background: 'var(--grad)', color: '#fff', border: 'none', padding: '0.6rem 1.1rem',
@@ -206,7 +207,7 @@ export default function CrmPipeline() {
           }}
         >
           + New Deal
-        </button>
+        </button></OwnerOnly>
       </div>
 
       <div className="pipeline-board" style={{ display: 'flex', gap: '1.4rem', overflowX: 'auto', paddingBottom: '1rem', flex: 1, minHeight: 0, minWidth: 0 }}>

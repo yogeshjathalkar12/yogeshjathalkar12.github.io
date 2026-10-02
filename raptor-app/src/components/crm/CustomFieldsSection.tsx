@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { fieldLabelStyle, fieldInputStyle, ghostBtnStyle } from './Modal';
 import { type CustomFieldDef, type CustomFieldEntity, type CustomFieldType, loadFieldDefs, createFieldDef, deleteFieldDef } from '../../lib/customFields';
+import { useOrg } from '../../hooks/OrgContext';
 
 const TABLE_BY_ENTITY: Record<CustomFieldEntity, string> = { contact: 'contacts', deal: 'deals' };
 
@@ -23,6 +24,9 @@ export default function CustomFieldsSection({ entityType, entity, onChanged }: C
   const [error, setError] = useState<string | null>(null);
   const [newName, setNewName] = useState('');
   const [newType, setNewType] = useState<CustomFieldType>('text');
+  const { can } = useOrg();
+  const canManageFields = can('manage_pipeline');
+  const canEditValues = can('edit');
 
   useEffect(() => {
     loadFieldDefs(entityType).then(setDefs).catch((e) => console.error('Failed to load custom fields:', e)).finally(() => setLoading(false));
@@ -77,6 +81,7 @@ export default function CustomFieldsSection({ entityType, entity, onChanged }: C
   if (loading) return null;
 
   if (defs.length === 0 && !managing) {
+    if (!canManageFields) return null;
     return (
       <div style={{ marginTop: '0.8rem' }}>
         <button type="button" style={{ ...ghostBtnStyle, flex: 'none', fontSize: '0.55rem', padding: '0.3rem 0.7rem' }} onClick={() => setManaging(true)}>
@@ -90,9 +95,11 @@ export default function CustomFieldsSection({ entityType, entity, onChanged }: C
     <div style={{ marginTop: '1.2rem', paddingTop: '0.8rem', borderTop: '1px solid var(--border)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <label style={{ ...fieldLabelStyle, marginBottom: 0 }}>Custom fields</label>
-        <button type="button" style={{ ...ghostBtnStyle, flex: 'none', fontSize: '0.5rem', padding: '0.2rem 0.6rem' }} onClick={() => setManaging((v) => !v)}>
-          {managing ? 'Done' : 'Manage'}
-        </button>
+        {canManageFields && (
+          <button type="button" style={{ ...ghostBtnStyle, flex: 'none', fontSize: '0.5rem', padding: '0.2rem 0.6rem' }} onClick={() => setManaging((v) => !v)}>
+            {managing ? 'Done' : 'Manage'}
+          </button>
+        )}
       </div>
       {error && <div style={{ color: 'var(--red)', fontSize: '0.6rem', marginTop: '0.4rem' }}>{error}</div>}
 
@@ -104,7 +111,7 @@ export default function CustomFieldsSection({ entityType, entity, onChanged }: C
             style={{ ...fieldInputStyle, marginBottom: 0, flex: 1 }}
             value={entity.custom_fields?.[def.id] ?? ''}
             onChange={(e) => saveValue(def.id, e.target.value)}
-            disabled={saving}
+            disabled={saving || !canEditValues}
           />
           {managing && (
             <button type="button" style={{ ...ghostBtnStyle, flex: 'none', fontSize: '0.5rem', padding: '0.2rem 0.5rem' }} onClick={() => handleDeleteField(def)} disabled={saving}>✕</button>

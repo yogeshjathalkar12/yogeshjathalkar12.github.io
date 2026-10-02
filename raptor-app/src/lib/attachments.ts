@@ -34,15 +34,15 @@ export async function listAttachments(entityType: CustomFieldEntity, entityId: s
   return (data || []) as Attachment[];
 }
 
-export async function uploadAttachment(entityType: CustomFieldEntity, entityId: string, file: File): Promise<void> {
+// `orgId` (not the signed-in user's own id) is the first path segment: with
+// organizations, a member's uploads belong to the org, and the storage
+// policy checks the segment against my_org_id(). For a solo owner the two
+// are the same value.
+export async function uploadAttachment(entityType: CustomFieldEntity, entityId: string, file: File, orgId: string): Promise<void> {
   if (file.size > MAX_FILE_SIZE_BYTES) throw new Error('That file is larger than the 20MB limit.');
 
-  const { data: userData, error: userError } = await supabase.auth.getUser();
-  if (userError) throw userError;
-  const ownerId = userData.user!.id;
-
   const safeName = file.name.replace(/[^\w.-]/g, '_');
-  const storagePath = `${ownerId}/${entityType}/${entityId}/${crypto.randomUUID()}-${safeName}`;
+  const storagePath = `${orgId}/${entityType}/${entityId}/${crypto.randomUUID()}-${safeName}`;
 
   const { error: uploadError } = await supabase.storage.from(BUCKET).upload(storagePath, file, { contentType: file.type });
   if (uploadError) throw uploadError;
