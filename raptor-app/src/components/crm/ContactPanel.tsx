@@ -10,6 +10,7 @@ import OwnerOnly from '../OwnerOnly';
 import AssigneeSelect from './AssigneeSelect';
 import RecordHistory from './RecordHistory';
 import TasksSection from './TasksSection';
+import PrivacySection from './PrivacySection';
 
 const WHATSAPP_API = toolApiBase('whatsapp');
 
@@ -386,6 +387,8 @@ export default function ContactPanel({ contact, interactions, onClose, onChanged
         recordId={contact.id}
         refreshKey={[contact.updated_at, contact.assignee_id, contact.status, contact.name, contact.email, contact.phone, contact.company_id].join('|')}
       />
+
+      <PrivacySection contactId={contact.id} contactName={contact.name || ''} onErased={() => { onChanged(); onClose(); }} />
 
       {/* --- WhatsApp thread --- */}
       <div

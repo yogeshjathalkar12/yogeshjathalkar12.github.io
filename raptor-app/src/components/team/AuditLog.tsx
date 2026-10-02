@@ -14,6 +14,8 @@ const LABELS: Record<string, string> = {
   admin_granted: 'Made someone an admin',
   admin_removed: 'Removed someone’s admin access',
   ownership_transferred: 'Transferred ownership',
+  contact_exported: 'Downloaded a person’s data',
+  contact_erased: 'Erased a person permanently',
   two_factor_reset: 'Reset someone’s two-step sign-in',
   two_factor_required: 'Required two-step sign-in for everyone',
   two_factor_optional: 'Made two-step sign-in optional',
