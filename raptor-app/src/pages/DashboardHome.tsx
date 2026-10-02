@@ -5,6 +5,7 @@ import { useCredits } from '../hooks/CreditsContext';
 import { TOOLS } from '../tools/registry';
 import { supabase } from '../lib/supabaseClient';
 import { formatCurrency } from '../lib/crmHelpers';
+import MyAccessCard from '../components/team/MyAccessCard';
 
 export default function DashboardHome() {
   const { user } = useAuth();
@@ -58,6 +59,8 @@ export default function DashboardHome() {
     <div style={{ padding: '2rem' }}>
       <div className="arsenal-hero-eyebrow">ShoonyaOrigins · Raptor</div>
       <h1 className="arsenal-hero-title" style={{ marginBottom: '2rem' }}>Workspace. Welcome, {displayName}.</h1>
+
+      <MyAccessCard />
 
       <div className="arsenal-stats" style={{ marginBottom: '3rem' }}>
         <div className="arsenal-stat">

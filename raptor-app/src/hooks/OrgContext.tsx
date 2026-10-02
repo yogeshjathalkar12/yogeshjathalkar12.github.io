@@ -20,6 +20,10 @@ interface OrgContextValue {
   orgId: string | null;
   status: MemberStatus;
   isOwner: boolean;
+  /** The preset the owner started from ("Rep", "Viewer", "Manager", "Custom") - display only. */
+  preset: string | null;
+  /** The member's individual toggles (owners implicitly have everything). */
+  permissions: Partial<Record<Permission, boolean>>;
   /** True for the org owner and for members holding that permission. */
   can: (permission: Permission) => boolean;
   refresh: () => Promise<void>;
@@ -33,6 +37,7 @@ interface Membership {
   org_id: string;
   status: MemberStatus;
   is_owner: boolean;
+  preset: string | null;
   permissions: Partial<Record<Permission, boolean>>;
 }
 
@@ -98,6 +103,8 @@ export function OrgProvider({ children }: { children: ReactNode }) {
       orgId: solo || !membership ? userId : membership.org_id,
       status,
       isOwner,
+      preset: solo || !membership ? null : membership.preset ?? null,
+      permissions,
       can: (p: Permission) => isOwner || (status === 'active' && permissions[p] === true),
       refresh,
     };

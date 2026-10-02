@@ -1,17 +1,39 @@
-import type { ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../hooks/AuthContext';
 import { useOrg } from '../hooks/OrgContext';
 import AcceptInvite from './AcceptInvite';
 import { primaryBtnStyle } from './crm/Modal';
 
+// Captured when this file first loads - before Supabase has had a chance to
+// clear the sign-in tokens out of the address bar. True only when the person
+// got here by clicking the link in their invitation email, which is proof
+// they own that mailbox, so that arrival accepts the invitation by itself.
+const ARRIVED_VIA_EMAIL_LINK =
+  typeof window !== 'undefined' &&
+  /(?:^|[#&?])type=(invite|magiclink|signup)(?:&|$)/.test(window.location.hash + window.location.search);
+
 // Sits between sign-in and the app. Active members pass straight through;
-// an invited member gets the set-password screen; a removed member gets a
+// an invited member who came from the email link is accepted automatically
+// (anyone else gets a one-click confirmation); a removed member gets a
 // dead-end screen with only "Sign out".
 export default function OrgGate({ children }: { children: ReactNode }) {
-  const { loading, status } = useOrg();
+  const { loading, status, refresh } = useOrg();
   const { signOut } = useAuth();
+  const autoAccepting = useRef(false);
+  const [autoTried, setAutoTried] = useState(false);
 
-  if (loading) {
+  useEffect(() => {
+    if (loading || status !== 'invited' || !ARRIVED_VIA_EMAIL_LINK || autoAccepting.current) return;
+    autoAccepting.current = true;
+    supabase.rpc('accept_invite').then(({ error }) => {
+      if (error) console.error('Auto-accept failed:', error);
+      setAutoTried(true); // if it failed, fall through to the one-click screen
+      refresh();
+    });
+  }, [loading, status, refresh]);
+
+  if (loading || (status === 'invited' && ARRIVED_VIA_EMAIL_LINK && !autoTried)) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
         <span className="arsenal-spinner" />
