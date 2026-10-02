@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let knowledgeBase = [];
 
     // Load Knowledge Base immediately on load
-    fetch('knowledge.json')
+    fetch('/knowledge.json') // site-root file; the relative path 404s from /ventures/raptor/
         .then(res => res.json())
         .then(data => { knowledgeBase = data; })
         .catch(err => console.error("Knowledge base missing:", err));
