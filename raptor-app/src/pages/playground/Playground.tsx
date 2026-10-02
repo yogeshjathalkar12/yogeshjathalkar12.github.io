@@ -3,6 +3,7 @@ import { useAuthedFetch } from '../../hooks/useAuthedFetch';
 import { useToast } from '../../hooks/ToastContext';
 import { toolApiBase } from '../../lib/config';
 import { supabase } from '../../lib/supabaseClient';
+import { loadPipelineStages, openStageKeys } from '../../lib/pipelineStages';
 
 const PLAYGROUND_API = toolApiBase('playground');
 const CONTENT_API = toolApiBase('content'); // reuse the same saved AI keys, no separate key entry here
@@ -27,6 +28,7 @@ export default function Playground() {
   const [mode, setMode] = useState<Mode>('lead_roleplay');
   const [provider, setProvider] = useState('');
   const [dealId, setDealId] = useState('');
+  const [stageLabels, setStageLabels] = useState<Record<string, string>>({});
   const [extraContext, setExtraContext] = useState('');
   const [topic, setTopic] = useState('');
   const [starting, setStarting] = useState(false);
@@ -54,13 +56,19 @@ export default function Playground() {
   }
 
   async function loadDeals() {
-    const { data } = await supabase
+    let openKeys: string[] = [];
+    try {
+      const stageRows = await loadPipelineStages();
+      openKeys = openStageKeys(stageRows);
+      setStageLabels(Object.fromEntries(stageRows.map((st) => [st.key, st.label])));
+    } catch { /* fall back to the old won/lost filter */ }
+    let query = supabase
       .from('deals')
       .select('id, title, stage, value, companies(name), contacts(name)')
-      .neq('stage', 'won')
-      .neq('stage', 'lost')
       .order('updated_at', { ascending: false })
       .limit(50);
+    query = openKeys.length > 0 ? query.in('stage', openKeys) : query.neq('stage', 'won').neq('stage', 'lost');
+    const { data } = await query;
     setDeals(data || []);
   }
 
@@ -175,7 +183,7 @@ export default function Playground() {
                       <option value="">Select…</option>
                       {deals.map((d) => (
                         <option key={d.id} value={d.id}>
-                          {(d.contacts as any)?.name || d.title} — {(d.companies as any)?.name || ''} ({d.stage})
+                          {(d.contacts as any)?.name || d.title} — {(d.companies as any)?.name || ''} ({stageLabels[d.stage] || d.stage})
                         </option>
                       ))}
                     </select>

@@ -5,6 +5,7 @@ import { useCredits } from '../hooks/CreditsContext';
 import { TOOLS } from '../tools/registry';
 import { supabase } from '../lib/supabaseClient';
 import { formatCurrency } from '../lib/crmHelpers';
+import { type PipelineStage, loadPipelineStages, openStageKeys, stageByKey } from '../lib/pipelineStages';
 import MyAccessCard from '../components/team/MyAccessCard';
 
 export default function DashboardHome() {
@@ -13,6 +14,7 @@ export default function DashboardHome() {
   const displayName = (user?.user_metadata?.full_name || user?.email || 'User').split(' ')[0];
 
   const [activeLeads, setActiveLeads] = useState<any[]>([]);
+  const [stages, setStages] = useState<PipelineStage[]>([]);
   const [loadingLeads, setLoadingLeads] = useState(true);
 
   // Fetch all active deals from Supabase
@@ -20,7 +22,15 @@ export default function DashboardHome() {
     async function fetchActivePipeline() {
       if (!user) return;
       try {
-        const { data, error } = await supabase
+        // Stages are customizable and each has an internal key (a random id
+        // for custom ones), so the table must show the stage's NAME, and
+        // "active" means every stage of type open - not just "not won/lost".
+        let stageRows: PipelineStage[] = [];
+        try { stageRows = await loadPipelineStages(); } catch { /* fall back to the old won/lost filter */ }
+        setStages(stageRows);
+        const openKeys = openStageKeys(stageRows);
+
+        let query = supabase
           .from('deals')
           .select(`
             id,
@@ -31,9 +41,9 @@ export default function DashboardHome() {
             companies ( name ),
             contacts ( name )
           `)
-          .neq('stage', 'won')
-          .neq('stage', 'lost')
           .order('updated_at', { ascending: false });
+        query = openKeys.length > 0 ? query.in('stage', openKeys) : query.neq('stage', 'won').neq('stage', 'lost');
+        const { data, error } = await query;
 
         if (error) throw error;
         setActiveLeads(data || []);
@@ -91,7 +101,7 @@ export default function DashboardHome() {
                 <th style={{ padding: '1rem' }}>Company</th>
                 <th style={{ padding: '1rem' }}>Contact</th>
                 <th style={{ padding: '1rem' }}>Stage</th>
-                <th style={{ padding: '1rem' }}>Value (USD)</th>
+                <th style={{ padding: '1rem' }}>Value</th>
                 <th style={{ padding: '1rem' }}>Last Touch</th>
               </tr>
             </thead>
@@ -116,7 +126,7 @@ export default function DashboardHome() {
                     <td style={{ padding: '1rem' }}>{lead.contacts?.name || '—'}</td>
                     <td style={{ padding: '1rem' }}>
                       <span style={{ backgroundColor: 'var(--accent-dim)', color: 'var(--accent)', padding: '0.2rem 0.6rem', borderRadius: '12px', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                        {lead.stage}
+                        {stageByKey(stages, lead.stage)?.label || lead.stage}
                       </span>
                     </td>
                     <td style={{ padding: '1rem' }}>
