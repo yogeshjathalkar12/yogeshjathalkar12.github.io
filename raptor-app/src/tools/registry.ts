@@ -146,7 +146,7 @@ export const TOOLS: ToolMeta[] = [
     title: 'AI Content Suite —\nBring Your Own Key',
     description:
       'Write sales emails, social posts and campaign copy with your own OpenAI, Google or Anthropic account. You pay those companies directly — Raptor adds no markup — and you choose the AI model.',
-    costLabel: 'Free — uses your own AI account',
+    costLabel: 'Pro plan — uses your own AI account',
     engineLabel: 'Your own AI account',
     extraMeta: ['Your key, encrypted — never sent to us unencrypted or reused elsewhere'],
     category: 'automation',

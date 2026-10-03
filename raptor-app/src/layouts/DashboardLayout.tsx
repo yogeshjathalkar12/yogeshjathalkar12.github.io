@@ -10,7 +10,7 @@ import GlobalSearch from '../components/GlobalSearch';
 
 export function DashboardLayout() {
   const { user, signOut } = useAuth();
-  const { credits, totalCredits, plan } = useCredits();
+  const { credits, totalCredits, plan, planLoaded } = useCredits();
   const { isLight, toggle } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
@@ -26,6 +26,8 @@ export function DashboardLayout() {
   const displayName = (user?.user_metadata?.full_name || user?.email || 'User').split(' ')[0];
   const fullName = user?.user_metadata?.full_name || displayName;
   const isPro = plan.toLowerCase() === 'pro';
+  // A small "PRO" tag on the locked sections for Free accounts (hidden until the plan is known).
+  const proTag = !isPro && planLoaded ? <span style={{ marginLeft: 'auto', fontSize: '0.5rem', letterSpacing: '0.1em', padding: '0.1rem 0.35rem', borderRadius: 3, border: '1px solid var(--purple)', color: 'var(--purple)' }}>PRO</span> : null;
 
   // "Intelligence Suite" tools vs "automation" tools
   const intelligenceTools = TOOLS.filter((t) => (t.category ?? 'intelligence') === 'intelligence');
@@ -144,20 +146,20 @@ export function DashboardLayout() {
 
             <div className="dash-sidebar-section-label">Automation</div>
             <NavLink to="/email" className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
-              <span className="dash-sidebar-icon">✉</span><span>Email</span>
+              <span className="dash-sidebar-icon">✉</span><span>Email</span>{proTag}
             </NavLink>
             <NavLink to="/whatsapp" className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
-              <span className="dash-sidebar-icon">◉</span><span>WhatsApp</span>
+              <span className="dash-sidebar-icon">◉</span><span>WhatsApp</span>{proTag}
             </NavLink>
             {automationTools.map((tool) => (
               <NavLink key={tool.slug} to={tool.route} className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
-                <span className="dash-sidebar-icon">{tool.icon}</span><span>{tool.navLabel}</span>
+                <span className="dash-sidebar-icon">{tool.icon}</span><span>{tool.navLabel}</span>{proTag}
               </NavLink>
             ))}
 
             <div className="dash-sidebar-section-label">Training</div>
             <NavLink to="/playground" className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
-              <span className="dash-sidebar-icon">◆</span><span>AI Playground</span>
+              <span className="dash-sidebar-icon">◆</span><span>AI Playground</span>{proTag}
             </NavLink>
 
             <div className="dash-sidebar-section-label">Intelligence Suite</div>

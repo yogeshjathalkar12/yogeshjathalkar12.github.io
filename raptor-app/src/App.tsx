@@ -9,6 +9,7 @@ import { OrgProvider } from './hooks/OrgContext';
 import { RequireAuth } from './components/RequireAuth';
 import OrgGate from './components/OrgGate';
 import MfaGate from './components/MfaGate';
+import ProGate, { PRO_COPY } from './components/ProGate';
 import DashboardHome from './pages/DashboardHome';
 import Settings from './pages/Settings';
 import { DashboardLayout } from './layouts/DashboardLayout';
@@ -115,7 +116,7 @@ export default function App() {
                       <Route path="competitors" element={<SyncCompetitors />} />
                     </Route>
 
-                    <Route path="/email" element={<EmailLayout />}>
+                    <Route path="/email" element={<ProGate {...PRO_COPY.email}><EmailLayout /></ProGate>}>
                       <Route index element={<Navigate to="setup" replace />} />
                       <Route path="setup" element={<EmailConnectionSetup />} />
                       <Route path="campaigns" element={<EmailCampaigns />} />
@@ -127,7 +128,7 @@ export default function App() {
                       <Route path="guide" element={<EmailGuide />} />
                     </Route>
 
-                    <Route path="/whatsapp" element={<WhatsappLayout />}>
+                    <Route path="/whatsapp" element={<ProGate {...PRO_COPY.whatsapp}><WhatsappLayout /></ProGate>}>
                       <Route index element={<Navigate to="setup" replace />} />
                       <Route path="setup" element={<WaConnectionSetup />} />
                       <Route path="inbox" element={<WaInbox />} />
@@ -139,7 +140,7 @@ export default function App() {
                       <Route path="guide" element={<WhatsappGuide />} />
                     </Route>
 
-                    <Route path="/playground" element={<Playground />} />
+                    <Route path="/playground" element={<ProGate {...PRO_COPY.playground}><Playground /></ProGate>} />
 
                     {TOOLS.map((tool) => {
                       const ToolComponent = tool.component;
@@ -149,7 +150,7 @@ export default function App() {
                           path={tool.route}
                           element={
                             <Suspense fallback={<ToolFallback />}>
-                              <ToolComponent />
+                              {tool.slug === 'content' ? <ProGate {...PRO_COPY.content}><ToolComponent /></ProGate> : <ToolComponent />}
                             </Suspense>
                           }
                         />
