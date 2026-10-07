@@ -1,0 +1,921 @@
+{
+ "total": 167,
+ "groups": [
+  {
+   "id": "fit",
+   "title": "Fit with your company",
+   "blurb": "How closely the prospect matches what you sell: industry, technology, pain keywords, vocabulary and the original similarity score.",
+   "count": 12
+  },
+  {
+   "id": "trigger",
+   "title": "Buying triggers",
+   "blurb": "Signs that now is a good moment: funding, hiring, new leadership, launches, pain and growth language, one signal per phrase.",
+   "count": 59
+  },
+  {
+   "id": "size",
+   "title": "Size and maturity",
+   "blurb": "Headcount, offices, countries, age, awards, certifications and how the company talks about its customers.",
+   "count": 14
+  },
+  {
+   "id": "web",
+   "title": "Web presence",
+   "blurb": "What their site offers: pricing, blog, careers, demo buttons, live chat, API docs, case studies and social profiles.",
+   "count": 14
+  },
+  {
+   "id": "tech",
+   "title": "Technology",
+   "blurb": "The tools they use, from CRM and analytics to payments, cloud and support desks.",
+   "count": 15
+  },
+  {
+   "id": "need",
+   "title": "Needs in their own words",
+   "blurb": "The problems their text describes: manual work, scaling, cost, speed, compliance, lead generation and more.",
+   "count": 14
+  },
+  {
+   "id": "industry",
+   "title": "Industry",
+   "blurb": "What kind of business they look like, across sixteen sectors.",
+   "count": 16
+  },
+  {
+   "id": "news",
+   "title": "News",
+   "blurb": "Funding, hiring, launches, partnerships and leadership changes in the headlines, and the tone of the coverage.",
+   "count": 8
+  },
+  {
+   "id": "contact",
+   "title": "Reachability",
+   "blurb": "Whether the right person was found, how senior, and how sure Raptor is about their address.",
+   "count": 15
+  }
+ ],
+ "signals": [
+  {
+   "name": "embedding_similarity",
+   "group": "fit",
+   "description": "Closeness of their website text to your Company DNA (the original Raptor score)"
+  },
+  {
+   "name": "industry_match",
+   "group": "fit",
+   "description": "Their industry is one you target"
+  },
+  {
+   "name": "industry_mentions",
+   "group": "fit",
+   "description": "How often your target industries appear in their text"
+  },
+  {
+   "name": "tech_overlap_ratio",
+   "group": "fit",
+   "description": "Share of the tech you target that they already use"
+  },
+  {
+   "name": "tech_overlap_any",
+   "group": "fit",
+   "description": "They use at least one technology you target"
+  },
+  {
+   "name": "pain_keyword_coverage",
+   "group": "fit",
+   "description": "Share of your pain keywords that appear in their text"
+  },
+  {
+   "name": "pain_keyword_density",
+   "group": "fit",
+   "description": "How densely your pain keywords appear in their text"
+  },
+  {
+   "name": "dna_vocab_overlap",
+   "group": "fit",
+   "description": "Share of your Company DNA's distinctive words found in their text"
+  },
+  {
+   "name": "geography_match",
+   "group": "fit",
+   "description": "They mention a region you target"
+  },
+  {
+   "name": "target_title_present",
+   "group": "fit",
+   "description": "A decision maker with a title you sell to was found"
+  },
+  {
+   "name": "similarity_x_pain",
+   "group": "fit",
+   "description": "Close to your profile AND showing your pain keywords"
+  },
+  {
+   "name": "similarity_strong",
+   "group": "fit",
+   "description": "Their similarity to your profile is high (70+)"
+  },
+  {
+   "name": "trigger_funding_present",
+   "group": "trigger",
+   "description": "The trigger detector found a 'funding' signal"
+  },
+  {
+   "name": "trigger_funding_count",
+   "group": "trigger",
+   "description": "How many 'funding' mentions were found"
+  },
+  {
+   "name": "kw_funding_raised",
+   "group": "trigger",
+   "description": "'raised' appears in their text or news"
+  },
+  {
+   "name": "kw_funding_funding",
+   "group": "trigger",
+   "description": "'funding' appears in their text or news"
+  },
+  {
+   "name": "kw_funding_series_a",
+   "group": "trigger",
+   "description": "'series a' appears in their text or news"
+  },
+  {
+   "name": "kw_funding_series_b",
+   "group": "trigger",
+   "description": "'series b' appears in their text or news"
+  },
+  {
+   "name": "kw_funding_seed_round",
+   "group": "trigger",
+   "description": "'seed round' appears in their text or news"
+  },
+  {
+   "name": "kw_funding_investment",
+   "group": "trigger",
+   "description": "'investment' appears in their text or news"
+  },
+  {
+   "name": "kw_funding_backed_by",
+   "group": "trigger",
+   "description": "'backed by' appears in their text or news"
+  },
+  {
+   "name": "kw_funding_venture",
+   "group": "trigger",
+   "description": "'venture' appears in their text or news"
+  },
+  {
+   "name": "kw_funding_crore",
+   "group": "trigger",
+   "description": "'crore' appears in their text or news"
+  },
+  {
+   "name": "kw_funding_million",
+   "group": "trigger",
+   "description": "'million' appears in their text or news"
+  },
+  {
+   "name": "trigger_hiring_present",
+   "group": "trigger",
+   "description": "The trigger detector found a 'hiring' signal"
+  },
+  {
+   "name": "trigger_hiring_count",
+   "group": "trigger",
+   "description": "How many 'hiring' mentions were found"
+  },
+  {
+   "name": "kw_hiring_hiring",
+   "group": "trigger",
+   "description": "'hiring' appears in their text or news"
+  },
+  {
+   "name": "kw_hiring_we_are_growing",
+   "group": "trigger",
+   "description": "'we are growing' appears in their text or news"
+  },
+  {
+   "name": "kw_hiring_join_our_team",
+   "group": "trigger",
+   "description": "'join our team' appears in their text or news"
+  },
+  {
+   "name": "kw_hiring_open_positions",
+   "group": "trigger",
+   "description": "'open positions' appears in their text or news"
+  },
+  {
+   "name": "kw_hiring_expanding",
+   "group": "trigger",
+   "description": "'expanding' appears in their text or news"
+  },
+  {
+   "name": "kw_hiring_new_office",
+   "group": "trigger",
+   "description": "'new office' appears in their text or news"
+  },
+  {
+   "name": "kw_hiring_scaling",
+   "group": "trigger",
+   "description": "'scaling' appears in their text or news"
+  },
+  {
+   "name": "trigger_new_leadership_present",
+   "group": "trigger",
+   "description": "The trigger detector found a 'new_leadership' signal"
+  },
+  {
+   "name": "trigger_new_leadership_count",
+   "group": "trigger",
+   "description": "How many 'new_leadership' mentions were found"
+  },
+  {
+   "name": "kw_new_leadership_appointed",
+   "group": "trigger",
+   "description": "'appointed' appears in their text or news"
+  },
+  {
+   "name": "kw_new_leadership_joins_as",
+   "group": "trigger",
+   "description": "'joins as' appears in their text or news"
+  },
+  {
+   "name": "kw_new_leadership_new_ceo",
+   "group": "trigger",
+   "description": "'new ceo' appears in their text or news"
+  },
+  {
+   "name": "kw_new_leadership_new_cto",
+   "group": "trigger",
+   "description": "'new cto' appears in their text or news"
+  },
+  {
+   "name": "kw_new_leadership_new_director",
+   "group": "trigger",
+   "description": "'new director' appears in their text or news"
+  },
+  {
+   "name": "kw_new_leadership_welcomes",
+   "group": "trigger",
+   "description": "'welcomes' appears in their text or news"
+  },
+  {
+   "name": "kw_new_leadership_named_as",
+   "group": "trigger",
+   "description": "'named as' appears in their text or news"
+  },
+  {
+   "name": "kw_new_leadership_promoted_to",
+   "group": "trigger",
+   "description": "'promoted to' appears in their text or news"
+  },
+  {
+   "name": "trigger_new_product_present",
+   "group": "trigger",
+   "description": "The trigger detector found a 'new_product' signal"
+  },
+  {
+   "name": "trigger_new_product_count",
+   "group": "trigger",
+   "description": "How many 'new_product' mentions were found"
+  },
+  {
+   "name": "kw_new_product_launched",
+   "group": "trigger",
+   "description": "'launched' appears in their text or news"
+  },
+  {
+   "name": "kw_new_product_announces",
+   "group": "trigger",
+   "description": "'announces' appears in their text or news"
+  },
+  {
+   "name": "kw_new_product_introducing",
+   "group": "trigger",
+   "description": "'introducing' appears in their text or news"
+  },
+  {
+   "name": "kw_new_product_new_product",
+   "group": "trigger",
+   "description": "'new product' appears in their text or news"
+  },
+  {
+   "name": "kw_new_product_new_solution",
+   "group": "trigger",
+   "description": "'new solution' appears in their text or news"
+  },
+  {
+   "name": "kw_new_product_now_available",
+   "group": "trigger",
+   "description": "'now available' appears in their text or news"
+  },
+  {
+   "name": "kw_new_product_release",
+   "group": "trigger",
+   "description": "'release' appears in their text or news"
+  },
+  {
+   "name": "trigger_pain_signal_present",
+   "group": "trigger",
+   "description": "The trigger detector found a 'pain_signal' signal"
+  },
+  {
+   "name": "trigger_pain_signal_count",
+   "group": "trigger",
+   "description": "How many 'pain_signal' mentions were found"
+  },
+  {
+   "name": "kw_pain_signal_challenge",
+   "group": "trigger",
+   "description": "'challenge' appears in their text or news"
+  },
+  {
+   "name": "kw_pain_signal_struggle",
+   "group": "trigger",
+   "description": "'struggle' appears in their text or news"
+  },
+  {
+   "name": "kw_pain_signal_problem",
+   "group": "trigger",
+   "description": "'problem' appears in their text or news"
+  },
+  {
+   "name": "kw_pain_signal_looking_for",
+   "group": "trigger",
+   "description": "'looking for' appears in their text or news"
+  },
+  {
+   "name": "kw_pain_signal_seeking_solution",
+   "group": "trigger",
+   "description": "'seeking solution' appears in their text or news"
+  },
+  {
+   "name": "kw_pain_signal_need_help",
+   "group": "trigger",
+   "description": "'need help' appears in their text or news"
+  },
+  {
+   "name": "kw_pain_signal_difficulty",
+   "group": "trigger",
+   "description": "'difficulty' appears in their text or news"
+  },
+  {
+   "name": "trigger_growth_signal_present",
+   "group": "trigger",
+   "description": "The trigger detector found a 'growth_signal' signal"
+  },
+  {
+   "name": "trigger_growth_signal_count",
+   "group": "trigger",
+   "description": "How many 'growth_signal' mentions were found"
+  },
+  {
+   "name": "kw_growth_signal_expanded",
+   "group": "trigger",
+   "description": "'expanded' appears in their text or news"
+  },
+  {
+   "name": "kw_growth_signal_growing",
+   "group": "trigger",
+   "description": "'growing' appears in their text or news"
+  },
+  {
+   "name": "kw_growth_signal_record_revenue",
+   "group": "trigger",
+   "description": "'record revenue' appears in their text or news"
+  },
+  {
+   "name": "kw_growth_signal_milestone",
+   "group": "trigger",
+   "description": "'milestone' appears in their text or news"
+  },
+  {
+   "name": "kw_growth_signal_achievement",
+   "group": "trigger",
+   "description": "'achievement' appears in their text or news"
+  },
+  {
+   "name": "kw_growth_signal_award",
+   "group": "trigger",
+   "description": "'award' appears in their text or news"
+  },
+  {
+   "name": "kw_growth_signal_recognition",
+   "group": "trigger",
+   "description": "'recognition' appears in their text or news"
+  },
+  {
+   "name": "trigger_score",
+   "group": "trigger",
+   "description": "The trigger detector's overall score"
+  },
+  {
+   "name": "employees_mentioned",
+   "group": "size",
+   "description": "States a headcount ('120 employees', '50+ people')"
+  },
+  {
+   "name": "employee_scale",
+   "group": "size",
+   "description": "The headcount they state, on a log scale"
+  },
+  {
+   "name": "offices_mentioned",
+   "group": "size",
+   "description": "Mentions several offices or locations"
+  },
+  {
+   "name": "countries_mentioned",
+   "group": "size",
+   "description": "Number of countries named in their text"
+  },
+  {
+   "name": "founded_recent",
+   "group": "size",
+   "description": "Founded recently (younger companies buy faster)"
+  },
+  {
+   "name": "founded_stated",
+   "group": "size",
+   "description": "States when it was founded"
+  },
+  {
+   "name": "enterprise_language",
+   "group": "size",
+   "description": "Uses enterprise language (enterprise, fortune 500, global, multinational)"
+  },
+  {
+   "name": "startup_language",
+   "group": "size",
+   "description": "Uses startup language (startup, early-stage, founded by, disrupt)"
+  },
+  {
+   "name": "customers_mentioned",
+   "group": "size",
+   "description": "Talks about its customers or clients"
+  },
+  {
+   "name": "trusted_by_logos",
+   "group": "size",
+   "description": "Shows who trusts them ('trusted by', 'our clients include')"
+  },
+  {
+   "name": "certifications",
+   "group": "size",
+   "description": "Lists certifications (ISO, SOC 2, GDPR, HIPAA)"
+  },
+  {
+   "name": "awards_mentioned",
+   "group": "size",
+   "description": "Mentions awards or recognition"
+  },
+  {
+   "name": "revenue_language",
+   "group": "size",
+   "description": "Mentions revenue, turnover or valuation"
+  },
+  {
+   "name": "partnerships_mentioned",
+   "group": "size",
+   "description": "Mentions partners or alliances"
+  },
+  {
+   "name": "text_length",
+   "group": "web",
+   "description": "How much text the site gave (log scale)"
+  },
+  {
+   "name": "pages_scanned",
+   "group": "web",
+   "description": "How many of their pages Raptor could read (from the cached site scan)"
+  },
+  {
+   "name": "has_pricing",
+   "group": "web",
+   "description": "Has a pricing page or talks about pricing and plans"
+  },
+  {
+   "name": "has_blog",
+   "group": "web",
+   "description": "Publishes a blog or articles"
+  },
+  {
+   "name": "has_careers",
+   "group": "web",
+   "description": "Has a careers page or open roles"
+  },
+  {
+   "name": "has_contact_page",
+   "group": "web",
+   "description": "Has a contact page"
+  },
+  {
+   "name": "has_demo_cta",
+   "group": "web",
+   "description": "Offers a demo or a call to book"
+  },
+  {
+   "name": "has_chat_widget",
+   "group": "web",
+   "description": "Has live chat or a chatbot"
+  },
+  {
+   "name": "has_api_docs",
+   "group": "web",
+   "description": "Has developer docs or an API"
+  },
+  {
+   "name": "has_integrations",
+   "group": "web",
+   "description": "Lists integrations"
+  },
+  {
+   "name": "has_case_studies",
+   "group": "web",
+   "description": "Publishes case studies"
+  },
+  {
+   "name": "has_testimonials",
+   "group": "web",
+   "description": "Shows testimonials or reviews"
+  },
+  {
+   "name": "social_presence",
+   "group": "web",
+   "description": "Links to social profiles"
+  },
+  {
+   "name": "https_site",
+   "group": "web",
+   "description": "The site is served over https"
+  },
+  {
+   "name": "tech_crm",
+   "group": "tech",
+   "description": "Uses crm tools (from tech stack or text)"
+  },
+  {
+   "name": "tech_marketing_automation",
+   "group": "tech",
+   "description": "Uses marketing automation tools (from tech stack or text)"
+  },
+  {
+   "name": "tech_analytics",
+   "group": "tech",
+   "description": "Uses analytics tools (from tech stack or text)"
+  },
+  {
+   "name": "tech_ecommerce",
+   "group": "tech",
+   "description": "Uses ecommerce tools (from tech stack or text)"
+  },
+  {
+   "name": "tech_cms",
+   "group": "tech",
+   "description": "Uses cms tools (from tech stack or text)"
+  },
+  {
+   "name": "tech_cloud",
+   "group": "tech",
+   "description": "Uses cloud tools (from tech stack or text)"
+  },
+  {
+   "name": "tech_payments",
+   "group": "tech",
+   "description": "Uses payments tools (from tech stack or text)"
+  },
+  {
+   "name": "tech_support_desk",
+   "group": "tech",
+   "description": "Uses support desk tools (from tech stack or text)"
+  },
+  {
+   "name": "tech_dev_tools",
+   "group": "tech",
+   "description": "Uses dev tools tools (from tech stack or text)"
+  },
+  {
+   "name": "tech_ai_ml",
+   "group": "tech",
+   "description": "Uses ai ml tools (from tech stack or text)"
+  },
+  {
+   "name": "tech_erp",
+   "group": "tech",
+   "description": "Uses erp tools (from tech stack or text)"
+  },
+  {
+   "name": "tech_comms",
+   "group": "tech",
+   "description": "Uses comms tools (from tech stack or text)"
+  },
+  {
+   "name": "tech_stack_size",
+   "group": "tech",
+   "description": "How many technologies were detected"
+  },
+  {
+   "name": "tech_stack_known",
+   "group": "tech",
+   "description": "A tech stack was detected at all"
+  },
+  {
+   "name": "tech_diversity",
+   "group": "tech",
+   "description": "How many different kinds of tool they use"
+  },
+  {
+   "name": "need_manual_work",
+   "group": "need",
+   "description": "Their text talks about manual work"
+  },
+  {
+   "name": "need_scaling",
+   "group": "need",
+   "description": "Their text talks about scaling"
+  },
+  {
+   "name": "need_cost_pressure",
+   "group": "need",
+   "description": "Their text talks about cost pressure"
+  },
+  {
+   "name": "need_speed",
+   "group": "need",
+   "description": "Their text talks about speed"
+  },
+  {
+   "name": "need_quality",
+   "group": "need",
+   "description": "Their text talks about quality"
+  },
+  {
+   "name": "need_compliance",
+   "group": "need",
+   "description": "Their text talks about compliance"
+  },
+  {
+   "name": "need_sales_hiring",
+   "group": "need",
+   "description": "Their text talks about sales hiring"
+  },
+  {
+   "name": "need_lead_generation",
+   "group": "need",
+   "description": "Their text talks about lead generation"
+  },
+  {
+   "name": "need_retention",
+   "group": "need",
+   "description": "Their text talks about retention"
+  },
+  {
+   "name": "need_analytics_gap",
+   "group": "need",
+   "description": "Their text talks about analytics gap"
+  },
+  {
+   "name": "need_integration_pain",
+   "group": "need",
+   "description": "Their text talks about integration pain"
+  },
+  {
+   "name": "need_productivity",
+   "group": "need",
+   "description": "Their text talks about productivity"
+  },
+  {
+   "name": "need_automation_intent",
+   "group": "need",
+   "description": "Their text talks about automation intent"
+  },
+  {
+   "name": "need_digital_transformation",
+   "group": "need",
+   "description": "Their text talks about digital transformation"
+  },
+  {
+   "name": "industry_saas",
+   "group": "industry",
+   "description": "Looks like a saas business"
+  },
+  {
+   "name": "industry_ecommerce",
+   "group": "industry",
+   "description": "Looks like a ecommerce business"
+  },
+  {
+   "name": "industry_manufacturing",
+   "group": "industry",
+   "description": "Looks like a manufacturing business"
+  },
+  {
+   "name": "industry_healthcare",
+   "group": "industry",
+   "description": "Looks like a healthcare business"
+  },
+  {
+   "name": "industry_fintech",
+   "group": "industry",
+   "description": "Looks like a fintech business"
+  },
+  {
+   "name": "industry_education",
+   "group": "industry",
+   "description": "Looks like a education business"
+  },
+  {
+   "name": "industry_logistics",
+   "group": "industry",
+   "description": "Looks like a logistics business"
+  },
+  {
+   "name": "industry_real_estate",
+   "group": "industry",
+   "description": "Looks like a real estate business"
+  },
+  {
+   "name": "industry_agency",
+   "group": "industry",
+   "description": "Looks like a agency business"
+  },
+  {
+   "name": "industry_retail",
+   "group": "industry",
+   "description": "Looks like a retail business"
+  },
+  {
+   "name": "industry_hospitality",
+   "group": "industry",
+   "description": "Looks like a hospitality business"
+  },
+  {
+   "name": "industry_consulting",
+   "group": "industry",
+   "description": "Looks like a consulting business"
+  },
+  {
+   "name": "industry_construction",
+   "group": "industry",
+   "description": "Looks like a construction business"
+  },
+  {
+   "name": "industry_energy",
+   "group": "industry",
+   "description": "Looks like a energy business"
+  },
+  {
+   "name": "industry_telecom",
+   "group": "industry",
+   "description": "Looks like a telecom business"
+  },
+  {
+   "name": "industry_media",
+   "group": "industry",
+   "description": "Looks like a media business"
+  },
+  {
+   "name": "news_count",
+   "group": "news",
+   "description": "How many news items were found"
+  },
+  {
+   "name": "news_funding",
+   "group": "news",
+   "description": "Headlines about funding"
+  },
+  {
+   "name": "news_hiring",
+   "group": "news",
+   "description": "Headlines about hiring or expansion"
+  },
+  {
+   "name": "news_product",
+   "group": "news",
+   "description": "Headlines about launches"
+  },
+  {
+   "name": "news_partnership",
+   "group": "news",
+   "description": "Headlines about partnerships or acquisitions"
+  },
+  {
+   "name": "news_leadership",
+   "group": "news",
+   "description": "Headlines about leadership changes"
+  },
+  {
+   "name": "news_positive_tone",
+   "group": "news",
+   "description": "Positive words in headlines (award, record, growth, wins)"
+  },
+  {
+   "name": "news_negative_tone",
+   "group": "news",
+   "description": "Negative words in headlines (layoffs, lawsuit, loss, shutdown)"
+  },
+  {
+   "name": "people_found",
+   "group": "contact",
+   "description": "How many decision makers were found"
+  },
+  {
+   "name": "has_founder_ceo",
+   "group": "contact",
+   "description": "A founder, owner or CEO was found"
+  },
+  {
+   "name": "has_cto",
+   "group": "contact",
+   "description": "A CTO or technology head was found"
+  },
+  {
+   "name": "has_sales_head",
+   "group": "contact",
+   "description": "A sales or revenue leader was found"
+  },
+  {
+   "name": "has_marketing_head",
+   "group": "contact",
+   "description": "A marketing leader was found"
+  },
+  {
+   "name": "has_ops_head",
+   "group": "contact",
+   "description": "An operations leader was found"
+  },
+  {
+   "name": "best_seniority",
+   "group": "contact",
+   "description": "Seniority of the most senior person found"
+  },
+  {
+   "name": "linkedin_profiles",
+   "group": "contact",
+   "description": "How many LinkedIn profiles were found for them"
+  },
+  {
+   "name": "email_published",
+   "group": "contact",
+   "description": "The chosen address is published on their own site"
+  },
+  {
+   "name": "email_inferred",
+   "group": "contact",
+   "description": "The chosen address was inferred from their pattern"
+  },
+  {
+   "name": "email_guessed",
+   "group": "contact",
+   "description": "The chosen address is a guess"
+  },
+  {
+   "name": "mail_server_checked",
+   "group": "contact",
+   "description": "Their domain's mail server was checked"
+  },
+  {
+   "name": "named_contact",
+   "group": "contact",
+   "description": "The contact is a named person, not a generic inbox"
+  },
+  {
+   "name": "phone_published",
+   "group": "contact",
+   "description": "They publish a phone number"
+  },
+  {
+   "name": "whatsapp_link",
+   "group": "contact",
+   "description": "They publish a WhatsApp chat link"
+  }
+ ],
+ "model": {
+  "event_types": [
+   "pitch",
+   "reply_engaged",
+   "reply_positive",
+   "opt_out",
+   "bounce",
+   "meeting"
+  ],
+  "channels": [
+   "email",
+   "linkedin",
+   "whatsapp"
+  ],
+  "day_groups": [
+   "early_week",
+   "mid_week",
+   "late_week"
+  ],
+  "max_history": 8,
+  "hidden_units": 12,
+  "min_prospects": 40,
+  "min_positives": 8,
+  "min_auc": 0.6
+ }
+}

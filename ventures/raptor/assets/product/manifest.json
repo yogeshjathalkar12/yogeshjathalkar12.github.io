@@ -1,0 +1,41 @@
+{
+ "note": "Steps appear only when their real screenshot file exists in this folder. Nothing is drawn or mocked. See docs/marketing-screenshots.md in the desktop repo for the shot list.",
+ "steps": [
+  {
+   "file": "autopilot-settings.png",
+   "title": "Choose how much it does",
+   "where": "Email > Autopilot",
+   "caption": "Switch between approving every message yourself and letting Raptor send to addresses companies published. Set daily budgets, follow-ups, and whether it may prepare LinkedIn and WhatsApp messages."
+  },
+  {
+   "file": "autopilot-approvals.png",
+   "title": "Review what it wrote",
+   "where": "Email > Autopilot",
+   "caption": "Every message waits here in approval mode, with the address, the reason it was held and the full text. Approve or reject each one."
+  },
+  {
+   "file": "prospects.png",
+   "title": "See who it chose, and why",
+   "where": "Email > Prospects",
+   "caption": "One row per prospect: the contact Raptor picked, whether the address was published, inferred or guessed, where it came from, and where each channel stands."
+  },
+  {
+   "file": "replies.png",
+   "title": "Answer with a draft ready",
+   "where": "Email > Replies",
+   "caption": "Each reply is sorted by what it needs from you, with a draft written from your company facts only. Edit it, send it, or offer real times from your calendar."
+  },
+  {
+   "file": "scoring-model.png",
+   "title": "See how it scores",
+   "where": "Email > Autopilot",
+   "caption": "How many signals Raptor reads, whether it is on starting weights or has learned from your outcomes, and how far it is from enough results to learn."
+  },
+  {
+   "file": "domain-health.png",
+   "title": "Check your sending domain",
+   "where": "Email > Mailbox",
+   "caption": "A read-only check of SPF, DKIM, DMARC and mail servers for the domain you send from, with what to fix."
+  }
+ ]
+}

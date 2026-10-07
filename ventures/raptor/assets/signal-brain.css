@@ -1,0 +1,53 @@
+/* Raptor signal brain: layout for the 3D signal explorer on the Prospect Scoring Engine page. */
+.sb { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(260px, 1fr); gap: 20px; margin-top: 18px; align-items: start; }
+.sb-stage { position: relative; height: 560px; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: radial-gradient(ellipse at 50% 40%, rgba(124, 58, 237, 0.10), transparent 62%), var(--surface); }
+body.dark-mode .sb-stage { background: radial-gradient(ellipse at 50% 40%, rgba(168, 85, 247, 0.18), transparent 62%), #0d0814; }
+.sb-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: pan-y; cursor: grab; }
+.sb-stage:not(.sb-idle) canvas { touch-action: none; }
+.sb-labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.sb-label { font: 500 11px/1.25 'DM Mono', monospace; color: var(--white); text-align: center; white-space: nowrap; text-shadow: 0 0 6px var(--black); }
+.sb-label b { display: block; font-weight: 500; color: var(--c, var(--white)); letter-spacing: .02em; }
+.sb-label span { display: block; opacity: .7; font-size: 10px; }
+.sb-core b { color: #a855f7; }
+.sb-event { font-size: 9.5px; opacity: .85; }
+.sb-ringhead { opacity: .85; }
+.sb-hint { position: absolute; left: 12px; top: 10px; font: 400 11px 'DM Mono', monospace; color: var(--dim); pointer-events: none; }
+.sb-idle .sb-hint { display: none; }
+.sb-tip { position: absolute; max-width: 220px; padding: 6px 9px; border-radius: 6px; background: var(--white); color: var(--black); font: 400 12px/1.35 'DM Mono', monospace; pointer-events: none; z-index: 3; }
+.sb-activate { position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 34px; gap: 6px; background: transparent; border: 0; cursor: pointer; color: var(--white); }
+.sb-activate span { padding: 10px 18px; border-radius: 999px; background: var(--grad); color: #fff; font: 500 13px 'DM Mono', monospace; letter-spacing: .06em; text-transform: uppercase; box-shadow: 0 6px 24px rgba(109, 40, 217, .35); }
+.sb-activate small { font: 400 11px 'DM Mono', monospace; color: var(--dim); }
+.sb-done { position: absolute; top: 10px; right: 10px; z-index: 2; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--card, rgba(127, 127, 127, 0.07)); color: var(--white); font: 400 11px 'DM Mono', monospace; cursor: pointer; }
+.sb-loading, .sb-fail { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 24px; color: var(--dim); font: 400 13px 'DM Mono', monospace; }
+.sb-ready .sb-loading { display: none; }
+.sb-side { display: flex; flex-direction: column; gap: 12px; }
+.sb-card { border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; background: var(--card, rgba(127, 127, 127, 0.07)); }
+.sb-card h3 { margin: 0 0 8px; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); font-weight: 500; }
+.sb-search { width: 100%; padding: 9px 11px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--white); font: 400 13px 'DM Mono', monospace; }
+.sb-count { margin-top: 6px; font: 400 11px 'DM Mono', monospace; color: var(--dim); }
+.sb-legend { display: flex; flex-wrap: wrap; gap: 6px; }
+.sb-legend button { display: inline-flex; align-items: center; gap: 6px; padding: 5px 9px; border-radius: 999px; border: 1px solid var(--border); background: transparent; color: var(--white); font: 400 11px 'DM Mono', monospace; cursor: pointer; }
+.sb-legend button[aria-pressed="true"] { border-color: var(--purple); background: rgba(124, 58, 237, .12); }
+.sb-legend i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.sb-legend small { opacity: .55; }
+.sb-detail h4 { margin: 0 0 8px; font-size: 15px; line-height: 1.3; font-weight: 600; }
+.sb-detail p { margin: 0 0 8px; font-size: 13px; line-height: 1.55; color: var(--text2, var(--dim)); }
+.sb-detail .sb-small { font-size: 12px; color: var(--dim); }
+.sb-detail code { font: 400 11px 'DM Mono', monospace; word-break: break-all; }
+.sb-reset { align-self: flex-start; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--white); font: 400 11px 'DM Mono', monospace; cursor: pointer; }
+.sb-list { margin-top: 16px; border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; background: var(--card, rgba(127, 127, 127, 0.07)); }
+.sb-list summary { cursor: pointer; font: 500 13px 'DM Mono', monospace; }
+.sb-list h4 { margin: 16px 0 4px; font-size: 13px; }
+.sb-list ul { margin: 0; padding-left: 18px; columns: 2; column-gap: 28px; font-size: 12.5px; line-height: 1.6; color: var(--text2, var(--dim)); }
+.sb-list li { break-inside: avoid; }
+.sb-note { margin-top: 10px; font-size: 12px; color: var(--dim); }
+@media (max-width: 900px) { .sb { grid-template-columns: 1fr; } .sb-stage { height: 440px; } .sb-list ul { columns: 1; } }
+@media (prefers-reduced-motion: reduce) { .sb-activate span { box-shadow: none; } }
+
+/* SB-HIDDEN-FIX: author `display` rules beat the [hidden] attribute, which left the (transparent) start button covering the whole
+   map after it was clicked, so every drag and click was swallowed by it. Hidden must always mean hidden. */
+.sb [hidden] { display: none !important; }
+.sb-stage:not(.sb-idle) .sb-activate { display: none !important; }
+.sb-stage.sb-idle .sb-done { display: none !important; }
+.sb-stage.sb-ready .sb-loading { display: none !important; }
+.sb-stage:not(.sb-failed) .sb-fail { display: none !important; }

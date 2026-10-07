@@ -1,0 +1,24 @@
+/* Raptor page backdrop: the signal structure, faint, behind the content, with an on/off button. See signal-bg.js. */
+.sb-bg {
+  position: fixed; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;
+  opacity: 0; transition: opacity 0.9s ease;
+}
+.sb-bg.on { opacity: 0.30; }
+body.dark-mode .sb-bg.on { opacity: 0.42; }
+
+.sb-bg-toggle {
+  position: fixed; left: 16px; bottom: 16px; z-index: 90; display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 14px; border-radius: 999px; cursor: pointer; font: 500 11.5px 'DM Mono', ui-monospace, monospace; letter-spacing: 0.02em;
+  color: var(--white); background: var(--surface); border: 1px solid var(--border);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); opacity: 0.9;
+}
+.sb-bg-toggle:hover { opacity: 1; }
+.sb-bg-toggle:focus-visible { outline: 2px solid var(--purple); outline-offset: 2px; }
+.sb-bg-toggle i { width: 8px; height: 8px; border-radius: 50%; background: var(--dim); display: inline-block; }
+.sb-bg-toggle[aria-pressed="true"] i { background: var(--purple); box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.22); }
+
+/* Three home-page sections paint an opaque background. While the backdrop is on, let it show through them a little. */
+body.has-3d-bg .cap-section, body.has-3d-bg .loop-section, body.has-3d-bg .who-section { background: color-mix(in srgb, var(--surface) 58%, transparent); }
+
+@media (max-width: 600px) { .sb-bg-toggle { left: 10px; bottom: 10px; } }
+@media print { .sb-bg, .sb-bg-toggle { display: none; } }

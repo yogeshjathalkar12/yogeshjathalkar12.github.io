@@ -140,9 +140,20 @@
      ═══════════════════════════════════════════════════ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <link rel="icon" type="image/x-icon" href="icon.ico">
+<!-- SIGNAL-BRAIN-HEAD:START -->
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.171.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.171.0/examples/jsm/"}}</script>
+<link rel="stylesheet" href="/ventures/raptor/assets/signal-brain.css?v=10">
+<!-- SIGNAL-BRAIN-HEAD:END -->
+<!-- SB-BG-HEAD:START -->
+<link rel="stylesheet" href="/ventures/raptor/assets/signal-bg.css?v=1">
+<!-- SB-BG-HEAD:END -->
 </head>
 <body>
 <script>try{if(localStorage.getItem('raptor-theme')==='dark')document.body.classList.add('dark-mode')}catch(e){}</script>
+<!-- SB-BG:START -->
+<canvas class="sb-bg" id="sb-bg-canvas" aria-hidden="true"></canvas>
+<button type="button" class="sb-bg-toggle" id="sb-bg-toggle" aria-pressed="true" title="Show or hide the slowly turning 3D backdrop"><i></i><span>3D backdrop: on</span></button>
+<!-- SB-BG:END -->
 
 <!-- TRUST BAR: crawlable, conversion-boosting signal -->
 <div class="trust-bar">
@@ -355,6 +366,51 @@
     <div class="ticker-item"><span class="ticker-word">Competitive Intelligence</span><span class="ticker-dot"></span></div>
   </div>
 </div>
+
+<!-- SIGNAL-BRAIN:START -->
+<div class="cap-section" id="signal-brain">
+  <div class="cap-inner">
+    <div class="cap-header">
+      <div>
+        <div class="label reveal">See What Raptor Reads</div>
+        <h2 class="big-title reveal">167 Signals.<br><em>One Map.</em></h2>
+      </div>
+      <p class="prose reveal">Every point is something Raptor measures about a prospect. Rotate it, search it, click any point to see exactly what it means. This is the real list from the product, not an illustration: there are no scores or prospects on it. <a href="/ventures/raptor/features/prospect-scoring-engine.html">How the scoring engine works &rarr;</a></p>
+    </div>
+    <div class="sb" id="sb">
+    <div class="sb-stage sb-idle" id="sb-stage">
+      <canvas id="sb-canvas" role="img" aria-label="Interactive 3D map of the 167 signals Raptor reads about a prospect, in nine groups. Drag to rotate, scroll to zoom. The full list is below."></canvas>
+      <div class="sb-loading" id="sb-loading">Loading the signal map&hellip;</div>
+      <div class="sb-fail" id="sb-fail" hidden><div data-msg></div></div>
+      <div class="sb-tip" id="sb-tip" hidden></div>
+      <button class="sb-activate" id="sb-activate" type="button"><span>Click to explore in 3D</span><small>Drag to rotate &middot; scroll to zoom &middot; click a point</small></button>
+      <button class="sb-done" id="sb-done" type="button" hidden>Done</button>
+      <div class="sb-hint">Esc to let go of the map</div>
+    </div>
+    <div class="sb-side">
+      <div class="sb-card"><h3>Find a signal</h3><input class="sb-search" id="sb-search" type="search" placeholder="e.g. funding, hiring, pricing" autocomplete="off" aria-label="Search signals"><div class="sb-count" id="sb-count">167 signals</div></div>
+      <div class="sb-card"><h3>Groups</h3><div class="sb-legend" id="sb-legend"></div></div>
+      <div class="sb-card sb-detail" id="sb-detail"></div>
+      <button class="sb-reset" id="sb-reset" type="button">Reset view</button>
+    </div>
+  </div>
+  <noscript><p class="sb-note">The 3D map needs JavaScript and WebGL. The complete list is below.</p></noscript>
+  <details class="sb-list"><summary>Read all 167 signals as a list</summary><h4>Fit with your company (12)</h4><ul><li>Closeness of their website text to your Company DNA (the original Raptor score)</li><li>Their industry is one you target</li><li>How often your target industries appear in their text</li><li>Share of the tech you target that they already use</li><li>They use at least one technology you target</li><li>Share of your pain keywords that appear in their text</li><li>How densely your pain keywords appear in their text</li><li>Share of your Company DNA&#x27;s distinctive words found in their text</li><li>They mention a region you target</li><li>A decision maker with a title you sell to was found</li><li>Close to your profile AND showing your pain keywords</li><li>Their similarity to your profile is high (70+)</li></ul><h4>Buying triggers (59)</h4><ul><li>The trigger detector found a &#x27;funding&#x27; signal</li><li>How many &#x27;funding&#x27; mentions were found</li><li>&#x27;raised&#x27; appears in their text or news</li><li>&#x27;funding&#x27; appears in their text or news</li><li>&#x27;series a&#x27; appears in their text or news</li><li>&#x27;series b&#x27; appears in their text or news</li><li>&#x27;seed round&#x27; appears in their text or news</li><li>&#x27;investment&#x27; appears in their text or news</li><li>&#x27;backed by&#x27; appears in their text or news</li><li>&#x27;venture&#x27; appears in their text or news</li><li>&#x27;crore&#x27; appears in their text or news</li><li>&#x27;million&#x27; appears in their text or news</li><li>The trigger detector found a &#x27;hiring&#x27; signal</li><li>How many &#x27;hiring&#x27; mentions were found</li><li>&#x27;hiring&#x27; appears in their text or news</li><li>&#x27;we are growing&#x27; appears in their text or news</li><li>&#x27;join our team&#x27; appears in their text or news</li><li>&#x27;open positions&#x27; appears in their text or news</li><li>&#x27;expanding&#x27; appears in their text or news</li><li>&#x27;new office&#x27; appears in their text or news</li><li>&#x27;scaling&#x27; appears in their text or news</li><li>The trigger detector found a &#x27;new_leadership&#x27; signal</li><li>How many &#x27;new_leadership&#x27; mentions were found</li><li>&#x27;appointed&#x27; appears in their text or news</li><li>&#x27;joins as&#x27; appears in their text or news</li><li>&#x27;new ceo&#x27; appears in their text or news</li><li>&#x27;new cto&#x27; appears in their text or news</li><li>&#x27;new director&#x27; appears in their text or news</li><li>&#x27;welcomes&#x27; appears in their text or news</li><li>&#x27;named as&#x27; appears in their text or news</li><li>&#x27;promoted to&#x27; appears in their text or news</li><li>The trigger detector found a &#x27;new_product&#x27; signal</li><li>How many &#x27;new_product&#x27; mentions were found</li><li>&#x27;launched&#x27; appears in their text or news</li><li>&#x27;announces&#x27; appears in their text or news</li><li>&#x27;introducing&#x27; appears in their text or news</li><li>&#x27;new product&#x27; appears in their text or news</li><li>&#x27;new solution&#x27; appears in their text or news</li><li>&#x27;now available&#x27; appears in their text or news</li><li>&#x27;release&#x27; appears in their text or news</li><li>The trigger detector found a &#x27;pain_signal&#x27; signal</li><li>How many &#x27;pain_signal&#x27; mentions were found</li><li>&#x27;challenge&#x27; appears in their text or news</li><li>&#x27;struggle&#x27; appears in their text or news</li><li>&#x27;problem&#x27; appears in their text or news</li><li>&#x27;looking for&#x27; appears in their text or news</li><li>&#x27;seeking solution&#x27; appears in their text or news</li><li>&#x27;need help&#x27; appears in their text or news</li><li>&#x27;difficulty&#x27; appears in their text or news</li><li>The trigger detector found a &#x27;growth_signal&#x27; signal</li><li>How many &#x27;growth_signal&#x27; mentions were found</li><li>&#x27;expanded&#x27; appears in their text or news</li><li>&#x27;growing&#x27; appears in their text or news</li><li>&#x27;record revenue&#x27; appears in their text or news</li><li>&#x27;milestone&#x27; appears in their text or news</li><li>&#x27;achievement&#x27; appears in their text or news</li><li>&#x27;award&#x27; appears in their text or news</li><li>&#x27;recognition&#x27; appears in their text or news</li><li>The trigger detector&#x27;s overall score</li></ul><h4>Size and maturity (14)</h4><ul><li>States a headcount (&#x27;120 employees&#x27;, &#x27;50+ people&#x27;)</li><li>The headcount they state, on a log scale</li><li>Mentions several offices or locations</li><li>Number of countries named in their text</li><li>Founded recently (younger companies buy faster)</li><li>States when it was founded</li><li>Uses enterprise language (enterprise, fortune 500, global, multinational)</li><li>Uses startup language (startup, early-stage, founded by, disrupt)</li><li>Talks about its customers or clients</li><li>Shows who trusts them (&#x27;trusted by&#x27;, &#x27;our clients include&#x27;)</li><li>Lists certifications (ISO, SOC 2, GDPR, HIPAA)</li><li>Mentions awards or recognition</li><li>Mentions revenue, turnover or valuation</li><li>Mentions partners or alliances</li></ul><h4>Web presence (14)</h4><ul><li>How much text the site gave (log scale)</li><li>How many of their pages Raptor could read (from the cached site scan)</li><li>Has a pricing page or talks about pricing and plans</li><li>Publishes a blog or articles</li><li>Has a careers page or open roles</li><li>Has a contact page</li><li>Offers a demo or a call to book</li><li>Has live chat or a chatbot</li><li>Has developer docs or an API</li><li>Lists integrations</li><li>Publishes case studies</li><li>Shows testimonials or reviews</li><li>Links to social profiles</li><li>The site is served over https</li></ul><h4>Technology (15)</h4><ul><li>Uses crm tools (from tech stack or text)</li><li>Uses marketing automation tools (from tech stack or text)</li><li>Uses analytics tools (from tech stack or text)</li><li>Uses ecommerce tools (from tech stack or text)</li><li>Uses cms tools (from tech stack or text)</li><li>Uses cloud tools (from tech stack or text)</li><li>Uses payments tools (from tech stack or text)</li><li>Uses support desk tools (from tech stack or text)</li><li>Uses dev tools tools (from tech stack or text)</li><li>Uses ai ml tools (from tech stack or text)</li><li>Uses erp tools (from tech stack or text)</li><li>Uses comms tools (from tech stack or text)</li><li>How many technologies were detected</li><li>A tech stack was detected at all</li><li>How many different kinds of tool they use</li></ul><h4>Needs in their own words (14)</h4><ul><li>Their text talks about manual work</li><li>Their text talks about scaling</li><li>Their text talks about cost pressure</li><li>Their text talks about speed</li><li>Their text talks about quality</li><li>Their text talks about compliance</li><li>Their text talks about sales hiring</li><li>Their text talks about lead generation</li><li>Their text talks about retention</li><li>Their text talks about analytics gap</li><li>Their text talks about integration pain</li><li>Their text talks about productivity</li><li>Their text talks about automation intent</li><li>Their text talks about digital transformation</li></ul><h4>Industry (16)</h4><ul><li>Looks like a saas business</li><li>Looks like a ecommerce business</li><li>Looks like a manufacturing business</li><li>Looks like a healthcare business</li><li>Looks like a fintech business</li><li>Looks like a education business</li><li>Looks like a logistics business</li><li>Looks like a real estate business</li><li>Looks like a agency business</li><li>Looks like a retail business</li><li>Looks like a hospitality business</li><li>Looks like a consulting business</li><li>Looks like a construction business</li><li>Looks like a energy business</li><li>Looks like a telecom business</li><li>Looks like a media business</li></ul><h4>News (8)</h4><ul><li>How many news items were found</li><li>Headlines about funding</li><li>Headlines about hiring or expansion</li><li>Headlines about launches</li><li>Headlines about partnerships or acquisitions</li><li>Headlines about leadership changes</li><li>Positive words in headlines (award, record, growth, wins)</li><li>Negative words in headlines (layoffs, lawsuit, loss, shutdown)</li></ul><h4>Reachability (15)</h4><ul><li>How many decision makers were found</li><li>A founder, owner or CEO was found</li><li>A CTO or technology head was found</li><li>A sales or revenue leader was found</li><li>A marketing leader was found</li><li>An operations leader was found</li><li>Seniority of the most senior person found</li><li>How many LinkedIn profiles were found for them</li><li>The chosen address is published on their own site</li><li>The chosen address was inferred from their pattern</li><li>The chosen address is a guess</li><li>Their domain&#x27;s mail server was checked</li><li>The contact is a named person, not a generic inbox</li><li>They publish a phone number</li><li>They publish a WhatsApp chat link</li></ul></details>
+    <p class="sb-note">Signals are calculated from what Raptor can see about a company: its website text, news headlines, detected technology, the people and contact it found, and your own Company DNA. A signal it has no data for is 0, never a guess.</p>
+  </div>
+</div>
+<script type="module">
+const el = document.getElementById('sb');
+if (el) {
+  let started = false;
+  const start = () => { if (started) return; started = true; import('/ventures/raptor/assets/signal-brain.js?v=11').catch((e) => console.error(e)); };
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { start(); io.disconnect(); } }, { rootMargin: '400px' });
+    io.observe(el);
+  } else start();
+}
+</script>
+<!-- SIGNAL-BRAIN:END -->
 
 <!-- STATEMENT -->
 <div class="statement-section reveal">
@@ -1139,5 +1195,8 @@
 </div>
 
 <script src="script.js"></script>
+<!-- SB-BG-SCRIPT:START -->
+<script type="module" src="/ventures/raptor/assets/signal-bg.js?v=6"></script>
+<!-- SB-BG-SCRIPT:END -->
 </body>
 </html>
