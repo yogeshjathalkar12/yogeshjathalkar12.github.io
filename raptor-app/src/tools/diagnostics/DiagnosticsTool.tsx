@@ -17,6 +17,8 @@ interface BulkResult {
   domain: string;
   mx: string[];
   spf: boolean;
+  dkim?: boolean;
+  dkim_selectors?: string[];
   dmarc: boolean;
   verdict: 'healthy' | 'warn' | 'fail' | string;
   reasons: string[];
@@ -196,7 +198,7 @@ export default function DiagnosticsTool() {
               ) : (
                 <table className="arsenal-table">
                   <thead>
-                    <tr><th>Domain</th><th title="Where its email is delivered">Mail server</th><th title="Says which servers may send email for this domain">Sender proof (SPF)</th><th title="Tells inboxes what to do with fake email from this domain">Anti-fake rule (DMARC)</th><th>Result</th></tr>
+                    <tr><th>Domain</th><th title="Where its email is delivered">Mail server</th><th title="Says which servers may send email for this domain">Sender proof (SPF)</th><th title="A digital signature that proves the email wasn't changed on the way. We look for it under the names common email providers use.">Signature (DKIM)</th><th title="Tells inboxes what to do with fake email from this domain">Anti-fake rule (DMARC)</th><th>Result</th></tr>
                   </thead>
                   <tbody>
                     {bulkResults.map((r) => (
@@ -205,6 +207,7 @@ export default function DiagnosticsTool() {
                           <td style={{ color: 'var(--white)' }}>{r.domain}</td>
                           <td>{r.mx.length ? r.mx[0] + (r.mx.length > 1 ? ` +${r.mx.length - 1}` : '') : '—'}</td>
                           <td>{r.spf ? '✓' : '✗'}</td>
+                          <td title={r.dkim ? `Found: ${(r.dkim_selectors || []).join(', ')}` : 'Not found under the usual names. A provider can use a custom name, so this is only a hint.'}>{r.dkim ? '✓' : '?'}</td>
                           <td>{r.dmarc ? '✓' : '✗'}</td>
                           <td>
                             <span className={`arsenal-badge ${r.verdict === 'healthy' ? 'ok' : r.verdict === 'warn' ? 'warn' : 'fail'}`}>
@@ -214,7 +217,7 @@ export default function DiagnosticsTool() {
                         </tr>
                         {r.reasons.length > 0 && (
                           <tr key={r.domain + '-reasons'}>
-                            <td colSpan={5} style={{ fontSize: '0.6rem', color: 'var(--dim2)', paddingTop: 0 }}>
+                            <td colSpan={6} style={{ fontSize: '0.6rem', color: 'var(--dim2)', paddingTop: 0 }}>
                               {r.reasons.join(' · ')}
                             </td>
                           </tr>
