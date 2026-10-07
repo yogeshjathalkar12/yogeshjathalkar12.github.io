@@ -8,6 +8,30 @@ import { NotificationBell } from '../components/NotificationBell';
 import { PaymentModal } from './PaymentModal';
 import GlobalSearch from '../components/GlobalSearch';
 
+// Profile photo from the sign-in provider (Google sends `picture`/`avatar_url`).
+// Password-only accounts have none, so they keep the initial-letter circle.
+function photoUrlOf(user: any): string | null {
+  const meta = user?.user_metadata || {};
+  const fromIdentity = (user?.identities || [])
+    .map((i: any) => i?.identity_data?.avatar_url || i?.identity_data?.picture)
+    .find(Boolean);
+  return meta.avatar_url || meta.picture || fromIdentity || null;
+}
+
+function UserAvatar({ photoUrl, letter, size }: { photoUrl: string | null; letter: string; size?: number }) {
+  const [failed, setFailed] = useState(false);
+  const style = size ? { width: size, height: size, fontSize: size > 34 ? '1rem' : undefined } : undefined;
+  return (
+    <div className="dash-user-avatar" style={style}>
+      {photoUrl && !failed ? (
+        <img src={photoUrl} alt="" referrerPolicy="no-referrer" onError={() => setFailed(true)} />
+      ) : (
+        letter
+      )}
+    </div>
+  );
+}
+
 export function DashboardLayout() {
   const { user, signOut } = useAuth();
   const { credits, totalCredits, plan, planLoaded } = useCredits();
@@ -25,6 +49,8 @@ export function DashboardLayout() {
 
   const displayName = (user?.user_metadata?.full_name || user?.email || 'User').split(' ')[0];
   const fullName = user?.user_metadata?.full_name || displayName;
+  const photoUrl = photoUrlOf(user);
+  const initial = displayName[0]?.toUpperCase() ?? '';
   const isPro = plan.toLowerCase() === 'pro';
   // A small "PRO" tag on the locked sections for Free accounts (hidden until the plan is known).
   const proTag = !isPro && planLoaded ? <span style={{ marginLeft: 'auto', fontSize: '0.5rem', letterSpacing: '0.1em', padding: '0.1rem 0.35rem', borderRadius: 3, border: '1px solid var(--purple)', color: 'var(--purple)' }}>PRO</span> : null;
@@ -69,7 +95,7 @@ export function DashboardLayout() {
           </div>
 
           <div className="dash-user" onClick={() => setMenuOpen((v) => !v)} style={{ position: 'relative' }}>
-            <div className="dash-user-avatar">{displayName[0]?.toUpperCase()}</div>
+            <UserAvatar photoUrl={photoUrl} letter={initial} />
             <div className="dash-user-name">{displayName}</div>
 
             {menuOpen && (
@@ -78,9 +104,7 @@ export function DashboardLayout() {
                 style={{ minWidth: 260, padding: '0.9rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', paddingBottom: '0.7rem', borderBottom: '1px solid var(--border)' }}>
-                  <div className="dash-user-avatar" style={{ width: 36, height: 36, fontSize: '1rem' }}>
-                    {displayName[0]?.toUpperCase()}
-                  </div>
+                  <UserAvatar photoUrl={photoUrl} letter={initial} size={36} />
                   <div style={{ minWidth: 0 }}>
                     <div style={{ color: 'var(--white)', fontSize: '0.8rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {fullName}

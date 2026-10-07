@@ -18,7 +18,8 @@
 .lamp-bulb { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #475569; }
 
 .dash-user { display: flex; align-items: center; gap: 0.8rem; cursor: pointer; position: relative; }
-.dash-user-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--grad); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-family: 'Bebas Neue', sans-serif; color: white; }
+.dash-user-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--grad); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-family: 'Bebas Neue', sans-serif; color: white; overflow: hidden; flex-shrink: 0; }
+.dash-user-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .dash-user-name { font-size: 0.6rem; letter-spacing: 0.15em; color: var(--dim); text-transform: uppercase; }
 .dash-user-dropdown { position: absolute; top: calc(100% + 1rem); right: 0; background: var(--surface); border: 1px solid var(--border); min-width: 160px; z-index: 300; }
 .dash-user-dropdown-item { padding: 0.9rem 1.2rem; font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--red); cursor: pointer; }
