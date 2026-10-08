@@ -1,1 +1,0 @@
-import{c as e}from"./index-CxQzMLxq.js";function t(){let{user:t}=e();if(!t)throw Error(`useUserId used outside an authenticated route`);return t.id}export{t};
