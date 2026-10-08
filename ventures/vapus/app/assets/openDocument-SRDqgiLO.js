@@ -1,0 +1,1 @@
+import{t as e}from"./index-CxQzMLxq.js";async function t(t,n,r){let i=window.open(``,`_blank`);try{let e=await t.get(`/documents/${n}/signed-url?patient_id=${r}`);return i?(i.opener=null,i.location.href=e.signed_url):window.location.href=e.signed_url,null}catch(t){return i?.close(),e(t)}}export{t};
