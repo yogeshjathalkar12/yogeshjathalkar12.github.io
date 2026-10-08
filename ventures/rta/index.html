@@ -1012,6 +1012,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Sent here by the Logistics web app (/ventures/rta/app/): open the login box, and after signing in
+  // go back to the app instead of the credits dashboard.
+  const NEXT_KEY = 'rta_next';
+  const APP_URL = '/ventures/rta/app/';
+  const cameFromApp = new URLSearchParams(window.location.search).get('next') === 'app';
+  if (cameFromApp) {
+    try { localStorage.setItem(NEXT_KEY, APP_URL); } catch (e) { /* storage blocked: falls back to the dashboard */ }
+    if (supabaseClient) {
+      supabaseClient.auth.getSession().then(({ data }) => { if (data.session) window.location.replace(APP_URL); });
+    }
+  }
+  if (cameFromApp || window.location.hash === '#login') openAuth('login');
+  function afterLoginUrl() {
+    try {
+      const next = localStorage.getItem(NEXT_KEY);
+      localStorage.removeItem(NEXT_KEY);
+      if (next === APP_URL) return next;
+    } catch (e) { /* ignore */ }
+    return '/ventures/rta/dashboard.html';
+  }
+
   closeBtn.addEventListener('click', closeAuth);
   overlay.addEventListener('click', (e) => { if (e.target === overlay) closeAuth(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && overlay.classList.contains('active')) closeAuth(); });
@@ -1075,7 +1096,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.disabled = false; btn.textContent = 'Log In';
     if (error) { showError('loginError', error.message); return; }
 
-    window.location.href = '/ventures/rta/dashboard.html';
+    window.location.href = afterLoginUrl();
   });
 
   // ── SIGN UP ──
@@ -1107,7 +1128,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (error) { showError('signupError', error.message); return; }
 
     if (data.session) {
-      window.location.href = '/ventures/rta/dashboard.html';
+      window.location.href = afterLoginUrl();
       return;
     }
 

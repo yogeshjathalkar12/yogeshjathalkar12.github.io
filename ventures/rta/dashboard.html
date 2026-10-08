@@ -240,6 +240,7 @@ body.dark-mode .db-tool-input { background: rgba(15,23,42,0.5); border-color: #3
   <div class="db-nav-group">
     <div class="db-nav-label">Overview</div>
     <div class="db-nav-item active">Dashboard</div>
+    <a class="db-nav-item" href="/ventures/rta/app/" style="display:block;text-decoration:none;color:inherit;">Site data (Logistics)</a>
     <div class="db-nav-item">Activity</div>
   </div>
 
@@ -394,6 +395,12 @@ async function loadUserData() {
 
   if (!session) { window.location.href = '/ventures/rta/'; return; }
   state.user = session.user;
+
+  // Signed in through Google on behalf of the Logistics web app: send them back to it.
+  try {
+    const next = localStorage.getItem('rta_next');
+    if (next === '/ventures/rta/app/') { localStorage.removeItem('rta_next'); window.location.replace(next); return; }
+  } catch (e) { /* ignore */ }
 
   const { data, error } = await supabaseClient
     .from('rta_users')
