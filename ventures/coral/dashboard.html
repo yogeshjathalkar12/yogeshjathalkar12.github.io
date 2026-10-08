@@ -1008,7 +1008,8 @@ textarea.form-control { resize: vertical; min-height: 84px; }
       <div class="page-eyebrow">Account</div>
       <div class="page-title">Settings.</div>
 
-      <div class="dash-card" style="max-width: 560px; margin-bottom: 1.4rem;">
+      <!-- Developer-only connection settings: hidden from users, kept in the DOM because the page script reads these inputs. -->
+      <div class="dash-card" hidden style="display: none; max-width: 560px; margin-bottom: 1.4rem;">
         <div class="dash-card-title" style="margin-bottom: 1.2rem;">API configuration</div>
         <div class="form-group">
           <label class="form-label">Backend API URL</label>
