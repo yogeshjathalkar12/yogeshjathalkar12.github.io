@@ -84,3 +84,7 @@
   scrollbar-width: auto;
   scrollbar-color: var(--purple) var(--surface2);
 }
+
+/* The scrollbar lives on top (.pipeline-board-top); hide the duplicate at the bottom. */
+.pipeline-board-main { scrollbar-width: none; }
+.pipeline-board-main::-webkit-scrollbar { display: none; }

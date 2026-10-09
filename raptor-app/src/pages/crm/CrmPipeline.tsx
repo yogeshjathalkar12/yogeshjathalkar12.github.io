@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import BulkImportModal from '../../components/crm/BulkImportModal';
@@ -33,6 +33,29 @@ export default function CrmPipeline() {
   } | null>(null);
   const [callError, setCallError] = useState<string | null>(null);
   const [callingDealId, setCallingDealId] = useState<string | null>(null);
+
+  // The board's own scrollbar sits at the very bottom, far from view on a long
+  // board, so a mirrored one is shown on top and the two are kept in step.
+  const boardRef = useRef<HTMLDivElement>(null);
+  const topBarRef = useRef<HTMLDivElement>(null);
+  const [boardScrollWidth, setBoardScrollWidth] = useState(0);
+  const syncing = useRef(false);
+  const mirrorScroll = (from: HTMLDivElement | null, to: HTMLDivElement | null) => {
+    if (!from || !to || syncing.current) return;
+    syncing.current = true;
+    to.scrollLeft = from.scrollLeft;
+    requestAnimationFrame(() => { syncing.current = false; });
+  };
+  useEffect(() => {
+    const board = boardRef.current;
+    if (!board) return;
+    const measure = () => setBoardScrollWidth(board.scrollWidth > board.clientWidth ? board.scrollWidth : 0);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(board);
+    Array.from(board.children).forEach((c) => ro.observe(c));
+    return () => ro.disconnect();
+  }, [stages, deals, loading]);
 
   const handleCall = async (e: React.MouseEvent, deal: any) => {
     e.stopPropagation();
@@ -221,7 +244,15 @@ export default function CrmPipeline() {
         </button></OwnerOnly>
       </div>
 
-      <div className="pipeline-board" style={{ display: 'flex', gap: '1.4rem', overflowX: 'auto', paddingBottom: '1rem', flex: 1, minHeight: 0, minWidth: 0 }}>
+      <div
+        ref={topBarRef}
+        className="pipeline-board pipeline-board-top"
+        onScroll={() => mirrorScroll(topBarRef.current, boardRef.current)}
+        style={{ overflowX: 'auto', overflowY: 'hidden', display: boardScrollWidth ? 'block' : 'none', marginBottom: '0.6rem', position: 'sticky', top: 64, zIndex: 5, background: 'var(--black)', paddingBottom: '0.3rem' }}
+      >
+        <div style={{ width: boardScrollWidth, height: 1 }} />
+      </div>
+      <div ref={boardRef} onScroll={() => mirrorScroll(boardRef.current, topBarRef.current)} className="pipeline-board pipeline-board-main" style={{ display: 'flex', gap: '1.4rem', overflowX: 'auto', paddingBottom: '1rem', flex: 1, minHeight: 0, minWidth: 0 }}>
         {stages.map(stage => {
           const stageDeals = shownDeals.filter(d => d.stage === stage.key);
           const stageValue = stageDeals.reduce((sum, d) => sum + (Number(d.value) || 0), 0);
