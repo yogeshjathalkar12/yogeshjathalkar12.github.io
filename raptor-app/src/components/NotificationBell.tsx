@@ -33,19 +33,23 @@ export function NotificationBell() {
     <div style={{ position: 'relative' }}>
       <div
         onClick={() => setOpen((v) => !v)}
-        style={{ position: 'relative', cursor: 'pointer', fontSize: '1.1rem', color: 'var(--white)', padding: '0.4rem' }}
+        style={{ position: 'relative', cursor: 'pointer', color: 'var(--white)', padding: '0.3rem', display: 'flex' }}
         title="Notifications"
       >
-        🔔
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 2.2a1.6 1.6 0 0 0-1.6 1.6v.62C7.6 5.1 6 7.5 6 10.4v4.1l-1.7 2.2c-.5.65-.04 1.6.8 1.6h13.8c.84 0 1.3-.95.8-1.6L18 14.5v-4.1c0-2.9-1.6-5.3-4.4-5.98V3.8A1.6 1.6 0 0 0 12 2.2Z" />
+          <path d="M9.6 19.6a2.4 2.4 0 0 0 4.8 0H9.6Z" />
+        </svg>
         {unreadCount > 0 && (
           <span
             style={{
-              position: 'absolute', top: 0, right: 0, background: 'var(--red)', color: '#fff',
-              borderRadius: '999px', fontSize: '0.55rem', minWidth: 16, height: 16, display: 'flex',
-              alignItems: 'center', justifyContent: 'center', padding: '0 3px', fontFamily: 'var(--mono)',
+              position: 'absolute', top: -3, right: -5, background: '#e5303a', color: '#fff',
+              borderRadius: '999px', fontSize: '0.62rem', fontWeight: 700, minWidth: 18, height: 18, display: 'flex',
+              alignItems: 'center', justifyContent: 'center', padding: '0 4px', fontFamily: 'var(--mono)', lineHeight: 1,
+              boxShadow: '0 0 0 2px var(--black)',
             }}
           >
-            {unreadCount > 9 ? '9+' : unreadCount}
+            {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
       </div>

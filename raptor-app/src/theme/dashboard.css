@@ -88,3 +88,10 @@
 /* The scrollbar lives on top (.pipeline-board-top); hide the duplicate at the bottom. */
 .pipeline-board-main { scrollbar-width: none; }
 .pipeline-board-main::-webkit-scrollbar { display: none; }
+
+/* Header "Buy More Credits" / "Upgrade to Pro" and the sidebar upgrade button: same look as + New Deal. */
+.dash-billing-btn, .dash-billing-btn-primary {
+  background: var(--grad); color: #fff; border: none; padding: 0.6rem 1.1rem; border-radius: 4px; cursor: pointer;
+  font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap;
+}
+.dash-billing-btn:hover, .dash-billing-btn-primary:hover { opacity: 0.9; }
