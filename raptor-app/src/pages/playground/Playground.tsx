@@ -186,7 +186,7 @@ export default function Playground() {
       fileBlocks += `[[attachment: ${a.name}]]\n${body}${body.length < a.text.length ? '\n…(truncated)' : ''}\n[[/attachment]]\n`;
     }
     if (attachments.some((a) => a.text.length > MAX_TOTAL_CHARS) || attachments.reduce((n, a) => n + a.text.length, 0) > MAX_TOTAL_CHARS) {
-      showToast('Attachments were long, so only the first part was sent to the AI', 'info');
+      showToast('Attachments were long, so only the first part was sent to the AI', 'warn');
     }
     const userMsg = (fileBlocks + (typed || 'Please look at the attached file(s).')).trim();
 
