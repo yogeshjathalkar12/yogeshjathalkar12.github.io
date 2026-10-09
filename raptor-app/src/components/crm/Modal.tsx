@@ -13,8 +13,9 @@ export default function Modal({ open, onClose, title, children, width = 440 }: M
   if (!open) return null;
 
   return (
+    // Closes only via the ✕ button - a stray click on the dimmed area must not
+    // throw away a half-filled form.
     <div
-      onClick={onClose}
       style={{
         position: 'fixed',
         inset: 0,
@@ -28,7 +29,6 @@ export default function Modal({ open, onClose, title, children, width = 440 }: M
       }}
     >
       <div
-        onClick={(e) => e.stopPropagation()}
         style={{
           background: 'var(--surface)',
           border: '1px solid var(--border)',

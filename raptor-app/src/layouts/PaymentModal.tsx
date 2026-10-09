@@ -185,8 +185,8 @@ export function PaymentModal({ plan, onClose }: PaymentModalProps) {
     });
 
   return (
-    <div className="billing-modal-overlay" onClick={onClose}>
-      <div className="billing-modal" onClick={(e) => e.stopPropagation()}>
+    <div className="billing-modal-overlay">
+      <div className="billing-modal">
         <button className="billing-modal-close" onClick={onClose} aria-label="Close">
           ×
         </button>

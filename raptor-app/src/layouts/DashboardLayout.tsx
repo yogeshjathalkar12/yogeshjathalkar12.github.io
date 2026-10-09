@@ -38,6 +38,22 @@ export function DashboardLayout() {
   const { isLight, toggle } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
+  // Same behaviour as the desktop app: hide the sidebar, bring it back with the
+  // "Menu" tab, and remember the choice.
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem('raptor_sidebar_collapsed') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem('raptor_sidebar_collapsed', String(sidebarCollapsed));
+    } catch {
+      // storage blocked - the choice just won't persist
+    }
+  }, [sidebarCollapsed]);
 
   // Screens that lock a feature behind Pro (Email automation) ask for the
   // upgrade dialog with this event instead of owning a payment flow.
@@ -153,16 +169,19 @@ export function DashboardLayout() {
         </div>
       </header>
 
-      <div className="dash-layout">
-        <nav className="dash-sidebar" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div className={`dash-layout${sidebarCollapsed ? ' sidebar-collapsed' : ''}`}>
+        <nav className="dash-sidebar" style={{ display: 'flex', flexDirection: 'column', height: '100%' }} aria-hidden={sidebarCollapsed}>
           <div style={{ flex: 1, overflowY: 'auto' }}>
+            <button type="button" className="dash-sidebar-collapse-btn" title="Hide sidebar" onClick={() => setSidebarCollapsed(true)}>
+              ‹‹ Hide
+            </button>
             <div className="dash-sidebar-section-label">Command Center</div>
             <NavLink to="/dashboard" end className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
               <span className="dash-sidebar-icon">⊞</span><span>Dashboard</span>
             </NavLink>
 
             <NavLink to="/crm" className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
-              <span className="dash-sidebar-icon">◫</span><span>Active CRM</span>
+              <span className="dash-sidebar-icon">◫</span><span>Automated CRM</span>
             </NavLink>
             <NavLink to="/sync" className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
               <span className="dash-sidebar-icon">⇄</span><span>Desktop Sync</span>
@@ -217,6 +236,12 @@ export function DashboardLayout() {
             )}
           </div>
         </nav>
+
+        {sidebarCollapsed && (
+          <button type="button" className="dash-sidebar-restore-tab" title="Show sidebar" onClick={() => setSidebarCollapsed(false)}>
+            ›› Menu
+          </button>
+        )}
 
         <main className="dash-main">
           <Outlet />

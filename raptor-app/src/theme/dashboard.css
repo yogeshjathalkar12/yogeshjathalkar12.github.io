@@ -53,6 +53,18 @@
   .dash-main { margin-left: 60px; padding: 1.5rem; }
 }
 
+/* Collapsible sidebar (matches the desktop app): width goes to 0, content takes the room. */
+.dash-sidebar { transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1), padding 0.25s ease; }
+.dash-main { transition: margin-left 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
+.dash-layout.sidebar-collapsed .dash-sidebar { width: 0; padding-left: 0; padding-right: 0; border-right: none; overflow: hidden; visibility: hidden; transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1), padding 0.25s ease, visibility 0s linear 0.25s; }
+.dash-layout.sidebar-collapsed .dash-main { margin-left: 0; }
+.dash-sidebar-collapse-btn { display: block; margin: 0 1.5rem 1rem auto; background: transparent; border: 1px solid var(--dim2); border-radius: 4px; color: var(--dim); font-size: 0.6rem; letter-spacing: 0.1em; cursor: pointer; padding: 3px 8px; line-height: 1; white-space: nowrap; }
+.dash-sidebar-collapse-btn:hover { color: var(--white); border-color: var(--purple); }
+.dash-sidebar-restore-tab { position: fixed; top: 50%; left: 0; transform: translateY(-50%); z-index: 50; background: var(--grad); color: #fff; border: none; border-radius: 0 6px 6px 0; padding: 12px 6px; font-size: 11px; font-weight: 600; cursor: pointer; writing-mode: vertical-rl; text-orientation: mixed; }
+@media (max-width: 900px) {
+  .dash-sidebar-collapse-btn { margin-right: auto; margin-left: auto; padding: 3px 4px; font-size: 0.5rem; }
+}
+
 /* Pipeline kanban board - deliberately thicker/more visible than the
    app-wide 4px scrollbar (theme.css) so a column scrolled off-screen
    (e.g. "Lost", past Won) is an obvious, noticeable affordance rather
