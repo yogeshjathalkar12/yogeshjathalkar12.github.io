@@ -2,10 +2,14 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { fieldInputStyle, primaryBtnStyle } from '../../components/crm/Modal';
 import { toolApiBase } from '../../lib/config';
+import DesktopRelayStatus from './DesktopRelayStatus';
 
 const EMAIL_API = toolApiBase('email');
 
 type Security = 'starttls' | 'ssl';
+// 'desktop' = the desktop app sends the mail (works everywhere, the password never reaches this server);
+// 'smtp' = this server sends it over SMTP (only offered when the server has that switched on).
+type Mode = 'desktop' | 'smtp';
 
 // Mirrors SENDING_DEFAULTS in the backend's email router (which is the
 // source of truth). Shown here only so people know what to expect.
@@ -40,6 +44,7 @@ export default function EmailConnectionSetup() {
   // server doesn't say otherwise, so the form is never offered on a server
   // that can't deliver it.
   const [smtpEnabled, setSmtpEnabled] = useState(false);
+  const [mode, setMode] = useState<Mode>('desktop');
   // The responsibilities statement and its version come from the server, so
   // the wording shown is exactly the wording that gets recorded.
   const [risksStatement, setRisksStatement] = useState('');
@@ -129,8 +134,10 @@ export default function EmailConnectionSetup() {
 
   async function handleConnect(e: React.FormEvent) {
     e.preventDefault();
-    if (!label.trim() || !fromEmail.trim() || !fromName.trim() || !password.trim()) return;
-    if (!smtpHost.trim()) {
+    const viaDesktop = mode === 'desktop' || !smtpEnabled;
+    if (!label.trim() || !fromEmail.trim() || !fromName.trim()) return;
+    if (!viaDesktop && !password.trim()) return;
+    if (!viaDesktop && !smtpHost.trim()) {
       setError('Enter your mail server, like smtp.gmail.com.');
       return;
     }
@@ -147,15 +154,23 @@ export default function EmailConnectionSetup() {
       const resp = await fetch(`${EMAIL_API}/accounts`, {
         method: 'POST',
         headers: await authHeader(),
-        body: JSON.stringify({
-          label: label.trim(),
-          provider: 'smtp',
-          from_email: fromEmail.trim(),
-          from_name: fromName.trim(),
-          api_key: password.trim(),
-          smtp_config: smtpConfig(),
-          accepted_risks_version: risksVersion,
-        }),
+        body: JSON.stringify(viaDesktop
+          ? {
+              label: label.trim(),
+              provider: 'desktop',
+              from_email: fromEmail.trim(),
+              from_name: fromName.trim(),
+              accepted_risks_version: risksVersion,
+            }
+          : {
+              label: label.trim(),
+              provider: 'smtp',
+              from_email: fromEmail.trim(),
+              from_name: fromName.trim(),
+              api_key: password.trim(),
+              smtp_config: smtpConfig(),
+              accepted_risks_version: risksVersion,
+            }),
       });
 
       if (!resp.ok) {
@@ -186,29 +201,44 @@ export default function EmailConnectionSetup() {
     fetchAccounts();
   }
 
+  // Without the server's SMTP switch there is only one way to connect, so never show a form that can't work.
+  const viaDesktop = mode === 'desktop' || !smtpEnabled;
+
   return (
     <div>
       <div style={{ fontSize: '0.65rem', color: 'var(--dim)', marginBottom: '1.4rem', maxWidth: 620, lineHeight: 1.7 }}>
-        Send from your own mailbox. Nothing routes through a shared identity — every send uses your own login, your own warm-up ramp and your own suppression list. Your password is encrypted before it's stored.
+        Send from your own mailbox. Nothing routes through a shared identity — every send uses your own login, your own warm-up ramp and your own suppression list.
       </div>
 
       <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 480 }}>
         <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.2rem', marginBottom: '1rem' }}>Connect your mailbox</div>
 
-        {!smtpEnabled && (
-          <div style={{ ...noteStyle, marginBottom: '1rem' }}>
-            Mailbox sending is being switched on for this server and isn't ready yet, so this form is off for now. Your Pro plan is active; check back shortly.
+        {smtpEnabled && (
+          <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+            <button type="button" onClick={() => setMode('desktop')} style={{ ...primaryBtnStyle, ...(mode === 'desktop' ? {} : { background: 'transparent', border: '1px solid var(--border)', color: 'var(--white)' }) }}>
+              Send via my desktop app
+            </button>
+            <button type="button" onClick={() => setMode('smtp')} style={{ ...primaryBtnStyle, ...(mode === 'smtp' ? {} : { background: 'transparent', border: '1px solid var(--border)', color: 'var(--white)' }) }}>
+              Send from this server
+            </button>
           </div>
         )}
 
-        <div style={{ ...noteStyle, marginBottom: '1rem' }}>
-          Works with Google Workspace, Microsoft 365, Zoho or any provider that gives you SMTP details. Gmail and Microsoft accounts need an app password, not your normal password. A separate sending domain is safer than your main one.
-        </div>
+        {viaDesktop ? (
+          <div style={{ ...noteStyle, marginBottom: '1rem' }}>
+            Your Raptor desktop app sends the mail, from the mailbox connected there, at that mailbox's own pace. The mailbox password never reaches our servers. Mail you schedule here waits safely and goes out while the desktop app is open and signed in; anything still unsent 48 hours after its time expires instead of going out late.
+          </div>
+        ) : (
+          <div style={{ ...noteStyle, marginBottom: '1rem' }}>
+            Works with Google Workspace, Microsoft 365, Zoho or any provider that gives you SMTP details. Gmail and Microsoft accounts need an app password, not your normal password. A separate sending domain is safer than your main one. Your password is encrypted before it's stored.
+          </div>
+        )}
 
-        <form onSubmit={handleConnect} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', opacity: smtpEnabled ? 1 : 0.5, pointerEvents: smtpEnabled ? 'auto' : 'none' }}>
+        <form onSubmit={handleConnect} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
           <input style={fieldInputStyle} placeholder="Label (e.g. Raptor outreach)" value={label} onChange={(e) => setLabel(e.target.value)} />
-          <input style={fieldInputStyle} placeholder="From email" value={fromEmail} onChange={(e) => setFromEmail(e.target.value)} />
+          <input style={fieldInputStyle} placeholder={viaDesktop ? 'Your mailbox address (as connected in the desktop app)' : 'From email'} value={fromEmail} onChange={(e) => setFromEmail(e.target.value)} />
           <input style={fieldInputStyle} placeholder="From name" value={fromName} onChange={(e) => setFromName(e.target.value)} />
+          {!viaDesktop && <>
           <input style={fieldInputStyle} placeholder="Mail server (e.g. smtp.gmail.com)" value={smtpHost} onChange={(e) => { setSmtpHost(e.target.value); setTestOk(false); }} />
           <div style={{ display: 'flex', gap: '0.6rem' }}>
             <select style={{ ...fieldInputStyle, flex: 2 }} value={smtpSecurity} onChange={(e) => changeSecurity(e.target.value as Security)} aria-label="Connection type">
@@ -223,6 +253,7 @@ export default function EmailConnectionSetup() {
             {testing ? 'Testing…' : 'Test connection'}
           </button>
           {testOk && <div style={{ color: 'var(--green, #22c55e)', fontSize: '0.65rem' }}>Connected. Nothing was sent. You can save it now.</div>}
+          </>}
 
           <div style={noteStyle}>
             Starts at {RAMP_START} emails a day and grows by {RAMP_STEP_PER_DAY} a day up to {RAMP_TARGET}. The ramp protects your mailbox's reputation.
@@ -240,6 +271,8 @@ export default function EmailConnectionSetup() {
         </form>
       </div>
 
+      {accounts.some((a) => a.provider === 'desktop') && <DesktopRelayStatus />}
+
       <div style={{ fontSize: '0.58rem', letterSpacing: '0.18em', color: 'var(--dim)', textTransform: 'uppercase', marginBottom: '0.8rem' }}>
         Connected Accounts
       </div>
@@ -255,7 +288,7 @@ export default function EmailConnectionSetup() {
                 <div style={{ fontSize: '0.75rem', color: 'var(--white)' }}>
                   {a.label}{' '}
                   <span style={{ fontSize: '0.55rem', color: 'var(--purple)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-                    {`SMTP · ${a.smtp_config?.host ?? ''}`}
+                    {a.provider === 'desktop' ? 'Desktop app' : `SMTP · ${a.smtp_config?.host ?? ''}`}
                   </span>
                 </div>
                 <div style={{ fontSize: '0.6rem', color: 'var(--dim)' }}>{a.from_email} · cap {a.daily_cap}/day, ramping to {a.warmup_target}</div>
