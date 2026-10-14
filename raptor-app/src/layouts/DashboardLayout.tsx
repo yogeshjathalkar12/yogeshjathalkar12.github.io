@@ -7,6 +7,7 @@ import { TOOLS } from '../tools/registry';
 import { NotificationBell } from '../components/NotificationBell';
 import { PaymentModal } from './PaymentModal';
 import GlobalSearch from '../components/GlobalSearch';
+import { WhatsAppDispatcher } from '../components/crm/WhatsAppDispatcher';
 
 // Profile photo from the sign-in provider (Google sends `picture`/`avatar_url`).
 // Password-only accounts have none, so they keep the initial-letter circle.
@@ -244,6 +245,7 @@ export function DashboardLayout() {
         )}
 
         <main className="dash-main">
+          <WhatsAppDispatcher />
           <Outlet />
         </main>
       </div>
