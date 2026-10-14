@@ -6,6 +6,7 @@ import ExportButton from '../../components/crm/ExportButton';
 import LiveCallPanel from '../../components/crm/LiveCallPanel';
 import PipelineStagesModal from '../../components/crm/PipelineStagesModal';
 import DealDetailModal from '../../components/crm/DealDetailModal';
+import OutreachSettingsModal, { type OutreachMode } from '../../components/crm/OutreachSettingsModal';
 import OwnerOnly from '../../components/OwnerOnly';
 import AssigneeFilter, { applyAssigneeFilter, useAssigneeFilter } from '../../components/crm/AssigneeFilter';
 import { useMemberLabels } from '../../hooks/useDirectory';
@@ -16,6 +17,22 @@ import { startCall } from '../../lib/calls';
 import { useAuth } from '../../hooks/AuthContext';
 import { type PipelineStage, loadPipelineStages, stageByKey } from '../../lib/pipelineStages';
 import { formatCurrency } from '../../lib/crmHelpers';
+
+// What the email on a deal card is doing. Statuses come from deal_outreach (see db/migrations/2026-10-14_crm_outreach.sql).
+interface DealEmail { status: string; error: string | null; }
+const EMAIL_STATUS: Record<string, { text: string; color: string }> = {
+  queued: { text: 'Waiting for your desktop app', color: 'var(--dim)' },
+  accepted: { text: 'In your desktop app\'s send queue', color: 'var(--purple)' },
+  sent: { text: 'Email sent', color: 'var(--green, #22c55e)' },
+  replied: { text: 'Replied', color: 'var(--green, #22c55e)' },
+  bounced: { text: 'Email bounced', color: 'var(--red)' },
+  failed: { text: 'Email failed', color: 'var(--red)' },
+  cancelled: { text: 'Email not sent', color: 'var(--dim)' },
+  expired: { text: 'Email not sent (expired)', color: 'var(--red)' },
+  skipped: { text: 'Email not sent', color: '#eab308' },
+};
+const EMAIL_IN_PROGRESS_OR_DONE = ['queued', 'accepted', 'sent', 'replied', 'bounced'];
+const MODE_LABEL: Record<OutreachMode, string> = { off: 'Off', semi: 'Semi-automatic', auto: 'Automatic' };
 
 export default function CrmPipeline() {
   const { session } = useAuth();
@@ -33,6 +50,12 @@ export default function CrmPipeline() {
   } | null>(null);
   const [callError, setCallError] = useState<string | null>(null);
   const [callingDealId, setCallingDealId] = useState<string | null>(null);
+
+  // Email on the cards: Off / Semi-automatic (an Email button next to Call) / Automatic (sent when the deal is added).
+  const [outreachMode, setOutreachMode] = useState<OutreachMode>('off');
+  const [dealEmail, setDealEmail] = useState<Record<string, DealEmail>>({});
+  const [showOutreach, setShowOutreach] = useState(false);
+  const [emailingDealId, setEmailingDealId] = useState<string | null>(null);
 
   // The board's own scrollbar sits at the very bottom, far from view on a long
   // board, so a mirrored one is shown on top and the two are kept in step.
@@ -78,10 +101,41 @@ export default function CrmPipeline() {
     }
   };
 
+  async function fetchOutreach() {
+    try {
+      const [settings, rows] = await Promise.all([
+        supabase.from('crm_outreach_settings').select('mode').maybeSingle(),
+        supabase.from('deal_outreach').select('deal_id, status, error'),
+      ]);
+      if (settings.error || rows.error) return; // the database part is not installed yet: the board works as before
+      setOutreachMode((settings.data?.mode as OutreachMode) || 'off');
+      setDealEmail(Object.fromEntries((rows.data || []).map((r: any) => [r.deal_id, { status: r.status, error: r.error }])));
+    } catch {
+      /* leave the cards as they were */
+    }
+  }
+
+  const handleEmail = async (e: React.MouseEvent, deal: any) => {
+    e.stopPropagation();
+    setCallError(null);
+    setEmailingDealId(deal.id);
+    try {
+      const { data, error } = await supabase.rpc('crm_outreach_request', { p_deal_id: deal.id });
+      if (error) throw error;
+      if (data?.status === 'skipped' && data.error) setCallError(data.error);
+      await fetchOutreach();
+    } catch (err: any) {
+      setCallError(err.message || 'Could not queue the email.');
+    } finally {
+      setEmailingDealId(null);
+    }
+  };
+
   // Initial load and Realtime Subscription
   useEffect(() => {
     fetchDeals();
     fetchStages();
+    fetchOutreach();
 
     // Replicate the realtime listener from crm.html
     const channel = supabase.channel('crm-deals')
@@ -90,6 +144,9 @@ export default function CrmPipeline() {
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'pipeline_stages' }, () => {
         fetchStages();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'deal_outreach' }, () => {
+        fetchOutreach();
       })
       .subscribe();
 
@@ -110,7 +167,7 @@ export default function CrmPipeline() {
     try {
       const { data, error } = await supabase
         .from('deals')
-        .select('*, contacts(id, name), companies(id, name)')
+        .select('*, contacts(id, name, email), companies(id, name)')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -212,6 +269,18 @@ export default function CrmPipeline() {
           ]}
           filename="deals"
         />
+        <button
+          onClick={() => setShowOutreach(true)}
+          title="Email automation for the pipeline"
+          style={{
+            background: outreachMode === 'off' ? 'transparent' : 'rgba(168,85,247,0.12)', color: outreachMode === 'off' ? 'var(--dim)' : 'var(--white)',
+            border: `1px solid ${outreachMode === 'off' ? 'var(--border)' : 'var(--purple)'}`, padding: '0.6rem 1.1rem',
+            borderRadius: '4px', cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: '0.65rem',
+            letterSpacing: '0.08em', textTransform: 'uppercase',
+          }}
+        >
+          ✉ Email: {MODE_LABEL[outreachMode]}
+        </button>
         <OwnerOnly><button
           onClick={() => setShowImport(true)}
           style={{
@@ -310,15 +379,40 @@ export default function CrmPipeline() {
                       {deal.assignee_id && (
                         <div style={{ fontSize: '0.5rem', color: 'var(--purple)', margin: '0 0 0.4rem' }}>&rarr; {shortName(assigneeLabels[deal.assignee_id])}</div>
                       )}
-                      {deal.contacts?.id && (
-                        <button
-                          onClick={(e) => handleCall(e, deal)}
-                          disabled={callingDealId === deal.id}
-                          style={{ fontSize: '0.55rem', padding: '0.3rem 0.6rem', width: '100%' }}
-                        >
-                          {callingDealId === deal.id ? 'Connecting…' : 'Call'}
-                        </button>
-                      )}
+                      {deal.contacts?.id && (() => {
+                        const email = dealEmail[deal.id];
+                        const canEmail = outreachMode !== 'off' && !(email && EMAIL_IN_PROGRESS_OR_DONE.includes(email.status));
+                        const hasAddress = !!deal.contacts?.email;
+                        const info = email ? EMAIL_STATUS[email.status] : null;
+                        return (
+                          <>
+                            <div style={{ display: 'flex', gap: '0.4rem' }}>
+                              <button
+                                onClick={(e) => handleCall(e, deal)}
+                                disabled={callingDealId === deal.id}
+                                style={{ fontSize: '0.55rem', padding: '0.3rem 0.6rem', flex: 1 }}
+                              >
+                                {callingDealId === deal.id ? 'Connecting…' : 'Call'}
+                              </button>
+                              {canEmail && (
+                                <button
+                                  onClick={(e) => handleEmail(e, deal)}
+                                  disabled={emailingDealId === deal.id || !hasAddress}
+                                  title={hasAddress ? 'Send your email template to this contact' : 'This contact has no email address'}
+                                  style={{ fontSize: '0.55rem', padding: '0.3rem 0.6rem', flex: 1 }}
+                                >
+                                  {emailingDealId === deal.id ? 'Queuing…' : email ? 'Retry email' : 'Email'}
+                                </button>
+                              )}
+                            </div>
+                            {info && (
+                              <div style={{ fontSize: '0.52rem', color: info.color, marginTop: '0.45rem', lineHeight: 1.5 }}>
+                                ✉ {info.text}{email.error && !['sent', 'replied', 'queued', 'accepted'].includes(email.status) ? `: ${email.error}` : ''}
+                              </div>
+                            )}
+                          </>
+                        );
+                      })()}
                     </div>
                   ))
                 )}
@@ -343,6 +437,8 @@ export default function CrmPipeline() {
           onClose={() => setActiveCall(null)}
         />
       )}
+
+      <OutreachSettingsModal open={showOutreach} onClose={() => setShowOutreach(false)} onSaved={fetchOutreach} />
 
       <BulkImportModal
         open={showImport}
