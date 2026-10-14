@@ -1,0 +1,18 @@
+/* One shape for every button on the Raptor marketing pages: smooth rounded corners instead of square ones.
+   Change --btn-radius to adjust all of them at once. Loaded last on each page (the web app has its own styles and is not touched).
+
+   Only real buttons are listed. Layout wrappers such as .hero-cta and .cta-band hold buttons and are deliberately left alone.
+   A button that already sets its own radius (for example the round on/off chip, set with a class) keeps it: a class beats the bare
+   `button` rule below. */
+:root { --btn-radius: 14px; }
+
+.btn-main, .btn-ghost, .btn,
+.plan-cta, .founding-cta,
+.nav-login-btn, .auth-google-btn, .rx-menu-btn,
+.arsenal-btn, .arsenal-copy-btn, .calc-btn, .sig-btn, .footer-cta, .sb-reset,
+button, input[type="button"], input[type="submit"], input[type="reset"] {
+  border-radius: var(--btn-radius);
+}
+
+/* The main button has a hover glow layer inside it: keep that clipped to the rounded shape. */
+.btn-main { overflow: hidden; }
