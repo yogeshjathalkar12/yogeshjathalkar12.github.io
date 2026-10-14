@@ -19,7 +19,7 @@ body.dark-mode .sb-stage { background: radial-gradient(ellipse at 50% 40%, rgba(
 .sb-activate small { font: 400 11px 'DM Mono', monospace; color: var(--dim); }
 .sb-done { position: absolute; top: 10px; right: 10px; z-index: 2; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--card, rgba(127, 127, 127, 0.07)); color: var(--white); font: 400 11px 'DM Mono', monospace; cursor: pointer; }
 .sb-loading, .sb-fail { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 24px; color: var(--dim); font: 400 13px 'DM Mono', monospace; }
-.sb-ready .sb-loading { display: none; }
+.sb-ready .sb-loading, .sb-failed .sb-loading { display: none; }
 .sb-side { display: flex; flex-direction: column; gap: 12px; }
 .sb-card { border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; background: var(--card, rgba(127, 127, 127, 0.07)); }
 .sb-card h3 { margin: 0 0 8px; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); font-weight: 500; }

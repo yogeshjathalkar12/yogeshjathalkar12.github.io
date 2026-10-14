@@ -37,8 +37,16 @@ function rng(str) {
 
 let renderer, labels;
 try {
+  if (/[?&]map=2d\b/.test(location.search)) throw new Error('2D map requested in the address (?map=2d)');   // for testing the fallback
   renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-} catch (e) { fail('Your browser could not start 3D graphics. The full list of signals is below.'); throw e; }
+} catch (e) {
+  // No WebGL here (3D graphics switched off or blocked): hand over to the 2D version of the same map, same data and same panel.
+  try {
+    const flat = await import('./signal-brain-2d.js?v=3');
+    flat.start({ data, L: layout(data), stage, canvas, rng });
+  } catch (e2) { fail('Your browser could not start 3D graphics. The full list of signals is below.'); throw e2; }
+  throw new Error('WebGL unavailable: the 2D map is showing instead');   // stops this module; nothing below applies to the 2D map
+}
 renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
 labels = new CSS2DRenderer();
 labels.domElement.className = 'sb-labels';

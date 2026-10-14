@@ -142,7 +142,7 @@
 <link rel="icon" type="image/x-icon" href="icon.ico">
 <!-- SIGNAL-BRAIN-HEAD:START -->
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.171.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.171.0/examples/jsm/"}}</script>
-<link rel="stylesheet" href="/ventures/raptor/assets/signal-brain.css?v=10">
+<link rel="stylesheet" href="/ventures/raptor/assets/signal-brain.css?v=11">
 <!-- SIGNAL-BRAIN-HEAD:END -->
 <!-- SB-BG-HEAD:START -->
 <link rel="stylesheet" href="/ventures/raptor/assets/signal-bg.css?v=2">
@@ -404,7 +404,7 @@
 const el = document.getElementById('sb');
 if (el) {
   let started = false;
-  const start = () => { if (started) return; started = true; import('/ventures/raptor/assets/signal-brain.js?v=11').catch((e) => console.error(e)); };
+  const start = () => { if (started) return; started = true; import('/ventures/raptor/assets/signal-brain.js?v=13').catch((e) => console.error(e)); };
   if ('IntersectionObserver' in window) {
     const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { start(); io.disconnect(); } }, { rootMargin: '400px' });
     io.observe(el);
