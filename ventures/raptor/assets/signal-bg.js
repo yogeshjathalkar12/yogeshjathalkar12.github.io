@@ -1,22 +1,26 @@
-// Raptor page backdrop: the signal structure, faint, behind the page. It turns slowly by itself and also spins, tilts and
-// zooms with scrolling. It is decoration only, and it can be switched off with the button at the bottom left (the choice is remembered).
+// Raptor page graphic: the signal structure, small, in the lower right corner (beside the assistant). It turns slowly by itself and
+// also spins and tilts with scrolling. It is decoration only, and it can be switched off with the button at the bottom left (the
+// choice is remembered). It is a small box on purpose: a full-screen animated canvas was slow to start and heavy on laptops.
 // Same data and layout as the interactive map (signals.json, signal-layout.js): no sample data.
 //
 // Care taken: it loads after the page is idle, pauses when the tab is hidden, caps the pixel ratio, switches itself off on a slow
-// device, stays still (turning only as you scroll) for people who prefer reduced motion, and starts off when data saving is on.
+// device, stays still (turning only as you scroll) for people who prefer reduced motion, and is not loaded at all on phones or
+// when data saving is on.
 const canvas = document.getElementById('sb-bg-canvas'), btn = document.getElementById('sb-bg-toggle');
 if (canvas && btn) {
   const KEY = 'raptor-bg3d';
   const store = { get() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }, set(v) { try { localStorage.setItem(KEY, v); } catch (e) { /* private mode */ } } };
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const saveData = !!(navigator.connection && navigator.connection.saveData);
+  const phone = matchMedia('(max-width: 700px)').matches;   // the corner graphic is hidden on phones: do not even download the 3D library
   const COLORS = { fit: '#7c3aed', trigger: '#ec4899', size: '#f59e0b', web: '#10b981', tech: '#0ea5e9', need: '#ef4444', industry: '#8b5cf6', news: '#14b8a6', contact: '#f97316' };
-  let want = store.get() ? store.get() === 'on' : !saveData;
+  let want = !phone && (store.get() ? store.get() === 'on' : !saveData);
   let state = 'idle', slow = false, raf = 0, api = null;
 
   const label = () => {
     btn.setAttribute('aria-pressed', String(want && !slow));
-    btn.querySelector('span').textContent = slow ? '3D backdrop: off (slow device)' : '3D backdrop: ' + (want ? 'on' : 'off');
+    btn.querySelector('span').textContent = slow ? '3D graphic: off (slow device)' : '3D graphic: ' + (want ? 'on' : 'off');
+    btn.title = 'Show or hide the small turning 3D graphic';
   };
   const apply = () => {
     const on = want && !slow && state === 'ready';
@@ -62,16 +66,14 @@ if (canvas && btn) {
       world.add(core);
 
       const fit = () => {
-        const w = innerWidth, h = innerHeight;
-        renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.5)); renderer.setSize(w, h, false);
+        // size to the small box the stylesheet gives the canvas, not to the window
+        const w = Math.max(canvas.clientWidth, 1), h = Math.max(canvas.clientHeight, 1);
+        renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2)); renderer.setSize(w, h, false);   // few pixels, so sharp costs little
         camera.aspect = w / h; camera.updateProjectionMatrix();
-        // a little closer than "whole structure fits" so it fills the screen like a backdrop should
-        const wide = camera.aspect > 1.15;                                   // on a phone or a narrow window it stays centred
         const tanHalf = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
-        const dist = L.sceneRadius / (tanHalf * Math.min(1, camera.aspect)) * (wide ? 1.08 : 0.82);
+        const dist = L.sceneRadius / (tanHalf * Math.min(1, camera.aspect)) * 1.3;           // the whole structure sits inside the box, with room to tip and swell
         camera.position.set(0, 0, dist);
-        // on a wide screen, sit it right of centre (about four fifths across), under the Download button: it pivots there, so it turns in place
-        world.position.set(wide ? 0.31 * 2 * dist * tanHalf * camera.aspect : 0, wide ? -0.03 * 2 * dist * tanHalf : 0, 0);
+        world.position.set(0, 0, 0);
       };
       addEventListener('resize', fit); fit();
 
@@ -85,7 +87,7 @@ if (canvas && btn) {
           const prog = y / Math.max(1, document.documentElement.scrollHeight - innerHeight);
           world.rotation.y = yaw + y * 0.00012;
           world.rotation.x = 0.32 + Math.sin(y * 0.0004) * 0.14;                           // it tips slowly as you move down the page
-          world.scale.setScalar(1 + prog * 0.12);                                          // and swells a little towards the end
+          world.scale.setScalar(1 + prog * 0.06);                                          // and swells a little towards the end
           core.rotation.y += dt * 0.00005; core.rotation.x += dt * 0.00002;
           renderer.render(scene, camera);
           frames++; canvas.dataset.frames = frames; canvas.dataset.yaw = world.rotation.y.toFixed(5);

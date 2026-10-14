@@ -1,10 +1,11 @@
-/* Raptor page backdrop: the signal structure, faint, behind the content, with an on/off button. See signal-bg.js. */
+/* Raptor page graphic: the signal structure, small, in the lower right corner, with an on/off button. See signal-bg.js.
+   It sits to the left of the assistant avatar (which is 75px wide and 30px from the right edge), never over it. Clicks pass through. */
 .sb-bg {
-  position: fixed; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;
-  opacity: 0; transition: opacity 0.9s ease;
+  position: fixed; right: 124px; bottom: 18px; width: clamp(170px, 17vw, 250px); height: auto; aspect-ratio: 1 / 1;
+  z-index: 5; pointer-events: none; opacity: 0; transition: opacity 0.9s ease;
 }
-.sb-bg.on { opacity: 0.30; }
-body.dark-mode .sb-bg.on { opacity: 0.42; }
+.sb-bg.on { opacity: 0.62; }
+body.dark-mode .sb-bg.on { opacity: 0.8; }
 
 .sb-bg-toggle {
   position: fixed; left: 16px; bottom: 16px; z-index: 90; display: inline-flex; align-items: center; gap: 8px;
@@ -17,8 +18,6 @@ body.dark-mode .sb-bg.on { opacity: 0.42; }
 .sb-bg-toggle i { width: 8px; height: 8px; border-radius: 50%; background: var(--dim); display: inline-block; }
 .sb-bg-toggle[aria-pressed="true"] i { background: var(--purple); box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.22); }
 
-/* Three home-page sections paint an opaque background. While the backdrop is on, let it show through them a little. */
-body.has-3d-bg .cap-section, body.has-3d-bg .loop-section, body.has-3d-bg .who-section { background: color-mix(in srgb, var(--surface) 58%, transparent); }
-
-@media (max-width: 600px) { .sb-bg-toggle { left: 10px; bottom: 10px; } }
+/* On a phone there is no room for it and no reason to download the 3D library: hidden, and not loaded (signal-bg.js). */
+@media (max-width: 700px) { .sb-bg, .sb-bg-toggle { display: none; } }
 @media print { .sb-bg, .sb-bg-toggle { display: none; } }
