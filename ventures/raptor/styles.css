@@ -568,7 +568,13 @@ nav::after {
 
 .big-title {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(3.5rem, 8vw, 8rem);
+  font-size: clamp(3.5rem, 6vw, 6rem);
+  line-height: 0.88; letter-spacing: 0.02em;
+}
+
+.big-title1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.5rem, 4vw, 4rem);
   line-height: 0.88; letter-spacing: 0.02em;
 }
 .big-title em {
@@ -576,6 +582,10 @@ nav::after {
   background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
 }
 
+.big-title1 em {
+  font-style: normal;
+  background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
 .prose {
   font-family: 'Instrument Serif', serif;
   font-size: 1.15rem; line-height: 1.75;
