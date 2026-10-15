@@ -299,6 +299,8 @@ nav .nav-auth{gap:.8rem}
 .feat-text{margin:.2rem 0 0;max-width:300px;font-family:'Instrument Serif',serif;font-style:italic;font-size:1.05rem;line-height:1.6;color:var(--dim)}
 .feat-text[hidden]{display:none}
 /* FEAT:END */
+.cta-urgency-link{color:inherit;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.cta-urgency-link:hover{opacity:.8}
 /* SEO keyword markup that must not change how the text looks */
 .seo-kw{font-weight:inherit;font-style:inherit}
 /* hybrid LLM + RNN explainer behind a View more button */
@@ -1094,7 +1096,7 @@ if (el) {
   <div class="cta-glow"></div>
   <div class="cta-urgency reveal">
     <span class="cta-urgency-dot"></span>
-    Founding Member Slots · Limited Availability
+    Founding Member Slots · Limited Availability &middot; <a href="#" class="cta-urgency-link" data-open-auth="login">Log in to claim yours</a>
   </div>
   <h2 class="cta-title reveal">
     <span class="outline">Your</span><br>
