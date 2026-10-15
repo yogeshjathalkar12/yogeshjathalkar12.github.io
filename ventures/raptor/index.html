@@ -282,6 +282,23 @@ nav .nav-auth{gap:.8rem}
 @keyframes emTail{from{transform:rotate(-3deg)}to{transform:rotate(4deg)}}
 @media(max-width:700px),(prefers-reduced-motion:reduce){.emerge{display:none}}
 /* EMERGE:END */
+/* FEAT:START */
+.feat-list{margin-top:1.6rem;display:grid;gap:1rem;justify-items:start}
+.feat-tag{display:inline-flex;align-items:center;gap:.75rem;font-family:'DM Mono',monospace;font-size:.64rem;letter-spacing:.18em;text-transform:uppercase;color:var(--purple);
+  background:linear-gradient(135deg,rgba(168,85,247,.26),rgba(236,72,153,.22));
+  background:linear-gradient(135deg,color-mix(in srgb,var(--purple) 26%,transparent),color-mix(in srgb,var(--pink) 22%,transparent));
+  border:1px solid rgba(168,85,247,.30);border:1px solid color-mix(in srgb,var(--purple) 32%,transparent);
+  border-radius:999px;padding:.62rem 1.3rem .62rem .95rem;white-space:nowrap;cursor:pointer;
+  box-shadow:0 6px 16px rgba(168,85,247,.16);box-shadow:0 6px 16px color-mix(in srgb,var(--purple) 16%,transparent);
+  transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease,background-size .25s ease}
+.feat-tag:hover{transform:translateY(-2px);border-color:var(--purple);box-shadow:0 10px 24px rgba(168,85,247,.30);box-shadow:0 10px 24px color-mix(in srgb,var(--purple) 28%,transparent)}
+.feat-tag[aria-expanded="true"]{border-color:var(--purple)}
+.feat-tag:focus-visible{outline:2px solid var(--purple);outline-offset:3px}
+.feat-chev{display:inline-block;font-size:.5rem;letter-spacing:0;line-height:1;transition:transform .25s ease}
+.feat-tag[aria-expanded="true"] .feat-chev{transform:rotate(90deg)}
+.feat-text{margin:.2rem 0 0;max-width:300px;font-family:'Instrument Serif',serif;font-style:italic;font-size:1.05rem;line-height:1.6;color:var(--dim)}
+.feat-text[hidden]{display:none}
+/* FEAT:END */
 /* SEO keyword markup that must not change how the text looks */
 .seo-kw{font-weight:inherit;font-style:inherit}
 /* hybrid LLM + RNN explainer behind a View more button */
@@ -426,7 +443,30 @@ nav .nav-auth{gap:.8rem}
   <div class="statement-inner">
     <div class="statement-left">
       <div class="label">what we do differently</div>
-      <div class="statement-num">01</div>
+      <!-- FEAT:START -->
+      <div class="feat-list">
+        <div class="feat">
+          <button type="button" class="feat-tag" aria-expanded="false" aria-controls="feat1"><span class="feat-chev" aria-hidden="true">&gt;&gt;</span>Custom AI models</button>
+          <p class="feat-text" id="feat1" hidden><strong class="seo-kw">Hyper-customised AI models.</strong> We train AI models on sales and marketing data. We then train that customised sales model further on your own data, on your own PC, so you get a hyper-customised AI model optimised for your sales and marketing needs. We provide custom AI models.</p>
+        </div>
+        <div class="feat">
+          <button type="button" class="feat-tag" aria-expanded="false" aria-controls="feat2"><span class="feat-chev" aria-hidden="true">&gt;&gt;</span>Sales modelling</button>
+          <p class="feat-text" id="feat2" hidden><strong class="seo-kw">Mathematical and logical modelling</strong> of your sales procedures. Raptor learns from all of your data and turns what works into repeatable patterns and solutions. The aim is to optimise for wins and minimise losses, so you can recreate your best results again and again instead of leaving them to chance.</p>
+        </div>
+        <div class="feat">
+          <button type="button" class="feat-tag" aria-expanded="false" aria-controls="feat3"><span class="feat-chev" aria-hidden="true">&gt;&gt;</span>Live call guidance</button>
+          <p class="feat-text" id="feat3" hidden><strong class="seo-kw">Live call intelligence guidance</strong> helps you say the right things at the right time while the conversation is happening, so you give yourself the best chance of the result you want.</p>
+        </div>
+        <div class="feat">
+          <button type="button" class="feat-tag" aria-expanded="false" aria-controls="feat4"><span class="feat-chev" aria-hidden="true">&gt;&gt;</span>Prospect mapping</button>
+          <p class="feat-text" id="feat4" hidden><strong class="seo-kw">Prospect mapping</strong> assigns each prospect a category based on 100+ parameters. Each category then gets a custom approach, so every prospect is handled the way that suits them best.</p>
+        </div>
+        <div class="feat">
+          <button type="button" class="feat-tag" aria-expanded="false" aria-controls="feat5"><span class="feat-chev" aria-hidden="true">&gt;&gt;</span>Continuous learning</button>
+          <p class="feat-text" id="feat5" hidden><strong class="seo-kw">Continuous learning</strong> in a single app for all of your sales needs. We bring in your data and feed it to the maths engine and the LLM, so Raptor keeps learning and every data point is put to use.</p>
+        </div>
+      </div>
+      <!-- FEAT:END -->
     </div>
     <div>
       <p class="statement-text">
@@ -1466,5 +1506,9 @@ setTimeout(check,2500);
 })();
 </script>
 <!-- EMERGE:END -->
+<script>/* FEAT:JS */
+(function(){document.querySelectorAll(".feat-tag").forEach(function(b){var t=document.getElementById(b.getAttribute("aria-controls"));if(!t)return;
+b.addEventListener("click",function(){var open=b.getAttribute("aria-expanded")==="true";t.hidden=open;b.setAttribute("aria-expanded",open?"false":"true");});});})();
+</script>
 </body>
 </html>
