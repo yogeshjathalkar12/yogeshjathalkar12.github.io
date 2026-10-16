@@ -29,7 +29,8 @@ def rules(cfg):
          re.compile(r"https://(?:github\.com/[\w.-]+/[\w.-]+/releases/download/[^\"'\s)<>]*|raptor-download\.[\w.-]+\.workers\.dev/)Raptor-Setup-[\d.]+\.exe"),
          win["url"]),
         ("Mac download link",
-         re.compile(r"https://github\.com/[\w.-]+/[\w.-]+/releases/download/[^\"'\s)<>]*Raptor-[\d.]+-mac-arm64\.dmg"),
+         # the GitHub address (how it used to be) or the download proxy (see the Windows rule above)
+         re.compile(r"https://(?:github\.com/[\w.-]+/[\w.-]+/releases/download/[^\"'\s)<>]*|raptor-download\.[\w.-]+\.workers\.dev/)Raptor-[\d.]+-mac-arm64\.dmg"),
          mac["url"]),
         ("Mac file name in the text", re.compile(r"(?<![/\w])Raptor-[\d.]+-mac-arm64\.dmg"), mac["file"]),
         ("Windows button label", re.compile(r'aria-label="Download Raptor (?:v?[\d.]+ )?for Windows"'), f'aria-label="Download Raptor {v} for Windows"'),
