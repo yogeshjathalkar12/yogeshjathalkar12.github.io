@@ -70,6 +70,19 @@
   <p class="note reveal">This is macOS being cautious about a downloaded app that is not notarized, not a sign the file is broken. Open Terminal, paste the line below, press Return, then open Raptor again.</p>
   <pre class="codeblock reveal"><code>xattr -cr /Applications/Raptor.app</code></pre>
 </div></section>
+<section class="sec" id="error-10661"><div class="wrap">
+  <div class="label">If it goes wrong</div>
+  <h2>Error -10661: &ldquo;The application can&rsquo;t be opened.&rdquo;</h2>
+  <p class="note reveal">macOS shows this when it refuses to start an app it cannot verify, most often because Raptor was started from inside the installer window instead of from Applications. Try these in order and open Raptor after each one.</p>
+  <div class="steps">
+    <div class="step reveal"><div class="step-num">01</div><div><h3>Run it from Applications, not the installer</h3><p>Drag Raptor into the Applications folder, then eject the Raptor installer in the Finder sidebar. Open Raptor from Applications. Starting it straight from the .dmg window is the usual cause of this error.</p></div></div>
+    <div class="step reveal"><div class="step-num">02</div><div><h3>Clear the download flag</h3><p>Open Terminal, paste this line, press Return, then open Raptor again.</p><pre class="codeblock"><code>xattr -cr /Applications/Raptor.app</code></pre></div></div>
+    <div class="step reveal"><div class="step-num">03</div><div><h3>Open it with a right-click</h3><p>In Applications, right-click (or Control-click) Raptor, choose Open, then click Open in the box that appears. If macOS offers it, also use System Settings &rarr; Privacy &amp; Security &rarr; Open Anyway.</p></div></div>
+    <div class="step reveal"><div class="step-num">04</div><div><h3>Sign it on your own Mac</h3><p>If it still will not open, paste this line in Terminal, press Return, and open Raptor again.</p><pre class="codeblock"><code>codesign --force --deep --sign - /Applications/Raptor.app</code></pre></div></div>
+    <div class="step reveal"><div class="step-num">05</div><div><h3>Download it again</h3><p>A download that was interrupted can leave a damaged file. The installer should be about 850 MB. If yours is smaller, delete it and download it again with the button at the top of this page.</p></div></div>
+  </div>
+  <p class="note reveal">Still stuck? Email <a href="mailto:contact@shoonyaorigins.com">contact@shoonyaorigins.com</a> with your Mac model and macOS version. Remember the beta needs an Apple Silicon Mac (M1 or newer) on macOS 14 or later.</p>
+</div></section>
 <section class="sec"><div class="wrap">
   <div class="label">Good to know</div>
   <h2>What the beta does not do yet.</h2>

@@ -1703,3 +1703,15 @@ a.cap-item { display: block; text-decoration: none; color: inherit; }
 /* five header links now (Features added): keep them on one line */
 .nav-links { gap: 1.6rem; }
 .nav-links a { white-space: nowrap; letter-spacing: 0.14em; }
+
+/* Capabilities header with the demo video above the intro text */
+.cap-header-media { align-items: flex-end; gap: 3rem; }
+.cap-side { flex: 0 1 520px; min-width: 0; }
+.cap-video {
+  display: block; width: 100%; height: auto; margin-bottom: 1.8rem;
+  border: 1px solid var(--border); background: var(--surface);
+}
+@media (max-width: 900px) {
+  .cap-header-media { flex-direction: column; align-items: stretch; gap: 2rem; }
+  .cap-side { flex: none; width: 100%; }
+}

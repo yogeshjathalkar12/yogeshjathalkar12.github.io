@@ -583,12 +583,17 @@ nav .nav-auth{gap:.8rem}
 <!-- CAPABILITIES -->
 <div class="cap-section" id="capabilities">
   <div class="cap-inner">
-    <div class="cap-header">
+    <div class="cap-header cap-header-media">
       <div>
         <div class="label reveal">Our Capabilities</div>
         <h2 class="big-title reveal">One Unified.<br><em>Brain.</em></h2>
       </div>
-      <p class="prose reveal">Where competitors offer a toolkit, Raptor offers unified intelligence. One system that sees everything, learns from everything, and compounds everything.</p>
+      <div class="cap-side">
+        <video class="cap-video reveal" autoplay loop muted playsinline preload="metadata" aria-label="Raptor demo: the autonomous prospecting engine at work">
+          <source src="https://shoonyaorigins.com/images/raptor-demo.webm" type="video/webm">
+        </video>
+        <p class="prose reveal">Where competitors offer a toolkit, Raptor offers unified intelligence. One system that sees everything, learns from everything, and compounds everything.</p>
+      </div>
     </div>
 
     <div class="cap-grid">
@@ -1354,7 +1359,7 @@ document.querySelectorAll('.arch-more').forEach(function(b){b.addEventListener('
       <div class="dl-ok"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
       <h3>Download started</h3>
       <p id="dlMsg">Your download should begin in a moment. If nothing happens, <button type="button" class="dl-retry" id="dlRetry">try again</button>.</p>
-      <p id="dlMacNote" hidden>New to Mac installs? Read the <a href="/ventures/raptor/install-mac.html">install guide</a>.</p>
+      <p id="dlMacNote" hidden>New to Mac installs? Read the <a href="/ventures/raptor/install-mac.html">install guide</a>. Seeing error -10661? <a href="/ventures/raptor/install-mac.html#error-10661">Here is the fix</a>.</p>
       <div class="dl-help">Any problem? Reach out to us at <a href="mailto:service.raptor@shoonyaorigins.com">service.raptor@shoonyaorigins.com</a></div>
     </div>
   </div>
