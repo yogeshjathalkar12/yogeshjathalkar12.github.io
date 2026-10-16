@@ -1,8 +1,8 @@
 {
-  "_about": "The ONE place that says which Raptor version each download is. After publishing a release, edit this file and run:  python scripts/set_release.py   It rewrites every download link and version label on the Raptor pages. Both platforms use the same version number from raptor-ui/package.json, and both files live in the same GitHub release (raptor-dist, tag v<version>).",
+  "_about": "The ONE place that says which Raptor version each download is. After publishing a release, edit this file and run:  python scripts/set_release.py   It rewrites every download link and version label on the Raptor pages. Both platforms use the same version number from raptor-ui/package.json, and both files live in the same GitHub release (raptor-dist, tag v<version>). The Windows link goes through the Cloudflare Worker 'raptor-download' (source: release-proxy/worker.js in the desktop repo), which serves the file from that GitHub release with an address that does not expire, so slow downloads finish. Releasing needs no extra upload: publish on GitHub, then change the version number in the URL here.",
   "windows": {
     "version": "0.1.7",
-    "url": "https://github.com/yogeshjathalkar12/raptor-dist/releases/download/v0.1.7/Raptor-Setup-0.1.7.exe"
+    "url": "https://raptor-download.yogeshjathalkar.workers.dev/Raptor-Setup-0.1.7.exe"
   },
   "mac": {
     "version": "0.1.1",

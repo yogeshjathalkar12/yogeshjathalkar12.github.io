@@ -25,7 +25,8 @@ def rules(cfg):
     v = win["version"]
     return [
         ("Windows download link",
-         re.compile(r"https://github\.com/[\w.-]+/[\w.-]+/releases/download/[^\"'\s)<>]*Raptor-Setup-[\d.]+\.exe"),
+         # either the GitHub address (how it used to be) or the download proxy that serves it without the 37-minute link expiry
+         re.compile(r"https://(?:github\.com/[\w.-]+/[\w.-]+/releases/download/[^\"'\s)<>]*|raptor-download\.[\w.-]+\.workers\.dev/)Raptor-Setup-[\d.]+\.exe"),
          win["url"]),
         ("Mac download link",
          re.compile(r"https://github\.com/[\w.-]+/[\w.-]+/releases/download/[^\"'\s)<>]*Raptor-[\d.]+-mac-arm64\.dmg"),
