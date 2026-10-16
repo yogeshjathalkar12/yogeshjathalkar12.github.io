@@ -967,43 +967,91 @@ if (el) {
 </div>
 
 <!-- WATCH -->
-<div class="yt-section" id="watch">
+<div class="yt-section" id="watch" hidden>
   <div class="yt-inner">
     <div class="label reveal">Watch Raptor</div>
     <h2 class="big-title reveal">See It<br><em>In Action.</em></h2>
     <p class="prose reveal" style="margin-top:1.5rem;">Short clips from our YouTube channel. Press play to watch.</p>
-    <div class="yt-row">
-      <div class="yt-card reveal" hidden data-yt="WFf3AjVpTNs" data-title="Visit Raptor Now"></div>
-      <div class="yt-card reveal" hidden data-yt="KRVlRSH6hkI" data-title="Raptor on YouTube"></div>
-    </div>
+  </div>
+  <div class="yt-viewport"><div class="yt-track" id="ytTrack"></div></div>
+  <div class="yt-inner">
     <a class="btn-ghost yt-more" href="https://www.youtube.com/@Raptor.ShoonyaOrigin" target="_blank" rel="noopener">More on YouTube</a>
   </div>
 </div>
 <script>
 (function () {
-  // Each card shows the video's thumbnail first and loads the player only when clicked. A card whose video is not public
-  // has no thumbnail, so it stays hidden until the video is made public or unlisted.
-  document.querySelectorAll('.yt-card[data-yt]').forEach(function (card) {
-    var id = card.getAttribute('data-yt'), title = card.getAttribute('data-title') || 'Raptor video';
-    var img = new Image();
-    img.alt = ''; img.decoding = 'async';
-    img.onload = function () {
-      if (img.naturalWidth < 200) return;   // YouTube answers a private or missing video with a tiny gray placeholder
+  var VIDEOS = [
+    { id: 'WFf3AjVpTNs', title: 'Visit Raptor Now' },
+    { id: 'KRVlRSH6hkI', title: 'Raptor on YouTube' }
+  ];
+  var CARD = 270 + 24;                       // card width + space after it (keep in step with styles.css)
+  var section = document.getElementById('watch'), track = document.getElementById('ytTrack');
+  var ready = [], activeReset = null, lastWidth = 0;
+
+  // Only videos that are public or unlisted have a real thumbnail: YouTube answers a private or missing one with a tiny gray image.
+  function check(v) {
+    return new Promise(function (resolve) {
+      var img = new Image();
+      img.onload = function () { resolve(img.naturalWidth >= 200 ? v : null); };
+      img.onerror = function () { resolve(null); };
+      img.src = 'https://i.ytimg.com/vi/' + v.id + '/hqdefault.jpg';
+    });
+  }
+
+  // A card shows the thumbnail and loads the player only when clicked. One video plays at a time, and the strip stops moving while it does.
+  function makeCard(v, isClone) {
+    var card = document.createElement('div');
+    card.className = 'yt-card';
+    if (isClone) card.setAttribute('aria-hidden', 'true');
+    function showThumb() {
       var btn = document.createElement('button');
-      btn.type = 'button'; btn.className = 'yt-play'; btn.setAttribute('aria-label', 'Play video: ' + title);
-      btn.appendChild(img);
-      var icon = document.createElement('span'); icon.className = 'yt-icon'; icon.setAttribute('aria-hidden', 'true'); btn.appendChild(icon);
+      btn.type = 'button'; btn.className = 'yt-play'; btn.setAttribute('aria-label', 'Play video: ' + v.title);
+      if (isClone) btn.tabIndex = -1;
+      var img = document.createElement('img');
+      img.alt = ''; img.decoding = 'async'; img.src = 'https://i.ytimg.com/vi/' + v.id + '/hqdefault.jpg';
+      var icon = document.createElement('span'); icon.className = 'yt-icon'; icon.setAttribute('aria-hidden', 'true');
+      btn.appendChild(img); btn.appendChild(icon);
       btn.addEventListener('click', function () {
+        if (activeReset) activeReset();
         var f = document.createElement('iframe');
-        f.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0&playsinline=1';
-        f.title = title; f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen'; f.allowFullscreen = true;
+        f.src = 'https://www.youtube-nocookie.com/embed/' + v.id + '?autoplay=1&rel=0&playsinline=1';
+        f.title = v.title; f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen'; f.allowFullscreen = true;
         f.referrerPolicy = 'strict-origin-when-cross-origin';
         card.replaceChildren(f);
+        track.classList.add('is-playing');
+        activeReset = function () { showThumb(); track.classList.remove('is-playing'); activeReset = null; };
       });
       card.replaceChildren(btn);
-      card.hidden = false;
-    };
-    img.src = 'https://i.ytimg.com/vi/' + id + '/hqdefault.jpg';
+    }
+    showThumb();
+    return card;
+  }
+
+  // The strip is the list of videos repeated until it is wider than the screen, twice over, and slides left to right by exactly one
+  // half so the loop has no jump.
+  function build() {
+    if (!ready.length) return;
+    activeReset = null; track.classList.remove('is-playing');
+    var unit = CARD * ready.length, copies = Math.max(1, Math.ceil(window.innerWidth / unit));
+    var frag = document.createDocumentFragment();
+    for (var half = 0; half < 2; half++)
+      for (var c = 0; c < copies; c++)
+        ready.forEach(function (v) { frag.appendChild(makeCard(v, half === 1 || c > 0)); });
+    track.replaceChildren(frag);
+    track.style.setProperty('--yt-dur', Math.round((unit * copies) / 35) + 's');   // about 35 px per second
+    lastWidth = window.innerWidth;
+  }
+
+  Promise.all(VIDEOS.map(check)).then(function (found) {
+    ready = found.filter(Boolean);
+    if (!ready.length) return;
+    section.hidden = false;
+    build();
+    var timer;
+    window.addEventListener('resize', function () {
+      clearTimeout(timer);
+      timer = setTimeout(function () { if (window.innerWidth > lastWidth && !track.classList.contains('is-playing')) build(); }, 300);
+    });
   });
 })();
 </script>
