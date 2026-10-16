@@ -223,6 +223,14 @@ nav .nav-login-btn:hover{color:#fff;border-color:#c084fc;background:rgba(168,85,
 .dl-help{margin-top:1.4rem;padding-top:1.2rem;border-top:1px solid var(--border,rgba(0,0,0,.12));font-size:.9rem}
 .dl-help a,.dl-retry{color:#a855f7;text-decoration:underline;background:none;border:0;padding:0;font:inherit;cursor:pointer}
 .dl-step[hidden]{display:none}
+.dl-overlay{padding-top:6rem}
+.dl-card{max-height:calc(100vh - 7.5rem);overflow-y:auto}
+.dl-fix{margin:0 0 1.2rem;padding:1rem 1.1rem;border-radius:12px;border:1px solid var(--border,rgba(0,0,0,.12));text-align:left;font-size:.88rem;line-height:1.5}
+.dl-fix b{display:block;margin-bottom:.5rem;font-weight:500;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase}
+.dl-fix ol{margin:0 0 .6rem;padding-left:1.2rem;color:var(--dim)}
+.dl-fix li{margin-bottom:.35rem}
+.dl-fix code{font-family:'DM Mono',monospace;font-size:.76rem;padding:.1rem .3rem;border-radius:4px;background:rgba(168,85,247,.12);color:var(--white);word-break:break-all}
+.dl-fix a{color:#a855f7;text-decoration:underline}
 @media(max-width:480px){.dl-options{grid-template-columns:1fr}}
 /* DEMO:START */
 nav .nav-demo{padding:.78rem 1.3rem;border-radius:999px;border:1px solid rgba(192,132,252,.7);background:rgba(168,85,247,.12);color:#f3e8ff;font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;white-space:nowrap;cursor:pointer;transition:background .2s,border-color .2s,transform .2s}
@@ -1448,7 +1456,20 @@ document.querySelectorAll('.arch-more').forEach(function(b){b.addEventListener('
       <div class="dl-ok"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
       <h3>Download started</h3>
       <p id="dlMsg">Your download should begin in a moment. If nothing happens, <button type="button" class="dl-retry" id="dlRetry">try again</button>.</p>
-      <p id="dlMacNote" hidden>New to Mac installs? Read the <a href="/ventures/raptor/install-mac.html">install guide</a>. Seeing error -10661? <a href="/ventures/raptor/install-mac.html#error-10661">Here is the fix</a>.</p>
+      <div id="dlMacNote" hidden>
+        <p>New to Mac installs? Read the <a href="/ventures/raptor/install-mac.html">install guide</a>.</p>
+        <div class="dl-fix">
+          <b>Error -10661, &ldquo;The application can&rsquo;t be opened&rdquo;?</b>
+          <ol>
+            <li>Drag Raptor into Applications, eject the installer, and open Raptor from Applications (not from the installer window).</li>
+            <li>In Terminal run <code>xattr -cr /Applications/Raptor.app</code>, then open Raptor again.</li>
+            <li>Right-click Raptor in Applications, choose Open, then Open.</li>
+            <li>Still blocked? Run <code>codesign --force --deep --sign - /Applications/Raptor.app</code> and open it again.</li>
+            <li>The installer should be about 850 MB. If yours is smaller, download it again.</li>
+          </ol>
+          <a href="/ventures/raptor/install-mac.html#error-10661">See the full steps</a>
+        </div>
+      </div>
       <div class="dl-help">Any problem? Reach out to us at <a href="mailto:service.raptor@shoonyaorigins.com">service.raptor@shoonyaorigins.com</a></div>
     </div>
   </div>
