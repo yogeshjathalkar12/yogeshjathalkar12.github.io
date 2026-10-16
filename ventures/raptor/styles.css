@@ -1721,10 +1721,12 @@ a.cap-item { display: block; text-decoration: none; color: inherit; }
 .yt-section[hidden] { display: none; }
 .yt-inner { max-width: 1200px; margin: 0 auto; padding: 0 4rem; box-sizing: border-box; }
 .yt-viewport {
-  margin-top: 4rem; overflow: hidden;
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
-          mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  /* four cards wide (4 x 294 px, less the gap after the last one): cards slide in and out at the edges of this window, not the screen */
+  max-width: 1176px; margin-top: 4rem; overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 48px, #000 calc(100% - 48px), transparent);
+          mask-image: linear-gradient(90deg, transparent, #000 48px, #000 calc(100% - 48px), transparent);
 }
+@media (min-width: 1280px) { .yt-viewport { width: 1152px; max-width: none; } }
 .yt-track { display: flex; width: max-content; animation: yt-slide var(--yt-dur, 60s) linear infinite; }
 .yt-track:hover, .yt-track:focus-within, .yt-track.is-playing { animation-play-state: paused; }
 @keyframes yt-slide { from { transform: translateX(-50%); } to { transform: translateX(0); } }

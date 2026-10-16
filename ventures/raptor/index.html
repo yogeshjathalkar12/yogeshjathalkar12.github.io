@@ -972,9 +972,7 @@ if (el) {
     <div class="label reveal">Watch Raptor</div>
     <h2 class="big-title reveal">See It<br><em>In Action.</em></h2>
     <p class="prose reveal" style="margin-top:1.5rem;">Short clips from our YouTube channel. Press play to watch.</p>
-  </div>
-  <div class="yt-viewport"><div class="yt-track" id="ytTrack"></div></div>
-  <div class="yt-inner">
+    <div class="yt-viewport" id="ytViewport"><div class="yt-track" id="ytTrack"></div></div>
     <a class="btn-ghost yt-more" href="https://www.youtube.com/@Raptor.ShoonyaOrigin" target="_blank" rel="noopener">More on YouTube</a>
   </div>
 </div>
@@ -985,7 +983,7 @@ if (el) {
     { id: 'KRVlRSH6hkI', title: 'Raptor on YouTube' }
   ];
   var CARD = 270 + 24;                       // card width + space after it (keep in step with styles.css)
-  var section = document.getElementById('watch'), track = document.getElementById('ytTrack');
+  var section = document.getElementById('watch'), track = document.getElementById('ytTrack'), viewport = document.getElementById('ytViewport');
   var ready = [], activeReset = null, lastWidth = 0;
 
   // Only videos that are public or unlisted have a real thumbnail: YouTube answers a private or missing one with a tiny gray image.
@@ -1032,14 +1030,14 @@ if (el) {
   function build() {
     if (!ready.length) return;
     activeReset = null; track.classList.remove('is-playing');
-    var unit = CARD * ready.length, copies = Math.max(1, Math.ceil(window.innerWidth / unit));
+    var unit = CARD * ready.length, copies = Math.max(1, Math.ceil(viewport.clientWidth / unit));
     var frag = document.createDocumentFragment();
     for (var half = 0; half < 2; half++)
       for (var c = 0; c < copies; c++)
         ready.forEach(function (v) { frag.appendChild(makeCard(v, half === 1 || c > 0)); });
     track.replaceChildren(frag);
     track.style.setProperty('--yt-dur', Math.round((unit * copies) / 35) + 's');   // about 35 px per second
-    lastWidth = window.innerWidth;
+    lastWidth = viewport.clientWidth;
   }
 
   Promise.all(VIDEOS.map(check)).then(function (found) {
@@ -1050,7 +1048,7 @@ if (el) {
     var timer;
     window.addEventListener('resize', function () {
       clearTimeout(timer);
-      timer = setTimeout(function () { if (window.innerWidth > lastWidth && !track.classList.contains('is-playing')) build(); }, 300);
+      timer = setTimeout(function () { if (viewport.clientWidth > lastWidth && !track.classList.contains('is-playing')) build(); }, 300);
     });
   });
 })();
