@@ -239,6 +239,14 @@ nav .nav-demo:focus-visible{outline:2px solid #fff;outline-offset:3px}
 nav .nav-auth{gap:.8rem}
 @media(max-width:1180px){nav .nav-links{gap:1.1rem}nav .nav-demo,nav .nav-login-btn{padding:.7rem 1rem;letter-spacing:.14em}}
 @media(max-width:900px){nav .nav-demo{display:none}}
+@media(max-width:560px){
+nav{padding:.7rem 3.4rem .7rem .8rem}
+nav .nav-logo-ai,nav .nav-login-btn .nl-more,.nav-download svg{display:none}
+nav .nav-auth{gap:.45rem}
+nav .nav-login-btn{padding:.55rem .8rem;font-size:.56rem;letter-spacing:.1em}
+.nav-download{padding:.6rem .85rem;font-size:.56rem}
+.trust-item{white-space:normal;text-align:center}
+}
 .demo-form{text-align:left;display:grid;gap:1rem;margin-top:.4rem}
 .demo-field label{display:block;font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:.35rem}
 .demo-field label i{font-style:normal;opacity:.7;text-transform:none;letter-spacing:.04em}
@@ -375,7 +383,7 @@ nav .nav-auth{gap:.8rem}
   </ul>
   <div class="nav-auth">
     <button type="button" class="nav-demo" id="navDemo" aria-haspopup="dialog">Book demo</button>
-    <button class="nav-login-btn" id="navLoginBtn" data-open-auth="login">Log in / Sign up</button>
+    <button class="nav-login-btn" id="navLoginBtn" data-open-auth="login">Log in<span class="nl-more"> / Sign up</span></button>
     <button type="button" class="nav-download" id="navDownload" aria-haspopup="dialog">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M4 20h16"/></svg>
       Download

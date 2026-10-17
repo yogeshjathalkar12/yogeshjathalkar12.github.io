@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
+<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-XV0W5ZV0RQ"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -12,898 +12,78 @@
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Raptor — Pricing</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=IBM+Plex+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --black: #030303;
-    --white: #f4f4f5;
-    --purple: #a855f7;
-    --pink: #ec4899;
-    --grad: linear-gradient(135deg, #a855f7, #ec4899);
-    --dim: #3f3f46;
-    --mid: #71717a;
-    --faint: #0a0a0a;
-    --border: rgba(255,255,255,0.06);
-  }
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  html { scroll-behavior: smooth; }
-
-  body {
-    background: var(--black);
-    color: var(--white);
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 13px;
-    line-height: 1.6;
-    overflow-x: hidden;
-    cursor: crosshair;
-  }
-
-  /* NOISE OVERLAY - Matches Home Site */
-  body::after {
-    content: '';
-    position: fixed; inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 9999;
-    opacity: 0.5;
-  }
-
-  /* NAV */
-  nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 40px;
-    border-bottom: 1px solid var(--border);
-    background: rgba(3,3,3,0.95);
-    backdrop-filter: blur(10px);
-  }
-
-  .nav-logo {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 22px;
-    letter-spacing: 4px;
-    background: var(--grad);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-decoration: none;
-  }
-
-  .nav-links {
-    display: flex;
-    gap: 32px;
-    list-style: none;
-  }
-
-  .nav-links a {
-    color: var(--mid);
-    text-decoration: none;
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    transition: color 0.2s;
-  }
-
-  .nav-links a:hover { color: var(--white); }
-
-  .nav-exit {
-    color: var(--mid);
-    text-decoration: none;
-    font-size: 11px;
-    letter-spacing: 2px;
-    border: 1px solid var(--dim);
-    padding: 6px 14px;
-    transition: all 0.2s;
-  }
-
-  .nav-exit:hover {
-    color: var(--purple);
-    border-color: var(--purple);
-  }
-
-  /* HERO */
-  .hero {
-    padding: 160px 40px 80px;
-    border-bottom: 1px solid var(--border);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .hero::after {
-    content: 'PRICING';
-    position: absolute;
-    right: -20px;
-    top: 50%;
-    transform: translateY(-50%) rotate(90deg);
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 180px;
-    color: rgba(168,85,247,0.03);
-    letter-spacing: 20px;
-    pointer-events: none;
-    white-space: nowrap;
-  }
-
-  .system-tag {
-    font-size: 10px;
-    letter-spacing: 3px;
-    color: var(--mid);
-    text-transform: uppercase;
-    margin-bottom: 24px;
-  }
-
-  .system-tag span {
-    color: var(--purple);
-    animation: blink 1.4s infinite;
-  }
-
-  /* CUSTOM CURSOR STYLES */
-body { cursor: none; } /* Hide the default cursor */
-
-.cursor {
-  position: fixed;
-  width: 8px; height: 8px;
-  background: var(--purple);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9999;
-  transform: translate(-50%, -50%);
-  transition: transform 0.1s ease, width 0.3s ease, height 0.3s ease, background 0.3s ease;
-  mix-blend-mode: screen;
-}
-
-.cursor-ring {
-  position: fixed;
-  width: 32px; height: 32px;
-  border: 1px solid rgba(168,85,247,0.4);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9998;
-  transform: translate(-50%, -50%);
-  transition: all 0.15s ease;
-}
-
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
-  }
-
-  .hero h1 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(60px, 10vw, 120px);
-    line-height: 0.9;
-    letter-spacing: 4px;
-    margin-bottom: 32px;
-  }
-
-  .hero h1 em {
-    font-style: normal;
-    background: var(--grad);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .hero-sub {
-    max-width: 560px;
-    color: var(--mid);
-    font-size: 13px;
-    line-height: 1.8;
-    margin-bottom: 48px;
-  }
-
-  .hero-sub strong { color: var(--white); }
-
-  /* FOUNDING BANNER */
-  .founding-banner {
-    background: var(--grad);
-    color: var(--white);
-    padding: 14px 40px;
-    font-size: 11px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-  }
-
-  .founding-banner strong { font-weight: 700; }
-
-  .founding-count {
-    background: rgba(0,0,0,0.3);
-    padding: 4px 12px;
-    font-weight: 700;
-    letter-spacing: 2px;
-  }
-
-  /* SECTION STRUCTURE */
-  section {
-    padding: 80px 40px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .section-label {
-    font-size: 10px;
-    letter-spacing: 4px;
-    color: var(--purple);
-    text-transform: uppercase;
-    margin-bottom: 48px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .section-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-    max-width: 200px;
-  }
-
-  /* PRICING GRID */
-  .pricing-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-    margin-bottom: 60px;
-  }
-
-  .plan {
-    background: var(--black);
-    padding: 40px 32px;
-    position: relative;
-    transition: background 0.3s;
-  }
-
-  .plan:hover { background: #080808; }
-
-  .plan.featured {
-    background: #0a0a0a;
-    outline: 1px solid var(--purple);
-    outline-offset: -1px;
-  }
-
-  .plan-badge {
-    font-size: 9px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--purple);
-    margin-bottom: 20px;
-    display: block;
-  }
-
-  .plan.featured .plan-badge {
-    background: var(--grad);
-    color: var(--white);
-    display: inline-block;
-    padding: 3px 10px;
-    margin-bottom: 20px;
-  }
-
-  .plan-name {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 36px;
-    letter-spacing: 3px;
-    margin-bottom: 8px;
-    color: var(--white);
-  }
-
-  .plan-target {
-    font-size: 10px;
-    color: var(--mid);
-    letter-spacing: 1px;
-    margin-bottom: 32px;
-    padding-bottom: 32px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .plan-price {
-    margin-bottom: 32px;
-  }
-
-  .price-amount {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 52px;
-    letter-spacing: 2px;
-    line-height: 1;
-    color: var(--white);
-  }
-
-  .plan.featured .price-amount {
-    background: var(--grad);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .price-period {
-    font-size: 11px;
-    color: var(--mid);
-    letter-spacing: 2px;
-    margin-top: 4px;
-  }
-
-  .price-annual {
-    font-size: 10px;
-    color: var(--purple);
-    margin-top: 6px;
-    letter-spacing: 1px;
-  }
-
-  .plan-features {
-    list-style: none;
-    margin-bottom: 40px;
-  }
-
-  .plan-features li {
-    font-size: 11px;
-    color: var(--mid);
-    padding: 8px 0;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    line-height: 1.5;
-  }
-
-  .plan-features li::before {
-    content: '├';
-    color: var(--dim);
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-
-  .plan-features li:last-child::before { content: '└'; }
-
-  .plan-features li strong { color: var(--white); }
-
-  .plan-features li.locked {
-    opacity: 0.15;
-    text-decoration: line-through;
-  }
-
-  .plan-cta {
-    display: block;
-    width: 100%;
-    padding: 14px;
-    background: transparent;
-    border: 1px solid var(--dim);
-    color: var(--mid);
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-align: center;
-    text-decoration: none;
-  }
-
-  .plan-cta:hover {
-    border-color: var(--purple);
-    color: var(--white);
-    background: rgba(168,85,247,0.05);
-  }
-
-  .plan.featured .plan-cta {
-    background: var(--grad);
-    border-color: transparent;
-    color: var(--white);
-  }
-
-  .plan.featured .plan-cta:hover {
-    opacity: 0.9;
-  }
-
-  /* ADD-ONS */
-  .addons-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-  }
-
-  .addon {
-    background: var(--black);
-    padding: 28px 24px;
-    transition: background 0.2s;
-  }
-
-  .addon:hover { background: #080808; }
-
-  .addon-label {
-    font-size: 9px;
-    letter-spacing: 3px;
-    color: var(--purple);
-    text-transform: uppercase;
-    margin-bottom: 10px;
-  }
-
-  .addon-name {
-    font-size: 13px;
-    color: var(--white);
-    margin-bottom: 8px;
-    letter-spacing: 1px;
-  }
-
-  .addon-desc {
-    font-size: 10px;
-    color: var(--mid);
-    margin-bottom: 16px;
-    line-height: 1.6;
-  }
-
-  .addon-price {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 28px;
-    letter-spacing: 2px;
-    color: var(--white);
-  }
-
-  .addon-price span {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    color: var(--mid);
-    letter-spacing: 1px;
-  }
-
-  /* ANNUAL TABLE */
-  .annual-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  .annual-table th {
-    font-size: 10px;
-    letter-spacing: 3px;
-    color: var(--mid);
-    text-transform: uppercase;
-    text-align: left;
-    padding: 12px 20px;
-    border-bottom: 1px solid var(--border);
-    font-weight: 400;
-  }
-
-  .annual-table td {
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--border);
-    font-size: 12px;
-    vertical-align: middle;
-  }
-
-  .annual-table tr:hover td { background: #080808; }
-
-  .annual-table .plan-col { color: var(--white); letter-spacing: 1px; }
-  .annual-table .monthly-col { color: var(--mid); }
-  .annual-table .annual-col { color: var(--purple); }
-  .annual-table .saving-col { background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; }
-
-  /* FOUNDING */
-  .founding-section {
-    background: #050505;
-  }
-
-  .founding-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 60px;
-    align-items: start;
-  }
-
-  .founding-left h2 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 56px;
-    letter-spacing: 3px;
-    line-height: 0.95;
-    margin-bottom: 24px;
-  }
-
-  .founding-left h2 em {
-    font-style: normal;
-    background: var(--grad);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .founding-left p {
-    color: var(--mid);
-    font-size: 12px;
-    line-height: 1.9;
-    margin-bottom: 16px;
-  }
-
-  .founding-left p strong { color: var(--white); }
-
-  .founding-benefits {
-    list-style: none;
-    margin-top: 32px;
-  }
-
-  .founding-benefits li {
-    font-size: 11px;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    gap: 12px;
-    color: var(--mid);
-  }
-
-  .founding-benefits li::before {
-    content: '//';
-    color: var(--purple);
-    flex-shrink: 0;
-  }
-
-  .founding-benefits li strong { color: var(--white); }
-
-  .founding-right {
-    border: 1px solid var(--border);
-    padding: 40px;
-  }
-
-  .slots-counter {
-    text-align: center;
-    padding: 32px 0;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 32px;
-  }
-
-  .slots-number {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 96px;
-    color: var(--purple);
-    line-height: 1;
-    letter-spacing: 4px;
-  }
-
-  .slots-label {
-    font-size: 10px;
-    letter-spacing: 4px;
-    color: var(--mid);
-    text-transform: uppercase;
-    margin-top: 8px;
-  }
-
-  .slots-bar {
-    width: 100%;
-    height: 2px;
-    background: var(--border);
-    margin: 24px 0;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .slots-bar::after {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 35%;
-    background: var(--grad);
-  }
-
-  .slots-taken {
-    display: flex;
-    justify-content: space-between;
-    font-size: 10px;
-    color: var(--mid);
-    letter-spacing: 1px;
-  }
-
-  .founding-price-display {
-    text-align: center;
-    padding: 24px 0;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 24px;
-  }
-
-  .founding-price-old {
-    font-size: 18px;
-    color: var(--dim);
-    text-decoration: line-through;
-    letter-spacing: 2px;
-    font-family: 'Bebas Neue', sans-serif;
-  }
-
-  .founding-price-new {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 64px;
-    color: var(--white);
-    letter-spacing: 3px;
-    line-height: 1;
-  }
-
-  .founding-price-note {
-    font-size: 10px;
-    color: var(--purple);
-    letter-spacing: 2px;
-    margin-top: 8px;
-  }
-
-  .founding-cta {
-    display: block;
-    width: 100%;
-    padding: 18px;
-    background: var(--grad);
-    border: none;
-    color: var(--white);
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: opacity 0.2s;
-    text-align: center;
-    text-decoration: none;
-    margin-bottom: 12px;
-  }
-
-  .founding-cta:hover { opacity: 0.9; }
-
-  .founding-cta-note {
-    font-size: 10px;
-    color: var(--mid);
-    text-align: center;
-    letter-spacing: 1px;
-  }
-
-  /* ROI CALCULATOR */
-  .roi-section {
-    background: #030303;
-  }
-
-  .roi-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-  }
-
-  .roi-inputs {
-    background: var(--black);
-    padding: 40px;
-  }
-
-  .roi-outputs {
-    background: #080808;
-    padding: 40px;
-  }
-
-  .roi-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 28px;
-    letter-spacing: 3px;
-    margin-bottom: 32px;
-    color: var(--white);
-  }
-
-  .roi-field {
-    margin-bottom: 28px;
-  }
-
-  .roi-field label {
-    display: block;
-    font-size: 10px;
-    letter-spacing: 3px;
-    color: var(--mid);
-    text-transform: uppercase;
-    margin-bottom: 10px;
-  }
-
-  .roi-field input, .roi-field select {
-    width: 100%;
-    background: transparent;
-    border: 1px solid var(--dim);
-    color: var(--white);
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 18px;
-    padding: 12px 16px;
-    outline: none;
-    transition: border-color 0.2s;
-    letter-spacing: 2px;
-  }
-
-  .roi-field input:focus, .roi-field select:focus {
-    border-color: var(--purple);
-  }
-
-  .roi-field select option { background: #111; }
-
-  .roi-metric {
-    padding: 24px 0;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .roi-metric:last-child { border-bottom: none; }
-
-  .roi-metric-label {
-    font-size: 10px;
-    letter-spacing: 3px;
-    color: var(--mid);
-    text-transform: uppercase;
-    margin-bottom: 8px;
-  }
-
-  .roi-metric-value {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 48px;
-    letter-spacing: 3px;
-    color: var(--white);
-    line-height: 1;
-  }
-
-  .roi-metric-value.positive { background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  .roi-metric-value.highlight { color: var(--purple); text-shadow: 0 0 10px rgba(168,85,247,0.3); }
-
-  .roi-metric-sub {
-    font-size: 10px;
-    color: var(--mid);
-    margin-top: 4px;
-    letter-spacing: 1px;
-  }
-
-  /* COMPARISON */
-  .comparison-grid {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  .comparison-grid th {
-    font-size: 11px;
-    letter-spacing: 2px;
-    padding: 16px 20px;
-    text-align: center;
-    border-bottom: 1px solid var(--border);
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 18px;
-    letter-spacing: 3px;
-  }
-
-  .comparison-grid th:first-child { text-align: left; }
-  .comparison-grid th.raptor-col { background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-  .comparison-grid td {
-    padding: 14px 20px;
-    border-bottom: 1px solid var(--border);
-    font-size: 11px;
-    text-align: center;
-    color: var(--mid);
-  }
-
-  .comparison-grid td:first-child {
-    text-align: left;
-    color: var(--white);
-    letter-spacing: 1px;
-  }
-
-  .comparison-grid tr:hover td { background: #080808; }
-
-  .check { color: var(--purple); font-size: 14px; }
-  .cross { color: var(--dim); font-size: 14px; opacity: 0.3; }
-  .partial { color: var(--purple); font-size: 11px; letter-spacing: 1px; opacity: 0.6; }
-
-  /* FOOTER */
-  footer {
-    padding: 40px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 10px;
-    color: var(--mid);
-    letter-spacing: 2px;
-    border-top: 1px solid var(--border);
-  }
-
-  .footer-logo {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 18px;
-    letter-spacing: 4px;
-    background: var(--grad);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  /* ANIMATIONS */
-  .fade-in {
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeIn 0.6s forwards;
-  }
-
-  @keyframes fadeIn {
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .fade-in:nth-child(1) { animation-delay: 0.1s; }
-  .fade-in:nth-child(2) { animation-delay: 0.2s; }
-  .fade-in:nth-child(3) { animation-delay: 0.3s; }
-  .fade-in:nth-child(4) { animation-delay: 0.4s; }
-
-  /* TERMINAL CURSOR */
-  .cursor::after {
-    content: '_';
-    animation: blink 1s infinite;
-    color: var(--purple);
-  }
-
-  @media (max-width: 900px) {
-    nav { padding: 16px 20px; }
-    .nav-links { display: none; }
-    .hero { padding: 120px 20px 60px; }
-    section { padding: 60px 20px; }
-    .pricing-grid { grid-template-columns: 1fr 1fr; }
-    .addons-grid { grid-template-columns: 1fr 1fr; }
-    .founding-grid { grid-template-columns: 1fr; }
-    .roi-grid { grid-template-columns: 1fr; }
-    footer { padding: 24px 20px; flex-direction: column; gap: 12px; text-align: center; }
-  }
-
-  @media (max-width: 600px) {
-    .pricing-grid { grid-template-columns: 1fr; }
-    .addons-grid { grid-template-columns: 1fr 1fr; }
-  }
-</style>
+<title>Raptor Pricing | Free, Pro, Prime and Enterprise Plans</title>
+<meta name="description" content="Raptor plans: Free at ₹0, Pro at ₹4,999 a month, Prime at ₹10,000 a month and custom Enterprise. Flat pricing, never per user, with credit top-ups and a founding member offer.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://shoonyaorigins.com/ventures/raptor/pricing/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Raptor by Shoonya Origins">
+<meta property="og:title" content="Raptor Pricing | Free, Pro, Prime and Enterprise Plans">
+<meta property="og:description" content="Raptor plans: Free at ₹0, Pro at ₹4,999 a month, Prime at ₹10,000 a month and custom Enterprise. Flat pricing, never per user.">
+<meta property="og:url" content="https://shoonyaorigins.com/ventures/raptor/pricing/">
+<meta property="og:image" content="https://shoonyaorigins.com/ventures/raptor/logo.png">
+<meta name="twitter:card" content="summary">
+<link rel="icon" type="image/x-icon" href="/ventures/raptor/icon.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/ventures/raptor/site.css">
 <link rel="stylesheet" href="/ventures/raptor/rx-footer.css">
+<link rel="stylesheet" href="/ventures/raptor/pricing/pricing.css">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://shoonyaorigins.com/ventures/raptor/"}, {"@type": "ListItem", "position": 2, "name": "Pricing"}]}</script>
 <link rel="stylesheet" href="/ventures/raptor/buttons.css?v=1">
 </head>
 <body>
-<div class="cursor" id="cursor"></div>
-<div class="cursor-ring" id="cursorRing"></div>
-
-<nav>
-  <a href="#" class="nav-logo">RAPTOR</a>
-  <ul class="nav-links">
-    <li><a href="#plans">Plans</a></li>
-    <li><a href="#addons">Add-ons</a></li>
-    <li><a href="#founding">Founding</a></li>
-    <li><a href="#roi">ROI</a></li>
-    <li><a href="#compare">Compare</a></li>
+<script>try{if(localStorage.getItem('raptor-theme')==='dark')document.body.classList.add('dark-mode')}catch(e){}</script>
+<a class="skip-link" href="#main">Skip to content</a>
+<nav class="rx-nav" aria-label="Main">
+  <a class="rx-logo" href="/ventures/raptor/"><img src="/ventures/raptor/logo.png" alt="" width="36" height="36"><span class="rx-wordmark">Raptor</span></a>
+  <ul class="rx-links" id="rxLinks">
+    <li><a href="/ventures/raptor/features/">Features</a></li>
+    <li><a href="/ventures/raptor/why-raptor.html">Why Raptor</a></li>
+    <li><a href="/ventures/raptor/pricing/" aria-current="page">Pricing</a></li>
+    <li><a href="/ventures/raptor/tools/">Tools</a></li>
+    <li><a href="/about/blogs/">Blog</a></li>
+    <li class="rx-mobile-only"><a href="/ventures/raptor/?auth=login">Log in</a></li>
   </ul>
-  <a href="https://shoonyaorigins.com/ventures/raptor/" class="nav-exit">Exit ///</a>
+  <div class="rx-actions">
+    <button class="rx-toggle" id="themeToggle" type="button" aria-pressed="false">Dark mode</button>
+    <a class="rx-login" href="/ventures/raptor/?auth=login">Log in</a>
+    <a class="btn-main" href="https://raptor-download.yogeshjathalkar.workers.dev/Raptor-Setup-0.1.8.exe">Download</a>
+    <button class="rx-menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="rxLinks">Menu</button>
+  </div>
 </nav>
-
+<main id="main">
 <div class="founding-banner">
-  <strong>FOUNDING MEMBER ACCESS OPEN</strong>
-  <span class="founding-count">7 / 20 SLOTS TAKEN</span>
-  <strong>50% OFF FOREVER — LOCKS IN TODAY'S PRICE PERMANENTLY</strong>
+  <strong>Founding member access open</strong>
+  <span class="founding-count">7 / 20 slots taken</span>
+  <strong>50% off forever &mdash; locks in today's price permanently</strong>
 </div>
+<div class="wrap"><div class="breadcrumb"><a href="/ventures/raptor/">Home</a> / Pricing</div></div>
+<header class="wrap hero-x">
+  <div class="label">Pricing</div>
+  <h1 class="big-title">Invest in<br>the <em>Brain.</em></h1>
+  <p class="lede">Every other tool charges you for access. <strong>Raptor charges you for outcomes.</strong></p>
+  <p class="lede lede-2">The longer you use it, the more valuable it becomes &mdash; and the cheaper it gets per deal closed.</p>
+  <nav class="chips jump" aria-label="On this page"><a href="#plans">Plans</a><a href="#addons">Add-ons</a><a href="#founding">Founding</a><a href="#roi">ROI</a><a href="#compare">Compare</a></nav>
+</header>
 
-<div class="hero">
-  <div class="system-tag"><span>■</span> PRICING MODULE // STATUS: ACTIVE</div>
-  <h1>INVEST IN<br>THE <em>BRAIN.</em></h1>
-  <p class="hero-sub">
-    Every other tool charges you for access. <strong>Raptor charges you for outcomes.</strong><br><br>
-    The longer you use it, the more valuable it becomes — and the cheaper it gets per deal closed.
-  </p>
-</div>
+<section class="sec" id="plans"><div class="wrap">
+  <div class="label">01 &middot; Deployment tiers</div>
+  <h2>Pick a plan.</h2>
+  <div class="plans">
 
-<section id="plans">
-  <div class="section-label">01 // Deployment Tiers</div>
-
-  <div class="pricing-grid">
-
-    <div class="plan fade-in">
-      <span class="plan-badge">// TIER 01</span>
-      <div class="plan-name">FREE</div>
-      <div class="plan-target">Individuals · Try Raptor properly</div>
+    <div class="plan reveal">
+      <span class="plan-badge">Tier 01</span>
+      <div class="plan-name">Free</div>
+      <div class="plan-target">Individuals &middot; Try Raptor properly</div>
       <div class="plan-price">
         <div class="price-amount">₹0</div>
-        <div class="price-period">/ FOREVER</div>
+        <div class="price-period">/ Forever</div>
         <div class="price-annual">No card required</div>
       </div>
       <ul class="plan-features">
-        <li><span><strong>Free CRM</strong> — contacts, deals, pipeline</span></li>
+        <li><span><strong>Free CRM</strong> &mdash; contacts, deals, pipeline</span></li>
         <li>Intelligence tools: deliverability, email verifier, forecasting &amp; more</li>
         <li><strong>50</strong> credits to start</li>
         <li class="locked">Email automation</li>
@@ -911,42 +91,42 @@ body { cursor: none; } /* Hide the default cursor */
         <li class="locked">AI Content Suite</li>
         <li class="locked">AI Playground</li>
       </ul>
-      <a href="https://shoonyaorigins.com/ventures/raptor/?auth=signup" class="plan-cta">Start Free →</a>
+      <a href="https://shoonyaorigins.com/ventures/raptor/?auth=signup" class="plan-cta btn-ghost">Start Free &rarr;</a>
     </div>
 
-    <div class="plan featured fade-in">
-      <span class="plan-badge">// START HERE</span>
-      <div class="plan-name">PRO</div>
-      <div class="plan-target">Growing teams · Most of what Raptor does</div>
+    <div class="plan featured reveal">
+      <span class="plan-badge">Start here</span>
+      <div class="plan-name">Pro</div>
+      <div class="plan-target">Growing teams &middot; Most of what Raptor does</div>
       <div class="plan-price">
         <div class="price-amount">₹4,999</div>
-        <div class="price-period">/ MONTH · FLAT, NEVER PER USER</div>
-        <div class="price-annual">Annual: ₹49,990 · Save ₹9,998</div>
+        <div class="price-period">/ Month &middot; flat, never per user</div>
+        <div class="price-annual">Annual: ₹49,990 &middot; Save ₹9,998</div>
       </div>
       <ul class="plan-features">
         <li>Everything in Free</li>
-        <li><span><strong>Email automation</strong> — from your own mailbox</span></li>
+        <li><span><strong>Email automation</strong> &mdash; from your own mailbox</span></li>
         <li><strong>WhatsApp automation</strong></li>
-        <li><span><strong>AI Content Suite</strong> — bring your own key</span></li>
-        <li><span><strong>AI Playground</strong> — practice deals, train new reps</span></li>
+        <li><span><strong>AI Content Suite</strong> &mdash; bring your own key</span></li>
+        <li><span><strong>AI Playground</strong> &mdash; practice deals, train new reps</span></li>
         <li><strong>500</strong> credits + top-up packs</li>
         <li class="locked">Desktop engine &amp; live call coaching</li>
       </ul>
-      <a href="mailto:contact@shoonyaorigins.com?subject=Raptor Pro Plan" class="plan-cta">Go Pro →</a>
+      <a href="mailto:contact@shoonyaorigins.com?subject=Raptor Pro Plan" class="plan-cta btn-main">Go Pro &rarr;</a>
     </div>
 
-    <div class="plan fade-in">
-      <span class="plan-badge">// TIER 03</span>
-      <div class="plan-name">PRIME</div>
+    <div class="plan reveal">
+      <span class="plan-badge">Tier 03</span>
+      <div class="plan-name">Prime</div>
       <div class="plan-target">Teams that want every feature</div>
       <div class="plan-price">
         <div class="price-amount">₹10,000</div>
-        <div class="price-period">/ MONTH · FLAT, NEVER PER USER</div>
-        <div class="price-annual">Annual: ₹1,00,000 · Save ₹20,000</div>
+        <div class="price-period">/ Month &middot; flat, never per user</div>
+        <div class="price-annual">Annual: ₹1,00,000 &middot; Save ₹20,000</div>
       </div>
       <ul class="plan-features">
         <li>Everything in Pro</li>
-        <li><span><strong>Desktop app</strong> — the full engine, on your machine</span></li>
+        <li><span><strong>Desktop app</strong> &mdash; the full engine, on your machine</span></li>
         <li>Company DNA</li>
         <li>Autonomous prospecting</li>
         <li>Live call coaching</li>
@@ -954,20 +134,20 @@ body { cursor: none; } /* Hide the default cursor */
         <li><strong>Self-learning engine</strong></li>
         <li>Every feature we ship</li>
       </ul>
-      <a href="mailto:contact@shoonyaorigins.com?subject=Raptor Prime Plan" class="plan-cta">Go Prime →</a>
+      <a href="mailto:contact@shoonyaorigins.com?subject=Raptor Prime Plan" class="plan-cta btn-ghost">Go Prime &rarr;</a>
     </div>
 
-    <div class="plan fade-in">
-      <span class="plan-badge">// TIER 04</span>
-      <div class="plan-name">ENTERPRISE</div>
-      <div class="plan-target">Large corps · Finance · Healthcare · Defense-adjacent</div>
+    <div class="plan reveal">
+      <span class="plan-badge">Tier 04</span>
+      <div class="plan-name">Enterprise</div>
+      <div class="plan-target">Large corps &middot; Finance &middot; Healthcare &middot; Defense-adjacent</div>
       <div class="plan-price">
-        <div class="price-amount">CUSTOM</div>
-        <div class="price-period">FROM ₹75,000 / MONTH</div>
-        <div class="price-annual">Data sovereignty · Local-first deployment</div>
+        <div class="price-amount">Custom</div>
+        <div class="price-period">From ₹75,000 / month</div>
+        <div class="price-annual">Data sovereignty &middot; Local-first deployment</div>
       </div>
       <ul class="plan-features">
-        <li><span><strong>No cap on users</strong> — your whole organisation</span></li>
+        <li><span><strong>No cap on users</strong> &mdash; your whole organisation</span></li>
         <li>Everything in Prime</li>
         <li>On-premise deployment</li>
         <li>Custom model training</li>
@@ -977,130 +157,131 @@ body { cursor: none; } /* Hide the default cursor */
         <li>White-label option</li>
         <li>Quarterly strategy review</li>
       </ul>
-      <a href="mailto:contact@shoonyaorigins.com?subject=Raptor Enterprise Inquiry" class="plan-cta">Request Briefing →</a>
+      <a href="mailto:contact@shoonyaorigins.com?subject=Raptor Enterprise Inquiry" class="plan-cta btn-ghost">Request Briefing &rarr;</a>
     </div>
 
   </div>
 
-  <div class="section-label" style="margin-top: 60px;">Annual Billing — Lock In and Save</div>
-  <table class="annual-table">
+  <h3 class="sub-title">Annual billing &mdash; lock in and save</h3>
+  <div class="tbl-wrap reveal"><table class="tbl annual">
     <thead>
       <tr>
-        <th>Plan</th>
-        <th>Monthly</th>
-        <th>Annual (÷12)</th>
-        <th>You Save</th>
-        <th>Equivalent to</th>
+        <th scope="col">Plan</th>
+        <th scope="col">Monthly</th>
+        <th scope="col">Annual (÷12)</th>
+        <th scope="col">You save</th>
+        <th scope="col">Equivalent to</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td class="plan-col">PRO</td>
-        <td class="monthly-col">₹4,999/mo</td>
-        <td class="annual-col">₹4,166/mo</td>
-        <td class="saving-col">₹9,998/yr</td>
-        <td style="color: var(--mid); font-size: 10px;">2 months free</td>
+        <td>Pro</td>
+        <td>₹4,999/mo</td>
+        <td class="hl">₹4,166/mo</td>
+        <td class="saving">₹9,998/yr</td>
+        <td>2 months free</td>
       </tr>
       <tr>
-        <td class="plan-col">PRIME</td>
-        <td class="monthly-col">₹10,000/mo</td>
-        <td class="annual-col">₹8,333/mo</td>
-        <td class="saving-col">₹20,000/yr</td>
-        <td style="color: var(--mid); font-size: 10px;">2 months free</td>
+        <td>Prime</td>
+        <td>₹10,000/mo</td>
+        <td class="hl">₹8,333/mo</td>
+        <td class="saving">₹20,000/yr</td>
+        <td>2 months free</td>
       </tr>
     </tbody>
-  </table>
-</section>
+  </table></div>
+</div></section>
 
-<section id="addons">
-  <div class="section-label">02 // Credit Top-ups</div>
-  <div class="addons-grid">
-    <div class="addon">
-      <div class="addon-label">// Small</div>
-      <div class="addon-name">100 Credits</div>
-      <div class="addon-desc">A quick refill when you run low mid-month. Available on Pro and above.</div>
+<section class="sec" id="addons"><div class="wrap">
+  <div class="label">02 &middot; Credit top-ups</div>
+  <h2>Need more credits?</h2>
+  <div class="cards compact">
+    <div class="card reveal">
+      <span class="card-tag">Small</span>
+      <h3>100 Credits</h3>
+      <p>A quick refill when you run low mid-month. Available on Pro and above.</p>
       <div class="addon-price">₹700 <span>/ 100 credits</span></div>
     </div>
-    <div class="addon">
-      <div class="addon-label">// Medium</div>
-      <div class="addon-name">250 Credits</div>
-      <div class="addon-desc">The everyday top-up for a busy pipeline. Available on Pro and above.</div>
+    <div class="card reveal">
+      <span class="card-tag">Medium</span>
+      <h3>250 Credits</h3>
+      <p>The everyday top-up for a busy pipeline. Available on Pro and above.</p>
       <div class="addon-price">₹1,500 <span>/ 250 credits</span></div>
     </div>
-    <div class="addon">
-      <div class="addon-label">// Large</div>
-      <div class="addon-name">500 Credits</div>
-      <div class="addon-desc">Best value per credit for heavy campaigns. Available on Pro and above.</div>
+    <div class="card reveal">
+      <span class="card-tag">Large</span>
+      <h3>500 Credits</h3>
+      <p>Best value per credit for heavy campaigns. Available on Pro and above.</p>
       <div class="addon-price">₹2,500 <span>/ 500 credits</span></div>
     </div>
   </div>
-</section>
+</div></section>
 
-<section id="founding" class="founding-section">
-  <div class="section-label">03 // Founding Member Protocol</div>
+<section class="sec" id="founding"><div class="wrap">
+  <div class="label">03 &middot; Founding member protocol</div>
   <div class="founding-grid">
     <div class="founding-left">
-      <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 56px; letter-spacing: 3px; line-height: 0.95; margin-bottom: 24px;">THE FIRST<br><em style="font-style: normal; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">20</em> CHANGE<br>EVERYTHING.</h2>
-      <p>Raptor is a <strong>self-retuning brain</strong>. Every deal closed by every client makes it sharper. The first 20 clients don't just get a product — they become the training data that makes Raptor irreplaceable.</p>
+      <h2>The first <em>20</em><br>change everything.</h2>
+      <p>Raptor is a <strong>self-retuning brain</strong>. Every deal closed by every client makes it sharper. The first 20 clients don't just get a product &mdash; they become the training data that makes Raptor irreplaceable.</p>
       <p>In exchange, they get <strong>50% off their chosen plan forever.</strong> Not a trial. Not a promo. Permanently locked pricing that compounds in their favour as Raptor scales.</p>
       <ul class="founding-benefits">
-        <li><strong>50% off forever</strong> — permanently locked, never expires</li>
+        <li><strong>50% off forever</strong> &mdash; permanently locked, never expires</li>
         <li><strong>Direct founding member line</strong> to the product team</li>
-        <li><strong>Feature input</strong> — your use case shapes the roadmap</li>
-        <li><strong>Case study co-creation</strong> — your wins become Raptor's proof</li>
+        <li><strong>Feature input</strong> &mdash; your use case shapes the roadmap</li>
+        <li><strong>Case study co-creation</strong> &mdash; your wins become Raptor's proof</li>
         <li><strong>First access</strong> to every new module before public launch</li>
-        <li><strong>Founding member badge</strong> — permanent recognition</li>
+        <li><strong>Founding member badge</strong> &mdash; permanent recognition</li>
       </ul>
     </div>
     <div class="founding-right">
       <div class="slots-counter">
         <div class="slots-number">13</div>
-        <div class="slots-label">Slots Remaining</div>
+        <div class="slots-label">Slots remaining</div>
       </div>
-      <div class="slots-bar"></div>
+      <div class="slots-bar" role="img" aria-label="7 of 20 founding slots taken"></div>
       <div class="slots-taken">
         <span>7 of 20 taken</span>
-        <span style="color: var(--purple);">35% claimed</span>
+        <span class="claimed">35% claimed</span>
       </div>
       <div class="founding-price-display">
         <div class="founding-price-old">₹4,999/mo</div>
         <div class="founding-price-new">₹2,500</div>
-        <div class="founding-price-note">// PRO PLAN · FOUNDING PRICE · FOREVER</div>
+        <div class="founding-price-note">Pro plan &middot; founding price &middot; forever</div>
       </div>
-      <a href="mailto:yogeshjathalkar@gmail.com?subject=Founding Member Application — Raptor" class="founding-cta">Claim Founding Slot →</a>
-      <div class="founding-cta-note">Via direct email · Response within 24hrs</div>
+      <a href="mailto:yogeshjathalkar@gmail.com?subject=Founding Member Application — Raptor" class="founding-cta btn-main">Claim Founding Slot &rarr;</a>
+      <div class="founding-cta-note">Via direct email &middot; Response within 24hrs</div>
     </div>
   </div>
-</section>
+</div></section>
 
-<section id="roi" class="roi-section">
-  <div class="section-label">04 // ROI Calculator</div>
+<section class="sec" id="roi"><div class="wrap">
+  <div class="label">04 &middot; ROI calculator</div>
+  <h2>Put in your numbers.</h2>
   <div class="roi-grid">
     <div class="roi-inputs">
-      <div class="roi-title">INPUT YOUR NUMBERS<span class="cursor"></span></div>
-
+      <div class="roi-title">Input your numbers</div>
       <div class="roi-field">
-        <label>Average Deal Size (₹)</label>
+        <label for="dealSize">Average Deal Size (₹)</label>
         <input type="number" id="dealSize" value="500000" min="0">
       </div>
       <div class="roi-field">
-        <label>Deals Closed Per Month (Current)</label>
+        <label for="currentDeals">Deals Closed Per Month (Current)</label>
         <input type="number" id="currentDeals" value="3" min="0">
       </div>
       <div class="roi-field">
-        <label>Current Close Rate (%)</label>
+        <label for="closeRate">Current Close Rate (%)</label>
         <input type="number" id="closeRate" value="15" min="0" max="100">
       </div>
       <div class="roi-field">
-        <label>Select Your Plan</label>
-        <select id="planSelect" onchange="calculate()">
+        <label for="planSelect">Select Your Plan</label>
+        <select id="planSelect">
           <option value="4999" selected>Pro — ₹4,999/mo</option>
           <option value="10000">Prime — ₹10,000/mo</option>
         </select>
       </div>
     </div>
-    <div class="roi-outputs">
-      <div class="roi-title">RAPTOR OUTPUT</div>
+    <div class="roi-outputs" aria-live="polite">
+      <div class="roi-title">Raptor output</div>
       <div class="roi-metric">
         <div class="roi-metric-label">Projected Additional Deals / Month</div>
         <div class="roi-metric-value positive" id="addDeals">+2</div>
@@ -1123,123 +304,54 @@ body { cursor: none; } /* Hide the default cursor */
       </div>
     </div>
   </div>
-</section>
+</div></section>
 
-<section id="compare">
-  <div class="section-label">05 // Stack Comparison</div>
-  <table class="comparison-grid">
+<section class="sec" id="compare"><div class="wrap">
+  <div class="label">05 &middot; Stack comparison</div>
+  <h2>Raptor next to the stack.</h2>
+  <div class="tbl-wrap reveal"><table class="tbl cmp">
     <thead>
       <tr>
-        <th>Capability</th>
-        <th class="raptor-col">RAPTOR</th>
-        <th>Apollo</th>
-        <th>Gong</th>
-        <th>Outreach</th>
-        <th>All Three</th>
+        <th scope="col">Capability</th>
+        <th scope="col" class="raptor-col">Raptor</th>
+        <th scope="col">Apollo</th>
+        <th scope="col">Gong</th>
+        <th scope="col">Outreach</th>
+        <th scope="col">All three</th>
       </tr>
     </thead>
     <tbody>
-      <tr>
-        <td>Autonomous Prospecting</td>
-        <td><span class="check">✓</span></td>
-        <td><span class="check">✓</span></td>
-        <td><span class="cross">✗</span></td>
-        <td><span class="cross">✗</span></td>
-        <td><span class="check">✓</span></td>
-      </tr>
-      <tr>
-        <td>Signal-Based Scoring (100+ params)</td>
-        <td><span class="check">✓</span></td>
-        <td><span class="partial">Partial</span></td>
-        <td><span class="cross">✗</span></td>
-        <td><span class="cross">✗</span></td>
-        <td><span class="partial">Partial</span></td>
-      </tr>
-      <tr>
-        <td>Live Call Intelligence</td>
-        <td><span class="check">✓</span></td>
-        <td><span class="cross">✗</span></td>
-        <td><span class="check">✓</span></td>
-        <td><span class="cross">✗</span></td>
-        <td><span class="check">✓</span></td>
-      </tr>
-      <tr>
-        <td>Personalised AI Pitches</td>
-        <td><span class="check">✓</span></td>
-        <td><span class="partial">Templates</span></td>
-        <td><span class="cross">✗</span></td>
-        <td><span class="partial">Templates</span></td>
-        <td><span class="partial">Templates</span></td>
-      </tr>
-      <tr>
-        <td>Self-Retuning Engine</td>
-        <td><span class="check">✓</span></td>
-        <td><span class="cross">✗</span></td>
-        <td><span class="cross">✗</span></td>
-        <td><span class="cross">✗</span></td>
-        <td><span class="cross">✗</span></td>
-      </tr>
-      <tr>
-        <td>Organisational Memory</td>
-        <td><span class="check">✓</span></td>
-        <td><span class="cross">✗</span></td>
-        <td><span class="cross">✗</span></td>
-        <td><span class="cross">✗</span></td>
-        <td><span class="cross">✗</span></td>
-      </tr>
-      <tr>
-        <td>Game Theory Stakeholder Mapping</td>
-        <td><span class="check">✓</span></td>
-        <td><span class="cross">✗</span></td>
-        <td><span class="cross">✗</span></td>
-        <td><span class="cross">✗</span></td>
-        <td><span class="cross">✗</span></td>
-      </tr>
-      <tr>
-        <td>Indian Market Data Quality</td>
-        <td><span class="check">✓</span></td>
-        <td><span class="partial">Weak</span></td>
-        <td><span class="cross">N/A</span></td>
-        <td><span class="cross">N/A</span></td>
-        <td><span class="partial">Weak</span></td>
-      </tr>
-      <tr>
-        <td>Local-First / On-Premise Option</td>
-        <td><span class="check">✓</span></td>
-        <td><span class="cross">✗</span></td>
-        <td><span class="cross">✗</span></td>
-        <td><span class="cross">✗</span></td>
-        <td><span class="cross">✗</span></td>
-      </tr>
-      <tr>
-        <td>Monthly Cost (3 users, INR)</td>
-        <td style="background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family: 'Bebas Neue'; font-size: 20px; letter-spacing: 2px;">₹10,000</td>
-        <td style="color: var(--mid);">₹12,000</td>
-        <td style="color: var(--mid);">₹36,000</td>
-        <td style="color: var(--mid);">₹24,000</td>
-        <td style="color: var(--mid);">₹72,000+</td>
-      </tr>
+      <tr><td>Autonomous Prospecting</td><td class="raptor-col"><span class="check"><span aria-hidden="true">✓</span><span class="sr">Yes</span></span></td><td><span class="check"><span aria-hidden="true">✓</span><span class="sr">Yes</span></span></td><td><span class="cross"><span aria-hidden="true">✗</span><span class="sr">No</span></span></td><td><span class="cross"><span aria-hidden="true">✗</span><span class="sr">No</span></span></td><td><span class="check"><span aria-hidden="true">✓</span><span class="sr">Yes</span></span></td></tr>
+      <tr><td>Signal-Based Scoring (100+ params)</td><td class="raptor-col"><span class="check"><span aria-hidden="true">✓</span><span class="sr">Yes</span></span></td><td><span class="partial">Partial</span></td><td><span class="cross"><span aria-hidden="true">✗</span><span class="sr">No</span></span></td><td><span class="cross"><span aria-hidden="true">✗</span><span class="sr">No</span></span></td><td><span class="partial">Partial</span></td></tr>
+      <tr><td>Live Call Intelligence</td><td class="raptor-col"><span class="check"><span aria-hidden="true">✓</span><span class="sr">Yes</span></span></td><td><span class="cross"><span aria-hidden="true">✗</span><span class="sr">No</span></span></td><td><span class="check"><span aria-hidden="true">✓</span><span class="sr">Yes</span></span></td><td><span class="cross"><span aria-hidden="true">✗</span><span class="sr">No</span></span></td><td><span class="check"><span aria-hidden="true">✓</span><span class="sr">Yes</span></span></td></tr>
+      <tr><td>Personalised AI Pitches</td><td class="raptor-col"><span class="check"><span aria-hidden="true">✓</span><span class="sr">Yes</span></span></td><td><span class="partial">Templates</span></td><td><span class="cross"><span aria-hidden="true">✗</span><span class="sr">No</span></span></td><td><span class="partial">Templates</span></td><td><span class="partial">Templates</span></td></tr>
+      <tr><td>Self-Retuning Engine</td><td class="raptor-col"><span class="check"><span aria-hidden="true">✓</span><span class="sr">Yes</span></span></td><td><span class="cross"><span aria-hidden="true">✗</span><span class="sr">No</span></span></td><td><span class="cross"><span aria-hidden="true">✗</span><span class="sr">No</span></span></td><td><span class="cross"><span aria-hidden="true">✗</span><span class="sr">No</span></span></td><td><span class="cross"><span aria-hidden="true">✗</span><span class="sr">No</span></span></td></tr>
+      <tr><td>Organisational Memory</td><td class="raptor-col"><span class="check"><span aria-hidden="true">✓</span><span class="sr">Yes</span></span></td><td><span class="cross"><span aria-hidden="true">✗</span><span class="sr">No</span></span></td><td><span class="cross"><span aria-hidden="true">✗</span><span class="sr">No</span></span></td><td><span class="cross"><span aria-hidden="true">✗</span><span class="sr">No</span></span></td><td><span class="cross"><span aria-hidden="true">✗</span><span class="sr">No</span></span></td></tr>
+      <tr><td>Game Theory Stakeholder Mapping</td><td class="raptor-col"><span class="check"><span aria-hidden="true">✓</span><span class="sr">Yes</span></span></td><td><span class="cross"><span aria-hidden="true">✗</span><span class="sr">No</span></span></td><td><span class="cross"><span aria-hidden="true">✗</span><span class="sr">No</span></span></td><td><span class="cross"><span aria-hidden="true">✗</span><span class="sr">No</span></span></td><td><span class="cross"><span aria-hidden="true">✗</span><span class="sr">No</span></span></td></tr>
+      <tr><td>Indian Market Data Quality</td><td class="raptor-col"><span class="check"><span aria-hidden="true">✓</span><span class="sr">Yes</span></span></td><td><span class="partial">Weak</span></td><td><span class="cross">N/A</span></td><td><span class="cross">N/A</span></td><td><span class="partial">Weak</span></td></tr>
+      <tr><td>Local-First / On-Premise Option</td><td class="raptor-col"><span class="check"><span aria-hidden="true">✓</span><span class="sr">Yes</span></span></td><td><span class="cross"><span aria-hidden="true">✗</span><span class="sr">No</span></span></td><td><span class="cross"><span aria-hidden="true">✗</span><span class="sr">No</span></span></td><td><span class="cross"><span aria-hidden="true">✗</span><span class="sr">No</span></span></td><td><span class="cross"><span aria-hidden="true">✗</span><span class="sr">No</span></span></td></tr>
+      <tr class="cost-row"><td>Monthly Cost (3 users, INR)</td><td class="raptor-col cost-raptor">₹10,000</td><td>₹12,000</td><td>₹36,000</td><td>₹24,000</td><td>₹72,000+</td></tr>
     </tbody>
-  </table>
-</section>
+  </table></div>
+</div></section>
 
-<section style="text-align: center; padding: 100px 40px; background: #030303;">
-  <div class="system-tag" style="justify-content: center; margin-bottom: 32px;"><span>■</span> WINDOW IS OPEN</div>
-  <h2 style="font-family: 'Bebas Neue'; font-size: clamp(48px, 8vw, 100px); letter-spacing: 4px; line-height: 0.95; margin-bottom: 32px;">YOUR COMPETITORS<br>DON'T HAVE <span style="background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">THIS.</span><br>YET.</h2>
-  <p style="color: var(--mid); max-width: 480px; margin: 0 auto 48px; font-size: 12px; line-height: 1.9;">
-    Every day without Raptor is a day your competitors could be building a smarter brain than yours. <strong style="color: var(--white);">The compounding starts on day one. Not day two.</strong>
-  </p>
-  <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
-    <a href="mailto:contact@shoonyaorigins.com?subject=Founding Member Application — Raptor" style="padding: 16px 40px; background: var(--grad); color: var(--white); text-decoration: none; font-family: 'IBM Plex Mono'; font-size: 12px; letter-spacing: 4px; text-transform: uppercase; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">Claim Founding Slot →</a>
-    <a href="https://shoonyaorigins.com/ventures/raptor/" style="padding: 16px 40px; background: transparent; color: var(--mid); text-decoration: none; font-family: 'IBM Plex Mono'; font-size: 12px; letter-spacing: 4px; text-transform: uppercase; border: 1px solid var(--dim); transition: all 0.2s;" onmouseover="this.style.color='#f4f4f5';this.style.borderColor='#f4f4f5'" onmouseout="this.style.color='#71717a';this.style.borderColor='#3f3f46'">Back to Raptor ///</a>
+<section class="sec"><div class="wrap">
+  <div class="cta-band reveal">
+    <h2>Your competitors<br>don't have <em>this.</em><br>Yet.</h2>
+    <p>Every day without Raptor is a day your competitors could be building a smarter brain than yours. <strong>The compounding starts on day one. Not day two.</strong></p>
+    <div class="hero-cta">
+      <a class="btn-main" href="mailto:contact@shoonyaorigins.com?subject=Founding Member Application — Raptor">Claim Founding Slot &rarr;</a>
+      <a class="btn-ghost" href="https://shoonyaorigins.com/ventures/raptor/">Back to Raptor</a>
+    </div>
+    <div class="cta-micro">Windows x64 &middot; Mac Apple Silicon (beta) &middot; Free to start &middot; No credit card</div>
   </div>
-</section>
-
-<footer class="rx-footer rx-dark">
+</div></section>
+</main>
+<footer class="rx-footer">
   <div class="rx-footer-grid">
     <div class="rx-col rx-col-brand">
       <a class="rx-brand-link" href="/ventures/raptor/"><img src="/ventures/raptor/logo.png" alt="" width="40" height="40"><span class="rx-footer-wordmark">Raptor</span></a>
-      <p class="rx-tagline">The self-learning AI sales brain for sales teams.</p>
+      <p class="rx-tagline">The self-learning AI sales brain for B2B teams.</p>
       <p class="rx-byline">By Shoonya Origins &middot; Pune, India</p>
     </div>
     <div class="rx-col">
@@ -1285,64 +397,28 @@ body { cursor: none; } /* Hide the default cursor */
     </div>
   </div>
   <div class="rx-bottom">
-    <p>Copyright 2026 Raptor. Built by Shoonya Origins for sales teams.</p>
+    <p>Copyright 2026 Raptor. Built by Shoonya Origins for B2B sales teams.</p>
     <p>This venture is incubated under Shoonya Origins.</p>
   </div>
 </footer>
-
+<script src="/ventures/raptor/site.js"></script>
 <script>
-
-  const cursor = document.getElementById('cursor');
-const ring = document.getElementById('cursorRing');
-let mx = 0, my = 0, rx = 0, ry = 0;
-
-document.addEventListener('mousemove', e => {
-  mx = e.clientX; 
-  my = e.clientY;
-  cursor.style.left = mx + 'px';
-  cursor.style.top = my + 'px';
-});
-
-// The smooth trailing animation
-function animateRing() {
-  rx += (mx - rx) * 0.12;
-  ry += (my - ry) * 0.12;
-  ring.style.left = rx + 'px';
-  ring.style.top = ry + 'px';
-  requestAnimationFrame(animateRing);
-}
-animateRing();
-
-// Expansion effect on interactive elements
-document.querySelectorAll('a, button, input, select, .plan').forEach(el => {
-  el.addEventListener('mouseenter', () => {
-    cursor.style.width = '16px'; cursor.style.height = '16px';
-    cursor.style.background = 'var(--pink)';
-    ring.style.width = '50px'; ring.style.height = '50px';
-  });
-  el.addEventListener('mouseleave', () => {
-    cursor.style.width = '8px'; cursor.style.height = '8px';
-    cursor.style.background = 'var(--purple)';
-    ring.style.width = '32px'; ring.style.height = '32px';
-  });
-});
-
+(function () {
   function formatINR(n) {
-    if (n >= 10000000) return '₹' + (n/10000000).toFixed(1) + 'Cr';
-    if (n >= 100000) return '₹' + (n/100000).toFixed(1) + 'L';
+    if (n >= 10000000) return '₹' + (n / 10000000).toFixed(1) + 'Cr';
+    if (n >= 100000) return '₹' + (n / 100000).toFixed(1) + 'L';
     return '₹' + n.toLocaleString('en-IN');
   }
 
   function calculate() {
-    const dealSize = parseFloat(document.getElementById('dealSize').value) || 0;
-    const currentDeals = parseFloat(document.getElementById('currentDeals').value) || 0;
-    const closeRate = parseFloat(document.getElementById('closeRate').value) || 0;
-    const planCost = parseFloat(document.getElementById('planSelect').value) || 0;
+    var dealSize = parseFloat(document.getElementById('dealSize').value) || 0;
+    var currentDeals = parseFloat(document.getElementById('currentDeals').value) || 0;
+    var planCost = parseFloat(document.getElementById('planSelect').value) || 0;
 
-    const improvement = 0.35;
-    const addDeals = Math.max(1, Math.round(currentDeals * improvement));
-    const addRevenue = addDeals * dealSize;
-    const roi = Math.round(addRevenue / planCost);
+    var improvement = 0.35;
+    var addDeals = Math.max(1, Math.round(currentDeals * improvement));
+    var addRevenue = addDeals * dealSize;
+    var roi = Math.round(addRevenue / planCost);
 
     document.getElementById('addDeals').textContent = '+' + addDeals;
     document.getElementById('addRevenue').textContent = formatINR(addRevenue);
@@ -1350,12 +426,14 @@ document.querySelectorAll('a, button, input, select, .plan').forEach(el => {
     document.getElementById('roiMultiple').textContent = roi + 'x';
   }
 
-  ['dealSize','currentDeals','closeRate','planSelect'].forEach(id => {
-    document.getElementById(id).addEventListener('input', calculate);
+  ['dealSize', 'currentDeals', 'closeRate', 'planSelect'].forEach(function (id) {
+    var el = document.getElementById(id);
+    el.addEventListener('input', calculate);
+    el.addEventListener('change', calculate);
   });
 
   calculate();
+})();
 </script>
-
 </body>
 </html>

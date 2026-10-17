@@ -1,0 +1,161 @@
+/* Extras for the pricing page only. Everything else (nav, type, buttons, tables, cards, footer, light/dark) comes from the shared
+   /ventures/raptor/site.css, so this page matches the rest of the public site. Colours use the shared tokens. */
+
+body { --ok: #15803d; --warn: #b45309; }
+body.dark-mode { --ok: #4ade80; --warn: #fbbf24; }
+
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ── founding banner (top strip) ── */
+.founding-banner {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.4rem 1.6rem;
+  padding: 0.7rem 1.25rem; text-align: center;
+  background: var(--surface2); border-bottom: 1px solid var(--border);
+  font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text2);
+}
+.founding-banner strong { font-weight: 500; color: var(--white); }
+.founding-count { color: var(--purple); }
+
+.lede strong { color: var(--white); font-weight: 400; }
+.lede-2 { margin-top: 0.8rem; }
+.jump { margin-top: 2.2rem; }
+
+.sub-title {
+  font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 1.7rem; letter-spacing: 0.03em;
+  margin: 3.2rem 0 1rem;
+}
+
+/* ── plans ── */
+.plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.2rem; align-items: stretch; }
+.plan {
+  position: relative; display: flex; flex-direction: column;
+  background: var(--card); border: 1px solid var(--border); padding: 1.7rem 1.5rem;
+}
+.plan.featured { border-color: var(--purple); box-shadow: 0 0 0 1px var(--purple); background: var(--surface); }
+.plan-badge { font-size: 0.62rem; letter-spacing: 0.24em; text-transform: uppercase; color: var(--purple); margin-bottom: 0.8rem; }
+.plan-name { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 0.04em; line-height: 1; }
+.plan-target {
+  font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-size: 1.08rem; line-height: 1.4;
+  color: var(--text2); margin: 0.5rem 0 1.3rem; min-height: 3em;
+}
+.plan-price { padding: 1.1rem 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin-bottom: 1.2rem; }
+.price-amount {
+  font-family: 'Bebas Neue', sans-serif; font-size: 3.1rem; line-height: 1; letter-spacing: 0.02em; color: var(--purple);
+}
+@supports (-webkit-background-clip: text) {
+  .price-amount { background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+}
+.price-period { margin-top: 0.4rem; font-size: 0.64rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim); }
+.price-annual { margin-top: 0.3rem; font-size: 0.72rem; color: var(--text2); }
+.plan-features { list-style: none; margin: 0 0 1.5rem; flex: 1; }
+.plan-features li {
+  position: relative; padding: 0.42rem 0 0.42rem 1.5rem;
+  font-family: 'Instrument Serif', Georgia, serif; font-size: 1.08rem; line-height: 1.4; color: var(--text2);
+}
+.plan-features li::before { content: '✓'; position: absolute; left: 0; top: 0.42rem; color: var(--ok); font-size: 0.85rem; }
+.plan-features li strong { color: var(--white); font-weight: 400; }
+.plan-features li.locked { color: var(--dim); text-decoration: line-through; text-decoration-color: rgba(128, 128, 128, 0.5); }
+.plan-features li.locked::before { content: '–'; color: var(--dim); }
+.plan-cta { text-align: center; width: 100%; padding-left: 1rem; padding-right: 1rem; }
+
+/* annual + comparison tables */
+.annual td.saving { color: var(--ok); }
+.annual td.hl { color: var(--white); }
+.annual td:last-child { color: var(--dim); }
+
+/* ── add-ons ── */
+.addon-price { margin-top: 1rem; font-family: 'Bebas Neue', sans-serif; font-size: 1.9rem; letter-spacing: 0.03em; color: var(--purple); }
+.addon-price span { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim); }
+
+/* ── founding ── */
+.founding-grid {
+  display: grid; grid-template-columns: 1.3fr 1fr; gap: 2.5rem;
+  background: var(--surface); border: 1px solid var(--border); padding: 2.4rem;
+}
+.founding-left h2 { margin-bottom: 1.4rem; }
+.founding-left h2 em { font-style: normal; color: var(--purple); }
+@supports (-webkit-background-clip: text) {
+  .founding-left h2 em { background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+}
+.founding-left p { font-family: 'Instrument Serif', Georgia, serif; font-size: 1.2rem; line-height: 1.6; color: var(--text2); margin-bottom: 1rem; }
+.founding-left strong { color: var(--white); font-weight: 400; }
+.founding-benefits { list-style: none; margin-top: 1.4rem; }
+.founding-benefits li {
+  position: relative; padding: 0.5rem 0 0.5rem 1.5rem; border-top: 1px solid var(--border);
+  font-family: 'Instrument Serif', Georgia, serif; font-size: 1.1rem; line-height: 1.45; color: var(--text2);
+}
+.founding-benefits li::before { content: '✓'; position: absolute; left: 0; top: 0.5rem; color: var(--ok); font-size: 0.85rem; }
+.founding-benefits strong { color: var(--white); font-weight: 400; }
+.founding-right { display: flex; flex-direction: column; justify-content: center; }
+.slots-counter { text-align: center; }
+.slots-number {
+  font-family: 'Bebas Neue', sans-serif; font-size: 6rem; line-height: 0.9; color: var(--purple);
+}
+@supports (-webkit-background-clip: text) {
+  .slots-number { background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+}
+.slots-label { font-size: 0.7rem; letter-spacing: 0.24em; text-transform: uppercase; color: var(--dim); margin-top: 0.4rem; }
+.slots-bar { height: 8px; margin: 1.4rem 0 0.6rem; background: var(--border); border-radius: 99px; overflow: hidden; position: relative; }
+.slots-bar::after { content: ''; position: absolute; inset: 0 auto 0 0; width: 35%; background: var(--grad); border-radius: 99px; }
+.slots-taken { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text2); }
+.slots-taken .claimed { color: var(--purple); }
+.founding-price-display { margin: 1.8rem 0; text-align: center; padding: 1.2rem; border: 1px solid var(--border); background: var(--card); }
+.founding-price-old { color: var(--dim); text-decoration: line-through; font-size: 0.9rem; }
+.founding-price-new { font-family: 'Bebas Neue', sans-serif; font-size: 3.4rem; line-height: 1; color: var(--white); }
+.founding-price-note { margin-top: 0.4rem; font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--purple); }
+.founding-cta { text-align: center; }
+.founding-cta-note { margin-top: 0.7rem; text-align: center; font-size: 0.66rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); }
+
+/* ── ROI calculator ── */
+.roi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+.roi-inputs, .roi-outputs { background: var(--card); border: 1px solid var(--border); padding: 1.8rem 1.6rem; }
+.roi-outputs { background: var(--surface); }
+.roi-title { font-size: 0.68rem; letter-spacing: 0.26em; text-transform: uppercase; color: var(--purple); margin-bottom: 1.3rem; }
+.roi-field { margin-bottom: 1.1rem; }
+.roi-field label { display: block; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); margin-bottom: 0.4rem; }
+.roi-field input, .roi-field select {
+  width: 100%; padding: 0.8rem 0.9rem; font-family: 'DM Mono', monospace; font-size: 0.95rem;
+  color: var(--white); background: var(--black); border: 1px solid var(--border); border-radius: 10px;
+}
+.roi-field input:focus, .roi-field select:focus { outline: 2px solid var(--purple); outline-offset: 1px; border-color: var(--purple); }
+.roi-metric { padding: 0.9rem 0; border-bottom: 1px solid var(--border); }
+.roi-metric:last-child { border-bottom: none; }
+.roi-metric-label { font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); }
+.roi-metric-value { font-family: 'Bebas Neue', sans-serif; font-size: 2.4rem; line-height: 1.1; color: var(--white); overflow-wrap: anywhere; }
+.roi-metric-value.positive { color: var(--ok); }
+.roi-metric-value.highlight { color: var(--purple); }
+@supports (-webkit-background-clip: text) {
+  .roi-metric-value.highlight { background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+}
+.roi-metric-sub { font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-size: 1rem; color: var(--text2); }
+
+/* ── comparison table ── */
+.cmp { min-width: 760px; }
+.cmp th:not(:first-child), .cmp td:not(:first-child) { text-align: center; }
+.cmp td { vertical-align: middle; }
+.cmp .raptor-col { background: var(--card); color: var(--white); }
+.cmp th.raptor-col { color: var(--purple); }
+.cmp .check { color: var(--ok); font-size: 1.15rem; }
+.cmp .cross { color: var(--dim); font-size: 1rem; }
+.cmp .partial { color: var(--warn); font-family: 'DM Mono', monospace; font-size: 0.78rem; letter-spacing: 0.04em; }
+.cmp .cost-row td { border-top: 1px solid var(--border); font-family: 'DM Mono', monospace; font-size: 0.85rem; color: var(--text2); }
+.cmp .cost-row td:first-child { color: var(--white); }
+.cmp .cost-raptor { font-family: 'Bebas Neue', sans-serif !important; font-size: 1.7rem !important; letter-spacing: 0.04em; color: var(--purple) !important; }
+
+.cta-band h2 em { font-style: normal; color: var(--purple); }
+@supports (-webkit-background-clip: text) {
+  .cta-band h2 em { background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+}
+.cta-band p strong { color: var(--white); font-weight: 400; }
+
+/* ── responsive ── */
+@media (max-width: 900px) {
+  .founding-grid { grid-template-columns: 1fr; padding: 1.6rem 1.25rem; gap: 2rem; }
+  .roi-grid { grid-template-columns: 1fr; }
+  .plan-target { min-height: 0; }
+}
+@media (max-width: 700px) {
+  .founding-banner { font-size: 0.6rem; letter-spacing: 0.1em; }
+  .slots-number { font-size: 4.6rem; }
+  .jump { margin-top: 1.6rem; }
+}
