@@ -40,6 +40,14 @@ export default function WaFlowBuilder() {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  // Full screen: the builder fills the whole window; Esc leaves it.
+  const [fullscreen, setFullscreen] = useState(false);
+  useEffect(() => {
+    if (!fullscreen) return undefined;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setFullscreen(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [fullscreen]);
   const [meta, setMeta] = useState({ name: '', entry_keyword: '', match_type: 'contains' as 'contains' | 'exact' });
 
   useEffect(() => { fetchFlow(); }, [flowId]);
@@ -107,7 +115,9 @@ export default function WaFlowBuilder() {
   if (!flow) return <div style={{ padding: '2rem', color: 'var(--dim)' }}>Flow not found.</div>;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <div style={fullscreen
+      ? { position: 'fixed', inset: 0, zIndex: 3000, background: 'var(--black)', padding: '1rem 1.25rem', display: 'flex', flexDirection: 'column' }
+      : { display: 'flex', flexDirection: 'column', height: '100%', minHeight: 640 }}>
       {/* Top bar */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', flex: 1, minWidth: 0 }}>
@@ -119,7 +129,12 @@ export default function WaFlowBuilder() {
             <option value="exact">Exact</option>
           </select>
         </div>
-        <button onClick={handleSave} style={primaryBtnStyle} disabled={saving}>{saving ? 'Saving…' : 'Save Flow'}</button>
+        <div style={{ display: 'flex', gap: '0.6rem' }}>
+          <button onClick={() => setFullscreen((f) => !f)} style={{ ...primaryBtnStyle, background: 'transparent', border: '1px solid var(--border)', color: 'var(--white)' }}>
+            {fullscreen ? 'Exit full screen (Esc)' : 'Full screen'}
+          </button>
+          <button onClick={handleSave} style={primaryBtnStyle} disabled={saving}>{saving ? 'Saving…' : 'Save Flow'}</button>
+        </div>
       </div>
 
       <div style={{ display: 'flex', gap: '1rem', flex: 1, minHeight: 0 }}>
@@ -143,7 +158,7 @@ export default function WaFlowBuilder() {
 
         {/* Canvas */}
         <div style={{ flex: 1, border: '1px solid var(--border)', borderRadius: '6px', overflow: 'hidden' }}>
-          <ReactFlowProvider>
+          <ReactFlowProvider key={fullscreen ? 'fullscreen' : 'normal'}>
             <ReactFlow
               nodes={nodes}
               edges={edges}
