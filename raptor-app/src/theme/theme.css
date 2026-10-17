@@ -27,19 +27,27 @@
   --red: #ef4444;
   --bulb-color: #cbd5e1;
   --bulb-glow: none;
+  /* The desktop app's font (raptor-ui/src/index.css). --mono is used all over as var(--mono) and was never defined, */
+  /* so every such piece of text simply inherited the body font; defining it here moves them all together. */
+  --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  --mono: var(--font-ui);
+  --card-bg: var(--surface);
+  --input-bg: var(--surface2);
+  --input-border: var(--border);
 }
 
 body.light-mode {
-  --black: #faf7f4;
-  --surface: #f0ebe4;
-  --surface2: #e8e0d6;
-  --border: rgba(0, 0, 0, 0.08);
-  --purple: #6d28d9;
-  --pink: #be185d;
-  --grad: linear-gradient(135deg, #6d28d9, #be185d);
-  --white: #1c1018;
-  --dim: #6b5f6a;
+  /* Same values as the desktop app's light mode (raptor-ui/src/App.css). */
+  --black: #f7f6f2;
+  --surface: #eceadd;
+  --surface2: #e2dfd2;
+  --border: #dedbc8;
+  --white: #1a1a1a;
+  --dim: #5c5a52;
   --dim2: #9c8fa0;
+  --card-bg: #ffffff;
+  --input-bg: #fcfcfc;
+  --input-border: #ccc8b8;
   --bulb-color: #ffaa00;
   --bulb-glow: drop-shadow(0 0 15px rgba(255, 170, 0, 0.8));
 }
@@ -59,7 +67,9 @@ html {
 body {
   background: var(--black);
   color: var(--white);
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
   min-height: 100vh;
 }
@@ -103,3 +113,14 @@ body {
   0% { background-position: -400px 0; }
   100% { background-position: 400px 0; }
 }
+
+/* ── The desktop app's look ───────────────────────────────────────────────────────────────────────────────────────
+   One switch for the whole web app. To undo: delete this block and set --font-ui back to 'DM Mono', monospace. */
+
+/* Titles that were written inline in the condensed Bebas Neue use the desktop's bold UI font instead
+   (the RAPTOR wordmark in the top bar is styled by a class, not inline, so it keeps its own look). */
+[style*="Bebas Neue"] { font-family: var(--font-ui) !important; font-weight: 700; }
+
+/* Cards and panels are white on the beige page in light mode, as on the desktop. They are the elements that set
+   their background inline from --surface (the sidebar and top bar are styled by classes and stay beige). */
+body.light-mode [style*="background: var(--surface)"] { background: var(--card-bg) !important; }

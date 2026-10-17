@@ -18,8 +18,8 @@ const PRESETS: Record<string, { label: string; smtp_host: string; smtp_security:
 
 const RAMP_STEP_PER_DAY = 5;
 
-const noteStyle = { fontSize: '0.6rem', color: 'var(--dim)', lineHeight: 1.6 } as const;
-const labelStyle = { display: 'block', fontSize: '0.55rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--dim)', marginBottom: '0.3rem' } as const;
+const noteStyle = { fontSize: '0.78rem', color: 'var(--dim)', lineHeight: 1.6 } as const;
+const labelStyle = { display: 'block', fontSize: '0.72rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--dim)', marginBottom: '0.3rem' } as const;
 const rowStyle = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: '0.8rem' } as const;
 const ghostBtnStyle = { ...primaryBtnStyle, background: 'transparent', border: '1px solid var(--border)', color: 'var(--white)' } as const;
 
