@@ -169,7 +169,7 @@ export default function EmailConnectionSetup() {
   const formCard = (
     <form
       onSubmit={handleConnect}
-      style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 620, display: 'flex', flexDirection: 'column', gap: '0.8rem' }}
+      style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 960, display: 'flex', flexDirection: 'column', gap: '0.8rem' }}
     >
       <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.2rem' }}>{hasAccounts ? 'Add another mailbox' : 'Connect your mailbox'}</div>
       <div style={noteStyle}>
@@ -260,7 +260,7 @@ export default function EmailConnectionSetup() {
       {accounts.length === 0 ? (
         <div style={{ color: 'var(--dim2)', fontSize: '0.65rem' }}>No accounts connected yet.</div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem', maxWidth: 620 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 420px), 1fr))', gap: '0.7rem', alignItems: 'start' }}>
           {accounts.map((a) => {
             const cfg = a.smtp_config || {};
             const stored = !!cfg.host;                  // a mailbox saved with its settings (older desktop connections have none)

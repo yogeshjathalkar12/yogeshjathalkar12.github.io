@@ -116,7 +116,7 @@ export default function WaFlows() {
         A flow starts when an inbound message matches its entry keyword and no other flow is already active for that contact. Flows are checked before plain keyword triggers — if a message matches both, the flow wins.
       </div>
 
-      <div style={{ marginBottom: '1.6rem', maxWidth: 640 }}>
+      <div style={{ marginBottom: '1.6rem', maxWidth: 960 }}>
         <button
           onClick={() => setShowAiSettings((v) => !v)}
           style={{ background: 'transparent', border: '1px solid var(--border)', color: 'var(--dim)', padding: '0.5rem 0.9rem', borderRadius: '4px', cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: '0.6rem', textTransform: 'uppercase', marginBottom: '0.8rem' }}
@@ -143,7 +143,7 @@ export default function WaFlows() {
         )}
       </div>
 
-      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 480 }}>
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 960 }}>
         <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.2rem', marginBottom: '1rem' }}>New Flow</div>
         <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
           <input style={fieldInputStyle} placeholder="Flow name (e.g. Lead Qualification)" value={name} onChange={(e) => setName(e.target.value)} />
@@ -158,7 +158,7 @@ export default function WaFlows() {
       </div>
 
       <div style={{ fontSize: '0.58rem', letterSpacing: '0.18em', color: 'var(--dim)', textTransform: 'uppercase', marginBottom: '0.8rem' }}>Flows</div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem', maxWidth: 640 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 420px), 1fr))', gap: '0.7rem', alignItems: 'start' }}>
         {flows.length === 0 ? (
           <div style={{ color: 'var(--dim2)', fontSize: '0.65rem' }}>No flows yet.</div>
         ) : (

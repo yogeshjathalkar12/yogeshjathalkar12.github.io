@@ -165,7 +165,7 @@ export default function EmailSegments() {
         tag when creating a campaign.
       </div>
 
-      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 620 }}>
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 960 }}>
         <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.2rem', marginBottom: '1rem' }}>New Segment</div>
         <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
           <input style={fieldInputStyle} placeholder="Segment name (e.g. Engaged customers)" value={name} onChange={(e) => setName(e.target.value)} />
@@ -241,7 +241,7 @@ export default function EmailSegments() {
       </div>
 
       <div style={{ fontSize: '0.58rem', letterSpacing: '0.18em', color: 'var(--dim)', textTransform: 'uppercase', marginBottom: '0.8rem' }}>Segments</div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem', maxWidth: 620 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 420px), 1fr))', gap: '0.7rem', alignItems: 'start' }}>
         {segments.length === 0 ? (
           <div style={{ color: 'var(--dim2)', fontSize: '0.65rem' }}>No segments yet.</div>
         ) : (

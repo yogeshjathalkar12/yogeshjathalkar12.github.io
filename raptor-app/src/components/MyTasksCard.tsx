@@ -19,7 +19,7 @@ export default function MyTasksCard() {
   if (!tasks || tasks.length === 0) return null;
 
   return (
-    <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 6, padding: '1.2rem 1.4rem', marginBottom: '2rem', maxWidth: 720 }}>
+    <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 6, padding: '1.2rem 1.4rem', marginBottom: '2rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
         <div style={{ fontSize: '0.7rem', color: 'var(--white)', fontWeight: 'bold' }}>My tasks for today</div>
         <Link to="/crm/tasks" style={{ fontSize: '0.6rem', color: 'var(--purple)', textDecoration: 'none' }}>All tasks →</Link>

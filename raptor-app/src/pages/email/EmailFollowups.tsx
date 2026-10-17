@@ -167,7 +167,7 @@ export default function EmailFollowups() {
         <div style={{ color: 'var(--dim2)', fontSize: '0.65rem' }}>Create a campaign on this account first — follow-ups branch off an existing campaign's send.</div>
       ) : (
         <>
-          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 620 }}>
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 960 }}>
             <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.2rem', marginBottom: '1rem' }}>New Follow-up</div>
             <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
               <input style={fieldInputStyle} placeholder="Follow-up name (e.g. Re-engage non-openers)" value={name} onChange={(e) => setName(e.target.value)} />
@@ -208,7 +208,7 @@ export default function EmailFollowups() {
           </div>
 
           <div style={{ fontSize: '0.58rem', letterSpacing: '0.18em', color: 'var(--dim)', textTransform: 'uppercase', marginBottom: '0.8rem' }}>Follow-ups for this campaign</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem', maxWidth: 620 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 420px), 1fr))', gap: '0.7rem', alignItems: 'start' }}>
             {followups.length === 0 ? (
               <div style={{ color: 'var(--dim2)', fontSize: '0.65rem' }}>No follow-ups yet.</div>
             ) : (

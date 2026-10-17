@@ -185,7 +185,7 @@ export default function WaTriggers() {
         Fires only on an inbound message — free-form replies, buttons, and lists are only allowed within Meta's 24-hour session window, which an inbound message always satisfies. "STOP"/"unsubscribe" are handled automatically as opt-outs. Tapping a button or list option counts as an inbound message too, so its id can match another trigger's keyword — useful for building simple multi-step flows.
       </div>
 
-      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 560 }}>
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 960 }}>
         <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.2rem', marginBottom: '1rem' }}>New Trigger</div>
         <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
           <input style={fieldInputStyle} placeholder="Keyword (e.g. pricing, or a button id like opt_pricing)" value={keyword} onChange={(e) => setKeyword(e.target.value)} />
@@ -318,7 +318,7 @@ export default function WaTriggers() {
       </div>
 
       <div style={{ fontSize: '0.58rem', letterSpacing: '0.18em', color: 'var(--dim)', textTransform: 'uppercase', marginBottom: '0.8rem' }}>Triggers</div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem', maxWidth: 620 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 420px), 1fr))', gap: '0.7rem', alignItems: 'start' }}>
         {triggers.length === 0 ? (
           <div style={{ color: 'var(--dim2)', fontSize: '0.65rem' }}>No triggers yet.</div>
         ) : (

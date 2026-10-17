@@ -342,7 +342,7 @@ export default function EmailSequences() {
         a different step (or end the sequence) based on whether it was opened or clicked.
       </div>
 
-      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 620 }}>
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 960 }}>
         <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.2rem', marginBottom: '1rem' }}>New Sequence</div>
         <form onSubmit={handleCreateSequence} style={{ display: 'flex', gap: '0.8rem' }}>
           <input style={{ ...fieldInputStyle, marginBottom: 0, flex: 1 }} placeholder="Sequence name (e.g. New subscriber nurture)" value={newSequenceName} onChange={(e) => setNewSequenceName(e.target.value)} />
@@ -358,7 +358,7 @@ export default function EmailSequences() {
         <div style={{ color: 'var(--dim2)', fontSize: '0.65rem' }}>No sequences yet — create one above.</div>
       ) : currentSequence ? (
         <>
-          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1rem 1.2rem', marginBottom: '1.6rem', maxWidth: 620, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1rem 1.2rem', marginBottom: '1.6rem', maxWidth: 960, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
               <div style={{ fontSize: '0.75rem', color: 'var(--white)' }}>{currentSequence.name}</div>
               <div style={{ fontSize: '0.6rem', color: 'var(--dim)' }}>
@@ -388,7 +388,7 @@ export default function EmailSequences() {
           </div>
 
           <div style={{ fontSize: '0.58rem', letterSpacing: '0.18em', color: 'var(--dim)', textTransform: 'uppercase', marginBottom: '0.8rem' }}>Steps</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', maxWidth: 620, marginBottom: '1.4rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 420px), 1fr))', gap: '0.6rem', alignItems: 'start', marginBottom: '1.4rem' }}>
             {steps.length === 0 ? (
               <div style={{ color: 'var(--dim2)', fontSize: '0.65rem' }}>No steps yet — add one below.</div>
             ) : (
@@ -519,7 +519,7 @@ export default function EmailSequences() {
             )}
           </div>
 
-          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 620 }}>
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 960 }}>
             <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.1rem', marginBottom: '1rem' }}>Add Step {steps.length + 1}</div>
             <form onSubmit={handleAddStep} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
               <input style={fieldInputStyle} placeholder="Subject — supports {{first_name}} and {a|b} spintax" value={stepSubject} onChange={(e) => setStepSubject(e.target.value)} />
@@ -552,7 +552,7 @@ export default function EmailSequences() {
             </form>
           </div>
 
-          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', maxWidth: 620 }}>
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', maxWidth: 960 }}>
             <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.1rem', marginBottom: '1rem' }}>Enroll Contacts</div>
             <form onSubmit={handleEnroll} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
               <textarea

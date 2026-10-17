@@ -4,7 +4,7 @@ import { type Enrollment, type VerifiedFactor, getAssurance, listVerifiedFactors
 import { setRequireMfa } from '../../lib/team';
 import { fieldInputStyle, primaryBtnStyle, ghostBtnStyle } from '../crm/Modal';
 
-const cardStyle: React.CSSProperties = { background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.6rem', maxWidth: 480 };
+const cardStyle: React.CSSProperties = { background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.6rem' };
 const headStyle: React.CSSProperties = { fontSize: '0.7rem', color: 'var(--white)', fontWeight: 'bold', marginBottom: '0.4rem' };
 const subStyle: React.CSSProperties = { fontSize: '0.65rem', color: 'var(--dim)', marginBottom: '1.2rem', lineHeight: 1.6 };
 

@@ -12,7 +12,6 @@ const cardStyle: React.CSSProperties = {
   border: '1px solid var(--border)',
   borderRadius: '6px',
   padding: '1.6rem',
-  maxWidth: 480,
 };
 
 // Optional: lets someone who signed in with Google or an email link also use
@@ -75,8 +74,8 @@ export default function Settings() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.6rem' }}>
-      <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.5rem', letterSpacing: '0.05em' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 440px), 1fr))', gap: '1.6rem', alignItems: 'start' }}>
+      <div style={{ gridColumn: '1 / -1', fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.5rem', letterSpacing: '0.05em' }}>
         Settings
       </div>
 
@@ -138,7 +137,7 @@ export default function Settings() {
 
       <SecurityCard />
 
-      {(isOwner || isAdmin) && <TeamSection />}
+      {(isOwner || isAdmin) && <div style={{ gridColumn: '1 / -1' }}><TeamSection /></div>}
     </div>
   );
 }
