@@ -195,6 +195,9 @@ export function DashboardLayout() {
             <NavLink to="/whatsapp" className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
               <span className="dash-sidebar-icon">◉</span><span>WhatsApp</span>{proTag}
             </NavLink>
+            <NavLink to="/connections" className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
+              <span className="dash-sidebar-icon">⌁</span><span>Connections</span>{proTag}
+            </NavLink>
             {automationTools.map((tool) => (
               <NavLink key={tool.slug} to={tool.route} className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
                 <span className="dash-sidebar-icon">{tool.icon}</span><span>{tool.navLabel}</span>{proTag}

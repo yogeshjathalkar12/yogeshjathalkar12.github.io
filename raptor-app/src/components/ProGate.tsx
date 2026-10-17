@@ -81,6 +81,15 @@ export const PRO_COPY = {
       'A shared inbox to reply to customers yourself',
     ],
   },
+  connections: {
+    feature: 'Connections',
+    headline: 'connecting your channels and data sources',
+    points: [
+      'Link your YouTube channel and watch subscribers, views and new videos',
+      'More channels and data sources are added over time, on the same screen',
+      'Everything stays with your organization; keys are saved encrypted',
+    ],
+  },
   content: {
     feature: 'The AI Content Suite',
     headline: 'AI-written sales emails and campaign copy',
