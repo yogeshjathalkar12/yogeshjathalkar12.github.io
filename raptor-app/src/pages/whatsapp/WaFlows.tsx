@@ -143,20 +143,9 @@ export default function WaFlows() {
         )}
       </div>
 
-      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 960 }}>
-        <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.2rem', marginBottom: '1rem' }}>New Flow</div>
-        <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-          <input style={fieldInputStyle} placeholder="Flow name (e.g. Lead Qualification)" value={name} onChange={(e) => setName(e.target.value)} />
-          <input style={fieldInputStyle} placeholder="Entry keyword (e.g. hi, hello, start)" value={entryKeyword} onChange={(e) => setEntryKeyword(e.target.value)} />
-          <select style={fieldInputStyle} value={matchType} onChange={(e) => setMatchType(e.target.value as 'contains' | 'exact')}>
-            <option value="contains">Message contains this word</option>
-            <option value="exact">Message is exactly this</option>
-          </select>
-          {error && <div style={{ color: 'var(--red)', fontSize: '0.65rem' }}>{error}</div>}
-          <button type="submit" style={primaryBtnStyle} disabled={creating}>{creating ? 'Creating…' : 'Create & Open Builder'}</button>
-        </form>
-      </div>
-
+      {/* Flows on the left (moved up), the New Flow card on the right. Narrow windows stack them. */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 420px), 1fr))', gap: '2rem', alignItems: 'start' }}>
+        <div>
       <div style={{ fontSize: '0.58rem', letterSpacing: '0.18em', color: 'var(--dim)', textTransform: 'uppercase', marginBottom: '0.8rem' }}>Flows</div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 420px), 1fr))', gap: '0.7rem', alignItems: 'start' }}>
         {flows.length === 0 ? (
@@ -184,6 +173,23 @@ export default function WaFlows() {
             </div>
           ))
         )}
+      </div>
+        </div>
+        <div>
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: 0 }}>
+        <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.2rem', marginBottom: '1rem' }}>New Flow</div>
+        <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+          <input style={fieldInputStyle} placeholder="Flow name (e.g. Lead Qualification)" value={name} onChange={(e) => setName(e.target.value)} />
+          <input style={fieldInputStyle} placeholder="Entry keyword (e.g. hi, hello, start)" value={entryKeyword} onChange={(e) => setEntryKeyword(e.target.value)} />
+          <select style={fieldInputStyle} value={matchType} onChange={(e) => setMatchType(e.target.value as 'contains' | 'exact')}>
+            <option value="contains">Message contains this word</option>
+            <option value="exact">Message is exactly this</option>
+          </select>
+          {error && <div style={{ color: 'var(--red)', fontSize: '0.65rem' }}>{error}</div>}
+          <button type="submit" style={primaryBtnStyle} disabled={creating}>{creating ? 'Creating…' : 'Create & Open Builder'}</button>
+        </form>
+      </div>
+        </div>
       </div>
     </div>
   );
