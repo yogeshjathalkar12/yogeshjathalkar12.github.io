@@ -329,7 +329,7 @@ export default function ContentTool() {
           })}
 
           <div style={{ display: 'flex', gap: '0.6rem' }}>
-            <button className="arsenal-btn" style={{ background: 'transparent', border: '1px solid var(--border)' }} disabled={steps.length >= 5} onClick={addStep}>
+            <button className="arsenal-btn" style={{ background: 'transparent', border: '1px solid var(--border)', color: 'var(--white)' }} disabled={steps.length >= 5} onClick={addStep}>
               + Chain another AI onto the output
             </button>
             <button className="arsenal-btn" disabled={running} onClick={runPipeline}>

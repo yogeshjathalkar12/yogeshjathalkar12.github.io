@@ -22,6 +22,8 @@ const noteStyle = { fontSize: '0.6rem', color: 'var(--dim)', lineHeight: 1.6 } a
 export default function EmailConnectionSetup() {
   const [accounts, setAccounts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  // With a mailbox already connected the form stays closed until "Add another mailbox" is pressed.
+  const [showForm, setShowForm] = useState(false);
 
   const [label, setLabel] = useState('');
   const [fromEmail, setFromEmail] = useState('');
@@ -186,6 +188,7 @@ export default function EmailConnectionSetup() {
       setSmtpUser('');
       setAcceptedRisks(false);
       setTestOk(false);
+      setShowForm(false);
       fetchAccounts();
     } catch (err: any) {
       console.error('Failed to save email account:', err);
@@ -204,14 +207,9 @@ export default function EmailConnectionSetup() {
   // Without the server's SMTP switch there is only one way to connect, so never show a form that can't work.
   const viaDesktop = mode === 'desktop' || !smtpEnabled;
 
-  return (
-    <div>
-      <div style={{ fontSize: '0.65rem', color: 'var(--dim)', marginBottom: '1.4rem', maxWidth: 620, lineHeight: 1.7 }}>
-        Send from your own mailbox. Nothing routes through a shared identity — every send uses your own login, your own warm-up ramp and your own suppression list.
-      </div>
-
+  const formCard = (
       <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 480 }}>
-        <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.2rem', marginBottom: '1rem' }}>Connect your mailbox</div>
+        <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.2rem', marginBottom: '1rem' }}>{accounts.length > 0 ? 'Add another mailbox' : 'Connect your mailbox'}</div>
 
         {smtpEnabled && (
           <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
@@ -268,13 +266,19 @@ export default function EmailConnectionSetup() {
           <button type="submit" style={primaryBtnStyle} disabled={saving}>
             {saving ? 'Connecting…' : 'Connect'}
           </button>
+          {accounts.length > 0 && (
+            <button type="button" style={{ ...primaryBtnStyle, background: 'transparent', border: '1px solid var(--border)', color: 'var(--white)' }} onClick={() => { setShowForm(false); setError(null); }}>
+              Cancel
+            </button>
+          )}
         </form>
       </div>
+  );
 
-      {accounts.some((a) => a.provider === 'desktop') && <DesktopRelayStatus />}
-
+  const accountList = (
+    <>
       <div style={{ fontSize: '0.58rem', letterSpacing: '0.18em', color: 'var(--dim)', textTransform: 'uppercase', marginBottom: '0.8rem' }}>
-        Connected Accounts
+        {accounts.length > 0 ? 'Your connected mailboxes' : 'Connected Accounts'}
       </div>
       {loading ? (
         <div style={{ color: 'var(--dim)', fontSize: '0.7rem' }}>Loading…</div>
@@ -302,6 +306,34 @@ export default function EmailConnectionSetup() {
             </div>
           ))}
         </div>
+      )}
+    </>
+  );
+
+  return (
+    <div>
+      <div style={{ fontSize: '0.65rem', color: 'var(--dim)', marginBottom: '1.4rem', maxWidth: 620, lineHeight: 1.7 }}>
+        Send from your own mailbox. Nothing routes through a shared identity — every send uses your own login, your own warm-up ramp and your own suppression list.
+      </div>
+
+      {loading ? (
+        <div style={{ color: 'var(--dim)', fontSize: '0.7rem' }}>Loading…</div>
+      ) : accounts.length > 0 ? (
+        <>
+          {accountList}
+          <div style={{ height: '1.4rem' }} />
+          {accounts.some((a) => a.provider === 'desktop') && <DesktopRelayStatus />}
+          {showForm ? formCard : (
+            <button type="button" style={{ ...primaryBtnStyle, background: 'transparent', border: '1px solid var(--border)', color: 'var(--white)' }} onClick={() => setShowForm(true)}>
+              + Add another mailbox
+            </button>
+          )}
+        </>
+      ) : (
+        <>
+          {formCard}
+          {accountList}
+        </>
       )}
     </div>
   );

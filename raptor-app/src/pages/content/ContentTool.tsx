@@ -369,14 +369,14 @@ export default function ContentTool() {
                 <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.8rem' }}>
                   <button
                     className="arsenal-btn"
-                    style={step.mode === 'custom' ? {} : { background: 'transparent', border: '1px solid var(--border)' }}
+                    style={step.mode === 'custom' ? {} : { background: 'transparent', border: '1px solid var(--border)', color: 'var(--white)' }}
                     onClick={() => setStepMode(idx, 'custom')}
                   >
                     Write your own prompt
                   </button>
                   <button
                     className="arsenal-btn"
-                    style={step.mode === 'template' ? {} : { background: 'transparent', border: '1px solid var(--border)' }}
+                    style={step.mode === 'template' ? {} : { background: 'transparent', border: '1px solid var(--border)', color: 'var(--white)' }}
                     onClick={() => setStepMode(idx, 'template')}
                   >
                     Use a template
@@ -570,7 +570,7 @@ export default function ContentTool() {
           })}
 
           <div style={{ display: 'flex', gap: '0.6rem' }}>
-            <button className="arsenal-btn" style={{ background: 'transparent', border: '1px solid var(--border)' }} disabled={steps.length >= 5} onClick={addStep}>
+            <button className="arsenal-btn" style={{ background: 'transparent', border: '1px solid var(--border)', color: 'var(--white)' }} disabled={steps.length >= 5} onClick={addStep}>
               + Chain another AI onto the output
             </button>
             <button className="arsenal-btn" disabled={running} onClick={runPipeline}>

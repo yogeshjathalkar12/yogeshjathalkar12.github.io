@@ -8,6 +8,8 @@ const WHATSAPP_API = toolApiBase('whatsapp');
 export default function WaConnectionSetup() {
   const [accounts, setAccounts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  // With a number already connected the form stays closed until "Add another number" is pressed.
+  const [showForm, setShowForm] = useState(false);
 
   const [label, setLabel] = useState('');
   const [phoneNumberId, setPhoneNumberId] = useState('');
@@ -68,6 +70,7 @@ export default function WaConnectionSetup() {
       setWabaId('');
       setAccessToken('');
       setCatalogId('');
+      setShowForm(false);
       fetchAccounts();
     } catch (err: any) {
       setError(err.message || 'Could not save this account.');
@@ -91,14 +94,9 @@ export default function WaConnectionSetup() {
     fetchAccounts();
   }
 
-  return (
-    <div>
-      <div style={{ fontSize: '0.65rem', color: 'var(--dim)', marginBottom: '1.4rem', maxWidth: 620 }}>
-        Connect your own Meta WhatsApp Cloud API app — phone_number_id, WABA ID, and access token from your own Meta Business Manager. Your token is encrypted before it's stored. No shared number, no shared reputation.
-      </div>
-
+  const formCard = (
       <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 480 }}>
-        <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.2rem', marginBottom: '1rem' }}>Connect a WhatsApp number</div>
+        <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.2rem', marginBottom: '1rem' }}>{accounts.length > 0 ? 'Add another WhatsApp number' : 'Connect a WhatsApp number'}</div>
         <form onSubmit={handleConnect} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
           <input style={fieldInputStyle} placeholder="Label (e.g. Raptor outreach)" value={label} onChange={(e) => setLabel(e.target.value)} />
           <input style={fieldInputStyle} placeholder="Phone Number ID" value={phoneNumberId} onChange={(e) => setPhoneNumberId(e.target.value)} />
@@ -109,11 +107,19 @@ export default function WaConnectionSetup() {
           <button type="submit" style={primaryBtnStyle} disabled={saving}>
             {saving ? 'Connecting…' : 'Connect'}
           </button>
+          {accounts.length > 0 && (
+            <button type="button" style={{ ...primaryBtnStyle, background: 'transparent', border: '1px solid var(--border)', color: 'var(--white)' }} onClick={() => { setShowForm(false); setError(null); }}>
+              Cancel
+            </button>
+          )}
         </form>
       </div>
+  );
 
+  const accountList = (
+    <>
       <div style={{ fontSize: '0.58rem', letterSpacing: '0.18em', color: 'var(--dim)', textTransform: 'uppercase', marginBottom: '0.8rem' }}>
-        Connected Numbers
+        {accounts.length > 0 ? 'Your connected numbers' : 'Connected Numbers'}
       </div>
       {loading ? (
         <div style={{ color: 'var(--dim)', fontSize: '0.7rem' }}>Loading…</div>
@@ -152,6 +158,33 @@ export default function WaConnectionSetup() {
             </div>
           ))}
         </div>
+      )}
+    </>
+  );
+
+  return (
+    <div>
+      <div style={{ fontSize: '0.65rem', color: 'var(--dim)', marginBottom: '1.4rem', maxWidth: 620 }}>
+        Connect your own Meta WhatsApp Cloud API app — phone_number_id, WABA ID, and access token from your own Meta Business Manager. Your token is encrypted before it's stored. No shared number, no shared reputation.
+      </div>
+
+      {loading ? (
+        <div style={{ color: 'var(--dim)', fontSize: '0.7rem' }}>Loading…</div>
+      ) : accounts.length > 0 ? (
+        <>
+          {accountList}
+          <div style={{ height: '1.4rem' }} />
+          {showForm ? formCard : (
+            <button type="button" style={{ ...primaryBtnStyle, background: 'transparent', border: '1px solid var(--border)', color: 'var(--white)' }} onClick={() => setShowForm(true)}>
+              + Add another WhatsApp number
+            </button>
+          )}
+        </>
+      ) : (
+        <>
+          {formCard}
+          {accountList}
+        </>
       )}
     </div>
   );
