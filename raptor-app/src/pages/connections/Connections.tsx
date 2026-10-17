@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { toolApiBase } from '../../lib/config';
 import { useAuthedFetch } from '../../hooks/useAuthedFetch';
@@ -10,12 +11,18 @@ import { fieldInputStyle, primaryBtnStyle, ghostBtnStyle } from '../../component
 const API = toolApiBase('connections');
 
 interface ProviderField { name: string; label: string; placeholder: string; help: string; secret: boolean; required: boolean }
-interface Provider { provider: string; title: string; description: string; category: string; available: boolean; fields: ProviderField[] }
+interface Provider {
+  provider: string; title: string; description: string; category: string; available: boolean;
+  auth: 'none' | 'oauth'; can_reply: boolean; fields: ProviderField[];
+}
 interface Connection {
   id: string; provider: string; label: string; external_id: string | null; status: 'pending' | 'connected' | 'error' | 'paused';
   last_sync_at: string | null; last_error: string | null; created_at: string;
 }
-interface Signal { name: string; value: number | null; entity: { video_id?: string; title?: string } | null; occurred_at: string }
+interface Signal {
+  name: string; value: number | null; text_value?: string | null; occurred_at: string;
+  entity: { video_id?: string; title?: string; comment_id?: string; author?: string; author_channel?: string; replies?: number; parent_id?: string } | null;
+}
 
 const labelStyle = { display: 'block', fontSize: '0.72rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--dim)', marginBottom: '0.3rem' } as const;
 const noteStyle = { fontSize: '0.78rem', color: 'var(--dim)', lineHeight: 1.6 } as const;
@@ -26,7 +33,10 @@ const STATUS: Record<string, { text: string; color: string }> = {
   paused: { text: 'Paused', color: 'var(--dim)' },
   pending: { text: 'Setting up', color: 'var(--dim)' },
 };
-const METRIC_NAMES: Record<string, string> = { subscribers: 'Subscribers', views: 'Total views', videos: 'Videos' };
+const METRIC_NAMES: Record<string, string> = {
+  subscribers: 'Subscribers', views: 'Total views', videos: 'Videos',
+  views_28d: 'Views, last 28 days', watch_minutes_28d: 'Minutes watched, last 28 days', subs_gained_28d: 'New subscribers, last 28 days',
+};
 
 const fmt = (n: number) => new Intl.NumberFormat().format(Math.round(n));
 function ago(iso: string | null) {
@@ -43,15 +53,20 @@ export default function Connections() {
   const { showToast } = useToast();
   const { can } = useOrg();
   const canManage = can('manage_automations');
+  const [params, setParams] = useSearchParams();
 
   const [providers, setProviders] = useState<Provider[]>([]);
   const [connections, setConnections] = useState<Connection[]>([]);
   const [signals, setSignals] = useState<Record<string, Signal[]>>({});
+  const [comments, setComments] = useState<Record<string, Signal[]>>({});
+  const [repliedTo, setRepliedTo] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState<Provider | null>(null);
   const [inputs, setInputs] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [replyOpen, setReplyOpen] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState('');
 
   // Read straight from the database: row-level security already limits this to the caller's own organization,
   // and the secrets table is not readable from the browser at all.
@@ -67,17 +82,24 @@ export default function Connections() {
     }
     const list = (rows || []) as Connection[];
     setConnections(list);
-    const next: Record<string, Signal[]> = {};
+    const nextSignals: Record<string, Signal[]> = {};
+    const nextComments: Record<string, Signal[]> = {};
+    const nextReplied: Record<string, string> = {};
     await Promise.all(list.map(async (c) => {
-      const { data } = await supabase
-        .from('signals')
-        .select('name, value, entity, occurred_at')
-        .eq('connection_id', c.id)
-        .order('occurred_at', { ascending: false })
-        .limit(80);
-      next[c.id] = (data || []) as Signal[];
+      const [numbers, mentions, sent] = await Promise.all([
+        supabase.from('signals').select('name, value, entity, occurred_at').eq('connection_id', c.id).neq('name', 'comment').neq('name', 'reply_sent')
+          .order('occurred_at', { ascending: false }).limit(120),
+        supabase.from('signals').select('name, value, text_value, entity, occurred_at').eq('connection_id', c.id).eq('name', 'comment')
+          .order('occurred_at', { ascending: false }).limit(12),
+        supabase.from('signals').select('entity').eq('connection_id', c.id).eq('name', 'reply_sent').limit(500),
+      ]);
+      nextSignals[c.id] = (numbers.data || []) as Signal[];
+      nextComments[c.id] = (mentions.data || []) as Signal[];
+      ((sent.data || []) as Signal[]).forEach((r) => { if (r.entity?.parent_id) nextReplied[r.entity.parent_id] = 'sent'; });
     }));
-    setSignals(next);
+    setSignals(nextSignals);
+    setComments(nextComments);
+    setRepliedTo(nextReplied);
     setLoading(false);
   }, []);
 
@@ -85,6 +107,17 @@ export default function Connections() {
     load();
     authedFetch<{ providers: Provider[] }>(`${API}/providers`).then((r) => setProviders(r.providers || [])).catch(() => { /* the list below stays empty */ });
   }, [load, authedFetch]);
+
+  // Back from Google: say what happened once, then clean the address.
+  useEffect(() => {
+    const connected = params.get('connected');
+    const failed = params.get('oauth_error');
+    if (!connected && !failed) return;
+    if (connected) showToast('Connected with Google', 'success');
+    if (failed) { setError(failed); showToast(failed, 'error'); }
+    setParams({}, { replace: true });
+    load();
+  }, [params, setParams, showToast, load]);
 
   const providerOf = useMemo(() => Object.fromEntries(providers.map((p) => [p.provider, p])), [providers]);
 
@@ -95,10 +128,12 @@ export default function Connections() {
       await fn();
       showToast(done, 'success');
       await load();
+      return true;
     } catch (e) {
       const msg = e instanceof ApiError ? e.message : 'Something went wrong. Try again.';
       setError(msg);
       showToast(msg, 'error');
+      return false;
     } finally {
       setBusy(null);
     }
@@ -106,9 +141,28 @@ export default function Connections() {
 
   async function submitConnect() {
     if (!adding) return;
-    await act('connect', () => authedFetch(API, { method: 'POST', body: JSON.stringify({ provider: adding.provider, inputs }) }), `${adding.title} connected`);
-    setAdding(null);
-    setInputs({});
+    const ok = await act('connect', () => authedFetch(API, { method: 'POST', body: JSON.stringify({ provider: adding.provider, inputs }) }), `${adding.title} connected`);
+    if (ok) { setAdding(null); setInputs({}); }
+  }
+
+  // Signing in happens on Google's own page; the server brings the person back here when they are done.
+  async function signIn(provider: string) {
+    setBusy(`signin-${provider}`);
+    setError(null);
+    try {
+      const r = await authedFetch<{ url: string }>(`${API}/oauth/start`, { method: 'POST', body: JSON.stringify({ provider }) });
+      window.location.href = r.url;
+    } catch (e) {
+      const msg = e instanceof ApiError ? e.message : 'Could not start the sign-in. Try again.';
+      setError(msg);
+      showToast(msg, 'error');
+      setBusy(null);
+    }
+  }
+
+  async function sendReply(connectionId: string, parentId: string) {
+    const ok = await act(`reply-${parentId}`, () => authedFetch(`${API}/${connectionId}/reply`, { method: 'POST', body: JSON.stringify({ parent_id: parentId, text: replyText }) }), 'Reply sent');
+    if (ok) { setReplyOpen(null); setReplyText(''); }
   }
 
   function headline(c: Connection) {
@@ -120,16 +174,18 @@ export default function Connections() {
   }
 
   function recentItems(c: Connection) {
-    const seen: Record<string, { title: string; views?: number; likes?: number; comments?: number }> = {};
+    const seen: Record<string, { title: string; views?: number; likes?: number; commentCount?: number }> = {};
+    const order: string[] = [];
     (signals[c.id] || []).forEach((s) => {
       const id = s.entity?.video_id;
       if (!id || s.value === null) return;
-      const item = seen[id] || (seen[id] = { title: s.entity?.title || id });
+      if (!seen[id]) { seen[id] = { title: s.entity?.title || id }; order.push(id); }
+      const item = seen[id];
       if (s.name === 'video_views' && item.views === undefined) item.views = s.value;
       if (s.name === 'video_likes' && item.likes === undefined) item.likes = s.value;
-      if (s.name === 'video_comments' && item.comments === undefined) item.comments = s.value;
+      if (s.name === 'video_comments' && item.commentCount === undefined) item.commentCount = s.value;
     });
-    return Object.values(seen).slice(0, 5);
+    return order.slice(0, 5).map((id) => seen[id]);
   }
 
   return (
@@ -152,6 +208,8 @@ export default function Connections() {
               const st = STATUS[c.status] || STATUS.pending;
               const tiles = headline(c);
               const items = recentItems(c);
+              const mentions = comments[c.id] || [];
+              const canReply = !!info?.can_reply && canManage && c.status === 'connected';
               return (
                 <div key={c.id} style={cardStyle}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.6rem', alignItems: 'baseline' }}>
@@ -177,14 +235,51 @@ export default function Connections() {
                         <div key={v.title} style={{ display: 'flex', justifyContent: 'space-between', gap: '0.8rem', fontSize: '0.78rem', padding: '0.25rem 0', borderTop: '1px solid var(--border)' }}>
                           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'var(--white)' }}>{v.title}</span>
                           <span style={{ color: 'var(--dim)', whiteSpace: 'nowrap' }}>
-                            {v.views !== undefined ? `${fmt(v.views)} views` : ''}{v.comments !== undefined ? ` · ${fmt(v.comments)} comments` : ''}
+                            {v.views !== undefined ? `${fmt(v.views)} views` : ''}{v.commentCount !== undefined ? ` · ${fmt(v.commentCount)} comments` : ''}
                           </span>
                         </div>
                       ))}
                     </div>
                   )}
+                  {mentions.length > 0 && (
+                    <div style={{ marginTop: '0.9rem' }}>
+                      <div style={{ ...noteStyle, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Latest comments</div>
+                      {mentions.map((m) => {
+                        const id = m.entity?.comment_id || '';
+                        return (
+                          <div key={id || m.occurred_at} style={{ padding: '0.45rem 0', borderTop: '1px solid var(--border)' }}>
+                            <div style={{ fontSize: '0.74rem', color: 'var(--dim)' }}>
+                              {m.entity?.author || 'Someone'}{m.entity?.title ? ` on “${m.entity.title}”` : ''} · {ago(m.occurred_at)}
+                            </div>
+                            <div style={{ fontSize: '0.8rem', color: 'var(--white)', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{m.text_value}</div>
+                            {canReply && id && (repliedTo[id] ? (
+                              <div style={{ ...noteStyle, marginTop: 4 }}>You replied.</div>
+                            ) : replyOpen === id ? (
+                              <div style={{ marginTop: 6 }}>
+                                <textarea style={{ ...fieldInputStyle, minHeight: 70, marginBottom: '0.5rem' }} value={replyText} maxLength={10000}
+                                  placeholder="Write your reply. It is posted on YouTube as your channel when you press Send."
+                                  onChange={(e) => setReplyText(e.target.value)} />
+                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                  <button type="button" style={{ ...primaryBtnStyle, flex: 'none' }} disabled={busy !== null || !replyText.trim()}
+                                    onClick={() => sendReply(c.id, id)}>{busy === `reply-${id}` ? 'Sending…' : 'Send reply'}</button>
+                                  <button type="button" style={{ ...ghostBtnStyle, flex: 'none' }} disabled={busy !== null} onClick={() => { setReplyOpen(null); setReplyText(''); }}>Cancel</button>
+                                </div>
+                              </div>
+                            ) : (
+                              <button type="button" style={{ ...ghostBtnStyle, flex: 'none', marginTop: 4, padding: '0.3rem 0.7rem' }} disabled={busy !== null}
+                                onClick={() => { setReplyOpen(id); setReplyText(''); }}>Reply</button>
+                            ))}
+                          </div>
+                        );
+                      })}
+                      {!info?.can_reply && <div style={{ ...noteStyle, marginTop: 6 }}>To reply from Raptor, connect “YouTube (sign in)” below.</div>}
+                    </div>
+                  )}
                   {canManage && (
                     <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem', flexWrap: 'wrap' }}>
+                      {info?.auth === 'oauth' && c.status === 'error' && (
+                        <button type="button" style={{ ...primaryBtnStyle, flex: 'none' }} disabled={busy !== null} onClick={() => signIn(c.provider)}>Sign in again</button>
+                      )}
                       <button type="button" style={{ ...ghostBtnStyle, flex: 'none' }} disabled={busy !== null || c.status === 'paused'}
                         onClick={() => act(`sync-${c.id}`, () => authedFetch(`${API}/${c.id}/sync`, { method: 'POST' }), 'Refreshed')}>
                         {busy === `sync-${c.id}` ? 'Refreshing…' : 'Refresh now'}
@@ -194,7 +289,7 @@ export default function Connections() {
                         {c.status === 'paused' ? 'Resume' : 'Pause'}
                       </button>
                       <button type="button" style={{ ...ghostBtnStyle, flex: 'none' }} disabled={busy !== null}
-                        onClick={() => { if (window.confirm(`Disconnect "${c.label}"? Its saved numbers are removed too.`)) act(`del-${c.id}`, () => authedFetch(`${API}/${c.id}`, { method: 'DELETE' }), 'Disconnected'); }}>
+                        onClick={() => { if (window.confirm(`Disconnect "${c.label}"? Its saved numbers are removed too${info?.auth === 'oauth' ? ', and Raptor’s access to your Google account is withdrawn' : ''}.`)) act(`del-${c.id}`, () => authedFetch(`${API}/${c.id}`, { method: 'DELETE' }), 'Disconnected'); }}>
                         Disconnect
                       </button>
                     </div>
@@ -212,9 +307,9 @@ export default function Connections() {
               <div key={p.provider} style={cardStyle}>
                 <strong style={{ color: 'var(--white)' }}>{p.title}</strong>
                 <div style={{ ...noteStyle, margin: '0.3rem 0 0.8rem' }}>{p.description}</div>
-                <button type="button" style={{ ...primaryBtnStyle, flex: 'none' }} disabled={!p.available || !canManage}
-                  onClick={() => { setAdding(p); setInputs({}); setError(null); }}>
-                  {p.available ? 'Connect' : 'Coming soon'}
+                <button type="button" style={{ ...primaryBtnStyle, flex: 'none' }} disabled={!p.available || !canManage || busy !== null}
+                  onClick={() => { if (p.auth === 'oauth') { signIn(p.provider); } else { setAdding(p); setInputs({}); setError(null); } }}>
+                  {!p.available ? 'Coming soon' : p.auth === 'oauth' ? (busy === `signin-${p.provider}` ? 'Opening Google…' : 'Sign in with Google') : 'Connect'}
                 </button>
               </div>
             ))}
