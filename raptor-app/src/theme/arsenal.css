@@ -46,7 +46,7 @@
 .arsenal-label { display: block; font-size: 0.5rem; letter-spacing: 0.2em; color: var(--dim2); text-transform: uppercase; margin-bottom: 0.5rem; }
 .arsenal-input, .arsenal-textarea {
   width: 100%; background: var(--surface2); border: 1px solid var(--border); outline: none;
-  color: var(--white); font-family: var(--font-ui); font-size: 0.7rem; padding: 0.85rem 1.1rem;
+  color: var(--white); font-family: 'DM Mono', monospace; font-size: 0.7rem; padding: 0.85rem 1.1rem;
   transition: border-color 0.3s;
 }
 .arsenal-input:focus, .arsenal-textarea:focus { border-color: var(--purple); }
@@ -55,7 +55,7 @@
 
 .arsenal-btn {
   width: 100%; padding: 0.95rem; background: var(--grad); color: white; border: none; cursor: pointer;
-  font-family: var(--font-ui); font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase;
+  font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase;
   transition: opacity 0.3s; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
 }
 .arsenal-btn:hover { opacity: 0.85; }
@@ -82,7 +82,7 @@
 
 /* ── CODE / COPY ── */
 .arsenal-code-block { background: var(--surface2); border: 1px solid var(--border); padding: 0.8rem; font-size: 0.6rem; word-break: break-all; display: flex; justify-content: space-between; align-items: center; gap: 0.6rem; }
-.arsenal-copy-btn { font-size: 0.45rem; letter-spacing: 0.1em; color: var(--purple); background: transparent; border: 1px solid rgba(168,85,247,0.2); padding: 0.3rem 0.6rem; cursor: pointer; font-family: var(--font-ui); flex-shrink: 0; }
+.arsenal-copy-btn { font-size: 0.45rem; letter-spacing: 0.1em; color: var(--purple); background: transparent; border: 1px solid rgba(168,85,247,0.2); padding: 0.3rem 0.6rem; cursor: pointer; font-family: 'DM Mono', monospace; flex-shrink: 0; }
 .arsenal-copy-btn:hover { background: rgba(168,85,247,0.08); }
 
 /* ── TABLE ── */

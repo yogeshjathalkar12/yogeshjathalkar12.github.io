@@ -89,12 +89,12 @@ export const fieldLabelStyle: React.CSSProperties = {
 export const fieldInputStyle: React.CSSProperties = {
   width: '100%',
   padding: '0.65rem 0.8rem',
-  background: 'var(--input-bg)',
-  border: '1px solid var(--input-border)',
+  background: 'var(--surface2)',
+  border: '1px solid var(--border)',
   color: 'var(--white)',
-  fontFamily: 'var(--font-ui)',
-  fontSize: '0.875rem',
-  borderRadius: '8px',
+  fontFamily: 'var(--mono)',
+  fontSize: '0.75rem',
+  borderRadius: '4px',
   marginBottom: '1.1rem',
 };
 

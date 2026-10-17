@@ -168,6 +168,7 @@ export default function EmailConnectionSetup() {
 
   const formCard = (
     <form
+      className="mailbox-card"
       onSubmit={handleConnect}
       style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 960, display: 'flex', flexDirection: 'column', gap: '0.8rem' }}
     >
