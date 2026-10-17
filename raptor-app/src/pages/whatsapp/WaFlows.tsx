@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { fieldInputStyle, primaryBtnStyle } from '../../components/crm/Modal';
+import WaTemplatePicker, { type PickerItem } from '../../components/whatsapp/WaTemplatePicker';
+import { WA_FLOWS, WA_FLOW_CATEGORIES, WA_PROMPTS, buildFlowDefinition, definitionBlanks, findBlanks, flowDetail } from '../../lib/waTemplates';
 
 export default function WaFlows() {
   const navigate = useNavigate();
@@ -21,6 +23,7 @@ export default function WaFlows() {
   const [aiEnabled, setAiEnabled] = useState(true);
   const [savingAi, setSavingAi] = useState(false);
   const [showAiSettings, setShowAiSettings] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   useEffect(() => { fetchAccounts(); }, []);
   useEffect(() => {
@@ -50,6 +53,12 @@ export default function WaFlows() {
   }
 
   async function handleSaveAiSettings() {
+    const blanks = findBlanks(aiPrompt);
+    if (blanks.length > 0) {
+      setAiError(`Fill in the parts in [square brackets] first: ${blanks.slice(0, 4).join(', ')}.`);
+      return;
+    }
+    setAiError(null);
     setSavingAi(true);
     try {
       await supabase.from('whatsapp_ai_settings').upsert(
@@ -61,6 +70,22 @@ export default function WaFlows() {
       setSavingAi(false);
     }
   }
+
+  // A template creates the flow, paused, and opens it in the builder so the blanks can be filled in.
+  async function applyFlow(id: string) {
+    const t = WA_FLOWS.find((x) => x.id === id);
+    if (!t) return;
+    setError(null);
+    const { data, error: insertErr } = await supabase.from('whatsapp_flows').insert({
+      account_id: accountId, name: t.name, entry_keyword: t.entry_keyword, match_type: t.match_type,
+      definition: buildFlowDefinition(t), is_active: false,
+    }).select().single();
+    if (insertErr) { setError(insertErr.message || 'Could not create the flow.'); return; }
+    navigate(`/whatsapp/flows/${data.id}`);
+  }
+
+  const flowItems: PickerItem[] = WA_FLOWS.map((t) => ({ id: t.id, category: t.category, name: t.name, when: t.when, detail: flowDetail(t) }));
+  const promptItems: PickerItem[] = WA_PROMPTS.map((p) => ({ id: p.id, category: p.category, name: p.name, when: p.when, detail: p.prompt }));
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
@@ -88,7 +113,16 @@ export default function WaFlows() {
     }
   }
 
+  // A flow talks to customers by itself, so one that still has a blank in it cannot be switched on.
   async function toggleActive(f: any) {
+    if (!f.is_active) {
+      const blanks = definitionBlanks(f.definition);
+      if (blanks.length > 0) {
+        setError(`Open the flow and fill in the parts in [square brackets] before switching it on: ${blanks.slice(0, 4).join(', ')}.`);
+        return;
+      }
+    }
+    setError(null);
     await supabase.from('whatsapp_flows').update({ is_active: !f.is_active }).eq('id', f.id);
     fetchFlows();
   }
@@ -116,6 +150,15 @@ export default function WaFlows() {
         A flow starts when an inbound message matches its entry keyword and no other flow is already active for that contact. Flows are checked before plain keyword triggers — if a message matches both, the flow wins.
       </div>
 
+      <WaTemplatePicker
+        intro="Ready-made flows for qualifying leads, booking demos, support and feedback. A flow is created paused and opens in the builder so you can fill in your details."
+        items={flowItems}
+        categories={WA_FLOW_CATEGORIES}
+        actionLabel="Create this flow"
+        onUse={applyFlow}
+      />
+      {error && <div style={{ color: 'var(--red)', fontSize: '0.65rem', marginBottom: '1rem', maxWidth: 960 }}>{error}</div>}
+
       <div style={{ marginBottom: '1.6rem', maxWidth: 960 }}>
         <button
           onClick={() => setShowAiSettings((v) => !v)}
@@ -132,12 +175,21 @@ export default function WaFlows() {
               <input type="checkbox" checked={aiEnabled} onChange={(e) => setAiEnabled(e.target.checked)} />
               Enable AI Reply nodes for this number
             </label>
+            <WaTemplatePicker
+              title="AI instruction templates"
+              intro="Ready-made instructions for a sales, support or booking assistant. Fill in your business facts, because the AI only knows what you tell it."
+              items={promptItems}
+              categories={['AI assistant']}
+              actionLabel="Use these instructions"
+              onUse={(id) => { const p = WA_PROMPTS.find((x) => x.id === id); if (p) { setAiPrompt(p.prompt); setAiError(null); } }}
+            />
             <textarea
               style={{ ...fieldInputStyle, minHeight: 90, resize: 'vertical' }}
               placeholder="System prompt"
               value={aiPrompt}
               onChange={(e) => setAiPrompt(e.target.value)}
             />
+            {aiError && <div style={{ color: 'var(--red)', fontSize: '0.65rem', marginBottom: '0.6rem' }}>{aiError}</div>}
             <button onClick={handleSaveAiSettings} style={primaryBtnStyle} disabled={savingAi}>{savingAi ? 'Saving…' : 'Save AI Settings'}</button>
           </div>
         )}

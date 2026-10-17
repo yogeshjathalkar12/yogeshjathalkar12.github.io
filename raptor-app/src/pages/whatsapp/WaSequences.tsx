@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { fieldInputStyle, primaryBtnStyle } from '../../components/crm/Modal';
 import { toolApiBase } from '../../lib/config';
+import WaTemplatePicker, { type PickerItem } from '../../components/whatsapp/WaTemplatePicker';
+import { META_APPROVAL_STEPS, WA_SEQUENCES, sequenceCopies, sequenceDetail, sequenceSteps } from '../../lib/waTemplates';
 
 const WHATSAPP_API = toolApiBase('whatsapp');
 
@@ -15,6 +17,7 @@ export default function WaSequences() {
   const [steps, setSteps] = useState([{ template_name: '', template_language: 'en_US', delay_hours: 0 }]);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   const [enrollTag, setEnrollTag] = useState<Record<string, string>>({});
   const [enrolling, setEnrolling] = useState<string | null>(null);
@@ -37,6 +40,21 @@ export default function WaSequences() {
       .order('created_at', { ascending: false });
     setSequences(data || []);
   }
+
+  // A template fills the name and every step with the exact names Meta approved them under.
+  function applySequence(id: string) {
+    const t = WA_SEQUENCES.find((x) => x.id === id);
+    if (!t) return;
+    setError(null);
+    setName(t.name);
+    setSteps(sequenceSteps(t).map((s) => ({ template_name: s.template.meta_name, template_language: s.template.language as string, delay_hours: s.delay_hours })));
+    setNotice('Filled in below. Each message must first be submitted to Meta and show as Approved in WhatsApp Manager, under the names shown in the preview.');
+  }
+
+  const pickerItems: PickerItem[] = WA_SEQUENCES.map((t) => ({
+    id: t.id, category: t.group, name: t.name, when: t.when, badge: `${t.steps.length} messages · needs Meta approval`,
+    detail: sequenceDetail(t), copy: sequenceCopies(t),
+  }));
 
   function updateStep(idx: number, patch: Partial<{ template_name: string; template_language: string; delay_hours: number }>) {
     setSteps((prev) => prev.map((s, i) => (i === idx ? { ...s, ...patch } : s)));
@@ -113,6 +131,20 @@ export default function WaSequences() {
           {accounts.map((a) => (<option key={a.id} value={a.id}>{a.label}</option>))}
         </select>
       </div>
+
+      <WaTemplatePicker
+        intro="Ready-made drip sequences for follow-ups, onboarding and win-backs. Each message must be approved by Meta first: copy the texts, submit them, then use the sequence."
+        items={pickerItems}
+        categories={['Follow-ups', 'Customers']}
+        actionLabel="Use this sequence"
+        onUse={applySequence}
+        guide={{
+          title: 'How to get the messages approved by Meta',
+          steps: META_APPROVAL_STEPS,
+          note: 'Sequence messages cannot contain variables such as a name, so these are written without them. Only message people who agreed to hear from you.',
+        }}
+      />
+      {notice && <div style={{ color: 'var(--green, #3ecf8e)', fontSize: '0.68rem', marginBottom: '1rem', maxWidth: 960 }}>{notice}</div>}
 
       <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 960 }}>
         <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.2rem', marginBottom: '1rem' }}>New Drip Sequence</div>

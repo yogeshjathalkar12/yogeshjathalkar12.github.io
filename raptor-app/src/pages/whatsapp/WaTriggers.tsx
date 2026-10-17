@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { fieldInputStyle, primaryBtnStyle } from '../../components/crm/Modal';
+import WaTemplatePicker, { type PickerItem } from '../../components/whatsapp/WaTemplatePicker';
+import { WA_REPLIES, WA_REPLY_SETS, WA_REPLY_CATEGORIES, replyDetail, replyRow, replySetDetail, triggerBlanks } from '../../lib/waTemplates';
 
 type ReplyKind = 'text' | 'buttons' | 'list' | 'catalog' | 'product' | 'product_list';
 
@@ -39,6 +41,7 @@ export default function WaTriggers() {
 
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const currentAccount = accounts.find((a) => a.id === accountId);
   const catalogConnected = !!currentAccount?.catalog_id;
 
@@ -122,6 +125,11 @@ export default function WaTriggers() {
       row.reply_payload = { body: bodyText.trim(), sections: validSections };
     }
 
+    const blanks = triggerBlanks(row);
+    if (blanks.length > 0) {
+      setError(`Fill in these parts before creating: ${blanks.slice(0, 5).join(', ')}.`);
+      return;
+    }
     setCreating(true);
     setError(null);
     try {
@@ -136,10 +144,48 @@ export default function WaTriggers() {
     }
   }
 
-  async function toggleActive(id: string, current: boolean) {
-    await supabase.from('whatsapp_triggers').update({ is_active: !current }).eq('id', id);
+  // A trigger replies by itself, so one that still has a blank in it cannot be switched on.
+  async function toggleActive(t: any) {
+    if (!t.is_active) {
+      const blanks = triggerBlanks(t);
+      if (blanks.length > 0) {
+        setNotice(null);
+        setError(`Fill in the parts in [square brackets] before switching this on: ${blanks.slice(0, 4).join(', ')}. Delete it and create it again from the template with them filled in.`);
+        return;
+      }
+    }
+    setError(null);
+    await supabase.from('whatsapp_triggers').update({ is_active: !t.is_active }).eq('id', t.id);
     fetchTriggers();
   }
+
+  // One template fills the form below; a set creates several triggers, all paused.
+  function applyReply(id: string) {
+    const r = WA_REPLIES.find((x) => x.id === id);
+    if (!r) return;
+    setError(null);
+    setKeyword(r.keyword); setMatchType(r.match_type); setReplyKind(r.reply_kind);
+    setReplyText(r.text || ''); setBodyText(r.body || '');
+    setButtons((r.buttons || ['']).map((title) => ({ id: slugify(title), title })));
+    setListButtonLabel(r.button_label || 'View options');
+    setListRows((r.rows || [{ title: '' }]).map((x) => ({ id: slugify(x.title), title: x.title, description: x.description || '' })));
+    setNotice('Template loaded in "New Trigger" below. Fill in the parts in [square brackets], then create it.');
+  }
+
+  async function applyReplySet(id: string) {
+    const set = WA_REPLY_SETS.find((x) => x.id === id);
+    if (!set) return;
+    setError(null);
+    const { error: insertErr } = await supabase.from('whatsapp_triggers').insert(set.replies.map((r) => ({ account_id: accountId, ...replyRow(r), is_active: false })));
+    if (insertErr) { setNotice(null); setError(insertErr.message || 'Could not create the set.'); return; }
+    setNotice(`"${set.name}" was created and is paused. Fill in the parts in [square brackets] (delete and recreate any you want to change), then switch each one on.`);
+    fetchTriggers();
+  }
+
+  const pickerItems: PickerItem[] = [
+    ...WA_REPLY_SETS.map((s) => ({ id: s.id, category: s.category, name: s.name, when: s.when, badge: `set of ${s.replies.length}`, detail: replySetDetail(s) })),
+    ...WA_REPLIES.map((r) => ({ id: r.id, category: r.category, name: r.name, when: r.when, detail: replyDetail(r) })),
+  ];
 
   async function handleRemove(id: string) {
     await supabase.from('whatsapp_triggers').delete().eq('id', id);
@@ -184,6 +230,15 @@ export default function WaTriggers() {
       <div style={{ fontSize: '0.6rem', color: 'var(--dim)', marginBottom: '1.2rem', maxWidth: 620 }}>
         Fires only on an inbound message — free-form replies, buttons, and lists are only allowed within Meta's 24-hour session window, which an inbound message always satisfies. "STOP"/"unsubscribe" are handled automatically as opt-outs. Tapping a button or list option counts as an inbound message too, so its id can match another trigger's keyword — useful for building simple multi-step flows.
       </div>
+
+      <WaTemplatePicker
+        intro="Ready-made replies for greetings, pricing, hours, support and bookings. Pick one to fill the form, or add a whole set at once."
+        items={pickerItems}
+        categories={WA_REPLY_CATEGORIES}
+        actionLabel="Use this template"
+        onUse={(id) => (id.startsWith('set-') ? applyReplySet(id) : applyReply(id))}
+      />
+      {notice && <div style={{ color: 'var(--green, #3ecf8e)', fontSize: '0.68rem', marginBottom: '1rem', maxWidth: 960 }}>{notice}</div>}
 
       <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 960 }}>
         <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.2rem', marginBottom: '1rem' }}>New Trigger</div>
@@ -336,7 +391,7 @@ export default function WaTriggers() {
                 <div style={{ fontSize: '0.6rem', color: 'var(--dim)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{describeReply(t)}</div>
               </div>
               <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
-                <button onClick={() => toggleActive(t.id, t.is_active)} style={{ background: 'transparent', border: '1px solid var(--border)', color: t.is_active ? 'var(--accent)' : 'var(--dim)', padding: '0.4rem 0.8rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.6rem' }}>
+                <button onClick={() => toggleActive(t)} style={{ background: 'transparent', border: '1px solid var(--border)', color: t.is_active ? 'var(--accent)' : 'var(--dim)', padding: '0.4rem 0.8rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.6rem' }}>
                   {t.is_active ? 'Active' : 'Paused'}
                 </button>
                 <button onClick={() => handleRemove(t.id)} style={{ background: 'transparent', border: '1px solid var(--border)', color: 'var(--red)', padding: '0.4rem 0.8rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.6rem' }}>

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { fieldInputStyle, primaryBtnStyle } from '../../components/crm/Modal';
+import WaTemplatePicker, { type PickerItem } from '../../components/whatsapp/WaTemplatePicker';
+import { META_APPROVAL_STEPS, META_GROUPS, META_TEMPLATES, metaDetail, metaCopies } from '../../lib/waTemplates';
 import { toolApiBase } from '../../lib/config';
 
 const WHATSAPP_API = toolApiBase('whatsapp');
@@ -15,6 +17,8 @@ export default function WaBroadcasts() {
   const [templateName, setTemplateName] = useState('');
   const [templateLanguage, setTemplateLanguage] = useState('en_US');
   const [audienceTag, setAudienceTag] = useState('');
+  const [usesName, setUsesName] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -62,9 +66,10 @@ export default function WaBroadcasts() {
         template_name: templateName.trim(),
         template_language: templateLanguage.trim() || 'en_US',
         audience_tag: audienceTag.trim() || null,
+        template_params_use_name: usesName,
       });
       if (insertErr) throw insertErr;
-      setName(''); setTemplateName(''); setAudienceTag('');
+      setName(''); setTemplateName(''); setAudienceTag(''); setUsesName(false); setNotice(null);
       fetchBroadcasts();
     } catch (err: any) {
       setError(err.message || 'Could not create broadcast.');
@@ -72,6 +77,23 @@ export default function WaBroadcasts() {
       setCreating(false);
     }
   }
+
+  // A template fills the form with the exact name Meta approved it under.
+  function applyTemplate(id: string) {
+    const t = META_TEMPLATES.find((x) => x.id === id);
+    if (!t) return;
+    setError(null);
+    setName(t.name);
+    setTemplateName(t.meta_name);
+    setTemplateLanguage(t.language);
+    setUsesName(t.uses_name);
+    setNotice('Filled in below. This only works once you have submitted the template to Meta and it shows as Approved in WhatsApp Manager.');
+  }
+
+  const pickerItems: PickerItem[] = META_TEMPLATES.map((t) => ({
+    id: t.id, category: t.group, name: t.name, when: t.when,
+    badge: `${t.category === 'MARKETING' ? 'Marketing' : 'Utility'} · needs Meta approval`, detail: metaDetail(t), copy: metaCopies(t),
+  }));
 
   async function handleSend(broadcastId: string) {
     try {
@@ -111,6 +133,20 @@ export default function WaBroadcasts() {
         </select>
       </div>
 
+      <WaTemplatePicker
+        intro="Ready-made messages for offers, launches, invitations, follow-ups and reminders. Meta must approve a message before you can broadcast it: copy the text, submit it, then come back."
+        items={pickerItems}
+        categories={META_GROUPS}
+        actionLabel="Use this template"
+        onUse={applyTemplate}
+        guide={{
+          title: 'How to get a message approved by Meta',
+          steps: META_APPROVAL_STEPS,
+          note: 'Only message people who agreed to hear from you on WhatsApp. Anyone who replies STOP is removed automatically.',
+        }}
+      />
+      {notice && <div style={{ color: 'var(--green, #3ecf8e)', fontSize: '0.68rem', marginBottom: '1rem', maxWidth: 960 }}>{notice}</div>}
+
       <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 960 }}>
         <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.2rem', marginBottom: '1rem' }}>New Broadcast</div>
         <div style={{ fontSize: '0.6rem', color: 'var(--dim)', marginBottom: '0.8rem' }}>
@@ -121,6 +157,10 @@ export default function WaBroadcasts() {
           <input style={fieldInputStyle} placeholder="Approved template name" value={templateName} onChange={(e) => setTemplateName(e.target.value)} />
           <input style={fieldInputStyle} placeholder="Template language (default en_US)" value={templateLanguage} onChange={(e) => setTemplateLanguage(e.target.value)} />
           <input style={fieldInputStyle} placeholder="Audience tag (optional — blank = everyone)" value={audienceTag} onChange={(e) => setAudienceTag(e.target.value)} />
+          <label style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', fontSize: '0.65rem', color: 'var(--dim)', cursor: 'pointer' }}>
+            <input type="checkbox" checked={usesName} onChange={(e) => setUsesName(e.target.checked)} />
+            This template has one variable, {'{{1}}'}, to be filled with each contact&rsquo;s first name
+          </label>
           {error && <div style={{ color: 'var(--red)', fontSize: '0.65rem' }}>{error}</div>}
           <button type="submit" style={primaryBtnStyle} disabled={creating}>
             {creating ? 'Creating…' : 'Create Broadcast'}
