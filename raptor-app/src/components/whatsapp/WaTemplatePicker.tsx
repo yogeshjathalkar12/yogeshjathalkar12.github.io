@@ -9,6 +9,7 @@ export interface PickerItem {
   badge?: string;                                 // a short tag next to the category, e.g. "set of 6" or "needs Meta approval"
   detail: string;                                 // what the template says, shown in the preview
   copy?: { label: string; text: string }[];       // things worth copying (a message to paste into WhatsApp Manager)
+  mine?: boolean;                                 // a template the team saved: it can be deleted by people who may
 }
 
 const noteStyle = { fontSize: '0.74rem', color: 'var(--dim)', lineHeight: 1.6 } as const;
@@ -37,10 +38,12 @@ interface Props {
   /** Steps shown above the list (for example how to get a message template approved by Meta). */
   guide?: { title: string; steps: string[]; note?: string };
   disabledReason?: string;
+  /** Given only to people who may delete: removes a saved template for everyone. */
+  onDelete?: (id: string) => void;
 }
 
 // A browsable library of ready-made things so nobody starts from a blank form. The page decides what "use" means.
-export default function WaTemplatePicker({ title = 'Start from a template', intro, items, categories, actionLabel, onUse, guide, disabledReason }: Props) {
+export default function WaTemplatePicker({ title = 'Start from a template', intro, items, categories, actionLabel, onUse, guide, disabledReason, onDelete }: Props) {
   const [open, setOpen] = useState(false);
   const [category, setCategory] = useState('All');
   const [preview, setPreview] = useState<string | null>(null);
@@ -107,6 +110,10 @@ export default function WaTemplatePicker({ title = 'Start from a template', intr
                       onClick={() => { onUse(t.id); setOpen(false); setPreview(null); }}>
                       {actionLabel}
                     </button>
+                    {t.mine && onDelete && (
+                      <button type="button" style={{ ...ghostSmall, color: 'var(--red, #ef5350)' }}
+                        onClick={() => { if (window.confirm(`Delete "${t.name}" for everyone in your organization?`)) onDelete(t.id); }}>Delete</button>
+                    )}
                   </div>
                 </div>
               );

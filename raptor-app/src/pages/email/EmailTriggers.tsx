@@ -4,6 +4,11 @@ import { fieldInputStyle, primaryBtnStyle } from '../../components/crm/Modal';
 import { toolApiBase } from '../../lib/config';
 import EmailBodyEditor from '../../components/email/EmailBodyEditor';
 import EmailTemplatePicker from '../../components/email/EmailTemplatePicker';
+import SaveAsTemplate from '../../components/SaveAsTemplate';
+import { useSavedTemplates } from '../../hooks/useSavedTemplates';
+import { useOrg } from '../../hooks/OrgContext';
+import { supabase as savedSupabase } from '../../lib/supabaseClient';
+import { emailFromRow, htmlToBlocks, saveTemplate } from '../../lib/savedTemplates';
 import { findPlaceholders, type EmailTemplate, type TemplateBlock } from '../../lib/emailTemplates';
 
 const EMAIL_API = toolApiBase('email');
@@ -91,6 +96,16 @@ export default function EmailTriggers() {
     const pending = events.filter((e: any) => e.status === 'pending').length;
     const failed = events.filter((e: any) => e.status === 'failed').length;
     return { total: events.length, sent, pending, failed };
+  }
+
+  const { can } = useOrg();
+  const savedEmails = useSavedTemplates('email');
+  const mineEmails = savedEmails.rows.map(emailFromRow).filter((t): t is NonNullable<typeof t> => !!t);
+  async function saveAsTemplate(name: string, description: string) {
+    const { blocks, lossy } = htmlToBlocks(bodyHtml);
+    await saveTemplate(savedSupabase, { kind: 'email', name, description, content: { subject: subject.trim(), blocks } });
+    await savedEmails.reload();
+    return lossy ? 'Images and custom HTML are not kept in templates; the text and buttons are.' : undefined;
   }
 
   // Starting from a template: fills the name, event, delay, subject and the visual editor; everything stays editable.
@@ -250,7 +265,7 @@ export default function EmailTriggers() {
       </div>
 
       <div style={{ maxWidth: 960 }}>
-        <EmailTemplatePicker singles firstCategory="Automatic emails" onUseSingle={applyTemplate} />
+        <EmailTemplatePicker singles firstCategory="Automatic emails" onUseSingle={applyTemplate} mine={{ singles: mineEmails, sequences: [] }} onDeleteMine={can('delete') ? savedEmails.remove : undefined} />
       </div>
 
       <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 960 }}>
@@ -374,6 +389,7 @@ export default function EmailTriggers() {
                   Fill in the parts in [square brackets] before saving: {findPlaceholders(`${subject} ${bodyHtml}`).slice(0, 5).join(', ')}
                 </div>
               )}
+              {can('create') && <SaveAsTemplate onSave={saveAsTemplate} defaultName={name} disabledReason={!subject.trim() || !bodyHtml.trim() ? 'Write the subject and the email first.' : undefined} />}
             </>
           )}
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>

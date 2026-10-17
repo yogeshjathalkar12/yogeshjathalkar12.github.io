@@ -3,6 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { fieldInputStyle, primaryBtnStyle } from '../../components/crm/Modal';
 import WaTemplatePicker, { type PickerItem } from '../../components/whatsapp/WaTemplatePicker';
+import SaveAsTemplate from '../../components/SaveAsTemplate';
+import { useSavedTemplates } from '../../hooks/useSavedTemplates';
+import { useOrg } from '../../hooks/OrgContext';
+import { MY_TEMPLATES, flowFromRow, promptFromRow, saveTemplate } from '../../lib/savedTemplates';
 import { WA_FLOWS, WA_FLOW_CATEGORIES, WA_PROMPTS, buildFlowDefinition, definitionBlanks, findBlanks, flowDetail } from '../../lib/waTemplates';
 
 export default function WaFlows() {
@@ -71,21 +75,52 @@ export default function WaFlows() {
     }
   }
 
+  const { can } = useOrg();
+  const savedFlows = useSavedTemplates('wa_flow');
+  const mineFlows = savedFlows.rows.map(flowFromRow).filter((f): f is NonNullable<typeof f> => !!f);
+  const savedPrompts = useSavedTemplates('wa_prompt');
+  const minePrompts = savedPrompts.rows.map(promptFromRow).filter((p): p is NonNullable<typeof p> => !!p);
+  const [flowToSave, setFlowToSave] = useState('');
+
+  // Saves an existing flow exactly as the builder holds it, so the team can create new ones from it.
+  async function saveFlowAsTemplate(name: string, description: string) {
+    const flow = flows.find((f) => f.id === flowToSave);
+    if (!flow) throw new Error('Choose a flow first.');
+    await saveTemplate(supabase, { kind: 'wa_flow', name, description, content: { entry_keyword: flow.entry_keyword, match_type: flow.match_type, definition: flow.definition } });
+    await savedFlows.reload();
+  }
+
+  async function saveAiAsTemplate(name: string, description: string) {
+    await saveTemplate(supabase, { kind: 'wa_prompt', name, description, content: { prompt: aiPrompt.trim() } });
+    await savedPrompts.reload();
+  }
+
   // A template creates the flow, paused, and opens it in the builder so the blanks can be filled in.
   async function applyFlow(id: string) {
-    const t = WA_FLOWS.find((x) => x.id === id);
-    if (!t) return;
+    const saved = mineFlows.find((x) => x.id === id);
+    const t = saved ? undefined : WA_FLOWS.find((x) => x.id === id);
+    if (!saved && !t) return;
     setError(null);
-    const { data, error: insertErr } = await supabase.from('whatsapp_flows').insert({
-      account_id: accountId, name: t.name, entry_keyword: t.entry_keyword, match_type: t.match_type,
-      definition: buildFlowDefinition(t), is_active: false,
+    const { data, error: insertErr } = await supabase.from('whatsapp_flows').insert(saved ? {
+      account_id: accountId, name: saved.name, entry_keyword: saved.entry_keyword, match_type: saved.match_type,
+      definition: JSON.parse(JSON.stringify(saved.definition)), is_active: false,
+    } : {
+      account_id: accountId, name: t!.name, entry_keyword: t!.entry_keyword, match_type: t!.match_type,
+      definition: buildFlowDefinition(t!), is_active: false,
     }).select().single();
     if (insertErr) { setError(insertErr.message || 'Could not create the flow.'); return; }
     navigate(`/whatsapp/flows/${data.id}`);
   }
 
-  const flowItems: PickerItem[] = WA_FLOWS.map((t) => ({ id: t.id, category: t.category, name: t.name, when: t.when, detail: flowDetail(t) }));
-  const promptItems: PickerItem[] = WA_PROMPTS.map((p) => ({ id: p.id, category: p.category, name: p.name, when: p.when, detail: p.prompt }));
+  const flowItems: PickerItem[] = [
+    ...mineFlows.map((f) => ({ id: f.id, category: MY_TEMPLATES, name: f.name, when: f.when, mine: true,
+      detail: `Starts when the message ${f.match_type === 'exact' ? 'is exactly' : 'contains'} "${f.entry_keyword}".\n${f.definition.nodes.length - 1} steps.` })),
+    ...WA_FLOWS.map((t) => ({ id: t.id, category: t.category, name: t.name, when: t.when, detail: flowDetail(t) })),
+  ];
+  const promptItems: PickerItem[] = [
+    ...minePrompts.map((p) => ({ id: p.id, category: MY_TEMPLATES, name: p.name, when: p.when, detail: p.prompt, mine: true })),
+    ...WA_PROMPTS.map((p) => ({ id: p.id, category: p.category, name: p.name, when: p.when, detail: p.prompt })),
+  ];
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
@@ -153,7 +188,8 @@ export default function WaFlows() {
       <WaTemplatePicker
         intro="Ready-made flows for qualifying leads, booking demos, support and feedback. A flow is created paused and opens in the builder so you can fill in your details."
         items={flowItems}
-        categories={WA_FLOW_CATEGORIES}
+        categories={[...(mineFlows.length > 0 ? [MY_TEMPLATES] : []), ...WA_FLOW_CATEGORIES]}
+        onDelete={can('delete') ? savedFlows.remove : undefined}
         actionLabel="Create this flow"
         onUse={applyFlow}
       />
@@ -179,9 +215,10 @@ export default function WaFlows() {
               title="AI instruction templates"
               intro="Ready-made instructions for a sales, support or booking assistant. Fill in your business facts, because the AI only knows what you tell it."
               items={promptItems}
-              categories={['AI assistant']}
+              categories={[...(minePrompts.length > 0 ? [MY_TEMPLATES] : []), 'AI assistant']}
               actionLabel="Use these instructions"
-              onUse={(id) => { const p = WA_PROMPTS.find((x) => x.id === id); if (p) { setAiPrompt(p.prompt); setAiError(null); } }}
+              onDelete={can('delete') ? savedPrompts.remove : undefined}
+              onUse={(id) => { const p = [...minePrompts, ...WA_PROMPTS].find((x) => x.id === id); if (p) { setAiPrompt(p.prompt); setAiError(null); } }}
             />
             <textarea
               style={{ ...fieldInputStyle, minHeight: 90, resize: 'vertical' }}
@@ -190,6 +227,7 @@ export default function WaFlows() {
               onChange={(e) => setAiPrompt(e.target.value)}
             />
             {aiError && <div style={{ color: 'var(--red)', fontSize: '0.65rem', marginBottom: '0.6rem' }}>{aiError}</div>}
+            {can('create') && <SaveAsTemplate label="Save these instructions as team template" onSave={saveAiAsTemplate} disabledReason={aiPrompt.trim().length < 20 ? 'Write the instructions first.' : undefined} />}
             <button onClick={handleSaveAiSettings} style={primaryBtnStyle} disabled={savingAi}>{savingAi ? 'Saving…' : 'Save AI Settings'}</button>
           </div>
         )}
@@ -241,6 +279,16 @@ export default function WaFlows() {
           <button type="submit" style={primaryBtnStyle} disabled={creating}>{creating ? 'Creating…' : 'Create & Open Builder'}</button>
         </form>
       </div>
+      {can('create') && flows.length > 0 && (
+        <div style={{ marginTop: '1rem' }}>
+          <div style={{ fontSize: '0.58rem', letterSpacing: '0.18em', color: 'var(--dim)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Share a flow with your team</div>
+          <select style={{ ...fieldInputStyle, marginBottom: '0.4rem' }} value={flowToSave} onChange={(e) => setFlowToSave(e.target.value)}>
+            <option value="">Choose a flow to save as a template…</option>
+            {flows.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}
+          </select>
+          <SaveAsTemplate label="Save as team template" onSave={saveFlowAsTemplate} defaultName={flows.find((f) => f.id === flowToSave)?.name || ''} disabledReason={!flowToSave ? 'Choose a flow first.' : undefined} />
+        </div>
+      )}
         </div>
       </div>
     </div>

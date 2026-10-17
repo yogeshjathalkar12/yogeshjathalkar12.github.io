@@ -4,6 +4,7 @@ import {
   type EmailTemplate, type SequenceTemplate, type TemplateBlock,
 } from '../../lib/emailTemplates';
 import { primaryBtnStyle } from '../crm/Modal';
+import { MY_TEMPLATES } from '../../lib/savedTemplates';
 
 const noteStyle = { fontSize: '0.74rem', color: 'var(--dim)', lineHeight: 1.6 } as const;
 const chipStyle = (on: boolean) => ({
@@ -26,29 +27,32 @@ interface Props {
   onUseSequence?: (template: SequenceTemplate) => void;
   /** Disable "Use" with a reason (e.g. no mailbox connected yet). */
   disabledReason?: string;
+  /** The team's own saved templates, shown first under "My templates". */
+  mine?: { singles: EmailTemplate[]; sequences: SequenceTemplate[] };
+  /** Given only to people who may delete: removes a saved template for everyone. */
+  onDeleteMine?: (id: string) => void;
 }
 
 // A browsable library of ready-made emails so nobody starts from a blank form. Picking one fills the form or builds the
 // sequence; everything stays editable, and the blanks in [square brackets] are flagged until they are filled in.
-export default function EmailTemplatePicker({ singles = true, sequences = false, firstCategory, onUseSingle, onUseSequence, disabledReason }: Props) {
+export default function EmailTemplatePicker({ singles = true, sequences = false, firstCategory, onUseSingle, onUseSequence, disabledReason, mine, onDeleteMine }: Props) {
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<'single' | 'sequence'>(singles ? 'single' : 'sequence');
   const [category, setCategory] = useState('All');
   const [preview, setPreview] = useState<string | null>(null);
 
+  const mineHere = (tab === 'single' ? mine?.singles : mine?.sequences) || [];
   const categories = useMemo(() => {
     const list = [...EMAIL_CATEGORIES];
     if (firstCategory && list.includes(firstCategory)) list.unshift(...list.splice(list.indexOf(firstCategory), 1));
-    return ['All', ...list];
-  }, [firstCategory]);
+    return ['All', ...(mineHere.length > 0 ? [MY_TEMPLATES] : []), ...list];
+  }, [firstCategory, mineHere.length]);
 
   const items = useMemo(() => {
     const order = (c: string) => categories.indexOf(c);
-    if (tab === 'single') {
-      return EMAIL_TEMPLATES.filter((t) => category === 'All' || t.category === category).sort((a, b) => order(a.category) - order(b.category));
-    }
-    return SEQUENCE_TEMPLATES.filter((t) => category === 'All' || t.category === category).sort((a, b) => order(a.category) - order(b.category));
-  }, [tab, category, categories]);
+    const pool: (EmailTemplate | SequenceTemplate)[] = tab === 'single' ? [...mineHere, ...EMAIL_TEMPLATES] : [...mineHere, ...SEQUENCE_TEMPLATES];
+    return pool.filter((t) => category === 'All' || t.category === category).sort((a, b) => order(a.category) - order(b.category));
+  }, [tab, category, categories, mineHere]);
 
   return (
     <div style={{ border: '1px solid var(--border)', borderRadius: 8, padding: '0.9rem 1rem', background: 'var(--surface)', marginBottom: '1.2rem' }}>
@@ -106,6 +110,10 @@ export default function EmailTemplatePicker({ singles = true, sequences = false,
                       onClick={() => { if (isSingle) onUseSingle?.(t as EmailTemplate); else onUseSequence?.(t as SequenceTemplate); setOpen(false); setPreview(null); }}>
                       {isSingle ? 'Use this template' : 'Create this sequence'}
                     </button>
+                    {(t as EmailTemplate | SequenceTemplate).mine && onDeleteMine && (
+                      <button type="button" style={{ ...ghostSmall, color: 'var(--red, #ef5350)' }}
+                        onClick={() => { if (window.confirm(`Delete "${t.name}" for everyone in your organization?`)) onDeleteMine(t.id); }}>Delete</button>
+                    )}
                   </div>
                 </div>
               );

@@ -2,6 +2,10 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { fieldInputStyle, primaryBtnStyle } from '../../components/crm/Modal';
 import WaTemplatePicker, { type PickerItem } from '../../components/whatsapp/WaTemplatePicker';
+import SaveAsTemplate from '../../components/SaveAsTemplate';
+import { useSavedTemplates } from '../../hooks/useSavedTemplates';
+import { useOrg } from '../../hooks/OrgContext';
+import { MY_TEMPLATES, replyContent, replyFromRow, saveTemplate } from '../../lib/savedTemplates';
 import { WA_REPLIES, WA_REPLY_SETS, WA_REPLY_CATEGORIES, replyDetail, replyRow, replySetDetail, triggerBlanks } from '../../lib/waTemplates';
 
 type ReplyKind = 'text' | 'buttons' | 'list' | 'catalog' | 'product' | 'product_list';
@@ -160,8 +164,22 @@ export default function WaTriggers() {
   }
 
   // One template fills the form below; a set creates several triggers, all paused.
+  const { can } = useOrg();
+  const savedReplies = useSavedTemplates('wa_reply');
+  const mineReplies = savedReplies.rows.map(replyFromRow).filter((r): r is NonNullable<typeof r> => !!r);
+
+  // Saves what is in the form (text, buttons or list replies) so the team can start from it.
+  async function saveReplyAsTemplate(name: string, description: string) {
+    const content = replyContent({
+      keyword, match_type: matchType, reply_kind: replyKind as 'text' | 'buttons' | 'list', text: replyText, body: bodyText,
+      buttons: buttons.map((b) => b.title), button_label: listButtonLabel, rows: listRows.map((r) => ({ title: r.title, description: r.description })),
+    });
+    await saveTemplate(supabase, { kind: 'wa_reply', name, description, content });
+    await savedReplies.reload();
+  }
+
   function applyReply(id: string) {
-    const r = WA_REPLIES.find((x) => x.id === id);
+    const r = [...mineReplies, ...WA_REPLIES].find((x) => x.id === id);
     if (!r) return;
     setError(null);
     setKeyword(r.keyword); setMatchType(r.match_type); setReplyKind(r.reply_kind);
@@ -183,6 +201,7 @@ export default function WaTriggers() {
   }
 
   const pickerItems: PickerItem[] = [
+    ...mineReplies.map((r) => ({ id: r.id, category: MY_TEMPLATES, name: r.name, when: r.when, detail: replyDetail(r), mine: true })),
     ...WA_REPLY_SETS.map((s) => ({ id: s.id, category: s.category, name: s.name, when: s.when, badge: `set of ${s.replies.length}`, detail: replySetDetail(s) })),
     ...WA_REPLIES.map((r) => ({ id: r.id, category: r.category, name: r.name, when: r.when, detail: replyDetail(r) })),
   ];
@@ -234,7 +253,8 @@ export default function WaTriggers() {
       <WaTemplatePicker
         intro="Ready-made replies for greetings, pricing, hours, support and bookings. Pick one to fill the form, or add a whole set at once."
         items={pickerItems}
-        categories={WA_REPLY_CATEGORIES}
+        categories={[...(mineReplies.length > 0 ? [MY_TEMPLATES] : []), ...WA_REPLY_CATEGORIES]}
+        onDelete={can('delete') ? savedReplies.remove : undefined}
         actionLabel="Use this template"
         onUse={(id) => (id.startsWith('set-') ? applyReplySet(id) : applyReply(id))}
       />
@@ -368,6 +388,13 @@ export default function WaTriggers() {
           )}
 
           {error && <div style={{ color: 'var(--red)', fontSize: '0.65rem' }}>{error}</div>}
+          {can('create') && (
+            <SaveAsTemplate
+              onSave={saveReplyAsTemplate}
+              defaultName={keyword ? `Reply to "${keyword.trim()}"` : ''}
+              disabledReason={!['text', 'buttons', 'list'].includes(replyKind) ? 'Catalog and product replies cannot be saved as templates yet.' : !keyword.trim() || !(replyText.trim() || bodyText.trim()) ? 'Fill in the keyword and the reply first.' : undefined}
+            />
+          )}
           <button type="submit" style={primaryBtnStyle} disabled={creating}>{creating ? 'Creating…' : 'Create Trigger'}</button>
         </form>
       </div>

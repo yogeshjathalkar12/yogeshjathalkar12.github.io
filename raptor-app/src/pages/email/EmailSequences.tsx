@@ -4,6 +4,11 @@ import { fieldInputStyle, primaryBtnStyle } from '../../components/crm/Modal';
 import { toolApiBase } from '../../lib/config';
 import EmailBodyEditor, { blocksFromTemplate, blocksToHtml } from '../../components/email/EmailBodyEditor';
 import EmailTemplatePicker from '../../components/email/EmailTemplatePicker';
+import SaveAsTemplate from '../../components/SaveAsTemplate';
+import { useSavedTemplates } from '../../hooks/useSavedTemplates';
+import { useOrg } from '../../hooks/OrgContext';
+import { supabase as savedSupabase } from '../../lib/supabaseClient';
+import { emailFromRow, htmlToBlocks, saveTemplate, sequenceFromRow } from '../../lib/savedTemplates';
 import { findPlaceholders, type EmailTemplate, type SequenceTemplate, type TemplateBlock } from '../../lib/emailTemplates';
 
 const EMAIL_API = toolApiBase('email');
@@ -150,6 +155,32 @@ export default function EmailSequences() {
     await supabase.from('email_sequences').delete().eq('id', id);
     if (sequenceId === id) setSequenceId('');
     fetchSequences();
+  }
+
+  const { can } = useOrg();
+  const savedEmails = useSavedTemplates('email');
+  const mineEmails = savedEmails.rows.map(emailFromRow).filter((t): t is NonNullable<typeof t> => !!t);
+  async function saveAsTemplate(name: string, description: string) {
+    const { blocks, lossy } = htmlToBlocks(stepBodyHtml);
+    await saveTemplate(savedSupabase, { kind: 'email', name, description, content: { subject: stepSubject.trim(), blocks } });
+    await savedEmails.reload();
+    return lossy ? 'Images and custom HTML are not kept in templates; the text and buttons are.' : undefined;
+  }
+  const savedSequences = useSavedTemplates('email_sequence');
+  const mineSequences = savedSequences.rows.map(sequenceFromRow).filter((t): t is NonNullable<typeof t> => !!t);
+
+  // Saves a whole existing sequence (its emails and waits) so the team can start new ones from it.
+  async function saveSequenceAsTemplate(name: string, description: string) {
+    if (steps.length === 0) throw new Error('Add at least one email to the sequence first.');
+    let lossyAny = false;
+    const converted = [...steps].sort((a, b) => a.step_order - b.step_order).map((s) => {
+      const { blocks, lossy } = htmlToBlocks(s.body_html || '');
+      lossyAny = lossyAny || lossy;
+      return { delay_hours: s.delay_hours, subject: s.subject, blocks };
+    });
+    await saveTemplate(savedSupabase, { kind: 'email_sequence', name, description, content: { steps: converted } });
+    await savedSequences.reload();
+    return lossyAny ? 'Images and custom HTML are not kept in templates; the text and buttons are.' : undefined;
   }
 
   // A single ready-made email becomes the next step's content (needs a sequence to be open).
@@ -402,7 +433,8 @@ export default function EmailSequences() {
       </div>
 
       <div style={{ maxWidth: 960 }}>
-        <EmailTemplatePicker singles sequences onUseSingle={applySingleTemplate} onUseSequence={applySequenceTemplate} />
+        <EmailTemplatePicker singles sequences onUseSingle={applySingleTemplate} onUseSequence={applySequenceTemplate} mine={{ singles: mineEmails, sequences: mineSequences }}
+          onDeleteMine={can('delete') ? (id) => (id.startsWith('saved:') && mineSequences.some((t) => t.id === id) ? savedSequences.remove(id) : savedEmails.remove(id)) : undefined} />
       </div>
       {notice && <div style={{ color: 'var(--green, #3ecf8e)', fontSize: '0.68rem', marginBottom: '1rem', maxWidth: 960 }}>{notice}</div>}
 
@@ -450,6 +482,11 @@ export default function EmailSequences() {
               </button>
             </div>
           </div>
+          {can('create') && (
+            <div style={{ marginTop: '-1rem', marginBottom: '1.4rem' }}>
+              <SaveAsTemplate label="Save this sequence as team template" onSave={saveSequenceAsTemplate} defaultName={currentSequence.name} disabledReason={steps.length === 0 ? 'Add at least one email first.' : undefined} />
+            </div>
+          )}
 
           <div style={{ fontSize: '0.58rem', letterSpacing: '0.18em', color: 'var(--dim)', textTransform: 'uppercase', marginBottom: '0.8rem' }}>Steps</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 420px), 1fr))', gap: '0.6rem', alignItems: 'start', marginBottom: '1.4rem' }}>
@@ -599,6 +636,7 @@ export default function EmailSequences() {
                   Fill in the parts in [square brackets] before adding: {findPlaceholders(`${stepSubject} ${stepBodyHtml}`).slice(0, 5).join(', ')}
                 </div>
               )}
+              {can('create') && <SaveAsTemplate label="Save this email as team template" onSave={saveAsTemplate} defaultName={stepSubject} disabledReason={!stepSubject.trim() || !stepBodyHtml.trim() ? 'Write the subject and the email first.' : undefined} />}
               <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                 <label style={{ fontSize: '0.65rem', color: 'var(--dim)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                   Delay

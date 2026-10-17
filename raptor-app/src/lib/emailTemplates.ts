@@ -22,6 +22,7 @@ export interface EmailTemplate {
   blocks: TemplateBlock[];
   // Only for templates meant to run automatically from an event (the Triggers page).
   trigger?: { name: string; event_key: string; delay_minutes: number };
+  mine?: boolean;          // true for a template the team saved (see savedTemplates.ts)
 }
 
 export interface SequenceStep { delay_hours: number; subject: string; blocks: TemplateBlock[] }
@@ -31,6 +32,7 @@ export interface SequenceTemplate {
   name: string;
   when: string;
   steps: SequenceStep[];
+  mine?: boolean;
 }
 
 const SIGN_OFF: TemplateBlock = { type: 'text', content: 'Best,\n[Your name]\n[Your role], [Your company]' };
