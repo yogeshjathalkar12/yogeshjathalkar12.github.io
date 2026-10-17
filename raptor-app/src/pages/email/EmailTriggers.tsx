@@ -3,6 +3,8 @@ import { supabase } from '../../lib/supabaseClient';
 import { fieldInputStyle, primaryBtnStyle } from '../../components/crm/Modal';
 import { toolApiBase } from '../../lib/config';
 import EmailBodyEditor from '../../components/email/EmailBodyEditor';
+import EmailTemplatePicker from '../../components/email/EmailTemplatePicker';
+import { findPlaceholders, type EmailTemplate, type TemplateBlock } from '../../lib/emailTemplates';
 
 const EMAIL_API = toolApiBase('email');
 
@@ -26,6 +28,7 @@ export default function EmailTriggers() {
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formResetKey, setFormResetKey] = useState(0);
+  const [templateBlocks, setTemplateBlocks] = useState<TemplateBlock[] | undefined>(undefined);
 
   // Shopify's own request signature, separate from the shared
   // X-Webhook-Secret above — set once per account, never re-displayed.
@@ -90,10 +93,30 @@ export default function EmailTriggers() {
     return { total: events.length, sent, pending, failed };
   }
 
+  // Starting from a template: fills the name, event, delay, subject and the visual editor; everything stays editable.
+  function applyTemplate(t: EmailTemplate) {
+    setActionType('send_email');
+    setName(t.trigger?.name || t.name);
+    if (t.trigger) {
+      setEventKey(t.trigger.event_key);
+      setDelayMinutes(String(t.trigger.delay_minutes));
+    }
+    setSubject(t.subject);
+    setTemplateBlocks(t.blocks);
+    setFormResetKey((k) => k + 1);
+    setError(null);
+  }
+
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim() || !eventKey.trim()) {
       setError('Fill in the name and event key.');
+      return;
+    }
+    const blanks = actionType === 'send_email' ? findPlaceholders(`${subject} ${bodyHtml}`) : [];
+    if (blanks.length > 0) {
+      // A trigger sends by itself the moment its event happens, so it must never go live with a blank in it.
+      setError(`Fill in these parts before saving: ${blanks.slice(0, 5).join(', ')}.`);
       return;
     }
     if (actionType === 'enroll_sequence') {
@@ -138,6 +161,7 @@ export default function EmailTriggers() {
       setDelayMinutes('0');
       setIsTransactional(false);
       setFormResetKey((k) => k + 1);
+      setTemplateBlocks(undefined);
       fetchTriggers();
     } catch (err: any) {
       setError(err.message || 'Could not create trigger.');
@@ -223,6 +247,10 @@ export default function EmailTriggers() {
         A trigger sends automatically the moment (or a set delay after) an event happens for a contact —
         from your own CRM in-process, or from an outside source below. This is separate from Campaigns,
         which fan one message out to many recipients at once.
+      </div>
+
+      <div style={{ maxWidth: 960 }}>
+        <EmailTemplatePicker singles firstCategory="Automatic emails" onUseSingle={applyTemplate} />
       </div>
 
       <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 960 }}>
@@ -337,9 +365,15 @@ export default function EmailTriggers() {
               <EmailBodyEditor
                 key={formResetKey}
                 initialHtml={bodyHtml}
+                initialBlocks={templateBlocks}
                 onChange={setBodyHtml}
                 requireUnsubscribe={!isTransactional}
               />
+              {findPlaceholders(`${subject} ${bodyHtml}`).length > 0 && (
+                <div style={{ color: 'var(--amber, #f59e0b)', fontSize: '0.68rem', lineHeight: 1.5 }}>
+                  Fill in the parts in [square brackets] before saving: {findPlaceholders(`${subject} ${bodyHtml}`).slice(0, 5).join(', ')}
+                </div>
+              )}
             </>
           )}
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>

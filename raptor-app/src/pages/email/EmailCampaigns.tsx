@@ -3,6 +3,8 @@ import { supabase } from '../../lib/supabaseClient';
 import { fieldInputStyle, primaryBtnStyle } from '../../components/crm/Modal';
 import { toolApiBase } from '../../lib/config';
 import EmailBodyEditor from '../../components/email/EmailBodyEditor';
+import EmailTemplatePicker from '../../components/email/EmailTemplatePicker';
+import { findPlaceholders, type EmailTemplate, type TemplateBlock } from '../../lib/emailTemplates';
 
 const EMAIL_API = `${toolApiBase('email')}`; // now the same backend as every other tool — see lib/config.ts
 
@@ -32,6 +34,7 @@ export default function EmailCampaigns() {
   const [abTestDurationHours, setAbTestDurationHours] = useState('4');
   const [decidingWinner, setDecidingWinner] = useState<string | null>(null);
   const [formResetKey, setFormResetKey] = useState(0);
+  const [templateBlocks, setTemplateBlocks] = useState<TemplateBlock[] | undefined>(undefined);
 
   useEffect(() => {
     fetchAccounts();
@@ -169,6 +172,7 @@ export default function EmailCampaigns() {
         { label: 'B', subject: '', body_html: '' },
       ]);
       setFormResetKey((k) => k + 1);
+      setTemplateBlocks(undefined);
       fetchCampaigns();
     } catch (err: any) {
       setError(err.message || 'Could not create campaign.');
@@ -177,7 +181,23 @@ export default function EmailCampaigns() {
     }
   }
 
+  // Starting from a template: fills the subject and the visual editor; everything stays editable.
+  function applyTemplate(t: EmailTemplate) {
+    setAbTestEnabled(false);
+    setName((n) => n || t.name);
+    setSubject(t.subject);
+    setTemplateBlocks(t.blocks);
+    setFormResetKey((k) => k + 1);
+    setError(null);
+  }
+
   async function handleSend(campaignId: string) {
+    const draft = campaigns.find((c) => c.id === campaignId);
+    const blanks = draft ? findPlaceholders(`${draft.subject || ''} ${draft.body_html || ''}`) : [];
+    if (blanks.length > 0) {
+      setError(`This email still has blanks to fill in: ${blanks.slice(0, 4).join(', ')}${blanks.length > 4 ? '…' : ''}. Delete this campaign and create it again with the blanks filled in.`);
+      return;
+    }
     try {
       // The send endpoint now requires a real user JWT and checks account
       // ownership server-side — it used to accept this call from anyone.
@@ -255,6 +275,10 @@ export default function EmailCampaigns() {
         </select>
       </div>
 
+      <div style={{ maxWidth: 960 }}>
+        <EmailTemplatePicker singles onUseSingle={applyTemplate} />
+      </div>
+
       <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 960 }}>
         <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.2rem', marginBottom: '1rem' }}>New Campaign</div>
         <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
@@ -323,8 +347,14 @@ export default function EmailCampaigns() {
               <EmailBodyEditor
                 key={`${formResetKey}-plain`}
                 initialHtml={bodyHtml}
+                initialBlocks={templateBlocks}
                 onChange={setBodyHtml}
               />
+              {findPlaceholders(`${subject} ${bodyHtml}`).length > 0 && (
+                <div style={{ color: 'var(--amber, #f59e0b)', fontSize: '0.68rem', lineHeight: 1.5 }}>
+                  Fill in the parts in [square brackets] before you send: {findPlaceholders(`${subject} ${bodyHtml}`).slice(0, 5).join(', ')}
+                </div>
+              )}
             </>
           )}
           <select style={fieldInputStyle} value={segmentId} onChange={(e) => setSegmentId(e.target.value)}>

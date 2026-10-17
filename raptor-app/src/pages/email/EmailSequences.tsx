@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { fieldInputStyle, primaryBtnStyle } from '../../components/crm/Modal';
 import { toolApiBase } from '../../lib/config';
-import EmailBodyEditor from '../../components/email/EmailBodyEditor';
+import EmailBodyEditor, { blocksFromTemplate, blocksToHtml } from '../../components/email/EmailBodyEditor';
+import EmailTemplatePicker from '../../components/email/EmailTemplatePicker';
+import { findPlaceholders, type EmailTemplate, type SequenceTemplate, type TemplateBlock } from '../../lib/emailTemplates';
 
 const EMAIL_API = toolApiBase('email');
 
@@ -44,6 +46,8 @@ export default function EmailSequences() {
 
   const [error, setError] = useState<string | null>(null);
   const [formResetKey, setFormResetKey] = useState(0);
+  const [templateBlocks, setTemplateBlocks] = useState<TemplateBlock[] | undefined>(undefined);
+  const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
     fetchAccounts();
@@ -148,6 +152,49 @@ export default function EmailSequences() {
     fetchSequences();
   }
 
+  // A single ready-made email becomes the next step's content (needs a sequence to be open).
+  function applySingleTemplate(t: EmailTemplate) {
+    if (!sequenceId) {
+      setError('Open or create a sequence first, then add this email as a step.');
+      return;
+    }
+    setError(null);
+    setStepSubject(t.subject);
+    setStepIsTransactional(false);
+    setTemplateBlocks(t.blocks);
+    setFormResetKey((k) => k + 1);
+    setNotice('Template loaded into "Add Step" below. Fill in the parts in [square brackets], then add it.');
+  }
+
+  // A whole ready-made sequence: creates it with all its steps. It starts PAUSED so nothing can go out before it is reviewed.
+  async function applySequenceTemplate(t: SequenceTemplate) {
+    setError(null);
+    setNotice(null);
+    try {
+      const { data: seq, error: seqErr } = await supabase
+        .from('email_sequences').insert({ account_id: accountId, name: t.name, status: 'paused' }).select().single();
+      if (seqErr) throw seqErr;
+      const rows = t.steps.map((s, i) => ({
+        sequence_id: seq.id,
+        step_order: i + 1,
+        delay_hours: s.delay_hours,
+        subject: s.subject,
+        body_html: blocksToHtml(blocksFromTemplate(s.blocks, true)),
+        is_transactional: false,
+      }));
+      const { error: stepErr } = await supabase.from('email_sequence_steps').insert(rows);
+      if (stepErr) {
+        await supabase.from('email_sequences').delete().eq('id', seq.id);   // never leave a half-built sequence behind
+        throw stepErr;
+      }
+      await fetchSequences();
+      setSequenceId(seq.id);
+      setNotice(`"${t.name}" was created and is paused. Open each email, fill in the parts in [square brackets], then resume the sequence.`);
+    } catch (err: any) {
+      setError(err.message || 'Could not create the sequence from the template.');
+    }
+  }
+
   async function handleAddStep(e: React.FormEvent) {
     e.preventDefault();
     if (!stepSubject.trim() || !stepBodyHtml.trim()) {
@@ -156,6 +203,11 @@ export default function EmailSequences() {
     }
     if (!stepIsTransactional && !stepBodyHtml.includes('{{unsubscribe_url}}')) {
       setError('Non-transactional steps must include {{unsubscribe_url}}.');
+      return;
+    }
+    const blanks = findPlaceholders(`${stepSubject} ${stepBodyHtml}`);
+    if (blanks.length > 0) {
+      setError(`Fill in these parts before adding the step: ${blanks.slice(0, 5).join(', ')}.`);
       return;
     }
     const delay = parseInt(stepDelayHours, 10);
@@ -179,6 +231,8 @@ export default function EmailSequences() {
       setStepSubject('');
       setStepDelayHours('24');
       setStepIsTransactional(false);
+      setTemplateBlocks(undefined);
+      setNotice(null);
       setFormResetKey((k) => k + 1);
       fetchSteps();
     } catch (err: any) {
@@ -285,6 +339,11 @@ export default function EmailSequences() {
       setError('Add at least one step before enrolling anyone.');
       return;
     }
+    const unfinished = steps.filter((s) => findPlaceholders(`${s.subject || ''} ${s.body_html || ''}`).length > 0);
+    if (unfinished.length > 0) {
+      setError(`Email ${unfinished.map((s) => s.step_order).join(', ')} still ${unfinished.length === 1 ? 'has' : 'have'} blanks in [square brackets]. Fill them in before enrolling anyone.`);
+      return;
+    }
     setEnrolling(true);
     setError(null);
     setEnrollResult(null);
@@ -341,6 +400,11 @@ export default function EmailSequences() {
         unsubscribe link unless marked transactional. Any step can also branch: wait, then route to
         a different step (or end the sequence) based on whether it was opened or clicked.
       </div>
+
+      <div style={{ maxWidth: 960 }}>
+        <EmailTemplatePicker singles sequences onUseSingle={applySingleTemplate} onUseSequence={applySequenceTemplate} />
+      </div>
+      {notice && <div style={{ color: 'var(--green, #3ecf8e)', fontSize: '0.68rem', marginBottom: '1rem', maxWidth: 960 }}>{notice}</div>}
 
       <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 960 }}>
         <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.2rem', marginBottom: '1rem' }}>New Sequence</div>
@@ -526,9 +590,15 @@ export default function EmailSequences() {
               <EmailBodyEditor
                 key={formResetKey}
                 initialHtml={stepBodyHtml}
+                initialBlocks={templateBlocks}
                 onChange={setStepBodyHtml}
                 requireUnsubscribe={!stepIsTransactional}
               />
+              {findPlaceholders(`${stepSubject} ${stepBodyHtml}`).length > 0 && (
+                <div style={{ color: 'var(--amber, #f59e0b)', fontSize: '0.68rem', lineHeight: 1.5 }}>
+                  Fill in the parts in [square brackets] before adding: {findPlaceholders(`${stepSubject} ${stepBodyHtml}`).slice(0, 5).join(', ')}
+                </div>
+              )}
               <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                 <label style={{ fontSize: '0.65rem', color: 'var(--dim)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                   Delay

@@ -125,7 +125,18 @@ function blockToHtml(b: any): string {
   }
 }
 
-function blocksToHtml(blocks: any[]): string {
+/** A template's blocks -> editor blocks (each gets an id; the unsubscribe footer is added unless this is a transactional email). */
+export function blocksFromTemplate(template: { type: string; [k: string]: any }[], withFooter = true): any[] {
+  const blocks: any[] = template.map((b) => {
+    if (b.type === 'button') return { id: uid(), type: 'button', label: b.label, url: b.url || '', align: 'left', color: '#7c3aed', textColor: '#ffffff' };
+    if (b.type === 'heading') return { id: uid(), type: 'heading', content: b.content, align: 'left' };
+    return { id: uid(), type: 'text', content: b.content, align: 'left' };
+  });
+  if (withFooter) blocks.push({ id: uid(), type: 'unsubscribe_footer', content: "You're receiving this because you subscribed." });
+  return blocks;
+}
+
+export function blocksToHtml(blocks: any[]): string {
   const inner = blocks.map(blockToHtml).join('\n');
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;background:#ffffff;">
   <tr>
@@ -254,14 +265,16 @@ const BLOCK_TYPE_LABELS: Record<string, string> = {
 
 interface EmailBodyEditorProps {
   initialHtml?: string;
+  /** Start from these blocks instead (a chosen template). Takes priority over initialHtml. */
+  initialBlocks?: { type: string; [k: string]: any }[];
   onChange: (html: string) => void;
   requireUnsubscribe?: boolean;
 }
 
-export default function EmailBodyEditor({ initialHtml, onChange, requireUnsubscribe = true }: EmailBodyEditorProps) {
+export default function EmailBodyEditor({ initialHtml, initialBlocks, onChange, requireUnsubscribe = true }: EmailBodyEditorProps) {
   const [mode, setMode] = useState<'visual' | 'html'>('visual');
-  const [blocks, setBlocks] = useState<any[]>(() => blocksFromInitialHtml(initialHtml));
-  const [htmlDraft, setHtmlDraft] = useState<string>(() => blocksToHtml(blocksFromInitialHtml(initialHtml)));
+  const [blocks, setBlocks] = useState<any[]>(() => (initialBlocks ? blocksFromTemplate(initialBlocks, requireUnsubscribe) : blocksFromInitialHtml(initialHtml)));
+  const [htmlDraft, setHtmlDraft] = useState<string>(() => blocksToHtml(initialBlocks ? blocksFromTemplate(initialBlocks, requireUnsubscribe) : blocksFromInitialHtml(initialHtml)));
 
   useEffect(() => {
     // Sync the initial computed HTML (default blocks, or the wrapped
