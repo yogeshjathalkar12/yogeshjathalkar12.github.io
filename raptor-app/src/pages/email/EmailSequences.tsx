@@ -424,7 +424,7 @@ export default function EmailSequences() {
         )}
       </div>
 
-      <div style={{ fontSize: '0.65rem', color: 'var(--dim)', marginBottom: '1.4rem', maxWidth: 620 }}>
+      <div style={{ fontSize: '0.65rem', color: 'var(--dim)', marginBottom: '1.4rem', maxWidth: 900 }}>
         A sequence walks each enrolled contact through an ordered list of emails automatically —
         step 1 goes out after its own delay from enrollment, each step after that waits its own
         delay from when the previous one sent. Unlike triggers and follow-ups, every step needs an
@@ -432,13 +432,14 @@ export default function EmailSequences() {
         a different step (or end the sequence) based on whether it was opened or clicked.
       </div>
 
-      <div style={{ maxWidth: 960 }}>
+      <div style={{ maxWidth: '100%' }}>
         <EmailTemplatePicker singles sequences onUseSingle={applySingleTemplate} onUseSequence={applySequenceTemplate} mine={{ singles: mineEmails, sequences: mineSequences }}
-          onDeleteMine={can('delete') ? (id) => (id.startsWith('saved:') && mineSequences.some((t) => t.id === id) ? savedSequences.remove(id) : savedEmails.remove(id)) : undefined} />
+          onDeleteMine={can('delete') ? (id) => (id.startsWith('saved:') && mineSequences.some((t) => t.id === id) ? savedSequences.remove(id) : savedEmails.remove(id)) : undefined}
+          editor={{ canCreate: can('create'), canEdit: can('edit'), onSave: (input, mode, savedId) => (input.kind === 'email_sequence' ? savedSequences : savedEmails).persist(input, mode, savedId) }} />
       </div>
-      {notice && <div style={{ color: 'var(--green, #3ecf8e)', fontSize: '0.68rem', marginBottom: '1rem', maxWidth: 960 }}>{notice}</div>}
+      {notice && <div style={{ color: 'var(--green, #3ecf8e)', fontSize: '0.68rem', marginBottom: '1rem', maxWidth: '100%' }}>{notice}</div>}
 
-      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 960 }}>
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: '100%' }}>
         <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.2rem', marginBottom: '1rem' }}>New Sequence</div>
         <form onSubmit={handleCreateSequence} style={{ display: 'flex', gap: '0.8rem' }}>
           <input style={{ ...fieldInputStyle, marginBottom: 0, flex: 1 }} placeholder="Sequence name (e.g. New subscriber nurture)" value={newSequenceName} onChange={(e) => setNewSequenceName(e.target.value)} />
@@ -454,7 +455,7 @@ export default function EmailSequences() {
         <div style={{ color: 'var(--dim2)', fontSize: '0.65rem' }}>No sequences yet — create one above.</div>
       ) : currentSequence ? (
         <>
-          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1rem 1.2rem', marginBottom: '1.6rem', maxWidth: 960, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1rem 1.2rem', marginBottom: '1.6rem', maxWidth: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
               <div style={{ fontSize: '0.75rem', color: 'var(--white)' }}>{currentSequence.name}</div>
               <div style={{ fontSize: '0.6rem', color: 'var(--dim)' }}>
@@ -620,7 +621,7 @@ export default function EmailSequences() {
             )}
           </div>
 
-          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 960 }}>
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: '100%' }}>
             <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.1rem', marginBottom: '1rem' }}>Add Step {steps.length + 1}</div>
             <form onSubmit={handleAddStep} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
               <input style={fieldInputStyle} placeholder="Subject — supports {{first_name}} and {a|b} spintax" value={stepSubject} onChange={(e) => setStepSubject(e.target.value)} />
@@ -660,7 +661,7 @@ export default function EmailSequences() {
             </form>
           </div>
 
-          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', maxWidth: 960 }}>
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', maxWidth: '100%' }}>
             <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.1rem', marginBottom: '1rem' }}>Enroll Contacts</div>
             <form onSubmit={handleEnroll} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
               <textarea

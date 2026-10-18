@@ -159,13 +159,13 @@ export default function EmailSegments() {
         </select>
       </div>
 
-      <div style={{ fontSize: '0.65rem', color: 'var(--dim)', marginBottom: '1.4rem', maxWidth: 620 }}>
+      <div style={{ fontSize: '0.65rem', color: 'var(--dim)', marginBottom: '1.4rem', maxWidth: 900 }}>
         A segment combines tag and engagement conditions to target a campaign more precisely than a single tag —
         e.g. "has tag 'customer' AND didn't open the last campaign." Pick a segment instead of a plain audience
         tag when creating a campaign.
       </div>
 
-      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 960 }}>
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: '100%' }}>
         <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.2rem', marginBottom: '1rem' }}>New Segment</div>
         <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
           <input style={fieldInputStyle} placeholder="Segment name (e.g. Engaged customers)" value={name} onChange={(e) => setName(e.target.value)} />

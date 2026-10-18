@@ -95,7 +95,7 @@ export default function WaConnectionSetup() {
   }
 
   const formCard = (
-      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 960 }}>
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: '100%' }}>
         <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.2rem', marginBottom: '1rem' }}>{accounts.length > 0 ? 'Add another WhatsApp number' : 'Connect a WhatsApp number'}</div>
         <form onSubmit={handleConnect} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
           <input style={fieldInputStyle} placeholder="Label (e.g. Raptor outreach)" value={label} onChange={(e) => setLabel(e.target.value)} />
@@ -164,7 +164,7 @@ export default function WaConnectionSetup() {
 
   return (
     <div>
-      <div style={{ fontSize: '0.65rem', color: 'var(--dim)', marginBottom: '1.4rem', maxWidth: 620 }}>
+      <div style={{ fontSize: '0.65rem', color: 'var(--dim)', marginBottom: '1.4rem', maxWidth: 900 }}>
         Connect your own Meta WhatsApp Cloud API app — phone_number_id, WABA ID, and access token from your own Meta Business Manager. Your token is encrypted before it's stored. No shared number, no shared reputation.
       </div>
 

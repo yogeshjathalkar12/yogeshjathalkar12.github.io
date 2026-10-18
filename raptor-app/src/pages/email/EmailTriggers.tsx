@@ -258,17 +258,18 @@ export default function EmailTriggers() {
         </select>
       </div>
 
-      <div style={{ fontSize: '0.65rem', color: 'var(--dim)', marginBottom: '1.4rem', maxWidth: 620 }}>
+      <div style={{ fontSize: '0.65rem', color: 'var(--dim)', marginBottom: '1.4rem', maxWidth: 900 }}>
         A trigger sends automatically the moment (or a set delay after) an event happens for a contact —
         from your own CRM in-process, or from an outside source below. This is separate from Campaigns,
         which fan one message out to many recipients at once.
       </div>
 
-      <div style={{ maxWidth: 960 }}>
-        <EmailTemplatePicker singles firstCategory="Automatic emails" onUseSingle={applyTemplate} mine={{ singles: mineEmails, sequences: [] }} onDeleteMine={can('delete') ? savedEmails.remove : undefined} />
+      <div style={{ maxWidth: '100%' }}>
+        <EmailTemplatePicker singles firstCategory="Automatic emails" onUseSingle={applyTemplate} mine={{ singles: mineEmails, sequences: [] }} onDeleteMine={can('delete') ? savedEmails.remove : undefined}
+          editor={{ canCreate: can('create'), canEdit: can('edit'), onSave: savedEmails.persist }} />
       </div>
 
-      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 960 }}>
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: '100%' }}>
         <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.2rem', marginBottom: '1rem' }}>External event source</div>
         <div style={{ fontSize: '0.65rem', color: 'var(--dim)', marginBottom: '0.8rem' }}>
           Point Shopify, Stripe, Zapier, or any custom integration at this URL, with the secret below as an{' '}
@@ -331,7 +332,7 @@ export default function EmailTriggers() {
         )}
       </div>
 
-      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 960 }}>
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: '100%' }}>
         <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.2rem', marginBottom: '1rem' }}>New Trigger</div>
         <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
           <input style={fieldInputStyle} placeholder="Trigger name (e.g. Welcome email)" value={name} onChange={(e) => setName(e.target.value)} />

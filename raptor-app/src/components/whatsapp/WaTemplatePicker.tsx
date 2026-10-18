@@ -1,5 +1,9 @@
 import { useMemo, useState } from 'react';
 import { primaryBtnStyle } from '../crm/Modal';
+import TemplateEditor from '../TemplateEditor';
+import type { EditorSpec, SaveInput, SaveMode } from '../TemplateEditor';
+import { rowIdOf } from '../../lib/savedTemplates';
+import type { SavedKind } from '../../lib/savedTemplates';
 
 export interface PickerItem {
   id: string;
@@ -10,6 +14,17 @@ export interface PickerItem {
   detail: string;                                 // what the template says, shown in the preview
   copy?: { label: string; text: string }[];       // things worth copying (a message to paste into WhatsApp Manager)
   mine?: boolean;                                 // a template the team saved: it can be deleted by people who may
+  /** What the editor starts from when the person presses Edit: the template's content in the shape the database stores. Absent = no Edit button. */
+  edit?: { kind: SavedKind; content: any };
+}
+
+/** Lets people change a template, copy a built-in one and change the copy, or write their own. See TemplateEditor.tsx. */
+export interface PickerEditor {
+  canCreate: boolean;
+  canEdit: boolean;
+  onSave: (input: SaveInput, mode: SaveMode, savedId?: string) => Promise<void>;
+  /** Shows "Create your own": a blank template of this kind. */
+  createOwn?: { kind: SavedKind; content: any; label?: string };
 }
 
 const noteStyle = { fontSize: '0.74rem', color: 'var(--dim)', lineHeight: 1.6 } as const;
@@ -40,14 +55,33 @@ interface Props {
   disabledReason?: string;
   /** Given only to people who may delete: removes a saved template for everyone. */
   onDelete?: (id: string) => void;
+  editor?: PickerEditor;
 }
 
 // A browsable library of ready-made things so nobody starts from a blank form. The page decides what "use" means.
-export default function WaTemplatePicker({ title = 'Start from a template', intro, items, categories, actionLabel, onUse, guide, disabledReason, onDelete }: Props) {
+export default function WaTemplatePicker({ title = 'Start from a template', intro, items, categories, actionLabel, onUse, guide, disabledReason, onDelete, editor }: Props) {
   const [open, setOpen] = useState(false);
   const [category, setCategory] = useState('All');
   const [preview, setPreview] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
+  const [editing, setEditing] = useState<EditorSpec | null>(null);
+  const [editorKey, setEditorKey] = useState(0);
+
+  const startEdit = (t: PickerItem) => {
+    if (!t.edit) return;
+    setEditing({
+      kind: t.edit.kind, name: t.mine ? t.name : `${t.name} (my version)`,
+      description: t.mine ? (t.when === 'Saved by your team' ? '' : t.when) : t.when, content: t.edit.content, savedId: t.mine ? rowIdOf(t.id) : undefined,
+    });
+    setEditorKey((k) => k + 1);
+    setOpen(true);
+  };
+  const startNew = () => {
+    if (!editor || !editor.createOwn) return;
+    setEditing({ kind: editor.createOwn.kind, name: '', description: '', content: editor.createOwn.content, title: 'Create your own template' });
+    setEditorKey((k) => k + 1);
+    setOpen(true);
+  };
 
   const shown = useMemo(() => items.filter((i) => category === 'All' || i.category === category), [items, category]);
 
@@ -59,17 +93,23 @@ export default function WaTemplatePicker({ title = 'Start from a template', intr
   }
 
   return (
-    <div style={{ border: '1px solid var(--border)', borderRadius: 8, padding: '0.9rem 1rem', background: 'var(--surface)', marginBottom: '1.2rem', maxWidth: 960 }}>
+    <div style={{ border: '1px solid var(--border)', borderRadius: 8, padding: '0.9rem 1rem', background: 'var(--surface)', marginBottom: '1.2rem', maxWidth: '100%' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
         <div style={{ flex: 1, minWidth: 220 }}>
           <strong style={{ color: 'var(--white)' }}>{title}</strong>
           <div style={noteStyle}>{intro}</div>
         </div>
-        <button type="button" style={{ ...primaryBtnStyle, flex: 'none' }} onClick={() => setOpen((o) => !o)}>{open ? 'Hide templates' : 'Browse templates'}</button>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          {editor && editor.createOwn && editor.canCreate && <button type="button" style={ghostSmall} onClick={startNew}>{editor.createOwn.label || 'Create your own'}</button>}
+          <button type="button" style={{ ...primaryBtnStyle, flex: 'none' }} onClick={() => setOpen((o) => !o)}>{open ? 'Hide templates' : 'Browse templates'}</button>
+        </div>
       </div>
 
       {open && (
         <div style={{ marginTop: '1rem' }}>
+          {editing && editor && (
+            <TemplateEditor key={editorKey} spec={editing} canCreate={editor.canCreate} canEdit={editor.canEdit} onSave={editor.onSave} onClose={() => setEditing(null)} />
+          )}
           {guide && (
             <div style={{ border: '1px solid var(--border)', borderRadius: 6, padding: '0.7rem 0.9rem', marginBottom: '0.9rem' }}>
               <div style={{ fontSize: '0.74rem', color: 'var(--white)', marginBottom: '0.3rem' }}><strong>{guide.title}</strong></div>
@@ -110,6 +150,9 @@ export default function WaTemplatePicker({ title = 'Start from a template', intr
                       onClick={() => { onUse(t.id); setOpen(false); setPreview(null); }}>
                       {actionLabel}
                     </button>
+                    {t.edit && editor && (editor.canCreate || (t.mine && editor.canEdit)) && (
+                      <button type="button" style={ghostSmall} onClick={() => startEdit(t)}>{t.mine ? 'Edit' : 'Customise'}</button>
+                    )}
                     {t.mine && onDelete && (
                       <button type="button" style={{ ...ghostSmall, color: 'var(--red, #ef5350)' }}
                         onClick={() => { if (window.confirm(`Delete "${t.name}" for everyone in your organization?`)) onDelete(t.id); }}>Delete</button>

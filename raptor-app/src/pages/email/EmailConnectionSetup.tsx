@@ -170,7 +170,7 @@ export default function EmailConnectionSetup() {
     <form
       className="mailbox-card"
       onSubmit={handleConnect}
-      style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 960, display: 'flex', flexDirection: 'column', gap: '0.8rem' }}
+      style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: '100%', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}
     >
       <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.2rem' }}>{hasAccounts ? 'Add another mailbox' : 'Connect your mailbox'}</div>
       <div style={noteStyle}>
@@ -301,7 +301,7 @@ export default function EmailConnectionSetup() {
 
   return (
     <div>
-      <div style={{ fontSize: '0.65rem', color: 'var(--dim)', marginBottom: '1.4rem', maxWidth: 620, lineHeight: 1.7 }}>
+      <div style={{ fontSize: '0.65rem', color: 'var(--dim)', marginBottom: '1.4rem', maxWidth: 900, lineHeight: 1.7 }}>
         Send from your own mailbox. Nothing routes through a shared identity — every send uses your own login, your own warm-up ramp and your own suppression list.
       </div>
       {notice && <div style={{ color: 'var(--green, #22c55e)', fontSize: '0.65rem', marginBottom: '1rem' }}>{notice}</div>}

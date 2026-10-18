@@ -290,11 +290,12 @@ export default function EmailCampaigns() {
         </select>
       </div>
 
-      <div style={{ maxWidth: 960 }}>
-        <EmailTemplatePicker singles onUseSingle={applyTemplate} mine={{ singles: mineEmails, sequences: [] }} onDeleteMine={can('delete') ? savedEmails.remove : undefined} />
+      <div style={{ maxWidth: '100%' }}>
+        <EmailTemplatePicker singles onUseSingle={applyTemplate} mine={{ singles: mineEmails, sequences: [] }} onDeleteMine={can('delete') ? savedEmails.remove : undefined}
+          editor={{ canCreate: can('create'), canEdit: can('edit'), onSave: savedEmails.persist }} />
       </div>
 
-      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 960 }}>
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: '100%' }}>
         <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.2rem', marginBottom: '1rem' }}>New Campaign</div>
         <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
           <input style={fieldInputStyle} placeholder="Campaign name" value={name} onChange={(e) => setName(e.target.value)} />

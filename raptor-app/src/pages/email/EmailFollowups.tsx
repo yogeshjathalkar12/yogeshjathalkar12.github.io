@@ -157,7 +157,7 @@ export default function EmailFollowups() {
         )}
       </div>
 
-      <div style={{ fontSize: '0.65rem', color: 'var(--dim)', marginBottom: '1.4rem', maxWidth: 620 }}>
+      <div style={{ fontSize: '0.65rem', color: 'var(--dim)', marginBottom: '1.4rem', maxWidth: 900 }}>
         A follow-up checks each recipient of the selected campaign once, a set number of hours after
         their original send, and sends different content depending on whether they opened or clicked —
         exactly once per recipient, never repeated.
@@ -167,7 +167,7 @@ export default function EmailFollowups() {
         <div style={{ color: 'var(--dim2)', fontSize: '0.65rem' }}>Create a campaign on this account first — follow-ups branch off an existing campaign's send.</div>
       ) : (
         <>
-          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 960 }}>
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: '100%' }}>
             <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.2rem', marginBottom: '1rem' }}>New Follow-up</div>
             <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
               <input style={fieldInputStyle} placeholder="Follow-up name (e.g. Re-engage non-openers)" value={name} onChange={(e) => setName(e.target.value)} />

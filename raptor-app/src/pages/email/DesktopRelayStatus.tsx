@@ -101,7 +101,7 @@ export default function DesktopRelayStatus() {
   if (!loaded) return null;
   if (failed) {
     return (
-      <div style={{ fontSize: '0.62rem', color: 'var(--dim)', marginBottom: '1.4rem', maxWidth: 620 }}>
+      <div style={{ fontSize: '0.62rem', color: 'var(--dim)', marginBottom: '1.4rem', maxWidth: 900 }}>
         Desktop sending status isn't available yet. The database part of this feature still has to be installed.
       </div>
     );
@@ -137,7 +137,7 @@ export default function DesktopRelayStatus() {
   }
 
   return (
-    <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 6, padding: '1.2rem 1.4rem', marginBottom: '1.6rem', maxWidth: 960 }}>
+    <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 6, padding: '1.2rem 1.4rem', marginBottom: '1.6rem', maxWidth: '100%' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.3rem' }}>
         <span style={{ width: 9, height: 9, borderRadius: '50%', background: color, display: 'inline-block' }} />
         <span style={{ fontSize: '0.8rem', color: 'var(--white)' }}>{headline}</span>

@@ -201,9 +201,9 @@ export default function WaTriggers() {
   }
 
   const pickerItems: PickerItem[] = [
-    ...mineReplies.map((r) => ({ id: r.id, category: MY_TEMPLATES, name: r.name, when: r.when, detail: replyDetail(r), mine: true })),
+    ...mineReplies.map((r) => ({ id: r.id, category: MY_TEMPLATES, name: r.name, when: r.when, detail: replyDetail(r), mine: true, edit: { kind: 'wa_reply' as const, content: replyContent(r as any) } })),
     ...WA_REPLY_SETS.map((s) => ({ id: s.id, category: s.category, name: s.name, when: s.when, badge: `set of ${s.replies.length}`, detail: replySetDetail(s) })),
-    ...WA_REPLIES.map((r) => ({ id: r.id, category: r.category, name: r.name, when: r.when, detail: replyDetail(r) })),
+    ...WA_REPLIES.map((r) => ({ id: r.id, category: r.category, name: r.name, when: r.when, detail: replyDetail(r), edit: { kind: 'wa_reply' as const, content: replyContent(r as any) } })),
   ];
 
   async function handleRemove(id: string) {
@@ -246,7 +246,7 @@ export default function WaTriggers() {
         </select>
       </div>
 
-      <div style={{ fontSize: '0.6rem', color: 'var(--dim)', marginBottom: '1.2rem', maxWidth: 620 }}>
+      <div style={{ fontSize: '0.6rem', color: 'var(--dim)', marginBottom: '1.2rem', maxWidth: 900 }}>
         Fires only on an inbound message — free-form replies, buttons, and lists are only allowed within Meta's 24-hour session window, which an inbound message always satisfies. "STOP"/"unsubscribe" are handled automatically as opt-outs. Tapping a button or list option counts as an inbound message too, so its id can match another trigger's keyword — useful for building simple multi-step flows.
       </div>
 
@@ -255,12 +255,13 @@ export default function WaTriggers() {
         items={pickerItems}
         categories={[...(mineReplies.length > 0 ? [MY_TEMPLATES] : []), ...WA_REPLY_CATEGORIES]}
         onDelete={can('delete') ? savedReplies.remove : undefined}
+        editor={{ canCreate: can('create'), canEdit: can('edit'), onSave: savedReplies.persist, createOwn: { kind: 'wa_reply', content: { keyword: '', match_type: 'contains', reply_kind: 'text', text: '' } } }}
         actionLabel="Use this template"
         onUse={(id) => (id.startsWith('set-') ? applyReplySet(id) : applyReply(id))}
       />
-      {notice && <div style={{ color: 'var(--green, #3ecf8e)', fontSize: '0.68rem', marginBottom: '1rem', maxWidth: 960 }}>{notice}</div>}
+      {notice && <div style={{ color: 'var(--green, #3ecf8e)', fontSize: '0.68rem', marginBottom: '1rem', maxWidth: '100%' }}>{notice}</div>}
 
-      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: 960 }}>
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: '100%' }}>
         <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.2rem', marginBottom: '1rem' }}>New Trigger</div>
         <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
           <input style={fieldInputStyle} placeholder="Keyword (e.g. pricing, or a button id like opt_pricing)" value={keyword} onChange={(e) => setKeyword(e.target.value)} />

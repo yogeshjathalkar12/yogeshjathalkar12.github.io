@@ -114,12 +114,14 @@ export default function WaFlows() {
 
   const flowItems: PickerItem[] = [
     ...mineFlows.map((f) => ({ id: f.id, category: MY_TEMPLATES, name: f.name, when: f.when, mine: true,
-      detail: `Starts when the message ${f.match_type === 'exact' ? 'is exactly' : 'contains'} "${f.entry_keyword}".\n${f.definition.nodes.length - 1} steps.` })),
-    ...WA_FLOWS.map((t) => ({ id: t.id, category: t.category, name: t.name, when: t.when, detail: flowDetail(t) })),
+      detail: `Starts when the message ${f.match_type === 'exact' ? 'is exactly' : 'contains'} "${f.entry_keyword}".\n${f.definition.nodes.length - 1} steps.`,
+      edit: { kind: 'wa_flow' as const, content: { entry_keyword: f.entry_keyword, match_type: f.match_type, definition: f.definition } } })),
+    ...WA_FLOWS.map((t) => ({ id: t.id, category: t.category, name: t.name, when: t.when, detail: flowDetail(t),
+      edit: { kind: 'wa_flow' as const, content: { entry_keyword: t.entry_keyword, match_type: t.match_type, definition: buildFlowDefinition(t) } } })),
   ];
   const promptItems: PickerItem[] = [
-    ...minePrompts.map((p) => ({ id: p.id, category: MY_TEMPLATES, name: p.name, when: p.when, detail: p.prompt, mine: true })),
-    ...WA_PROMPTS.map((p) => ({ id: p.id, category: p.category, name: p.name, when: p.when, detail: p.prompt })),
+    ...minePrompts.map((p) => ({ id: p.id, category: MY_TEMPLATES, name: p.name, when: p.when, detail: p.prompt, mine: true, edit: { kind: 'wa_prompt' as const, content: { prompt: p.prompt } } })),
+    ...WA_PROMPTS.map((p) => ({ id: p.id, category: p.category, name: p.name, when: p.when, detail: p.prompt, edit: { kind: 'wa_prompt' as const, content: { prompt: p.prompt } } })),
   ];
 
   async function handleCreate(e: React.FormEvent) {
@@ -181,7 +183,7 @@ export default function WaFlows() {
         </select>
       </div>
 
-      <div style={{ fontSize: '0.6rem', color: 'var(--dim)', marginBottom: '1.2rem', maxWidth: 640 }}>
+      <div style={{ fontSize: '0.6rem', color: 'var(--dim)', marginBottom: '1.2rem', maxWidth: 900 }}>
         A flow starts when an inbound message matches its entry keyword and no other flow is already active for that contact. Flows are checked before plain keyword triggers — if a message matches both, the flow wins.
       </div>
 
@@ -190,12 +192,13 @@ export default function WaFlows() {
         items={flowItems}
         categories={[...(mineFlows.length > 0 ? [MY_TEMPLATES] : []), ...WA_FLOW_CATEGORIES]}
         onDelete={can('delete') ? savedFlows.remove : undefined}
+        editor={{ canCreate: can('create'), canEdit: can('edit'), onSave: savedFlows.persist }}
         actionLabel="Create this flow"
         onUse={applyFlow}
       />
-      {error && <div style={{ color: 'var(--red)', fontSize: '0.65rem', marginBottom: '1rem', maxWidth: 960 }}>{error}</div>}
+      {error && <div style={{ color: 'var(--red)', fontSize: '0.65rem', marginBottom: '1rem', maxWidth: '100%' }}>{error}</div>}
 
-      <div style={{ marginBottom: '1.6rem', maxWidth: 960 }}>
+      <div style={{ marginBottom: '1.6rem', maxWidth: '100%' }}>
         <button
           onClick={() => setShowAiSettings((v) => !v)}
           style={{ background: 'transparent', border: '1px solid var(--border)', color: 'var(--dim)', padding: '0.5rem 0.9rem', borderRadius: '4px', cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: '0.6rem', textTransform: 'uppercase', marginBottom: '0.8rem' }}
@@ -218,6 +221,7 @@ export default function WaFlows() {
               categories={[...(minePrompts.length > 0 ? [MY_TEMPLATES] : []), 'AI assistant']}
               actionLabel="Use these instructions"
               onDelete={can('delete') ? savedPrompts.remove : undefined}
+              editor={{ canCreate: can('create'), canEdit: can('edit'), onSave: savedPrompts.persist, createOwn: { kind: 'wa_prompt', content: { prompt: '' } } }}
               onUse={(id) => { const p = [...minePrompts, ...WA_PROMPTS].find((x) => x.id === id); if (p) { setAiPrompt(p.prompt); setAiError(null); } }}
             />
             <textarea

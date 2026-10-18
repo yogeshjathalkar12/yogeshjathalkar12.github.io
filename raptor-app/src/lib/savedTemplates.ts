@@ -148,6 +148,23 @@ export async function saveTemplate(supabase: any, input: { kind: SavedKind; name
   return data as SavedRow;
 }
 
+/** Changes a saved template in place (everyone in the organization sees the new version). Needs the edit permission. */
+export async function updateTemplate(supabase: any, id: string, input: { kind: SavedKind; name: string; description?: string; content: any }): Promise<SavedRow> {
+  const checked = validateTemplate(input);
+  if ('error' in checked) throw new Error(checked.error);
+  const { kind: _kind, ...changes } = checked.value;
+  const { data, error } = await supabase.from('saved_templates').update({ ...changes, updated_at: new Date().toISOString() }).eq('id', id).select(COLUMNS).single();
+  // No row came back: row-level security hid it from this person's edit rights, or somebody deleted it meanwhile.
+  if (error && (error.code === 'PGRST116' || /0 rows|no rows/i.test(String(error.message || '')))) {
+    throw new Error("This template could not be changed. You may not have permission to edit templates, or someone deleted it.");
+  }
+  if (error) throw new Error(friendlyError(error, 'change'));
+  return data as SavedRow;
+}
+
+/** The id of the database row behind a picker id ("saved:<id>"). */
+export const rowIdOf = (pickerId: string): string => String(pickerId).replace(/^saved:/, '');
+
 export async function deleteSaved(supabase: any, id: string): Promise<void> {
   const { error } = await supabase.from('saved_templates').delete().eq('id', id);
   if (error) throw new Error(friendlyError(error, 'delete'));
@@ -163,6 +180,27 @@ export function textToBlocks(text: string): TemplateBlock[] {
 /** Blocks -> plain text (a button becomes a line with its link to fill in). */
 export function blocksToText(blocks: TemplateBlock[]): string {
   return (blocks || []).map((b) => (b.type === 'button' ? `${String(b.label).replace(/^\[|\]$/g, '')}: ${b.url || '[link]'}` : b.content)).join('\n\n');
+}
+
+// The template editor shows an email as text and turns it back into blocks when saved. Three small conventions keep the parts that
+// are not plain paragraphs: a line starting with "# " is a heading, and a line like "Book a call: https://..." (or ": [link]") is a button.
+const BUTTON_LINE = /^(.{1,40}?):\s*(https?:\/\/\S+|\[link\])$/;
+
+export function blocksToEditable(blocks: TemplateBlock[]): string {
+  return (blocks || []).map((b) => {
+    if (b.type === 'heading') return `# ${b.content}`;
+    if (b.type === 'button') return `${String(b.label).replace(/^\[|\]$/g, '')}: ${b.url || '[link]'}`;
+    return b.content;
+  }).join('\n\n');
+}
+
+export function editableToBlocks(text: string): TemplateBlock[] {
+  return String(text || '').split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean).map((p): TemplateBlock => {
+    if (/^#\s+\S/.test(p) && !p.includes('\n')) return { type: 'heading', content: p.replace(/^#\s+/, '') };
+    const button = !p.includes('\n') ? BUTTON_LINE.exec(p) : null;
+    if (button) return { type: 'button', label: button[1].trim(), url: button[2] === '[link]' ? '' : button[2] };
+    return { type: 'text', content: p };
+  });
 }
 
 function cleanText(html: string): string {

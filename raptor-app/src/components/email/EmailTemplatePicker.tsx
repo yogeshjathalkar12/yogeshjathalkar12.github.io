@@ -4,7 +4,9 @@ import {
   type EmailTemplate, type SequenceTemplate, type TemplateBlock,
 } from '../../lib/emailTemplates';
 import { primaryBtnStyle } from '../crm/Modal';
-import { MY_TEMPLATES } from '../../lib/savedTemplates';
+import TemplateEditor from '../TemplateEditor';
+import type { EditorSpec, SaveInput, SaveMode } from '../TemplateEditor';
+import { MY_TEMPLATES, rowIdOf } from '../../lib/savedTemplates';
 
 const noteStyle = { fontSize: '0.74rem', color: 'var(--dim)', lineHeight: 1.6 } as const;
 const chipStyle = (on: boolean) => ({
@@ -31,15 +33,40 @@ interface Props {
   mine?: { singles: EmailTemplate[]; sequences: SequenceTemplate[] };
   /** Given only to people who may delete: removes a saved template for everyone. */
   onDeleteMine?: (id: string) => void;
+  /** Lets people change a template, customise a copy of a built-in one, or write their own (see TemplateEditor.tsx). */
+  editor?: { canCreate: boolean; canEdit: boolean; onSave: (input: SaveInput, mode: SaveMode, savedId?: string) => Promise<void> };
 }
 
 // A browsable library of ready-made emails so nobody starts from a blank form. Picking one fills the form or builds the
 // sequence; everything stays editable, and the blanks in [square brackets] are flagged until they are filled in.
-export default function EmailTemplatePicker({ singles = true, sequences = false, firstCategory, onUseSingle, onUseSequence, disabledReason, mine, onDeleteMine }: Props) {
+export default function EmailTemplatePicker({ singles = true, sequences = false, firstCategory, onUseSingle, onUseSequence, disabledReason, mine, onDeleteMine, editor }: Props) {
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<'single' | 'sequence'>(singles ? 'single' : 'sequence');
   const [category, setCategory] = useState('All');
   const [preview, setPreview] = useState<string | null>(null);
+  const [editing, setEditing] = useState<EditorSpec | null>(null);
+  const [editorKey, setEditorKey] = useState(0);
+
+  const startEdit = (t: EmailTemplate | SequenceTemplate) => {
+    const isMine = !!(t as EmailTemplate).mine;
+    const single = 'blocks' in t;
+    setEditing({
+      kind: single ? 'email' : 'email_sequence',
+      name: isMine ? t.name : `${t.name} (my version)`,
+      description: isMine ? (t.when === 'Saved by your team' ? '' : t.when) : t.when,
+      content: single ? { subject: (t as EmailTemplate).subject, blocks: (t as EmailTemplate).blocks } : { steps: (t as SequenceTemplate).steps },
+      savedId: isMine ? rowIdOf(t.id) : undefined,
+    });
+    setEditorKey((k) => k + 1);
+    setOpen(true);
+  };
+  const startNew = () => {
+    setEditing(tab === 'single'
+      ? { kind: 'email', name: '', description: '', content: { subject: '', blocks: [] }, title: 'Create your own email template' }
+      : { kind: 'email_sequence', name: '', description: '', content: { steps: [{ delay_hours: 0, subject: '', blocks: [] }] }, title: 'Create your own sequence template' });
+    setEditorKey((k) => k + 1);
+    setOpen(true);
+  };
 
   const mineHere = (tab === 'single' ? mine?.singles : mine?.sequences) || [];
   const categories = useMemo(() => {
@@ -61,11 +88,17 @@ export default function EmailTemplatePicker({ singles = true, sequences = false,
           <strong style={{ color: 'var(--white)' }}>Start from a template</strong>
           <div style={noteStyle}>Ready-made emails you can use as they are or change. Fill in the parts in [square brackets] before you send.</div>
         </div>
-        <button type="button" style={{ ...primaryBtnStyle, flex: 'none' }} onClick={() => setOpen((o) => !o)}>{open ? 'Hide templates' : 'Browse templates'}</button>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          {editor && editor.canCreate && <button type="button" style={ghostSmall} onClick={startNew}>Create your own</button>}
+          <button type="button" style={{ ...primaryBtnStyle, flex: 'none' }} onClick={() => setOpen((o) => !o)}>{open ? 'Hide templates' : 'Browse templates'}</button>
+        </div>
       </div>
 
       {open && (
         <div style={{ marginTop: '1rem' }}>
+          {editing && editor && (
+            <TemplateEditor key={editorKey} spec={editing} canCreate={editor.canCreate} canEdit={editor.canEdit} onSave={editor.onSave} onClose={() => setEditing(null)} />
+          )}
           {singles && sequences && (
             <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.7rem' }}>
               <button type="button" style={chipStyle(tab === 'single')} onClick={() => { setTab('single'); setPreview(null); }}>Single emails</button>
@@ -110,6 +143,9 @@ export default function EmailTemplatePicker({ singles = true, sequences = false,
                       onClick={() => { if (isSingle) onUseSingle?.(t as EmailTemplate); else onUseSequence?.(t as SequenceTemplate); setOpen(false); setPreview(null); }}>
                       {isSingle ? 'Use this template' : 'Create this sequence'}
                     </button>
+                    {editor && (editor.canCreate || ((t as EmailTemplate | SequenceTemplate).mine && editor.canEdit)) && (
+                      <button type="button" style={ghostSmall} onClick={() => startEdit(t)}>{(t as EmailTemplate | SequenceTemplate).mine ? 'Edit' : 'Customise'}</button>
+                    )}
                     {(t as EmailTemplate | SequenceTemplate).mine && onDeleteMine && (
                       <button type="button" style={{ ...ghostSmall, color: 'var(--red, #ef5350)' }}
                         onClick={() => { if (window.confirm(`Delete "${t.name}" for everyone in your organization?`)) onDeleteMine(t.id); }}>Delete</button>

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { listSaved, deleteSaved, type SavedKind, type SavedRow } from '../lib/savedTemplates';
+import { listSaved, deleteSaved, saveTemplate, updateTemplate, type SavedKind, type SavedRow } from '../lib/savedTemplates';
+import type { SaveInput, SaveMode } from '../components/TemplateEditor';
 
 // The team's saved templates of one kind. If they cannot be loaded (nothing saved yet, or the database step has not been run)
 // the list is simply empty and the built-in templates work as before.
@@ -17,5 +18,12 @@ export function useSavedTemplates(kind: SavedKind) {
     await reload();
   }, [reload]);
 
-  return { rows, reload, remove };
+  // What the template editor calls: change a saved template in place, or save a new one (a copy of a built-in, or one written from nothing).
+  const persist = useCallback(async (input: SaveInput, mode: SaveMode, savedId?: string) => {
+    if (mode === 'update' && savedId) await updateTemplate(supabase, savedId, input);
+    else await saveTemplate(supabase, input);
+    await reload();
+  }, [reload]);
+
+  return { rows, reload, remove, persist };
 }
