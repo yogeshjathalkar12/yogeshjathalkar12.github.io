@@ -4,7 +4,7 @@ import { api } from './env';
 import { commentRows, countSeries, dailySeries, fmtAgo, fmtNum, latest, videoTable, youtubeInsights } from './insights';
 import { Shell, grid } from './pagekit';
 import type { PageProps } from './pagekit';
-import { Bars, Card, Empty, InsightList, Notice, Spark, Tile, TileRow, buttonStyle, inputStyle, note } from './ui';
+import { Bars, Card, Empty, InsightList, Notice, ReplyComposer, Spark, Tile, TileRow, buttonStyle, note } from './ui';
 
 const channel = CHANNELS.find((c) => c.key === 'youtube')!;
 
@@ -18,17 +18,15 @@ export default function YouTubePage(props: PageProps) {
   const videos = videoTable(sigs).slice(0, 8);
   const comments = commentRows(sigs).slice(0, 15);
   const [open, setOpen] = useState<string | null>(null);
-  const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ tone: 'good' | 'warn'; text: string } | null>(null);
 
-  async function send(connectionId: string, commentId: string) {
+  async function send(connectionId: string, commentId: string, text: string) {
     setBusy(true);
     setMsg(null);
     try {
       await api.reply(connectionId, commentId, text);
       setOpen(null);
-      setText('');
       setMsg({ tone: 'good', text: 'Reply sent on YouTube.' });
       await props.reload();
     } catch (e: any) {
@@ -78,14 +76,9 @@ export default function YouTubePage(props: PageProps) {
               </div>
               <div style={{ fontSize: 13.5, color: 'var(--white)', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{c.text}</div>
               {signedIn && props.canManage && c.id && (c.replied ? <div style={note}>You replied.</div> : open === c.id ? (
-                <div style={{ marginTop: 6 }}>
-                  <textarea style={{ ...inputStyle, minHeight: 70, marginBottom: 8 }} maxLength={10000} value={text} placeholder="Write your reply. It is posted on YouTube as your channel when you press Send." onChange={(e) => setText(e.target.value)} />
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <button type="button" style={buttonStyle('primary', busy || !text.trim())} disabled={busy || !text.trim()} onClick={() => send(c.connectionId, c.id)}>{busy ? 'Sending…' : 'Send reply'}</button>
-                    <button type="button" style={buttonStyle('ghost', busy)} disabled={busy} onClick={() => { setOpen(null); setText(''); }}>Cancel</button>
-                  </div>
-                </div>
-              ) : <button type="button" style={{ ...buttonStyle('ghost'), marginTop: 6, padding: '4px 10px' }} onClick={() => { setOpen(c.id); setText(''); }}>Reply</button>)}
+                <ReplyComposer limit={10000} busy={busy} placeholder="Write your reply. It is posted on YouTube as your channel when you press Send." onCancel={() => setOpen(null)}
+                  onDraft={() => api.draftReply(c.connectionId, { text: c.text, author: c.author, context: c.video, kind: 'comment' })} onSend={(text) => send(c.connectionId, c.id, text)} />
+              ) : <button type="button" style={{ ...buttonStyle('ghost'), marginTop: 6, padding: '4px 10px' }} onClick={() => setOpen(c.id)}>Reply</button>)}
             </div>
           ))}
         </Card>

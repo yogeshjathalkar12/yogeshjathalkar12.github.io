@@ -1,0 +1,39 @@
+name: Refresh connections
+
+# Raptor's server has no clock of its own (free hosting), so something has to knock on its door. This does, once an hour: the server then
+# refreshes every connection (YouTube, Analytics, reviews, Facebook, Instagram, Lead Ads, news...) that has not been refreshed for 6 hours,
+# and sends the alerts that follow from anything new. Without this, connections only refresh when connected or when someone presses
+# "Refresh now". New Facebook/Instagram messages, comments and leads do not need it: Meta pushes those live.
+#
+# Needs one repository secret: AUTOMATION_CRON_SECRET, the same value as the AUTOMATION_CRON_SECRET variable on Render.
+# (GitHub: Settings > Secrets and variables > Actions > New repository secret.) A failed run emails the repo owner automatically.
+on:
+  schedule:
+    - cron: '17 * * * *' # every hour at :17 (GitHub may start it a few minutes late)
+  workflow_dispatch: {} # manual "run now" button in the Actions tab
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions: {}
+    steps:
+      - name: Ask the server to refresh what is due
+        env:
+          AUTOMATION_CRON_SECRET: ${{ secrets.AUTOMATION_CRON_SECRET }}
+        run: |
+          if [ -z "$AUTOMATION_CRON_SECRET" ]; then
+            echo "The AUTOMATION_CRON_SECRET repository secret is not set, so the server cannot be asked." >&2
+            exit 1
+          fi
+          # The free server sleeps when idle and takes up to a minute to wake, so wait generously and try again once.
+          for attempt in 1 2 3; do
+            code=$(curl -sS -o response.json -w '%{http_code}' --max-time 150 -X POST \
+              -H "X-Automation-Secret: $AUTOMATION_CRON_SECRET" \
+              https://websites-api-5wmu.onrender.com/api/raptor/connections/tick || echo 000)
+            echo "attempt $attempt: HTTP $code"
+            cat response.json 2>/dev/null; echo
+            if [ "$code" = "200" ]; then exit 0; fi
+            sleep 30
+          done
+          exit 1

@@ -132,6 +132,9 @@ export function makeApi(deps: ApiDeps) {
     saveSettings: (id: string, settings: Record<string, unknown>) => call('PATCH', `/${enc(id)}`, { settings }),
     action: (id: string, name: string, params: Record<string, unknown> = {}) => call('POST', `/${enc(id)}/action/${enc(name)}`, { params }),
     reply: (id: string, parentId: string, text: string) => call('POST', `/${enc(id)}/reply`, { parent_id: parentId, text }),
+    /** A suggested answer from the person's own AI key. Nothing is sent or saved; the person edits it and sends it with reply/action. */
+    draftReply: (id: string, input: { text: string; author?: string; context?: string; kind?: 'comment' | 'message' }) =>
+      call('POST', `/${enc(id)}/draft-reply`, input).then((r) => ({ draft: String(r.draft || ''), skip: !!r.skip })),
 
     /** Connections, and the last two months of signals of every channel that has one, grouped by channel. */
     async load(now = Date.now()): Promise<HubData> {

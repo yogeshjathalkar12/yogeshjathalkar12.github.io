@@ -195,3 +195,42 @@ export function Steps({ items }: { items: string[] }) {
     </ol>
   );
 }
+
+export interface DraftResult { draft: string; skip: boolean }
+
+/** The box a person writes a reply in. "Draft with AI" fills it with a suggestion from their own AI key; nothing is sent until they press Send. */
+export function ReplyComposer({ placeholder, busy, limit, onSend, onCancel, onDraft }: {
+  placeholder: string; busy: boolean; limit: number; onSend: (text: string) => void; onCancel: () => void; onDraft?: () => Promise<DraftResult>;
+}) {
+  const [text, setText] = useState('');
+  const [drafting, setDrafting] = useState(false);
+  const [hint, setHint] = useState<{ tone: 'info' | 'warn'; text: string } | null>(null);
+
+  async function draft() {
+    if (!onDraft) return;
+    setDrafting(true);
+    setHint(null);
+    try {
+      const out = await onDraft();
+      if (out.skip || !out.draft) setHint({ tone: 'info', text: 'The AI thinks this does not need an answer (it looks like spam or an advert). You can still write your own.' });
+      else { setText(out.draft.slice(0, limit)); setHint({ tone: 'info', text: 'AI draft. Read it, change anything you like, then press Send. It is not sent until you do.' }); }
+    } catch (e: any) {
+      setHint({ tone: 'warn', text: e.message || 'Could not draft a reply. Try again.' });
+    } finally {
+      setDrafting(false);
+    }
+  }
+
+  const stuck = busy || drafting;
+  return (
+    <div style={{ marginTop: 6 }}>
+      <textarea style={{ ...inputStyle, minHeight: 70, marginBottom: 8 }} maxLength={limit} value={text} placeholder={placeholder} onChange={(e) => setText(e.target.value)} />
+      {hint ? <div style={{ ...note, marginBottom: 8, color: hint.tone === 'warn' ? '#f59e0b' : 'var(--dim)' }}>{hint.text}</div> : null}
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <button type="button" style={buttonStyle('primary', stuck || !text.trim())} disabled={stuck || !text.trim()} onClick={() => onSend(text)}>{busy ? 'Sending…' : 'Send reply'}</button>
+        {onDraft ? <button type="button" style={buttonStyle('ghost', stuck)} disabled={stuck} onClick={draft}>{drafting ? 'Drafting…' : text.trim() ? 'Draft again with AI' : 'Draft with AI'}</button> : null}
+        <button type="button" style={buttonStyle('ghost', stuck)} disabled={stuck} onClick={onCancel}>Cancel</button>
+      </div>
+    </div>
+  );
+}

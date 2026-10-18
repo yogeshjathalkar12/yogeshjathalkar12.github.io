@@ -5,26 +5,13 @@ import { NETWORKS, conversations, countSeries, dailySeries, fmtAgo, fmtNum, late
 import type { Network } from './insights';
 import { Shell, grid } from './pagekit';
 import type { PageProps } from './pagekit';
-import { Bars, Card, Empty, InsightList, Notice, Spark, Tile, TileRow, buttonStyle, inputStyle, note } from './ui';
+import { Bars, Card, Empty, InsightList, Notice, ReplyComposer, Spark, Tile, TileRow, buttonStyle, note } from './ui';
 
 // Facebook and Instagram share one screen: a Page or an Instagram professional account has followers, posts, direct messages and comments,
 // and Meta lets a business answer a message only within 24 hours of the person's last one. The server enforces that rule too; the screen
 // shows how long each conversation has left so nothing is a surprise.
 
 type Msg = { tone: 'good' | 'warn'; text: string } | null;
-
-function Composer({ placeholder, busy, onSend, onCancel, limit }: { placeholder: string; busy: boolean; onSend: (text: string) => void; onCancel: () => void; limit: number }) {
-  const [text, setText] = useState('');
-  return (
-    <div style={{ marginTop: 6 }}>
-      <textarea style={{ ...inputStyle, minHeight: 70, marginBottom: 8 }} maxLength={limit} value={text} placeholder={placeholder} onChange={(e) => setText(e.target.value)} />
-      <div style={{ display: 'flex', gap: 8 }}>
-        <button type="button" style={buttonStyle('primary', busy || !text.trim())} disabled={busy || !text.trim()} onClick={() => onSend(text)}>{busy ? 'Sending…' : 'Send reply'}</button>
-        <button type="button" style={buttonStyle('ghost', busy)} disabled={busy} onClick={onCancel}>Cancel</button>
-      </div>
-    </div>
-  );
-}
 
 function SocialPage({ network, props }: { network: Network; props: PageProps }) {
   const names = NETWORKS[network];
@@ -90,7 +77,7 @@ function SocialPage({ network, props }: { network: Network; props: PageProps }) 
               </div>
               <div style={{ fontSize: 13.5, color: 'var(--white)', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{c.text}</div>
               {canReply && !c.replied && (c.windowOpen ? (open === `m:${c.senderId}` ? (
-                <Composer limit={1000} busy={busy} placeholder={`Write your reply. It is sent as ${isFacebook ? 'your Page' : 'your account'} when you press Send.`} onCancel={() => setOpen(null)}
+                <ReplyComposer limit={1000} busy={busy} placeholder={`Write your reply. It is sent as ${isFacebook ? 'your Page' : 'your account'} when you press Send.`} onCancel={() => setOpen(null)} onDraft={() => api.draftReply(c.connectionId, { text: c.text, author: c.from, kind: 'message' })}
                   onSend={(text) => send(() => api.action(c.connectionId, 'send_message', { recipient_id: c.senderId, text }), `Reply sent on ${names.label}.`)} />
               ) : (
                 <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginTop: 6, flexWrap: 'wrap' }}>
@@ -111,7 +98,7 @@ function SocialPage({ network, props }: { network: Network; props: PageProps }) 
               </div>
               <div style={{ fontSize: 13.5, color: 'var(--white)', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{c.text}</div>
               {canReply && c.id && (c.replied ? <div style={note}>You replied.</div> : open === `c:${c.id}` ? (
-                <Composer limit={isFacebook ? 8000 : 2200} busy={busy} placeholder={`Write your reply. It is posted publicly on ${names.label} when you press Send.`} onCancel={() => setOpen(null)}
+                <ReplyComposer limit={isFacebook ? 8000 : 2200} busy={busy} placeholder={`Write your reply. It is posted publicly on ${names.label} when you press Send.`} onCancel={() => setOpen(null)} onDraft={() => api.draftReply(c.connectionId, { text: c.text, author: c.author, kind: 'comment' })}
                   onSend={(text) => send(() => api.action(c.connectionId, 'reply_comment', { comment_id: c.id, text }), `Reply posted on ${names.label}.`)} />
               ) : <button type="button" style={{ ...buttonStyle('ghost'), marginTop: 6, padding: '4px 10px' }} onClick={() => setOpen(`c:${c.id}`)}>Reply</button>)}
             </div>
