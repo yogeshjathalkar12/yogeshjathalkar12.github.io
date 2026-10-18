@@ -85,8 +85,9 @@ export const PRO_COPY = {
     feature: 'Connections',
     headline: 'connecting your channels and data sources',
     points: [
-      'Link your YouTube channel and watch subscribers, views and new videos',
-      'More channels and data sources are added over time, on the same screen',
+      'One tab for each channel: YouTube, Google Analytics, Google reviews, payments, Slack and Teams, Telegram, SMS and news',
+      'A Home tab that reads across all of them and tells you what needs attention',
+      'Alerts the moment a payment arrives, a review comes in or someone shows buying interest',
       'Everything stays with your organization; keys are saved encrypted',
     ],
   },
