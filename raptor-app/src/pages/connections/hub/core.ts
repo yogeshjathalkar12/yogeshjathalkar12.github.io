@@ -14,6 +14,7 @@ export interface ActionDef { name: string; label: string; description: string; f
 export interface ProviderInfo {
   provider: string; title: string; description: string; category: string; channel: string; auth: 'none' | 'oauth'; can_reply: boolean; inbound: boolean;
   syncable: boolean; help: string[]; settings: string[]; available: boolean; min_sync_interval: number; fields: FieldDef[]; actions: ActionDef[];
+  unavailable_note?: string; restricted?: boolean;
   extra?: { events?: { value: string; label: string }[]; default_events?: string[] };
 }
 export interface Connection extends Conn { external_id: string | null; created_at: string; config: any }
@@ -38,6 +39,14 @@ export function friendlyLoadError(error: any): string {
   return 'Could not load your connections. Check your internet connection and try again.';
 }
 
+/** The sign-in service a connection type uses, for wording ("Sign in with Facebook"). */
+export const signInService = (provider: string): string => (provider.startsWith('meta_') ? 'Facebook' : 'Google');
+
+const EMAIL_SAFE = /^[^\s,()"%]+@[^\s,()"%]+$/;
+const digits = (value: string): string => value.replace(/\D/g, '').slice(-10);
+
+export interface LeadInput { name: string; email: string; phone: string; company: string; campaign: string; ad: string; leadId: string }
+
 export function makeApi(deps: ApiDeps) {
   const fetchFn = deps.fetchFn || fetch;
 
@@ -60,8 +69,59 @@ export function makeApi(deps: ApiDeps) {
 
   const enc = encodeURIComponent;
 
+  /** Which of these leads are already contacts in the CRM (matched by email, then by the last 10 digits of the phone). Returns their lead keys. */
+  async function leadsInCrm(leads: { email: string; phone: string }[]): Promise<Set<string>> {
+    const found = new Set<string>();
+    const emails = Array.from(new Set(leads.map((l) => l.email.trim()).filter((e) => EMAIL_SAFE.test(e)))).slice(0, 100);
+    const phones = Array.from(new Set(leads.map((l) => l.phone.trim()).filter(Boolean))).slice(0, 100);
+    const rows: { email: string | null; phone: string | null }[] = [];
+    if (emails.length) {
+      const { data } = await deps.supabase.from('contacts').select('email, phone').or(emails.map((e) => `email.ilike.${e}`).join(','));
+      rows.push(...(data || []));
+    }
+    if (phones.length) {
+      const { data } = await deps.supabase.from('contacts').select('email, phone').in('phone', phones);
+      rows.push(...(data || []));
+    }
+    const haveEmail = new Set(rows.map((r) => (r.email || '').trim().toLowerCase()).filter(Boolean));
+    const havePhone = new Set(rows.map((r) => digits(r.phone || '')).filter((d) => d.length >= 7));
+    leads.forEach((l) => {
+      if ((l.email && haveEmail.has(l.email.trim().toLowerCase())) || (digits(l.phone).length >= 7 && havePhone.has(digits(l.phone)))) found.add((l.email || l.phone).trim().toLowerCase());
+    });
+    return found;
+  }
+
+  /** Adds a lead to the CRM as a new contact, unless the same person is already there (same email or phone). Returns whether it was new. */
+  async function addLeadToCrm(lead: LeadInput): Promise<{ created: boolean }> {
+    const name = lead.name.trim() || lead.email.trim() || lead.phone.trim();
+    if (!name) throw new Error('This lead has no name, email or phone to save.');
+    if ((await leadsInCrm([lead])).size) return { created: false };
+    let companyId: string | null = null;
+    const company = lead.company.trim();
+    if (company) {
+      try {
+        const escaped = company.replace(/[\\%_]/g, (c) => `\\${c}`);
+        const { data: existing } = await deps.supabase.from('companies').select('id').ilike('name', escaped).limit(1);
+        if (existing && existing.length) companyId = existing[0].id;
+        else {
+          const { data: made } = await deps.supabase.from('companies').insert({ name: company }).select('id').single();
+          companyId = made ? made.id : null;
+        }
+      } catch { /* the company is kept in the contact's details below even if it could not be created */ }
+    }
+    const [first, ...rest] = name.split(/\s+/);
+    const { error } = await deps.supabase.from('contacts').insert({
+      name, first_name: first, last_name: rest.join(' ') || null, email: lead.email.trim() || null, phone: lead.phone.trim() || null, company_id: companyId, status: 'new',
+      custom_fields: { source: 'Facebook / Instagram Lead Ads', company: company || undefined, campaign: lead.campaign || undefined, ad: lead.ad || undefined, lead_id: lead.leadId || undefined },
+    });
+    if (error) throw new Error(/permission|policy|row-level/i.test(error.message || '') ? 'You do not have permission to add contacts. Ask your owner.' : 'Could not add this lead to the CRM. Try again.');
+    return { created: true };
+  }
+
   return {
     call,
+    leadsInCrm,
+    addLeadToCrm,
     providers: async (): Promise<ProviderInfo[]> => (await call('GET', '/providers')).providers || [],
     connect: (provider: string, inputs: Record<string, string>) => call('POST', '', { provider, inputs }).then((r) => r.connection as Connection),
     signIn: (provider: string) => call('POST', '/oauth/start', { provider }).then((r) => r.url as string),

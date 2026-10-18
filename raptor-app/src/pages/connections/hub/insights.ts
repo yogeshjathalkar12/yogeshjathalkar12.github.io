@@ -298,7 +298,7 @@ export function alertInsights(sigs: Sig[], now = NOW()): Insight[] {
 
 export const EVENT_NAMES: Record<string, string> = {
   payment_received: 'a payment came in', payment_failed: 'a payment failed', new_review: 'a new review', low_review: 'a low review', rating_drop: 'the rating dropped',
-  buying_comment: 'buying interest', new_message: 'a Telegram message', sync_error: 'a connection stopped working',
+  buying_comment: 'buying interest', new_message: 'a message', new_lead: 'a new lead', sync_error: 'a connection stopped working',
 };
 
 export function telegramInsights(sigs: Sig[], conns: Conn[], now = NOW()): Insight[] {
@@ -348,6 +348,127 @@ export function newsInsights(sigs: Sig[], now = NOW()): Insight[] {
   return out;
 }
 
+// ───────────── Facebook and Instagram ─────────────
+
+export type Network = 'facebook' | 'instagram';
+export const REPLY_WINDOW_MS = 24 * 3600000;       // Meta only allows a reply within 24 hours of the person's last message
+
+interface NetworkNames { label: string; followers: string; msg: string; comment: string; sent: string; postId: string; post: Record<string, string> }
+export const NETWORKS: Record<Network, NetworkNames> = {
+  facebook: { label: 'Facebook', followers: 'page_followers', msg: 'facebook_message', comment: 'facebook_comment', sent: 'facebook_reply_sent', postId: 'post_id',
+    post: { reactions: 'post_reactions', comments: 'post_comments', shares: 'post_shares' } },
+  instagram: { label: 'Instagram', followers: 'ig_followers', msg: 'instagram_message', comment: 'instagram_comment', sent: 'instagram_reply_sent', postId: 'media_id',
+    post: { likes: 'ig_post_likes', comments: 'ig_post_comments' } },
+};
+
+export interface Conversation { senderId: string; connectionId: string; from: string; text: string; at: string; count: number; replied: boolean; buying: boolean; windowOpen: boolean; hoursLeft: number }
+
+/** One row per person who wrote to you, newest first: their latest message, whether you answered it, and whether Meta still allows a reply. */
+export function conversations(sigs: Sig[], network: Network, now = NOW()): Conversation[] {
+  const n = NETWORKS[network];
+  const sent = named(sigs, n.sent).filter((s) => s.entity && s.entity.recipient_id);
+  const bySender: Record<string, Sig[]> = {};
+  named(sigs, n.msg).forEach((s) => { const id = s.entity && s.entity.sender_id; if (id) (bySender[id] = bySender[id] || []).push(s); });
+  return Object.entries(bySender).map(([senderId, msgs]) => {
+    const last = msgs[0];
+    const answered = sent.some((r) => r.entity.recipient_id === senderId && time(r) >= time(last));
+    const left = REPLY_WINDOW_MS - (now - time(last));
+    return {
+      senderId, connectionId: last.connection_id, from: (last.entity && last.entity.from) || 'Someone', text: last.text_value || '', at: last.occurred_at, count: msgs.length,
+      replied: answered, buying: msgs.some((m) => looksLikeBuying(m.text_value)) && !answered, windowOpen: left > 0, hoursLeft: Math.max(0, Math.ceil(left / 3600000)),
+    };
+  }).sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime());
+}
+
+export interface SocialComment { id: string; connectionId: string; author: string; text: string; at: string; replied: boolean; buying: boolean }
+
+export function socialComments(sigs: Sig[], network: Network): SocialComment[] {
+  const n = NETWORKS[network];
+  const replied = new Set(named(sigs, n.sent).map((s) => s.entity && s.entity.comment_id).filter(Boolean));
+  return named(sigs, n.comment).map((s) => ({
+    id: (s.entity && s.entity.comment_id) || '', connectionId: s.connection_id, author: (s.entity && s.entity.author) || 'Someone', text: s.text_value || '',
+    at: s.occurred_at, replied: replied.has(s.entity && s.entity.comment_id), buying: looksLikeBuying(s.text_value),
+  }));
+}
+
+export interface PostRow { id: string; title: string; url: string; numbers: Record<string, number>; total: number }
+
+/** The newest numbers of each recent post, the most engaging first. */
+export function postTable(sigs: Sig[], network: Network): PostRow[] {
+  const n = NETWORKS[network];
+  const rows: Record<string, PostRow> = {};
+  Object.entries(n.post).forEach(([key, name]) => {
+    named(sigs, name).forEach((s) => {
+      const id = s.entity && s.entity[n.postId];
+      if (!id || s.value === null) return;
+      const row = (rows[id] = rows[id] || { id, title: s.entity.title || 'Untitled post', url: s.entity.url || '', numbers: {}, total: 0 });
+      if (row.numbers[key] === undefined) row.numbers[key] = s.value as number;
+    });
+  });
+  return Object.values(rows).map((r) => ({ ...r, total: Object.values(r.numbers).reduce((a, b) => a + b, 0) })).sort((a, b) => b.total - a.total);
+}
+
+export function socialInsights(sigs: Sig[], network: Network, now = NOW()): Insight[] {
+  const n = NETWORKS[network];
+  const out: Insight[] = [];
+  const series = dailySeries(sigs, n.followers, 30, 'last', now).filter((p) => p.value !== null);
+  if (series.length >= 2) {
+    const d = (series[series.length - 1].value as number) - (series[0].value as number);
+    out.push({ tone: d > 0 ? 'good' : d < 0 ? 'warn' : 'info', text: d === 0 ? `Your ${n.label} follower count has not changed since Raptor started watching.` : `You ${d > 0 ? 'gained' : 'lost'} ${plural(Math.abs(d), 'follower')} on ${n.label} since Raptor started watching.` });
+  }
+  const convs = conversations(sigs, network, now);
+  const buying = convs.filter((c) => c.buying && c.windowOpen);
+  if (buying.length) out.push({ tone: 'warn', text: `${plural(buying.length, 'person', 'people')} asked about price, a demo or buying and ${buying.length === 1 ? 'is' : 'are'} still waiting. Reply within ${buying.length === 1 ? 'the' : 'their'} 24-hour window.` });
+  const waiting = convs.filter((c) => !c.replied && c.windowOpen && !c.buying);
+  if (waiting.length) out.push({ tone: 'info', text: `${plural(waiting.length, 'message')} ${waiting.length === 1 ? 'is' : 'are'} waiting for a reply and can still be answered.` });
+  const missed = convs.filter((c) => !c.replied && !c.windowOpen && time({ occurred_at: c.at } as Sig) > now - 7 * DAY);
+  if (missed.length) out.push({ tone: 'warn', text: `${plural(missed.length, 'message')} from the last 7 days went unanswered and can no longer be replied to here: ${n.label} only allows a reply within 24 hours.` });
+  const comments = socialComments(sigs, network);
+  const buyingComments = comments.filter((c) => c.buying && !c.replied);
+  if (buyingComments.length) out.push({ tone: 'warn', text: `${plural(buyingComments.length, 'comment')} ${buyingComments.length === 1 ? 'shows' : 'show'} buying interest and ${buyingComments.length === 1 ? 'has' : 'have'} no reply. Answer ${buyingComments.length === 1 ? 'it' : 'them'} first.` });
+  const open = comments.filter((c) => !c.replied && !c.buying).length;
+  if (open) out.push({ tone: 'info', text: `${plural(open, 'comment')} ${open === 1 ? 'is' : 'are'} waiting for a reply.` });
+  const top = postTable(sigs, network)[0];
+  if (top && top.total > 0) out.push({ tone: 'info', text: `Your most engaging recent post is “${top.title.slice(0, 60)}” with ${plural(top.total, 'interaction')}.` });
+  const week = named(sigs, n.msg).filter((s) => time(s) > now - 7 * DAY).length;
+  if (!out.length) out.push({ tone: 'info', text: week ? `${plural(week, 'message')} arrived in the last 7 days.` : `Nothing needs you on ${n.label} right now. New messages and comments appear here the moment they arrive.` });
+  return out;
+}
+
+// ───────────── Lead Ads ─────────────
+
+export interface LeadRow { id: string; connectionId: string; name: string; email: string; phone: string; company: string; campaign: string; ad: string; platform: string; at: string; answers: Record<string, string> }
+
+export function leadRows(sigs: Sig[]): LeadRow[] {
+  return named(sigs, 'lead').map((s) => {
+    const e = s.entity || {};
+    return { id: e.lead_id || s.occurred_at, connectionId: s.connection_id, name: e.name || '', email: e.email || '', phone: e.phone || '', company: e.company || '', campaign: e.campaign_name || '', ad: e.ad_name || '', platform: e.platform || '', at: s.occurred_at, answers: e.answers || {} };
+  });
+}
+
+export const leadKey = (l: { email: string; phone: string }): string => (l.email || l.phone).trim().toLowerCase();
+
+export function leadInsights(sigs: Sig[], inCrm: Set<string> | null = null, now = NOW()): Insight[] {
+  const rows = leadRows(sigs);
+  if (!rows.length) return [{ tone: 'info', text: 'No lead has arrived yet. When someone fills in one of your Facebook or Instagram lead forms, it appears here within seconds.' }];
+  const out: Insight[] = [];
+  const w = rows.filter((r) => new Date(r.at).getTime() > now - 7 * DAY).length;
+  const p = rows.filter((r) => { const t = new Date(r.at).getTime(); return t <= now - 7 * DAY && t > now - 14 * DAY; }).length;
+  const c = change(w, p || undefined);
+  out.push({ tone: c !== null && c <= -20 ? 'warn' : c !== null && c >= 20 ? 'good' : 'info', text: `${plural(w, 'lead')} in the last 7 days${c !== null ? `, ${c >= 0 ? 'up' : 'down'} ${Math.abs(c).toFixed(0)}% on the 7 days before (${p})` : ''}.` });
+  const fresh = rows.filter((r) => new Date(r.at).getTime() > now - DAY && (!inCrm || !inCrm.has(leadKey(r))));
+  if (fresh.length) out.push({ tone: 'warn', text: `${plural(fresh.length, 'lead')} arrived in the last 24 hours${inCrm ? ` and ${fresh.length === 1 ? 'is' : 'are'} not in your CRM yet` : ''}. Contact ${fresh.length === 1 ? 'them' : 'them all'} while the interest is fresh.` });
+  const byCampaign: Record<string, number> = {};
+  rows.forEach((r) => { if (r.campaign) byCampaign[r.campaign] = (byCampaign[r.campaign] || 0) + 1; });
+  const best = Object.entries(byCampaign).sort((a, b) => b[1] - a[1]);
+  if (best.length) out.push({ tone: 'info', text: `${best[0][0]} brought the most leads: ${best[0][1]} of ${rows.length}${best.length > 1 ? `, ahead of ${best[1][0]} (${best[1][1]})` : ''}.` });
+  const phone = rows.filter((r) => r.phone).length;
+  const email = rows.filter((r) => r.email).length;
+  if (phone / rows.length < 0.5) out.push({ tone: 'info', text: `Only ${Math.round((phone / rows.length) * 100)}% of your leads left a phone number. Add a phone question to the form if you want to call them.` });
+  else out.push({ tone: 'info', text: `${Math.round((phone / rows.length) * 100)}% of leads left a phone number and ${Math.round((email / rows.length) * 100)}% an email address.` });
+  return out;
+}
+
 // ───────────── Home: the overall picture ─────────────
 
 export interface HubData { connections: Conn[]; signals: Record<string, Sig[]> }   // signals grouped by channel key
@@ -391,13 +512,27 @@ export function overviewInsights(data: HubData, now = NOW()): Insight[] {
   }
   const tg = connsOf(data, ['telegram']);
   if (tg.length && !tg.some((c) => c.config && c.config.chat_id)) attention.push({ tone: 'warn', text: 'Send /start to your Telegram bot so Raptor knows where to send alerts.', tab: 'telegram' });
+  (['facebook', 'instagram'] as Network[]).forEach((net) => {
+    if (!connsOf(data, [net === 'facebook' ? 'meta_page' : 'meta_instagram']).length) return;
+    const sigs = data.signals[net] || [];
+    const hot = conversations(sigs, net, now).filter((c) => c.buying && c.windowOpen).length + socialComments(sigs, net).filter((c) => c.buying && !c.replied).length;
+    if (hot) attention.push({ tone: 'warn', text: `${plural(hot, 'person', 'people')} on ${NETWORKS[net].label} ${hot === 1 ? 'is' : 'are'} asking about buying and waiting for a reply.`, tab: net });
+    const followers = socialInsights(sigs, net, now).find((i) => /follower/.test(i.text));
+    if (followers) highlights.push({ ...followers, tab: net });
+  });
+  if (connsOf(data, ['meta_leads']).length) {
+    const rows = leadRows(data.signals.leads || []);
+    const fresh = rows.filter((r) => new Date(r.at).getTime() > now - DAY).length;
+    if (fresh) attention.push({ tone: 'info', text: `${plural(fresh, 'new lead')} from your Facebook and Instagram forms in the last 24 hours.`, tab: 'leads' });
+    if (rows.length) highlights.push({ ...leadInsights(data.signals.leads || [], null, now)[0], tab: 'leads' });
+  }
   const news = data.signals.news || [];
   if (connsOf(data, ['news_feed']).length) {
     const spike = newsInsights(news, now).find((i) => i.tone === 'warn');
     if (spike) attention.push({ ...spike, tab: 'news' });
     else highlights.push({ ...(newsInsights(news, now)[0]), tab: 'news' });
   }
-  const dataChannels = connsOf(data, ['youtube_public', 'youtube_account', 'ga4', 'google_reviews', 'razorpay', 'stripe', 'webhook']).length;
+  const dataChannels = connsOf(data, ['youtube_public', 'youtube_account', 'ga4', 'google_reviews', 'razorpay', 'stripe', 'webhook', 'meta_page', 'meta_instagram', 'meta_leads']).length;
   const alertChannels = connsOf(data, ['slack', 'teams', 'telegram']).length;
   if (dataChannels && !alertChannels) attention.push({ tone: 'info', text: 'Connect Slack, Teams or Telegram to hear about payments, reviews and buying interest the moment they happen.', tab: 'alerts' });
   return [...attention, ...highlights];
@@ -410,6 +545,9 @@ export function tabForProvider(provider: string): string {
   if (provider === 'razorpay' || provider === 'stripe' || provider === 'webhook') return 'payments';
   if (provider === 'slack' || provider === 'teams') return 'alerts';
   if (provider === 'telegram') return 'telegram';
+  if (provider === 'meta_instagram') return 'instagram';
+  if (provider === 'meta_page') return 'facebook';
+  if (provider === 'meta_leads') return 'leads';
   if (provider === 'sms_twilio') return 'sms';
   if (provider === 'news_feed') return 'news';
   return 'home';
@@ -430,6 +568,14 @@ export function activityFeed(data: HubData, limit = 14): Activity[] {
   (all.reviews || []).filter((s) => s.name === 'review').forEach((s) => out.push({ at: s.occurred_at, tab: 'reviews', label: `${Math.round(s.value || 0)}★ review`, text: (s.text_value || '').slice(0, 120), tone: (s.value || 0) <= 3 ? 'warn' : 'good' }));
   (all.youtube || []).filter((s) => s.name === 'comment' && !(s.entity && s.entity.mine)).forEach((s) => out.push({ at: s.occurred_at, tab: 'youtube', label: looksLikeBuying(s.text_value) ? 'Buying interest' : 'Comment', text: `${(s.entity && s.entity.author) || 'Someone'}: ${(s.text_value || '').slice(0, 100)}`, tone: looksLikeBuying(s.text_value) ? 'warn' : 'info' }));
   (all.telegram || []).filter((s) => s.name === 'telegram_message').forEach((s) => out.push({ at: s.occurred_at, tab: 'telegram', label: 'Telegram', text: `${(s.entity && s.entity.from) || 'Someone'}: ${(s.text_value || '').slice(0, 100)}`, tone: 'info' }));
+  (['facebook', 'instagram'] as Network[]).forEach((net) => {
+    const n = NETWORKS[net];
+    (all[net] || []).filter((s) => s.name === n.msg || s.name === n.comment).forEach((s) => {
+      const buying = looksLikeBuying(s.text_value);
+      out.push({ at: s.occurred_at, tab: net, label: buying ? 'Buying interest' : `${n.label} ${s.name === n.msg ? 'message' : 'comment'}`, text: `${(s.entity && (s.entity.from || s.entity.author)) || 'Someone'}: ${(s.text_value || '').slice(0, 100)}`, tone: buying ? 'warn' : 'info' });
+    });
+  });
+  (all.leads || []).filter((s) => s.name === 'lead').forEach((s) => out.push({ at: s.occurred_at, tab: 'leads', label: 'New lead', text: [s.entity && s.entity.name, s.entity && s.entity.email, s.entity && s.entity.phone].filter(Boolean).join(' · ') || 'see Lead Ads', tone: 'good' }));
   (all.news || []).forEach((s) => out.push({ at: s.occurred_at, tab: 'news', label: 'News', text: (s.text_value || '').slice(0, 120), tone: 'info' }));
   ['alerts', 'telegram'].forEach((k) => (all[k] || []).filter((s) => s.name === 'alert_sent').forEach((s) => out.push({ at: s.occurred_at, tab: k, label: 'Alert sent', text: (s.text_value || '').slice(0, 100), tone: 'info' })));
   (all.sms || []).filter((s) => s.name === 'sms_sent').forEach((s) => out.push({ at: s.occurred_at, tab: 'sms', label: 'SMS sent', text: `to ${(s.entity && s.entity.to) || ''}`, tone: 'info' }));

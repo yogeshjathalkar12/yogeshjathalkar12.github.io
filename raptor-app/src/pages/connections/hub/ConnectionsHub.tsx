@@ -3,13 +3,16 @@ import type { ReactElement } from 'react';
 import { CHANNELS, HOME } from './channels';
 import type { ProviderInfo } from './core';
 import { api, clearReturn, readReturn, useCanManage } from './env';
+import { tabForProvider } from './insights';
 import type { HubData } from './insights';
 import AnalyticsPage from './AnalyticsPage';
 import HomePage from './HomePage';
+import LeadsPage from './LeadsPage';
 import { AlertsPage, NewsPage, SmsPage, TelegramPage } from './MessagingPages';
 import PaymentsPage from './PaymentsPage';
 import type { PageProps } from './pagekit';
 import ReviewsPage from './ReviewsPage';
+import { FacebookPage, InstagramPage } from './SocialPages';
 import YouTubePage from './YouTubePage';
 import { Notice, buttonStyle, note } from './ui';
 
@@ -17,7 +20,7 @@ import { Notice, buttonStyle, note } from './ui';
 // has its own setup, its own numbers and its own insights; Home reads across all of them.
 
 const PAGES: Record<string, (props: PageProps) => ReactElement> = {
-  youtube: YouTubePage, analytics: AnalyticsPage, reviews: ReviewsPage, payments: PaymentsPage,
+  youtube: YouTubePage, instagram: InstagramPage, facebook: FacebookPage, leads: LeadsPage, analytics: AnalyticsPage, reviews: ReviewsPage, payments: PaymentsPage,
   alerts: AlertsPage, telegram: TelegramPage, sms: SmsPage, news: NewsPage,
 };
 
@@ -53,7 +56,10 @@ export default function ConnectionsHub() {
   useEffect(() => {
     const back = readReturn();
     if (back.connected || back.error) {
-      if (back.connected) { setTab('youtube'); setNotice({ tone: 'good', text: 'Connected with Google.' }); }
+      if (back.connected) {
+        setTab(tabForProvider(back.connected));
+        setNotice({ tone: 'good', text: back.connected.startsWith('meta_') ? 'Connected with Facebook. Your Pages, their Lead Ads and any linked Instagram accounts are set up.' : 'Connected with Google.' });
+      }
       if (back.error) setNotice({ tone: 'warn', text: back.error });
       clearReturn();
     }

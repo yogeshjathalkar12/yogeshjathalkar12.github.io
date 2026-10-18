@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import type { Channel } from './channels';
+import { signInService } from './core';
 import type { Connection, ProviderInfo } from './core';
 import { api, hooksBase, openUrl } from './env';
 import { fmtAgo } from './insights';
@@ -68,7 +69,7 @@ export default function ConnectPanel({ channel, providers, connections, reload, 
     setMessage(null);
     try {
       openUrl(await api.signIn(p.provider));
-      setMessage({ tone: 'info', text: 'Finish signing in with Google in your browser, then come back here.' });
+      setMessage({ tone: 'info', text: `Finish signing in with ${signInService(p.provider)} in your browser, then come back here.` });
     } catch (e: any) {
       setMessage({ tone: 'warn', text: e.message || 'Could not start the sign-in. Try again.' });
     } finally {
@@ -147,7 +148,7 @@ export default function ConnectPanel({ channel, providers, connections, reload, 
                       {c.status === 'paused' ? 'Resume' : 'Pause'}
                     </button>
                     <button type="button" style={buttonStyle('danger', busy !== null)} disabled={busy !== null}
-                      onClick={() => { if (window.confirm(`Disconnect "${c.label}"? Its saved numbers are removed too${p && p.auth === 'oauth' ? ', and Raptor’s access to your Google account is withdrawn' : ''}.`)) run(`del-${c.id}`, async () => { await api.remove(c.id); return 'Disconnected.'; }); }}>
+                      onClick={() => { if (window.confirm(`Disconnect "${c.label}"? Its saved numbers are removed too${p && p.auth === 'oauth' ? `, and Raptor’s saved access to your ${signInService(p.provider)} account is removed` : ''}.`)) run(`del-${c.id}`, async () => { await api.remove(c.id); return 'Disconnected.'; }); }}>
                       Disconnect
                     </button>
                   </div>
@@ -174,13 +175,13 @@ export default function ConnectPanel({ channel, providers, connections, reload, 
               <div style={{ ...note, marginBottom: 6 }}>{p.description}</div>
               {!p.available ? (
                 <Notice tone="info">
-                  {p.auth === 'oauth' ? 'Signing in with Google is not switched on for this Raptor server yet.' : `${p.title} is not switched on for this Raptor server yet.`} It needs a one-time setup by whoever runs Raptor; nothing is wrong on your side.
+                  {p.unavailable_note ? p.unavailable_note : `${p.auth === 'oauth' ? `Signing in with ${signInService(p.provider)}` : p.title} is not switched on for this Raptor server yet. It needs a one-time setup by whoever runs Raptor; nothing is wrong on your side.`}
                 </Notice>
               ) : null}
               {p.help.length > 0 && <Steps items={p.help} />}
               {p.auth === 'oauth' ? (
                 <button type="button" style={buttonStyle('primary', !p.available || busy !== null)} disabled={!p.available || busy !== null} onClick={() => signIn(p)}>
-                  {busy === `signin-${p.provider}` ? 'Opening Google…' : 'Sign in with Google'}
+                  {busy === `signin-${p.provider}` ? `Opening ${signInService(p.provider)}…` : p.provider.startsWith('meta_') ? 'Connect with Facebook' : 'Sign in with Google'}
                 </button>
               ) : (
                 <form onSubmit={(e) => { e.preventDefault(); submitAdd(p); }} style={{ maxWidth: 560 }}>

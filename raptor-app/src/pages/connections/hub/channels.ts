@@ -6,6 +6,9 @@ export const HOME = 'home';
 
 export const CHANNELS: Channel[] = [
   { key: 'youtube', label: 'YouTube', short: 'YouTube', providers: ['youtube_public', 'youtube_account'], blurb: 'Your channel, your videos and what viewers say about them.' },
+  { key: 'instagram', label: 'Instagram', short: 'Instagram', providers: ['meta_instagram'], blurb: 'Your followers and posts, and the direct messages and comments people send you.' },
+  { key: 'facebook', label: 'Facebook', short: 'Facebook', providers: ['meta_page'], blurb: 'Your Page’s followers and posts, and the messages and comments people send you.' },
+  { key: 'leads', label: 'Lead Ads', short: 'Lead Ads', providers: ['meta_leads'], blurb: 'People who fill in your Facebook and Instagram lead forms, the moment they do.' },
   { key: 'analytics', label: 'Google Analytics', short: 'Analytics', providers: ['ga4'], blurb: 'Who visits your website, what they read and where they come from.' },
   { key: 'reviews', label: 'Reviews', short: 'Reviews', providers: ['google_reviews'], blurb: 'Your Google star rating and what customers write about you.' },
   { key: 'payments', label: 'Payments & Webhooks', short: 'Payments', providers: ['razorpay', 'stripe', 'webhook'], blurb: 'Money coming in, from Razorpay, Stripe or any tool that can send a webhook.' },

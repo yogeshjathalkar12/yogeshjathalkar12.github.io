@@ -1,7 +1,7 @@
 import { CHANNELS } from './channels';
 import type { Channel } from './channels';
 import {
-  activityFeed, analyticsInsights, change, fmtAgo, fmtMoney, fmtNum, fmtPct, latest, named, overviewInsights, primaryCurrency, revenueWithin, reviewRows, time,
+  activityFeed, analyticsInsights, change, fmtAgo, fmtMoney, fmtNum, fmtPct, latest, leadRows, named, overviewInsights, primaryCurrency, revenueWithin, reviewRows, tabForProvider, time,
 } from './insights';
 import type { HubData } from './insights';
 import { grid } from './pagekit';
@@ -16,6 +16,9 @@ export function headline(key: string, data: HubData, now = Date.now()): { value:
   const conns = data.connections.filter((c) => CHANNELS.find((ch) => ch.key === key)!.providers.includes(c.provider));
   if (!conns.length) return null;
   if (key === 'youtube') { const v = latest(sigs, 'subscribers'); return { value: v !== undefined ? fmtNum(v) : '–', sub: 'subscribers' }; }
+  if (key === 'instagram') { const v = latest(sigs, 'ig_followers'); return { value: v !== undefined ? fmtNum(v) : '–', sub: 'followers' }; }
+  if (key === 'facebook') { const v = latest(sigs, 'page_followers'); return { value: v !== undefined ? fmtNum(v) : '–', sub: 'followers' }; }
+  if (key === 'leads') return { value: fmtNum(leadRows(sigs).filter((r) => new Date(r.at).getTime() > now - 7 * DAY).length), sub: 'leads, 7 days' };
   if (key === 'analytics') {
     const v = latest(sigs, 'ga_sessions_28d');
     const c = change(v, latest(sigs, 'ga_sessions_prev28d'));
@@ -57,7 +60,7 @@ export default function HomePage(props: PageProps) {
   const { data } = props;
   const insights = overviewInsights(data);
   const attention = insights.filter((i) => i.tone === 'warn');
-  const connected = data.connections.filter((c) => c.status === 'connected').length;
+  const connected = new Set(data.connections.filter((c) => c.status === 'connected').map((c) => tabForProvider(c.provider))).size;
   const feed = activityFeed(data);
   const pay = data.signals.payments || [];
   const cur = primaryCurrency(pay);
