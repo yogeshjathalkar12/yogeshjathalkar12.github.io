@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { useCredits } from '../hooks/CreditsContext';
 import { useOrg } from '../hooks/OrgContext';
+import { SECTION_NAME } from '../pages/connections/hub/channels';
 
 interface ProGateProps {
   /** Short name of the feature, e.g. "Email automation". */
@@ -82,7 +83,7 @@ export const PRO_COPY = {
     ],
   },
   connections: {
-    feature: 'Connections',
+    feature: SECTION_NAME,
     headline: 'connecting your channels and data sources',
     points: [
       'One tab for each channel: YouTube, Google Analytics, Google reviews, payments, Slack and Teams, Telegram, SMS and news',

@@ -8,6 +8,7 @@ import { NotificationBell } from '../components/NotificationBell';
 import { PaymentModal } from './PaymentModal';
 import GlobalSearch from '../components/GlobalSearch';
 import { WhatsAppDispatcher } from '../components/crm/WhatsAppDispatcher';
+import { SECTION_NAME } from '../pages/connections/hub/channels';
 
 // Profile photo from the sign-in provider (Google sends `picture`/`avatar_url`).
 // Password-only accounts have none, so they keep the initial-letter circle.
@@ -196,7 +197,7 @@ export function DashboardLayout() {
               <span className="dash-sidebar-icon">◉</span><span>WhatsApp</span>{proTag}
             </NavLink>
             <NavLink to="/connections" className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
-              <span className="dash-sidebar-icon">⌁</span><span>Connections</span>{proTag}
+              <span className="dash-sidebar-icon">⌁</span><span>{SECTION_NAME}</span>{proTag}
             </NavLink>
             {automationTools.map((tool) => (
               <NavLink key={tool.slug} to={tool.route} className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>

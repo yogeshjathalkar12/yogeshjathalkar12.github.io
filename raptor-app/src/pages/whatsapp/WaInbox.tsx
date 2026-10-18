@@ -3,6 +3,8 @@ import { supabase } from '../../lib/supabaseClient';
 import { fieldInputStyle, primaryBtnStyle } from '../../components/crm/Modal';
 import { relativeTime } from '../../lib/crmHelpers';
 import { toolApiBase } from '../../lib/config';
+import SendNow from '../../components/whatsapp/SendNow';
+import type { SendNowBody } from '../../components/whatsapp/SendNow';
 
 const WHATSAPP_API = toolApiBase('whatsapp');
 
@@ -118,6 +120,21 @@ export default function WaInbox() {
     await supabase.from('whatsapp_conversations').update({ status: 'waiting' }).eq('id', conv.id);
   }
 
+  // "Send a message now": one message delivered at once to any number (server: POST /send-now).
+  async function sendNow(body: SendNowBody) {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new Error('Not signed in.');
+    const resp = await fetch(`${WHATSAPP_API}/send-now`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+      body: JSON.stringify(body),
+    });
+    if (!resp.ok) {
+      const detail = await resp.json().catch(() => ({}));
+      throw new Error(typeof detail.detail === 'string' ? detail.detail : 'Could not send the message.');
+    }
+  }
+
   async function handleSendReply(e: React.FormEvent) {
     e.preventDefault();
     if (!replyText.trim() || !active) return;
@@ -155,6 +172,8 @@ export default function WaInbox() {
           {accounts.map((a) => (<option key={a.id} value={a.id}>{a.label}</option>))}
         </select>
       </div>
+
+      {accountId && <SendNow accountId={accountId} onSend={sendNow} />}
 
       <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexShrink: 0 }}>
         {STATUS_FILTERS.map((f) => (

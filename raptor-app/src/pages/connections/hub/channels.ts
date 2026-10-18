@@ -2,6 +2,9 @@
 
 export interface Channel { key: string; label: string; short: string; providers: string[]; blurb: string }
 
+// What this whole section is called in the sidebar, its page title and the upgrade screen. Change it here and everywhere follows.
+export const SECTION_NAME = 'Channels';
+
 export const HOME = 'home';
 
 export const CHANNELS: Channel[] = [

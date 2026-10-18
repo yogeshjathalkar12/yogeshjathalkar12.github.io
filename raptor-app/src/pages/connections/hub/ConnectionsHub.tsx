@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ReactElement } from 'react';
-import { CHANNELS, HOME } from './channels';
+import { CHANNELS, HOME, SECTION_NAME } from './channels';
 import type { ProviderInfo } from './core';
 import { api, clearReturn, readReturn, useCanManage } from './env';
 import { tabForProvider } from './insights';
@@ -93,7 +93,7 @@ export default function ConnectionsHub() {
   return (
     <div style={{ maxWidth: 1100 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
-        <h2 style={{ marginTop: 0 }}>Connections</h2>
+        <h2 style={{ marginTop: 0 }}>{SECTION_NAME}</h2>
         {data.connections.length > 0 && <button type="button" style={buttonStyle('ghost', refreshing)} disabled={refreshing} onClick={refreshAll}>{refreshing ? 'Refreshing…' : 'Refresh everything'}</button>}
       </div>
       <p style={{ ...note, marginTop: 0 }}>
