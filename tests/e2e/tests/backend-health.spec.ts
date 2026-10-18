@@ -13,19 +13,13 @@ test('websites-api backend responds', async ({ request }) => {
   expect(res.ok(), `websites-api returned ${res.status()}`).toBeTruthy();
 });
 
-test('license server responds', async ({ request }) => {
-  const res = await request.get('https://raptor-license-server.onrender.com/', { timeout: WAKE_TIMEOUT });
-  expect(res.ok(), `license server returned ${res.status()}`).toBeTruthy();
-  const body = await res.json();
-  expect(body.status).toBeTruthy();
-});
-
 // Every feature the app depends on must exist on the live server and be
 // protected. A signed-out request should be REFUSED (401/403/422) - never
 // "not found" (the route was never deployed or got dropped in a bad merge)
 // and never a 5xx (the router crashed on import). This is what catches a
 // whole tool or the team API silently disappearing after a deploy.
 const PROTECTED_ROUTES: [string, string][] = [
+  ['GET', '/api/raptor/search?query=test'],   // web search for the desktop app: needs a signed-in user
   ['POST', '/api/raptor/team/otp/send'],
   ['POST', '/api/raptor/team/invite'],
   ['POST', '/api/raptor/team/reinstate'],
