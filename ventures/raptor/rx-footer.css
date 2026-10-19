@@ -54,6 +54,10 @@ body.dark-mode .rx-footer,
   margin: 0.9rem 0 0; max-width: 260px;
 }
 .rx-byline { margin: 0.9rem 0 0; font-size: 0.7rem; letter-spacing: 0.08em; color: var(--rf-faint); }
+.rx-socials { margin-top: 1.4rem; }
+.rx-socials-label { display: block; margin: 0 0 1.1rem; font-size: 0.68rem; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; color: var(--rf-text); }
+.rx-socials a { display: block; margin: 0 0 0.7rem; font-size: 0.8rem; line-height: 1.4; color: var(--rf-muted); text-decoration: none; transition: color 0.2s; }
+.rx-socials a:hover { color: var(--rf-accent); }
 
 .rx-col h4 {
   margin: 0 0 1.1rem; font-size: 0.68rem; font-weight: 500;
