@@ -82,6 +82,16 @@ export const PRO_COPY = {
       'A shared inbox to reply to customers yourself',
     ],
   },
+  sms: {
+    feature: 'SMS',
+    headline: 'text messages that follow up and answer for you',
+    points: [
+      'Text people one at a time from your own Twilio number, never a blast',
+      'An inbox for replies, and follow-ups that stop the moment someone answers',
+      'Keyword auto-replies, and STOP is always respected',
+      'An SMS button on every pipeline card, or fully automatic for new deals',
+    ],
+  },
   connections: {
     feature: SECTION_NAME,
     headline: 'connecting your channels and data sources',

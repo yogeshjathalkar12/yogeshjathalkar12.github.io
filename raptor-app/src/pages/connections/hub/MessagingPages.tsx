@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { CHANNELS } from './channels';
 import type { Connection } from './core';
-import { api, openLink } from './env';
-import { EVENT_NAMES, alertInsights, countSeries, fmtAgo, fmtNum, named, newsInsights, newsRows, smsInsights, telegramInsights, time } from './insights';
+import { openLink } from './env';
+import { EVENT_NAMES, alertInsights, countSeries, fmtAgo, fmtNum, named, newsInsights, newsRows, telegramInsights, time } from './insights';
 import { Shell, connectionsOf, grid } from './pagekit';
 import type { PageProps } from './pagekit';
-import { Bars, Card, CopyBox, Empty, FieldInput, InsightList, Notice, Tile, TileRow, buttonStyle, initialValues, note } from './ui';
+import { Bars, Card, CopyBox, Empty, InsightList, Tile, TileRow, note } from './ui';
 
 const channelOf = (key: string) => CHANNELS.find((c) => c.key === key)!;
-export const SMS_DAILY_CAP = 200;   // keep in step with DAILY_CAP in the server's sms.py
+export { SmsPage, SMS_DAILY_CAP } from './SmsPage';
 
 function AlertLog({ sigs }: { sigs: PageProps['data']['signals'][string] }) {
   const rows = named(sigs, 'alert_sent').slice(0, 12);
@@ -69,79 +69,6 @@ export function TelegramPage(props: PageProps) {
         ))}
       </Card>
       <div style={{ margin: '14px 0' }}><AlertLog sigs={sigs} /></div>
-    </Shell>
-  );
-}
-
-export function SmsPage(props: PageProps) {
-  const channel = channelOf('sms');
-  const sigs = props.data.signals.sms || [];
-  const conns = connectionsOf(props.data, channel).filter((c) => c.status === 'connected');
-  const provider = props.providers.find((p) => p.provider === 'sms_twilio');
-  const action = provider && provider.actions.find((a) => a.name === 'send');
-  const [target, setTarget] = useState('');
-  const [values, setValues] = useState<Record<string, string>>(action ? initialValues(action.fields) : {});
-  const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState<{ tone: 'good' | 'warn'; text: string } | null>(null);
-  const chosen = conns.find((c) => c.id === target) || conns[0];
-  const sent = named(sigs, 'sms_sent');
-  const today = sent.filter((s) => time(s) >= new Date().setUTCHours(0, 0, 0, 0)).length;
-  const week = sent.filter((s) => time(s) > Date.now() - 7 * 86400000).length;
-  const length = (values.text || '').length;
-
-  async function send(e: React.FormEvent) {
-    e.preventDefault();
-    if (!chosen) return;
-    setBusy(true);
-    setMsg(null);
-    try {
-      await api.action(chosen.id, 'send', values);
-      setMsg({ tone: 'good', text: 'Message sent.' });
-      setValues({ ...values, text: '' });
-      await props.reload();
-    } catch (err: any) {
-      setMsg({ tone: 'warn', text: err.message });
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <Shell channel={channel} props={props}>
-      <TileRow>
-        <Tile label="Sent today" value={`${fmtNum(today)} / ${SMS_DAILY_CAP}`} tone={today >= SMS_DAILY_CAP * 0.8 ? 'warn' : undefined} />
-        <Tile label="Sent, last 7 days" value={fmtNum(week)} />
-      </TileRow>
-      {action && chosen && props.canManage && (
-        <div style={{ margin: '14px 0' }}>
-          <Card title="Send a text message">
-            {msg ? <Notice tone={msg.tone}>{msg.text}</Notice> : null}
-            <form onSubmit={send} style={{ maxWidth: 560 }}>
-              {conns.length > 1 && (
-                <div style={{ marginBottom: 12 }}>
-                  <select value={chosen.id} onChange={(e) => setTarget(e.target.value)} style={{ width: '100%', padding: 9, background: 'transparent', color: 'var(--white)', border: '1px solid var(--border)', borderRadius: 5 }}>
-                    {conns.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
-                  </select>
-                </div>
-              )}
-              {action.fields.map((f) => <FieldInput key={f.name} field={f} value={values[f.name] || ''} onChange={(v) => setValues({ ...values, [f.name]: v })} />)}
-              <div style={{ ...note, marginBottom: 10 }}>{length} characters{length > 160 ? ` · about ${Math.ceil(length / 153)} text segments` : ''}. Only text people who agreed to hear from you.</div>
-              <button type="submit" style={buttonStyle('primary', busy || !(values.to || '').trim() || !(values.text || '').trim())} disabled={busy || !(values.to || '').trim() || !(values.text || '').trim()}>{busy ? 'Sending…' : 'Send message'}</button>
-            </form>
-          </Card>
-        </div>
-      )}
-      <Card title="What this tells you"><InsightList items={smsInsights(sigs, SMS_DAILY_CAP)} /></Card>
-      <div style={{ margin: '14px 0' }}>
-        <Card title="Messages sent">
-          {sent.length === 0 ? <Empty>Nothing sent yet.</Empty> : sent.slice(0, 15).map((s) => (
-            <div key={s.occurred_at + (s.entity && s.entity.sid)} style={{ padding: '7px 0', borderTop: '1px solid var(--border)', fontSize: 13 }}>
-              <div style={{ ...note, fontSize: 12 }}>To {(s.entity && s.entity.to) || ''} · {fmtAgo(s.occurred_at)}</div>
-              <div style={{ color: 'var(--white)', whiteSpace: 'pre-wrap' }}>{s.text_value}</div>
-            </div>
-          ))}
-        </Card>
-      </div>
     </Shell>
   );
 }

@@ -64,6 +64,7 @@ import WaFlowBuilder from './pages/whatsapp/WaFlowBuilder';
 import WhatsappGuide from './pages/whatsapp/WhatsappGuide';
 
 /* connections */
+import SmsSection from './pages/connections/hub/SmsSection';
 import Connections from './pages/connections/Connections';
 
 /* playground */
@@ -142,6 +143,8 @@ export default function App() {
                       <Route path="triggers" element={<WaTriggers />} />
                       <Route path="guide" element={<WhatsappGuide />} />
                     </Route>
+
+                    <Route path="/sms" element={<ProGate {...PRO_COPY.sms}><SmsSection /></ProGate>} />
 
                     <Route path="/connections" element={<ProGate {...PRO_COPY.connections}><Connections /></ProGate>} />
 

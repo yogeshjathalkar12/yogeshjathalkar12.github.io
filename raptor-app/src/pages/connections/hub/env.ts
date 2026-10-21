@@ -3,9 +3,14 @@ import { useOrg } from '../../../hooks/OrgContext';
 import { toolApiBase } from '../../../lib/config';
 import { supabase } from '../../../lib/supabaseClient';
 import { makeApi } from './core';
+import { makeSmsApi } from './smsApi';
 
 export const hooksBase = toolApiBase('hooks');
 export const api = makeApi({ supabase, base: toolApiBase('connections'), getToken: async () => (await supabase.auth.getSession()).data.session?.access_token });
+
+const token = async () => (await supabase.auth.getSession()).data.session?.access_token;
+/** Text messages (SMS): inbox, follow-ups, auto-replies and the pipeline's SMS settings. */
+export const smsApi = makeSmsApi({ supabase, base: toolApiBase('sms'), getToken: token });
 
 /** Whether the signed-in person may connect, change and remove connections (the manage-automations permission). */
 export function useCanManage(): boolean {

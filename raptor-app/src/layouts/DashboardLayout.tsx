@@ -8,6 +8,7 @@ import { NotificationBell } from '../components/NotificationBell';
 import { PaymentModal } from './PaymentModal';
 import GlobalSearch from '../components/GlobalSearch';
 import { WhatsAppDispatcher } from '../components/crm/WhatsAppDispatcher';
+import { SmsDispatcher } from '../components/crm/SmsDispatcher';
 import { SECTION_NAME } from '../pages/connections/hub/channels';
 
 // Profile photo from the sign-in provider (Google sends `picture`/`avatar_url`).
@@ -196,6 +197,9 @@ export function DashboardLayout() {
             <NavLink to="/whatsapp" className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
               <span className="dash-sidebar-icon">◉</span><span>WhatsApp</span>{proTag}
             </NavLink>
+            <NavLink to="/sms" className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
+              <span className="dash-sidebar-icon">✆</span><span>SMS</span>{proTag}
+            </NavLink>
             <NavLink to="/connections" className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
               <span className="dash-sidebar-icon">⌁</span><span>{SECTION_NAME}</span>{proTag}
             </NavLink>
@@ -250,6 +254,7 @@ export function DashboardLayout() {
 
         <main className="dash-main">
           <WhatsAppDispatcher />
+          <SmsDispatcher />
           <Outlet />
         </main>
       </div>

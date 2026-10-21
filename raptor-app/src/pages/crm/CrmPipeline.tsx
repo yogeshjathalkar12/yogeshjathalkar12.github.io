@@ -8,6 +8,8 @@ import PipelineStagesModal from '../../components/crm/PipelineStagesModal';
 import DealDetailModal from '../../components/crm/DealDetailModal';
 import OutreachSettingsModal, { type OutreachMode } from '../../components/crm/OutreachSettingsModal';
 import WhatsAppSettingsModal, { type WhatsAppMode } from '../../components/crm/WhatsAppSettingsModal';
+import SmsSettingsModal, { type SmsMode } from '../../components/crm/SmsSettingsModal';
+import { smsApi } from '../connections/hub/env';
 import { dispatchCrmWhatsApp } from '../../lib/whatsappDispatch';
 import OwnerOnly from '../../components/OwnerOnly';
 import AssigneeFilter, { applyAssigneeFilter, useAssigneeFilter } from '../../components/crm/AssigneeFilter';
@@ -50,6 +52,19 @@ const WA_STATUS: Record<string, { text: string; color: string }> = {
 };
 const WA_IN_PROGRESS_OR_DONE = ['pending', 'sending', 'sent', 'delivered', 'read', 'replied'];
 
+// The same for the text message (SMS) on a deal card (table deal_sms, see db/migrations/2026-10-21_sms.sql).
+interface DealSms { status: string; error: string | null; }
+const SMS_STATUS: Record<string, { text: string; color: string }> = {
+  pending: { text: 'Queued, sending shortly', color: 'var(--dim)' },
+  sending: { text: 'Sending…', color: 'var(--purple)' },
+  sent: { text: 'Text sent', color: 'var(--green, #22c55e)' },
+  delivered: { text: 'Text delivered', color: 'var(--green, #22c55e)' },
+  replied: { text: 'Replied', color: 'var(--green, #22c55e)' },
+  failed: { text: 'Text failed', color: 'var(--red)' },
+  skipped: { text: 'Text not sent', color: '#eab308' },
+};
+const SMS_IN_PROGRESS_OR_DONE = ['pending', 'sending', 'sent', 'delivered', 'replied'];
+
 export default function CrmPipeline() {
   const { session } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -78,6 +93,12 @@ export default function CrmPipeline() {
   const [dealWa, setDealWa] = useState<Record<string, DealWa>>({});
   const [showWaSettings, setShowWaSettings] = useState(false);
   const [wasendingDealId, setWaSendingDealId] = useState<string | null>(null);
+
+  // And for text messages: an SMS button next to Call, Email and WhatsApp.
+  const [smsMode, setSmsMode] = useState<SmsMode>('off');
+  const [dealSms, setDealSms] = useState<Record<string, DealSms>>({});
+  const [showSmsSettings, setShowSmsSettings] = useState(false);
+  const [smsSendingDealId, setSmsSendingDealId] = useState<string | null>(null);
 
   // The board's own scrollbar sits at the very bottom, far from view on a long
   // board, so a mirrored one is shown on top and the two are kept in step.
@@ -171,6 +192,39 @@ export default function CrmPipeline() {
     }
   };
 
+  async function fetchSms() {
+    try {
+      const [settings, rows] = await Promise.all([
+        supabase.from('sms_settings').select('mode').maybeSingle(),
+        supabase.from('deal_sms').select('deal_id, status, error'),
+      ]);
+      if (settings.error || rows.error) return; // the database part is not installed yet: the board works as before
+      setSmsMode((settings.data?.mode as SmsMode) || 'off');
+      setDealSms(Object.fromEntries((rows.data || []).map((r: any) => [r.deal_id, { status: r.status, error: r.error }])));
+    } catch {
+      /* leave the cards as they were */
+    }
+  }
+
+  const handleSms = async (e: React.MouseEvent, deal: any) => {
+    e.stopPropagation();
+    setCallError(null);
+    setSmsSendingDealId(deal.id);
+    try {
+      const data = await smsApi.requestDeal(deal.id);
+      if (data.status === 'skipped' && data.error) setCallError(data.error);
+      await fetchSms();
+      if (data.status === 'pending') {
+        await smsApi.dispatch(); // send it now rather than waiting for the next check
+        await fetchSms();
+      }
+    } catch (err: any) {
+      setCallError(err.message || 'Could not queue the text message.');
+    } finally {
+      setSmsSendingDealId(null);
+    }
+  };
+
   const handleEmail = async (e: React.MouseEvent, deal: any) => {
     e.stopPropagation();
     setCallError(null);
@@ -193,6 +247,7 @@ export default function CrmPipeline() {
     fetchStages();
     fetchOutreach();
     fetchWhatsApp();
+    fetchSms();
 
     // Replicate the realtime listener from crm.html
     const channel = supabase.channel('crm-deals')
@@ -207,6 +262,9 @@ export default function CrmPipeline() {
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'deal_whatsapp' }, () => {
         fetchWhatsApp();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'deal_sms' }, () => {
+        fetchSms();
       })
       .subscribe();
 
@@ -353,6 +411,18 @@ export default function CrmPipeline() {
         >
           ◉ WhatsApp: {MODE_LABEL[waMode]}
         </button>
+        <button
+          onClick={() => setShowSmsSettings(true)}
+          title="Text message (SMS) automation for the pipeline"
+          style={{
+            background: smsMode === 'off' ? 'transparent' : 'rgba(168,85,247,0.12)', color: smsMode === 'off' ? 'var(--dim)' : 'var(--white)',
+            border: `1px solid ${smsMode === 'off' ? 'var(--border)' : 'var(--purple)'}`, padding: '0.6rem 1.1rem',
+            borderRadius: '4px', cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: '0.65rem',
+            letterSpacing: '0.08em', textTransform: 'uppercase',
+          }}
+        >
+          ✆ SMS: {MODE_LABEL[smsMode]}
+        </button>
         <OwnerOnly><button
           onClick={() => setShowImport(true)}
           style={{
@@ -460,6 +530,9 @@ export default function CrmPipeline() {
                         const canWa = waMode !== 'off' && !(wa && WA_IN_PROGRESS_OR_DONE.includes(wa.status));
                         const hasPhone = !!deal.contacts?.phone;
                         const waInfo = wa ? WA_STATUS[wa.status] : null;
+                        const sms = dealSms[deal.id];
+                        const canSms = smsMode !== 'off' && !(sms && SMS_IN_PROGRESS_OR_DONE.includes(sms.status));
+                        const smsInfo = sms ? SMS_STATUS[sms.status] : null;
                         return (
                           <>
                             <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
@@ -490,10 +563,26 @@ export default function CrmPipeline() {
                                   {wasendingDealId === deal.id ? 'Queuing…' : wa ? 'Retry WhatsApp' : 'WhatsApp'}
                                 </button>
                               )}
+                              {canSms && (
+                                <button
+                                  onClick={(e) => handleSms(e, deal)}
+                                  disabled={smsSendingDealId === deal.id || !hasPhone}
+                                  title={hasPhone ? 'Send your text message to this contact' : 'This contact has no phone number'}
+                                  style={{ fontSize: '0.55rem', padding: '0.3rem 0.6rem', flex: 1 }}
+                                >
+                                  {smsSendingDealId === deal.id ? 'Queuing…' : sms ? 'Retry SMS' : 'SMS'}
+                                </button>
+                              )}
                             </div>
                             {info && (
                               <div style={{ fontSize: '0.52rem', color: info.color, marginTop: '0.45rem', lineHeight: 1.5 }}>
                                 ✉ {info.text}{email.error && !['sent', 'replied', 'queued', 'accepted'].includes(email.status) ? `: ${email.error}` : ''}
+                              </div>
+                            )}
+                            {smsInfo && sms && (
+                              <div style={{ fontSize: '0.52rem', color: smsInfo.color, marginTop: '0.35rem', lineHeight: 1.5 }}>
+                                ✆ {sms.status === 'pending' && sms.error ? `Waiting: ${sms.error}` : smsInfo.text}
+                                {sms.error && !['pending', 'sent', 'delivered', 'replied'].includes(sms.status) ? `: ${sms.error}` : ''}
                               </div>
                             )}
                             {waInfo && (
@@ -531,6 +620,7 @@ export default function CrmPipeline() {
       )}
 
       <OutreachSettingsModal open={showOutreach} onClose={() => setShowOutreach(false)} onSaved={fetchOutreach} />
+      <SmsSettingsModal open={showSmsSettings} onClose={() => setShowSmsSettings(false)} onSaved={fetchSms} />
       <WhatsAppSettingsModal open={showWaSettings} onClose={() => setShowWaSettings(false)} onSaved={fetchWhatsApp} />
 
       <BulkImportModal

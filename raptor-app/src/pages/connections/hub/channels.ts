@@ -17,7 +17,7 @@ export const CHANNELS: Channel[] = [
   { key: 'payments', label: 'Payments & Webhooks', short: 'Payments', providers: ['razorpay', 'stripe', 'webhook'], blurb: 'Money coming in, from Razorpay, Stripe or any tool that can send a webhook.' },
   { key: 'alerts', label: 'Slack & Teams', short: 'Slack & Teams', providers: ['slack', 'teams'], blurb: 'Tell your team the moment something worth knowing happens.' },
   { key: 'telegram', label: 'Telegram', short: 'Telegram', providers: ['telegram'], blurb: 'Alerts in Telegram, and a bot people can message.' },
-  { key: 'sms', label: 'SMS', short: 'SMS', providers: ['sms_twilio'], blurb: 'Send text messages from your own Twilio number.' },
+  { key: 'sms', label: 'SMS', short: 'SMS', providers: ['sms_twilio'], blurb: 'Text people one at a time from your own Twilio number: an inbox, follow-ups that stop when they reply, and automatic answers.' },
   { key: 'news', label: 'News', short: 'News', providers: ['news_feed'], blurb: 'Headlines about your competitors, customers and topics.' },
 ];
 
