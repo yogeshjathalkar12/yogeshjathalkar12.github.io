@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free Company Audit | Raptor</title>
+<meta name="description" content="Enter a company's website and get a measured report in about a minute: website health, domain and email trust, how customers can reach it, and how it shows up on Google. Every finding shows how to check it yourself.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://shoonyaorigins.com/ventures/raptor/audit.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Raptor by Shoonya Origins">
+<meta property="og:title" content="Free Company Audit | Raptor">
+<meta property="og:description" content="A measured report on a company's website, domain, email set-up and Google visibility. Nothing guessed: every finding shows how to verify it.">
+<meta property="og:url" content="https://shoonyaorigins.com/ventures/raptor/audit.html">
+<meta property="og:image" content="https://shoonyaorigins.com/ventures/raptor/logo.png">
+<meta name="twitter:card" content="summary">
+<link rel="icon" type="image/x-icon" href="/ventures/raptor/icon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/ventures/raptor/site.css">
+<link rel="stylesheet" href="/ventures/raptor/rx-footer.css">
+<link rel="stylesheet" href="/ventures/raptor/buttons.css?v=1">
+<link rel="stylesheet" href="/ventures/raptor/download.css?v=1">
+<script src="/ventures/raptor/download.js?v=2" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+  :root { --ok:#15803d; --okbg:rgba(21,128,61,.12); --warn:#b45309; --warnbg:rgba(180,83,9,.13); --bad:#b91c1c; --badbg:rgba(185,28,28,.12); --info:#4b5563; --infobg:rgba(75,85,99,.12); }
+  body.dark-mode { --ok:#4ade80; --okbg:rgba(74,222,128,.12); --warn:#fbbf24; --warnbg:rgba(251,191,36,.12); --bad:#f87171; --badbg:rgba(248,113,113,.13); --info:#a1a1aa; --infobg:rgba(161,161,170,.12); }
+  .au-wrap { max-width: 980px; margin: 0 auto; padding: 0 1.5rem 5rem; }
+  .au-hero { padding: 4rem 0 2rem; }
+  .au-eyebrow { font-size: .68rem; letter-spacing: .3em; text-transform: uppercase; color: var(--purple); margin-bottom: 1rem; }
+  .au-hero h1 { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: clamp(2.8rem, 8vw, 5rem); line-height: .95; letter-spacing: .02em; }
+  .au-hero h1 span { background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .au-hero p { font-family: 'Instrument Serif', serif; font-size: 1.25rem; color: var(--dim); max-width: 640px; margin-top: 1.2rem; line-height: 1.5; }
+  .au-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 1.8rem; margin-top: 1.5rem; }
+  .au-card h2 { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 1.7rem; letter-spacing: .04em; margin-bottom: .3rem; }
+  .au-card .au-sub { color: var(--dim); font-size: .8rem; margin-bottom: 1.2rem; }
+  .au-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .au-field { display: flex; flex-direction: column; gap: .35rem; }
+  .au-field.full { grid-column: 1 / -1; }
+  .au-field label { font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
+  .au-field label i { color: var(--pink); font-style: normal; }
+  .au-field input, .au-field select, .au-field textarea { font: inherit; font-size: .9rem; color: var(--white); background: var(--black); border: 1px solid var(--border); border-radius: 12px; padding: .75rem .9rem; width: 100%; }
+  .au-field textarea { min-height: 84px; resize: vertical; }
+  .au-field input:focus, .au-field select:focus, .au-field textarea:focus { outline: 2px solid var(--purple); outline-offset: 1px; }
+  .au-hint { font-size: .68rem; color: var(--dim); }
+  .au-actions { display: flex; gap: .8rem; flex-wrap: wrap; align-items: center; margin-top: 1.4rem; }
+  .au-btn { border-radius: var(--btn-radius, 14px); font: inherit; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; padding: .95rem 1.7rem; border: 0; cursor: pointer; background: var(--grad); color: #fff; text-decoration: none; display: inline-block; }
+  .au-btn.ghost { background: transparent; color: var(--white); border: 1px solid var(--border); }
+  .au-btn[disabled] { opacity: .55; cursor: wait; }
+  .au-error { color: var(--bad); font-size: .85rem; margin-top: .9rem; }
+  .au-note { color: var(--dim); font-size: .75rem; margin-top: .9rem; }
+  [hidden] { display: none !important; }
+
+  .au-steps { list-style: none; display: grid; gap: .45rem; margin-top: 1rem; }
+  .au-steps li { font-size: .85rem; color: var(--dim); display: flex; gap: .6rem; align-items: center; }
+  .au-steps li::before { content: ''; width: 9px; height: 9px; border-radius: 50%; background: var(--border); flex: none; }
+  .au-steps li.done { color: var(--white); }
+  .au-steps li.done::before { background: var(--ok); }
+  .au-steps li.run::before { background: var(--purple); animation: au-pulse 1s infinite; }
+  @keyframes au-pulse { 50% { opacity: .3; } }
+
+  .au-report { margin-top: 2.5rem; overflow-wrap: anywhere; }
+  .au-cover { display: grid; grid-template-columns: auto 1fr; gap: 2rem; align-items: center; }
+  .au-ring { --v: 0; width: 150px; height: 150px; border-radius: 50%; display: grid; place-items: center; background: conic-gradient(var(--purple) calc(var(--v) * 1%), var(--border) 0); position: relative; }
+  .au-ring::after { content: ''; position: absolute; inset: 12px; border-radius: 50%; background: var(--black); }
+  .au-ring b { position: relative; z-index: 1; font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 3.2rem; line-height: 1; }
+  .au-ring small { position: relative; z-index: 1; display: block; font-size: .6rem; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); text-align: center; }
+  .au-cover h2 { font-size: clamp(1.8rem, 5vw, 2.6rem); }
+  .au-meta { color: var(--dim); font-size: .78rem; line-height: 1.7; }
+  .au-counts { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .9rem; }
+  .au-chip { display: inline-block; font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; padding: .25rem .6rem; border-radius: 999px; white-space: nowrap; }
+  .au-chip.pass { color: var(--ok); background: var(--okbg); }
+  .au-chip.warn { color: var(--warn); background: var(--warnbg); }
+  .au-chip.issue { color: var(--bad); background: var(--badbg); }
+  .au-chip.info { color: var(--info); background: var(--infobg); }
+  .au-chip.unknown { color: var(--dim); border: 1px dashed var(--border); }
+  .au-told { margin-top: 1rem; padding: .8rem 1rem; border-left: 3px solid var(--purple); background: var(--card); font-family: 'Instrument Serif', serif; font-size: 1.05rem; }
+  .au-top { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-top: 1rem; }
+  .au-top > div { border: 1px solid var(--border); border-radius: 14px; padding: 1.1rem; background: var(--card); }
+  .au-top h4 { font-size: .95rem; font-weight: 500; margin: .6rem 0 .3rem; }
+  .au-top p { font-size: .8rem; color: var(--dim); }
+  .au-top .v { font-size: .8rem; color: var(--white); }
+  .au-sec { margin-top: 2.6rem; }
+  .au-sec > h3 { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 1.9rem; letter-spacing: .04em; border-bottom: 1px solid var(--border); padding-bottom: .5rem; }
+  .au-check { padding: 1rem 0; border-bottom: 1px solid var(--border); }
+  .au-check.unknown { opacity: .78; }
+  .au-row { display: flex; gap: .8rem; align-items: baseline; flex-wrap: wrap; }
+  .au-row strong { font-weight: 500; font-size: .95rem; }
+  .au-val { font-size: .8rem; color: var(--dim); }
+  .au-check p { font-size: .82rem; color: var(--text2); margin-top: .4rem; max-width: 760px; }
+  .au-check details { margin-top: .5rem; font-size: .74rem; color: var(--dim); }
+  .au-check summary { cursor: pointer; color: var(--purple); }
+  .au-check details div { margin-top: .35rem; line-height: 1.6; }
+  .au-tools { display: flex; flex-wrap: wrap; align-items: center; gap: .8rem; margin: 1.2rem 0 0; font-size: .75rem; color: var(--dim); }
+  .au-table-wrap { overflow-x: auto; margin-top: 1rem; border: 1px solid var(--border); border-radius: 14px; }
+  .au-table { border-collapse: collapse; width: 100%; font-size: .78rem; min-width: 560px; }
+  .au-table th, .au-table td { padding: .65rem .8rem; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+  .au-table th { overflow-wrap: normal; word-break: normal; min-width: 74px; font-weight: 500; font-size: .66rem; letter-spacing: .08em; text-transform: uppercase; color: var(--dim); }
+  .au-table tr:last-child td { border-bottom: 0; }
+  .au-table.wide { min-width: 1100px; }
+  .au-table th:first-child, .au-table td:first-child { min-width: 200px; overflow-wrap: break-word; }
+  .au-table td.c { text-align: center; }
+  .au-rownote { display: block; font-size: .66rem; color: var(--dim); font-weight: 400; margin-top: .2rem; }
+  .au-table tr.me td:first-child { font-weight: 500; }
+  .au-sym { font-weight: 500; }
+  .au-sym.pass { color: var(--ok); } .au-sym.warn { color: var(--warn); } .au-sym.issue { color: var(--bad); } .au-sym.unknown, .au-sym.info { color: var(--dim); }
+  .au-fixes { list-style: none; counter-reset: fix; margin-top: 1rem; display: grid; gap: .9rem; }
+  .au-fixes li { counter-increment: fix; border: 1px solid var(--border); border-radius: 14px; padding: 1rem 1rem 1rem 3.2rem; position: relative; background: var(--card); }
+  .au-fixes li::before { content: counter(fix); position: absolute; left: 1rem; top: .9rem; font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .au-fixes b { font-weight: 500; }
+  .au-fixes p { font-size: .82rem; color: var(--text2); margin-top: .25rem; }
+  .au-fixes .rx { color: var(--purple); }
+  .au-legend { font-size: .75rem; color: var(--dim); line-height: 1.8; margin-top: .8rem; max-width: 780px; }
+  .au-cta { margin-top: 1.6rem; padding: 1.4rem; border-radius: 16px; background: var(--grad); color: #fff; display: flex; gap: 1rem; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+  .au-cta p { font-family: 'Instrument Serif', serif; font-size: 1.2rem; max-width: 560px; }
+  .au-cta a { background: #fff; color: #1c1018; padding: .85rem 1.4rem; text-decoration: none; font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; border-radius: 12px; }
+  @media (max-width: 640px) {
+    .au-grid { grid-template-columns: 1fr; }
+    .au-cover { grid-template-columns: 1fr; justify-items: start; }
+    .rx-nav { padding-left: 1rem; padding-right: 1rem; }
+  }
+  @media print {
+    .rx-nav, .rx-footer, .au-hero, #gate, #auditForm, #progress, .au-tools, .au-noprint, .skip-link { display: none !important; }
+    body { background: #fff !important; color: #111 !important; }
+    .au-wrap { max-width: none; padding: 0; }
+    .au-report { margin-top: 0; }
+    .au-ring::after { background: #fff; }
+    .au-sec, .au-fixes li, .au-top > div { break-inside: avoid; }
+    .au-check.unknown { opacity: 1; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="rx-nav" aria-label="Main">
+  <a class="rx-logo" href="/ventures/raptor/"><img src="/ventures/raptor/logo.png" alt="" width="36" height="36"><span class="rx-wordmark">Raptor</span></a>
+  <ul class="rx-links" id="rxLinks">
+    <li><a href="/ventures/raptor/features/">Features</a></li>
+    <li><a href="/ventures/raptor/why-raptor.html">Why Raptor</a></li>
+    <li><a href="/ventures/raptor/pricing/">Pricing</a></li>
+    <li><a href="/ventures/raptor/tools/">Tools</a></li>
+    <li><a href="/ventures/raptor/audit.html" aria-current="page">Audit</a></li>
+    <li><a href="/about/blogs/">Blog</a></li>
+    <li class="rx-mobile-only"><a href="/ventures/raptor/?auth=login">Log in</a></li>
+  </ul>
+  <div class="rx-actions">
+    <button class="rx-toggle" id="themeToggle" type="button" aria-pressed="false">Dark mode</button>
+    <a class="rx-login" href="/ventures/raptor/?auth=login">Log in</a>
+    <button type="button" class="btn-main" data-download>Download</button>
+    <button class="rx-menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="rxLinks">Menu</button>
+  </div>
+</nav>
+
+<main id="main" class="au-wrap">
+  <section class="au-hero">
+    <div class="au-eyebrow">Free tool</div>
+    <h1>Company <span>audit</span></h1>
+    <p>Type in a company's website and get a short report in about a minute: its website, its domain and email set-up, how customers can reach it, and how it shows up on Google. Every finding is measured, not guessed, and shows how to check it yourself.</p>
+  </section>
+
+  <section class="au-card" id="gate" hidden>
+    <h2>Sign in to run an audit</h2>
+    <p class="au-sub">Audits are free with a Raptor account. Use the same email and password as the Raptor app.</p>
+    <form id="gateForm" class="au-grid" novalidate>
+      <div class="au-field"><label for="gEmail">Email</label><input id="gEmail" type="email" autocomplete="email" required></div>
+      <div class="au-field"><label for="gPass">Password</label><input id="gPass" type="password" autocomplete="current-password" required></div>
+      <div class="au-actions full" style="grid-column:1/-1">
+        <button class="au-btn" type="submit" id="gateBtn">Sign in</button>
+        <a class="au-btn ghost" href="/ventures/raptor/?auth=signup">Create a free account</a>
+      </div>
+    </form>
+    <p class="au-error" id="gateError" role="alert" hidden></p>
+  </section>
+
+  <form class="au-card" id="auditForm" hidden novalidate>
+    <h2>Who are we looking at?</h2>
+    <p class="au-sub">Only the first two boxes are required. The rest make the report sharper.</p>
+    <div class="au-grid">
+      <div class="au-field"><label for="fCompany">Company name <i>*</i></label><input id="fCompany" maxlength="120" placeholder="Acme Robots Pvt Ltd" autocomplete="off"></div>
+      <div class="au-field"><label for="fSite">Website <i>*</i></label><input id="fSite" maxlength="300" placeholder="acme.com" autocomplete="off" inputmode="url"></div>
+      <div class="au-field"><label for="fCity">City or area</label><input id="fCity" maxlength="80" placeholder="Pune, Maharashtra, India" autocomplete="off"><span class="au-hint">Used for the Google searches. Write it like Google does: city, state, country.</span></div>
+      <div class="au-field"><label for="fPreset">Type of company</label>
+        <select id="fPreset">
+          <option value="general">Any company</option>
+          <option value="local">Local service or retail</option>
+          <option value="b2b">B2B or manufacturer</option>
+          <option value="online">SaaS or online business</option>
+        </select><span class="au-hint">Only changes which sections come first.</span></div>
+      <div class="au-field full"><label for="fKeywords">Searches customers would type (up to 5, one per line)</label><textarea id="fKeywords" placeholder="warehouse robots pune&#10;industrial automation supplier"></textarea><span class="au-hint">We check where the company ranks for each. Leave empty to check only its own name.</span></div>
+      <div class="au-field full"><label for="fComps">Competitors' websites (up to 3, one per line)</label><textarea id="fComps" placeholder="rival.com&#10;othercompany.in"></textarea><span class="au-hint">Use the ones the company would name itself. We never guess competitors.</span></div>
+      <div class="au-field full"><label for="fNote">The one thing hurting them (optional)</label><input id="fNote" maxlength="300" placeholder="For example: leads are slow, or we are not found on Google" autocomplete="off"></div>
+    </div>
+    <div class="au-actions">
+      <button class="au-btn" type="submit" id="runBtn">Run audit</button>
+      <span class="au-note" id="lastWrap" hidden>Last report: <a href="#" id="lastLink"></a></span>
+    </div>
+    <p class="au-error" id="formError" role="alert" hidden></p>
+    <p class="au-note">Public pages and official sources only. We stop at any site that refuses automated visits and never try to get around it. A finding we could not check is shown as "couldn't check", never as a problem.</p>
+  </form>
+
+  <section class="au-card" id="progress" hidden aria-live="polite">
+    <h2 id="progTitle">Running the audit</h2>
+    <p class="au-sub" id="progSub">This takes about a minute. You can leave this tab open.</p>
+    <ul class="au-steps" id="steps"></ul>
+  </section>
+
+  <section class="au-report" id="report" hidden></section>
+</main>
+
+<footer class="rx-footer">
+  <div class="rx-footer-grid">
+    <div class="rx-col rx-col-brand">
+      <a class="rx-brand-link" href="/ventures/raptor/"><img src="/ventures/raptor/logo.png" alt="" width="40" height="40"><span class="rx-footer-wordmark">Raptor</span></a>
+      <p class="rx-tagline">The self-learning AI sales brain for B2B teams.</p>
+      <p class="rx-byline">By Shoonya Origins &middot; Pune, India</p>
+      <div class="rx-socials">
+        <span class="rx-socials-label">Socials</span>
+        <a href="https://www.youtube.com/@Raptor.ShoonyaOrigin" target="_blank" rel="noopener">YouTube</a>
+        <a href="https://www.instagram.com/raptor.shoonyaorigins/" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://www.linkedin.com/company/raptor-by-shoonya/" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
+    </div>
+    <div class="rx-col">
+      <h4>About Raptor</h4>
+      <a href="/ventures/raptor/why-raptor.html">Why Raptor</a>
+      <a href="/ventures/raptor/#loop">How It Works</a>
+      <a href="/ventures/raptor/#who">Who It's For</a>
+      <a href="/ventures/raptor/pricing/">Pricing</a>
+      <a href="/about/">About Shoonya Origins</a>
+    </div>
+    <div class="rx-col">
+      <h4>Features</h4>
+      <a href="/ventures/raptor/features/company-dna.html">Company DNA</a>
+      <a href="/ventures/raptor/features/autonomous-prospecting.html">Autonomous Prospecting</a>
+      <a href="/ventures/raptor/features/competitive-intelligence.html">Competitive Intelligence</a>
+      <a href="/ventures/raptor/features/ai-pitch-studio.html">AI Pitch Studio</a>
+      <a href="/ventures/raptor/features/live-call-intelligence.html">Live Call Intelligence</a>
+      <a href="/ventures/raptor/features/self-learning-engine.html">Self-Learning Engine</a>
+      <a href="/ventures/raptor/features/outreach-automation.html">Outreach Automation</a>
+      <a href="/ventures/raptor/features/free-crm.html">Free CRM</a>
+      <a href="/ventures/raptor/features/sales-arsenal.html">Sales Arsenal</a>
+      <a href="/ventures/raptor/features/local-first-privacy.html">Local-First &amp; Private</a>
+      <a href="/ventures/raptor/features/ai-sdr-autopilot.html">AI SDR Autopilot</a>
+      <a href="/ventures/raptor/features/reply-engine-meetings.html">Replies &amp; Meeting Booking</a>
+      <a href="/ventures/raptor/features/prospect-scoring-engine.html">Prospect Scoring Engine</a>
+      <a href="/ventures/raptor/features/linkedin-whatsapp-outreach.html">LinkedIn &amp; WhatsApp Outreach</a>
+      <a href="/ventures/raptor/features/">All features &rarr;</a>
+    </div>
+    <div class="rx-col">
+      <h4>Legal</h4>
+      <a href="/ventures/raptor/terms.html">Terms &amp; Conditions</a>
+      <a href="/ventures/raptor/privacy.html">Privacy Policy</a>
+      <a href="/about/disclaimer.html">Legal Disclaimer</a>
+    </div>
+    <div class="rx-col">
+      <h4>My Account</h4>
+      <a href="/ventures/raptor/?auth=login">Log In</a>
+      <a href="/ventures/raptor/?auth=signup">Create Account</a>
+      <a href="https://raptor-download.yogeshjathalkar.workers.dev/Raptor-Setup-0.1.13.exe">Download for Windows</a>
+      <a href="https://raptor-download.yogeshjathalkar.workers.dev/Raptor-0.1.13-mac-arm64.dmg">Download for Mac (beta)</a>
+      <a href="/ventures/raptor/install-mac.html">Mac install guide</a>
+      <a href="mailto:contact@shoonyaorigins.com">Contact Us</a>
+    </div>
+  </div>
+  <div class="rx-bottom">
+    <p>Copyright 2026 Raptor. Built by Shoonya Origins for B2B sales teams.</p>
+    <p>This venture is incubated under Shoonya Origins.</p>
+  </div>
+</footer>
+
+<script src="/ventures/raptor/site.js"></script>
+<script>
+(function () {
+  'use strict';
+  var SB_URL = 'https://pcdbtcpctlnvdtbrrqoo.supabase.co', SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjZGJ0Y3BjdGxudmR0YnJycW9vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI2MjIxMjQsImV4cCI6MjA5ODE5ODEyNH0._y59k8mmSqvkCL9gPBWp5hfp2LwpP_IBvr5h7y3nP7Q';
+  var API = null;
+  try { API = localStorage.getItem('raptor_api_url'); } catch (e) { /* storage blocked */ }
+  API = (API || 'https://websites-api-5wmu.onrender.com').replace(/\/+$/, '') + '/api/raptor/audit';
+  var sb = window.supabase ? window.supabase.createClient(SB_URL, SB_KEY) : null;
+
+  var $ = function (id) { return document.getElementById(id); };
+  var STATUS_LABEL = { pass: 'Good', warn: 'Could be better', issue: 'Problem', info: 'Fact', unknown: "Couldn't check" };
+  var SYMBOL = { pass: '✓', warn: '~', issue: '✗', info: '–', unknown: '?' };
+  var STEPS = [['website', 'Reading the website and its security'], ['domain_email', 'Checking the domain and email set-up'], ['funnel', 'Looking for ways customers can reach the company'],
+               ['visibility', 'Searching Google, reviews and news'], ['history', 'Reading the site history'], ['competitors', 'Comparing with competitors']];
+  var token = null, polling = null;
+
+  function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined && text !== null) n.textContent = String(text); return n; }
+  function show(node, on) { node.hidden = !on; }
+  function say(node, text) { node.textContent = text; show(node, !!text); }
+  function lines(text, max) { return (text || '').split(/\r?\n/).map(function (s) { return s.trim(); }).filter(Boolean).slice(0, max); }
+
+  // ---------- sign-in ----------
+  function gate(session) {
+    token = session ? session.access_token : null;
+    show($('gate'), !token); show($('auditForm'), !!token);
+    if (token) showLast();
+  }
+  if (sb) {
+    sb.auth.getSession().then(function (r) { gate(r.data && r.data.session); });
+    sb.auth.onAuthStateChange(function (_e, session) { gate(session); });
+  } else { gate(null); say($('gateError'), 'Sign-in is not available right now. Please try again later.'); }
+
+  $('gateForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var email = $('gEmail').value.trim(), pass = $('gPass').value;
+    if (!email || !pass) { say($('gateError'), 'Enter your email and password.'); return; }
+    var btn = $('gateBtn'); btn.disabled = true; say($('gateError'), '');
+    sb.auth.signInWithPassword({ email: email, password: pass }).then(function (r) {
+      btn.disabled = false;
+      if (r.error) say($('gateError'), r.error.message || 'Could not sign in.');
+    }, function () { btn.disabled = false; say($('gateError'), 'Could not reach the sign-in service. Try again.'); });
+  });
+
+  // ---------- running ----------
+  function fresh() {
+    return sb.auth.getSession().then(function (r) { var s = r.data && r.data.session; if (s) token = s.access_token; return token; });
+  }
+  function call(method, path, body) {
+    return fresh().then(function (t) {
+      return fetch(API + path, { method: method, headers: { 'Authorization': 'Bearer ' + t, 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
+    }).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (data) { return { ok: res.ok, status: res.status, data: data }; });
+    });
+  }
+  function problemText(r) {
+    if (r.status === 401) return 'Your session has ended. Please sign in again.';
+    if (r.data && typeof r.data.detail === 'string') return r.data.detail;
+    if (r.data && Array.isArray(r.data.detail)) return 'Please check the company name and website.';
+    return 'Something went wrong. Try again in a minute.';
+  }
+
+  $('auditForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    say($('formError'), '');
+    var company = $('fCompany').value.trim(), site = $('fSite').value.trim();
+    if (!company) { say($('formError'), "Enter the company's name."); $('fCompany').focus(); return; }
+    if (!site) { say($('formError'), "Enter the company's website, for example acme.com."); $('fSite').focus(); return; }
+    var body = { company: company, website: site, city: $('fCity').value.trim() || null, preset: $('fPreset').value,
+                 keywords: lines($('fKeywords').value, 5), competitors: lines($('fComps').value, 3), note: $('fNote').value.trim() || null };
+    var btn = $('runBtn'); btn.disabled = true;
+    show($('report'), false); beginProgress();
+    var slow = setTimeout(function () { $('progSub').textContent = 'The server was asleep and is waking up. The first audit of the day can take up to a minute longer.'; }, 7000);
+    call('POST', '/start', body).then(function (r) {
+      clearTimeout(slow);
+      if (!r.ok) { endProgress(); btn.disabled = false; say($('formError'), problemText(r)); return; }
+      poll(r.data.job_id, btn, Date.now());
+    }, function () { clearTimeout(slow); endProgress(); btn.disabled = false; say($('formError'), 'Could not reach the audit service. Check your connection and try again.'); });
+  });
+
+  function beginProgress() {
+    var ul = $('steps'); ul.textContent = '';
+    STEPS.forEach(function (s) { var li = el('li', '', s[1]); li.dataset.id = s[0]; ul.appendChild(li); });
+    $('progTitle').textContent = 'Running the audit';
+    $('progSub').textContent = 'This takes about a minute. You can leave this tab open.';
+    show($('progress'), true); $('progress').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  function endProgress() { show($('progress'), false); }
+  function markSteps(job) {
+    var done = job.sections_done || {}, firstOpen = true;
+    Array.prototype.forEach.call($('steps').children, function (li) {
+      var id = li.dataset.id, finished = (done[id] && done[id].done) || (id === 'competitors' && job.status === 'done');
+      li.className = finished ? 'done' : (firstOpen ? 'run' : '');
+      if (!finished) firstOpen = false;
+    });
+  }
+  function poll(id, btn, started) {
+    clearTimeout(polling);
+    call('GET', '/' + encodeURIComponent(id)).then(function (r) {
+      if (!r.ok) { endProgress(); btn.disabled = false; say($('formError'), r.status === 404 ? 'The audit expired on the server. Run it again.' : problemText(r)); return; }
+      var job = r.data; markSteps(job);
+      if (job.status === 'running') {
+        if (Date.now() - started > 6 * 60 * 1000) { endProgress(); btn.disabled = false; say($('formError'), 'The audit is taking too long. Try again in a minute.'); return; }
+        polling = setTimeout(function () { poll(id, btn, started); }, 2500); return;
+      }
+      endProgress(); btn.disabled = false;
+      if (job.status === 'error' || !job.report) { say($('formError'), job.error || 'The audit could not be completed.'); return; }
+      saveLast(job.report); render(job.report);
+    }, function () {
+      polling = setTimeout(function () { poll(id, btn, started); }, 4000);          // a dropped connection: keep trying
+    });
+  }
+
+  // ---------- last report ----------
+  function saveLast(report) { try { localStorage.setItem('raptor_last_audit', JSON.stringify(report)); } catch (e) { /* too big or blocked */ } }
+  function loadLast() { try { return JSON.parse(localStorage.getItem('raptor_last_audit') || 'null'); } catch (e) { return null; } }
+  function showLast() {
+    var r = loadLast();
+    if (r && r.company) { $('lastLink').textContent = r.company + ' (' + (r.generated_at || '').slice(0, 10) + ')'; show($('lastWrap'), true); }
+  }
+  $('lastLink').addEventListener('click', function (e) { e.preventDefault(); var r = loadLast(); if (r) render(r); });
+
+  // ---------- report ----------
+  function chip(status) { return el('span', 'au-chip ' + status, STATUS_LABEL[status] || status); }
+  function section(title) { var s = el('section', 'au-sec'); s.appendChild(el('h3', '', title)); return s; }
+
+  function checkRow(c) {
+    var row = el('div', 'au-check ' + c.status);
+    var top = el('div', 'au-row'); top.appendChild(chip(c.status)); top.appendChild(el('strong', '', c.title));
+    if (c.value !== null && c.value !== undefined && c.value !== '') top.appendChild(el('span', 'au-val', c.value));
+    row.appendChild(top);
+    if (c.detail) row.appendChild(el('p', '', c.detail));
+    if (c.source || c.verify) {
+      var d = el('details'); d.appendChild(el('summary', '', 'How we know, and how to check it yourself'));
+      if (c.source) { var a = el('div'); a.appendChild(el('b', '', 'Source: ')); a.appendChild(document.createTextNode(c.source)); d.appendChild(a); }
+      if (c.verify) { var b = el('div'); b.appendChild(el('b', '', 'Verify: ')); b.appendChild(document.createTextNode(c.verify)); d.appendChild(b); }
+      if (c.checked_at) { var t = el('div'); t.appendChild(el('b', '', 'Checked: ')); t.appendChild(document.createTextNode(c.checked_at.replace('T', ' ').replace('Z', ' UTC'))); d.appendChild(t); }
+      row.appendChild(d);
+    }
+    return row;
+  }
+
+  function rankingsTable(rankings) {
+    var rows = (rankings || []).filter(function (r) { return r.query; });
+    if (!rows.length) return null;
+    var wrap = el('div', 'au-table-wrap'), t = el('table', 'au-table'), thead = el('thead'), hr = el('tr');
+    ['Search', 'Position', 'Map pack', 'Who ranks first', 'Searched from', 'Date'].forEach(function (h) { hr.appendChild(el('th', '', h)); });
+    thead.appendChild(hr); t.appendChild(thead);
+    var tb = el('tbody');
+    rows.forEach(function (r) {
+      var tr = el('tr');
+      tr.appendChild(el('td', '', r.query + (r.kind === 'brand' ? ' (its own name)' : '')));
+      tr.appendChild(el('td', '', r.position ? '#' + r.position : 'not in the top 20'));
+      tr.appendChild(el('td', '', r.map_position ? '#' + r.map_position : (r.map_pack && r.map_pack.length ? 'not shown' : 'no map pack')));
+      var first = (r.top || []).filter(function (x) { return x.domain; })[0];
+      tr.appendChild(el('td', '', first ? '#' + first.position + ' ' + first.domain : '–'));
+      tr.appendChild(el('td', '', r.location || 'default'));
+      tr.appendChild(el('td', '', r.date || ''));
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb); wrap.appendChild(t); return wrap;
+  }
+
+  function competitorTable(comp) {
+    if (!comp || !comp.rows || comp.rows.length < 2) return null;
+    var s = section('Competitor comparison');
+    s.appendChild(el('p', 'au-legend', comp.note || ''));
+    var wrap = el('div', 'au-table-wrap'), t = el('table', 'au-table wide'), thead = el('thead'), hr = el('tr');
+    hr.appendChild(el('th', '', 'Company'));
+    comp.columns.forEach(function (c) { hr.appendChild(el('th', 'c', c.title)); });
+    thead.appendChild(hr); t.appendChild(thead);
+    var tb = el('tbody');
+    comp.rows.forEach(function (row) {
+      var tr = el('tr', row.is_company ? 'me' : '');
+      var nameCell = el('td', '', row.name + (row.is_company ? ' (this company)' : ''));
+      if (row.note) nameCell.appendChild(el('span', 'au-rownote', row.note));
+      tr.appendChild(nameCell);
+      comp.columns.forEach(function (c) {
+        var cell = row.cells[c.id] || { status: 'unknown' }, td = el('td', 'c');
+        var sym = el('span', 'au-sym ' + cell.status, SYMBOL[cell.status] || '?'); sym.title = (STATUS_LABEL[cell.status] || '') + (cell.value ? ': ' + cell.value : '');
+        td.appendChild(sym); tr.appendChild(td);
+      });
+      tb.appendChild(tr);
+    });
+    (comp.queries || []).forEach(function (q) {
+      var tr = el('tr'); tr.appendChild(el('td', '', 'Google position: ' + q));
+      var td = el('td'); td.colSpan = comp.columns.length;
+      td.textContent = comp.rows.map(function (r) { return r.name + ' ' + (r.ranks && r.ranks[q] ? '#' + r.ranks[q] : 'not in the top 20'); }).join('   ·   ');
+      tr.appendChild(td); tb.appendChild(tr);
+    });
+    t.appendChild(tb); wrap.appendChild(t); s.appendChild(wrap);
+    s.appendChild(el('p', 'au-legend', '✓ good   ~ could be better   ✗ problem   ? could not be checked   – a fact. Positions were searched from ' + (comp.searched_from || 'the default place') + (comp.date ? ' on ' + comp.date : '') + '.'));
+    return s;
+  }
+
+  function summaryText(r) {
+    var out = ['Company audit: ' + r.company + ' (' + r.website + ')', 'Score: ' + (r.score.value === null ? 'not enough measured checks' : r.score.value + '/100 (' + r.score.label + '), based on ' + r.score.based_on + ' measured checks'), ''];
+    if (r.top_findings.length) { out.push('Biggest findings:'); r.top_findings.forEach(function (f) { out.push('- ' + f.title + (f.value ? ': ' + f.value : '')); }); out.push(''); }
+    if (r.fixes.length) { out.push('Fix first:'); r.fixes.forEach(function (f, i) { out.push((i + 1) + '. ' + f.title + ': ' + f.fix); }); }
+    return out.join('\n');
+  }
+
+  function render(r) {
+    var root = $('report'); root.textContent = '';
+    var sc = r.score || {}, counts = r.counts || {};
+
+    var cover = el('div', 'au-card au-cover');
+    var ring = el('div', 'au-ring'); ring.style.setProperty('--v', sc.value === null || sc.value === undefined ? 0 : sc.value);
+    var inner = el('div'); inner.style.position = 'relative'; inner.style.zIndex = '1'; inner.style.textAlign = 'center';
+    inner.appendChild(el('b', '', sc.value === null || sc.value === undefined ? '–' : sc.value)); inner.appendChild(el('small', '', sc.label || 'No score'));
+    ring.textContent = ''; ring.appendChild(inner); cover.appendChild(ring);
+    var info = el('div'); info.appendChild(el('div', 'au-eyebrow', 'Company audit'));
+    info.appendChild(el('h2', '', r.company));
+    var meta = el('div', 'au-meta');
+    meta.appendChild(document.createTextNode(r.website + '  ·  ' + (r.generated_at || '').slice(0, 10) + (r.city ? '  ·  searched from ' + r.city : '')));
+    meta.appendChild(el('br'));
+    meta.appendChild(document.createTextNode(sc.value === null || sc.value === undefined ? 'Too few checks could be measured to give a score.' :
+      'Score based on ' + sc.based_on + ' measured checks. ' + (sc.unknown ? sc.unknown + " could not be checked and are not counted." : 'Every check could be made.')));
+    info.appendChild(meta);
+    var chips = el('div', 'au-counts');
+    [['issue', 'Problems'], ['warn', 'Could be better'], ['pass', 'Good'], ['info', 'Facts'], ['unknown', "Couldn't check"]].forEach(function (p) {
+      var c = el('span', 'au-chip ' + p[0], (counts[p[0]] || 0) + ' ' + p[1]); chips.appendChild(c);
+    });
+    info.appendChild(chips); cover.appendChild(info); root.appendChild(cover);
+
+    if (r.note) root.appendChild(el('div', 'au-told', 'What you told us: ' + r.note));
+
+    var tools = el('div', 'au-tools');
+    var print = el('button', 'au-btn', 'Print or save as PDF'); print.type = 'button';
+    print.addEventListener('click', function () { Array.prototype.forEach.call(document.querySelectorAll('#report details'), function (d) { d.open = true; }); window.print(); });
+    var copy = el('button', 'au-btn ghost', 'Copy summary'); copy.type = 'button';
+    copy.addEventListener('click', function () {
+      var text = summaryText(r);
+      (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(function () { copy.textContent = 'Copied'; }, function () { copy.textContent = 'Copy not allowed here'; });
+      setTimeout(function () { copy.textContent = 'Copy summary'; }, 2200);
+    });
+    var again = el('button', 'au-btn ghost', 'Run another'); again.type = 'button';
+    again.addEventListener('click', function () { show($('report'), false); window.scrollTo({ top: 0, behavior: 'smooth' }); $('fCompany').focus(); });
+    var hide = el('label'); var cb = el('input'); cb.type = 'checkbox'; cb.checked = true; hide.appendChild(cb); hide.appendChild(document.createTextNode(" Show items we couldn't check"));
+    cb.addEventListener('change', function () { Array.prototype.forEach.call(document.querySelectorAll('#report .au-check.unknown'), function (n) { n.hidden = !cb.checked; }); });
+    [print, copy, again, hide].forEach(function (n) { tools.appendChild(n); });
+    root.appendChild(tools);
+
+    if (r.top_findings && r.top_findings.length) {
+      var s = section('The biggest findings'); var grid = el('div', 'au-top');
+      r.top_findings.forEach(function (f) {
+        var box = el('div'); box.appendChild(chip(f.status)); box.appendChild(el('h4', '', f.title));
+        if (f.value) box.appendChild(el('div', 'v', f.value)); if (f.detail) box.appendChild(el('p', '', f.detail)); grid.appendChild(box);
+      });
+      s.appendChild(grid); root.appendChild(s);
+    } else if (sc.value !== null && sc.value !== undefined) {
+      var ok = section('The biggest findings'); ok.appendChild(el('p', 'au-legend', 'No problems were found in the checks we could make.')); root.appendChild(ok);
+    }
+
+    (r.sections || []).forEach(function (sec) {
+      var s = section(sec.title);
+      sec.checks.forEach(function (c) { s.appendChild(checkRow(c)); });
+      if (sec.id === 'visibility') { var t = rankingsTable(r.rankings); if (t) { s.appendChild(el('p', 'au-legend', 'Where the company appeared on Google for each search. Rankings change by place and day.')); s.appendChild(t); } }
+      root.appendChild(s);
+    });
+
+    var ct = competitorTable(r.competitors); if (ct) root.appendChild(ct);
+
+    var fx = section('What to fix first');
+    if (r.fixes && r.fixes.length) {
+      fx.appendChild(el('p', 'au-legend', r.priority_rule || ''));
+      var ol = el('ol', 'au-fixes');
+      r.fixes.forEach(function (f) {
+        var li = el('li'); li.appendChild(chip(f.status)); li.appendChild(document.createTextNode(' ')); li.appendChild(el('b', '', f.title)); li.appendChild(el('p', '', f.fix));
+        if (f.raptor) li.appendChild(el('p', 'rx', 'How Raptor helps: ' + f.raptor));
+        ol.appendChild(li);
+      });
+      fx.appendChild(ol);
+      var helps = r.fixes.some(function (f) { return f.raptor; });
+      if (helps) {
+        var cta = el('div', 'au-cta au-noprint'); cta.appendChild(el('p', '', 'Raptor captures every enquiry, follows up on email, WhatsApp and SMS, and keeps the CRM, all on your own computer.'));
+        var dl = el('a', '', 'Get Raptor'); dl.href = '/ventures/raptor/'; dl.setAttribute('data-download', ''); cta.appendChild(dl); fx.appendChild(cta);
+      }
+    } else { fx.appendChild(el('p', 'au-legend', 'Nothing to fix came out of the checks we could make.')); }
+    root.appendChild(fx);
+
+    var how = section('How to read this report');
+    how.appendChild(el('p', 'au-legend', 'Every item is something we measured, with the source and a way for you to check it yourself. "Good", "Could be better" and "Problem" are measured. "Fact" is measured but not good or bad. "Couldn\'t check" means the site refused us, a service was down, or a plain read cannot prove it; those items are never counted against the company. Pages are read as a visitor\'s browser first receives them, so anything a script adds afterwards cannot be seen: check the verify line before presenting a finding. Rankings and ads are a snapshot of the date shown.'));
+    root.appendChild(how);
+
+    show(root, true); root.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+})();
+</script>
+</body>
+</html>
