@@ -97,6 +97,7 @@
     a.href = LINKS[os];
     a.download = '';
     a.rel = 'noopener';
+    a.setAttribute('data-dl-start', '');   // this link is the download itself: the click handler below must let it through
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -110,7 +111,7 @@
   document.addEventListener('click', function (e) {
     if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;   // a new-tab click still goes to the file
     var el = e.target && e.target.closest ? e.target.closest('a,button') : null;
-    if (!el) return;
+    if (!el || el.hasAttribute('data-dl-start')) return;
     var isHeaderButton = el.id === 'navDownload';
     var isMarked = el.hasAttribute('data-download');
     var isInstallerLink = el.tagName === 'A' && INSTALLER_LINK.test(el.getAttribute('href') || '');
