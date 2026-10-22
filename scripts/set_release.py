@@ -34,6 +34,7 @@ def rules(cfg):
          mac["url"]),
         ("Mac file name in the text", re.compile(r"(?<![/\w])Raptor-[\d.]+-mac-arm64\.dmg"), mac["file"]),
         ("Windows button label", re.compile(r'aria-label="Download Raptor (?:v?[\d.]+ )?for Windows"'), f'aria-label="Download Raptor {v} for Windows"'),
+        ("Chooser version", re.compile(r"var RELEASE_VERSION = '[\d.]+';"), f"var RELEASE_VERSION = '{v}';"),
         ("Windows version line", re.compile(rf"Windows x64 {DOT} (?:Stable Release|Version [\d.]+)"), f"Windows x64 {DOT} Version {v}"),
         ("FAQ version note", re.compile(r"\((?:stable v1\.0|version [\d.]+)\)"), f"(version {v})"),
         ("CTA version chip", re.compile(r'<span class="cta-micro-item">(?:Stable v1\.0|Version [\d.]+)</span>'),
@@ -49,7 +50,7 @@ def main(check_only: bool) -> int:
     for folder, dirs, files in os.walk(PAGES):
         dirs[:] = [d for d in dirs if not (folder == PAGES and d in SKIP_DIRS)]
         for name in files:
-            if not name.endswith(".html"):
+            if not (name.endswith(".html") or name == "download.js"):      # download.js holds the chooser's addresses
                 continue
             path = os.path.join(folder, name)
             with open(path, encoding="utf-8", newline="") as f:

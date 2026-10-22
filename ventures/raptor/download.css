@@ -1,0 +1,25 @@
+/* The download chooser (download.js): the same "Choose your device" window opens from every download button on every Raptor page. */
+.dl-overlay{position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center;padding:6rem 1.5rem 1.5rem;background:rgba(5,4,10,.7);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.dl-overlay.open{display:flex}
+.dl-card{box-sizing:border-box;overflow-x:hidden;position:relative;width:100%;max-width:460px;max-height:calc(100vh - 7.5rem);overflow-y:auto;padding:2.4rem 2rem 2rem;border-radius:20px;background:var(--surface,#f0ebe4);color:var(--white,#1c1018);border:1px solid var(--border,rgba(0,0,0,.12));box-shadow:0 30px 80px rgba(0,0,0,.5),0 0 0 1px rgba(168,85,247,.25);text-align:center}
+.dl-close{position:absolute;top:.9rem;right:1rem;width:2rem;height:2rem;border:0;border-radius:50%;background:transparent;color:var(--dim,#6b5f6a);font-size:1.3rem;line-height:1;cursor:pointer}
+.dl-close:hover{color:var(--white,#1c1018)}
+.dl-card h3{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:.04em;margin:0 0 .4rem;font-weight:400}
+.dl-card p{font-family:'Instrument Serif',serif;font-size:1.05rem;line-height:1.6;color:var(--dim,#6b5f6a);margin:0 0 1.4rem}
+.dl-options{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.dl-option{display:flex;flex-direction:column;align-items:center;gap:.5rem;padding:1.4rem 1rem;border-radius:14px;cursor:pointer;background:transparent;color:inherit;border:1px solid var(--border,rgba(0,0,0,.15));font-family:'DM Mono',monospace;transition:border-color .2s,transform .2s,box-shadow .2s}
+.dl-option:hover,.dl-option:focus-visible{border-color:#a855f7;transform:translateY(-2px);box-shadow:0 8px 24px rgba(168,85,247,.2);outline:none}
+.dl-option svg{width:34px;height:34px}
+.dl-option b{font-weight:500;font-size:.85rem;letter-spacing:.08em;text-transform:uppercase}
+.dl-option small{font-size:.62rem;letter-spacing:.06em;color:var(--dim,#6b5f6a)}
+.dl-ok{width:56px;height:56px;margin:0 auto 1rem;border-radius:50%;display:grid;place-items:center;background:var(--grad,linear-gradient(135deg,#a855f7,#ec4899));color:#fff}
+.dl-help{margin-top:1.4rem;padding-top:1.2rem;border-top:1px solid var(--border,rgba(0,0,0,.12));font-size:.9rem}
+.dl-help a,.dl-retry{color:#a855f7;text-decoration:underline;background:none;border:0;padding:0;font:inherit;cursor:pointer}
+.dl-step[hidden]{display:none}
+.dl-fix{margin:0 0 1.2rem;padding:1rem 1.1rem;border-radius:12px;border:1px solid var(--border,rgba(0,0,0,.12));text-align:left;font-size:.88rem;line-height:1.5}
+.dl-fix b{display:block;margin-bottom:.5rem;font-weight:500;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase}
+.dl-fix ol{margin:0 0 .6rem;padding-left:1.2rem;color:var(--dim,#6b5f6a)}
+.dl-fix li{margin-bottom:.35rem}
+.dl-fix code{font-family:'DM Mono',monospace;font-size:.76rem;padding:.1rem .3rem;border-radius:4px;background:rgba(168,85,247,.12);color:var(--white,#1c1018);word-break:break-all}
+.dl-fix a{color:#a855f7;text-decoration:underline}
+@media(max-width:480px){.dl-options{grid-template-columns:1fr}}
