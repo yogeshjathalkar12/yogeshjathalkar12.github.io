@@ -11,10 +11,10 @@
 (function () {
   'use strict';
 
-  var RELEASE_VERSION = '0.1.13';
+  var RELEASE_VERSION = '0.1.14';
   var LINKS = {
-    windows: 'https://raptor-download.yogeshjathalkar.workers.dev/Raptor-Setup-0.1.13.exe',
-    mac: 'https://raptor-download.yogeshjathalkar.workers.dev/Raptor-0.1.13-mac-arm64.dmg'
+    windows: 'https://raptor-download.yogeshjathalkar.workers.dev/Raptor-Setup-0.1.14.exe',
+    mac: 'https://raptor-download.yogeshjathalkar.workers.dev/Raptor-0.1.14-mac-arm64.dmg'
   };
 
   var INSTALLER_LINK = /Raptor-Setup-[\d.]+\.exe|Raptor-[\d.]+-mac-arm64\.dmg|workers\.dev\/(?:windows|mac)\b/;
