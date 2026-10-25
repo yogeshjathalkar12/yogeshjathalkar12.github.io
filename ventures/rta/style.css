@@ -77,7 +77,7 @@
 
         /* BRAND (Top Left of Content) */
         .brand { 
-            position: fixed; top: 1.9rem; left: 110px; /* Right of the sidebar toggle */
+            position: fixed; top: 1.9rem; left: 80px; /* Right of the sidebar toggle (closed) */
             z-index: 100;
             font-size: 1.5rem; font-weight: 800; 
             color: var(--concrete-grey); 
@@ -163,7 +163,7 @@
         .sidebar-toggle {
             position: fixed; top: 20px; left: 20px;
             z-index: 200;
-            display: flex; align-items: center; gap: 10px;
+            display: flex; align-items: center; gap: 0;
             padding: 0.6rem 1rem;
             border-radius: 10px;
             background: var(--glass-bg);
@@ -180,6 +180,38 @@
             color: var(--text-light);
             white-space: nowrap;
         }
+        .sidebar-toggle .toggle-label:not(:empty) { margin-left: 10px; }
+
+        /* the word "click" stays hidden until the button is hovered (or focused), then slides open */
+        .sidebar-toggle .toggle-hint {
+            display: inline-block;
+            max-width: 0; margin-left: 0; opacity: 0; overflow: hidden;
+            white-space: nowrap;
+            transition: max-width 0.3s ease, margin-left 0.3s ease, opacity 0.25s ease;
+        }
+        .sidebar-toggle:hover .toggle-hint,
+        .sidebar-toggle:focus-within .toggle-hint { max-width: 80px; margin-left: 10px; opacity: 1; }
+
+        /* the Sanskrit name after RTA, in brackets */
+        .brand { display: flex; align-items: baseline; gap: 0.55rem; padding-bottom: 6px; }
+        .brand .brand-name { font-weight: 800; letter-spacing: 4px; color: var(--text-dark); }
+        .brand .brand-deva {
+            letter-spacing: 0; text-transform: none; font-weight: 700; font-size: 1.25rem;
+            color: #b45309;                     /* deep amber: readable on the light page */
+        }
+        .brand .brand-deva i { font-style: normal; font-weight: 300; color: var(--text-light); margin: 0 1px; }
+        body.dark-mode .brand .brand-deva { color: var(--safety-yellow); }
+        /* a short safety-yellow bar under the name */
+        .brand::after {
+            content: ''; position: absolute; left: 0; bottom: 0;
+            width: 34px; height: 3px; border-radius: 2px;
+            background: var(--safety-yellow);
+            transition: width 0.3s ease;
+        }
+        .brand:hover::after { width: 100%; }
+        /* RTA sits a little closer while the button is closed, and steps aside when it opens */
+        .brand { transition: left 0.3s ease; }
+        .sidebar-toggle:hover ~ .brand { left: 135px; }
 
         .sys-header {
             font-family: 'JetBrains Mono', monospace;
@@ -229,10 +261,12 @@
            4. MAIN CONTENT
            ========================================= */
         .hero {
-            height: 90vh;
+            /* min-height, not a fixed height: the hero holds the headline, the sub-text and the download cards, which are
+               taller than the screen, and a fixed height pushed the top of the headline up behind the fixed header */
+            min-height: 90vh;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             text-align: center;
-            padding: 0 10%;
+            padding: 3rem 10% 2rem;
             position: relative;
             z-index: 1;
             margin-top: 100px; /* Offset for fixed header */

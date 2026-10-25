@@ -110,6 +110,15 @@
             flex-shrink: 0;
         }
         .logo span { color: var(--primary); }
+        /* the Sanskrit name after the logo, in brackets */
+        .logo .logo-deva {
+            margin-left: 0.6rem;
+            font-size: 1.25rem; font-weight: 700; line-height: 1;
+            letter-spacing: 0;
+            color: #0e708e;                 /* the teal of the "Vapus" wordmark in the logo */
+            white-space: nowrap;
+        }
+        [data-theme="dark"] .logo .logo-deva { color: #19c4f9; }   /* the same teal after the logo's dark-mode brightening */
 
         .nav-right { display: flex; align-items: center; gap: 0.9rem; flex-shrink: 0; }
 
@@ -580,6 +589,7 @@
 <link rel="stylesheet" href="/ventures/vapus/assets/aura-brand.css">
 <meta property="og:image" content="https://shoonyaorigins.com/ventures/vapus/assets/vapus-share.png">
 <!-- VAPUS-BRAND:END -->
+<link rel="stylesheet" href="/book-demo.css?v=1">
 </head>
 <body>
 
@@ -591,7 +601,7 @@
     <!-- AURA-BG:END -->
 
     <nav data-aos="fade-down" data-aos-duration="800">
-        <a href="#" class="logo"><img class="vapus-logo" src="/ventures/vapus/assets/vapus-logo.png" alt="Vapus" width="131" height="50"></a>
+        <a href="#" class="logo"><img class="vapus-logo" src="/ventures/vapus/assets/vapus-logo.png" alt="Vapus" width="131" height="50"><span class="logo-deva" lang="sa">(वपुः)</span></a>
 
         <div class="nav-right">
             <a href="https://shoonyaorigins.com/" class="brand-sub" target="_blank">Shoonya Origins</a>
@@ -1573,5 +1583,7 @@ if (bx && stage) {
   window.addEventListener('hashchange', openLogin);
 })();
 </script>
+<script src="/book-demo.js?v=1"></script>
+<script>ShoonyaBookDemo.init({ venture: 'Vapus', accent: 'var(--primary)', accentText: '#fff', mount: '.nav-right', before: '[data-open-auth="login"]' });</script>
 </body>
 </html>

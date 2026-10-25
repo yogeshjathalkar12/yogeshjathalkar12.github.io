@@ -760,6 +760,7 @@ html[data-theme="dark"] .feature-live-tag.on { background: rgba(16,185,129,0.14)
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="/book-demo.css?v=1">
 </head>
 <body>
 
@@ -2353,5 +2354,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('hashchange', openLogin);
 })();
 </script>
+<script src="/book-demo.js?v=1"></script>
+<script>ShoonyaBookDemo.init({ venture: 'Coral', accent: 'var(--accent)', accentText: 'var(--bg)', mount: '.nav-links', before: '#navSignIn' });</script>
 </body>
 </html>
