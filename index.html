@@ -28,7 +28,12 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700;800&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=3">
+    <link rel="stylesheet" href="ventures/vapus/assets/aura-bg.css?v=bc342c8f">
+    <link rel="stylesheet" href="style.css?v=31">
+    <!-- The 3D body is Vapus's own script, pointed at from here instead of copied -->
+    <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.171.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.171.0/examples/jsm/"}}</script>
+    <script>window.AURA_BG_OPTIONS = { extraLayers: ['muscular'], spin: 0.00008, overlay: 'images/cosmos-overlay.png' };</script>
+    <script type="module" src="ventures/vapus/assets/aura-bg.js?v=home4"></script>
 </head>
 <body>
     <div class="lamp-container" id="lightSwitch" title="Pull to toggle">
@@ -40,10 +45,50 @@
 
     <header data-aos="fade-down" data-aos-duration="1000">
         <div class="logo" id="logoTrigger">Shoonya<span>Origins</span></div>
+        <nav class="header-nav">
+            <a href="#free-tools">Tools</a>
+            <a href="/about/blogs">Blog</a>
+            <a href="/about">About</a>
+        </nav>
+        <div class="header-actions">
+            <!-- TODO: point Book Demo and Log in at their destinations once decided -->
+            <a href="#contact" class="demo-btn" id="demoBtn">Book Demo</a>
+            <a href="#" class="login-btn" id="loginBtn">Log in</a>
+        </div>
     </header>
 
     
-    <br><br><br><br>
+    <section class="hero-section">
+        <canvas class="aura-bg-body hero-body" id="aura-bg-canvas" aria-hidden="true"></canvas>
+        <button type="button" class="aura-bg-toggle" id="aura-bg-toggle" aria-pressed="true" title="Show or hide the 3D body"><i class="dot"></i><span>3D body backdrop: on</span></button>
+        <h1 data-aos="fade-up" data-aos-duration="1200">
+            <span class="hero-line"><span class="hero-sub hero-sub-top">We create</span>Technology that</span><br>
+            <span class="hero-line"><span class="gradient-text"> pushes human capabilities</span><span class="hero-sub hero-sub-bottom">for a better future</span></span>
+        </h1>
+        <br><br><br>
+        <p class="subtitle" data-aos="fade-up" data-aos-delay="200" data-aos-duration="1200">
+            We are an innovation ecosystem advancing Defense, Health, Infrastructure, Research and Business Intelligence.
+        </p>
+    </section>
+
+    <!-- WHAT AND WHY WE BUILD SECTION -->
+    <section class="why-section container" id="why-we-build">
+        <h2 class="why-title" data-aos="fade-up">
+            <span class="why-title-big">We Build</span>
+        </h2>
+
+        <div class="why-body">
+            <div class="why-col" data-aos="fade-up">
+                <span class="why-kicker">What</span>
+                <p class="why-lead">Shoonya Origins is a deep-tech company building technology at the intersection of mathematics and physics: computer vision, physical AI, quantum machine learning, biological modelling and more. We take that thinking into fields where it has rarely been applied, and bring it to the world through focused ventures.</p>
+                <p>Most tools in a field only record data. We model the system underneath: biology in health, human relationships in sales, physical environments in construction and manufacturing.</p>
+            </div>
+            <div class="why-col" data-aos="fade-up" data-aos-delay="150">
+                <span class="why-kicker">Why</span>
+                <p class="why-lead">We are drawn to problems that are hard, messy and close to the brink of mattering. We believe the technologies that shape the next era of humanity will come from deep mathematical and physical understanding. Software is simply the medium we use to express it.</p>
+            </div>
+        </div>
+    </section>
 
     <!-- EXPLORE OUR PRODUCTS SECTION -->
     <section class="explore-products container" id="explore-products">
@@ -53,7 +98,7 @@
         <div class="zig-zag-container">
             
             <!-- Product 1: Raptor -->
-            <div class="zig-zag-row" id="raptor-demo" data-aos="fade-up">
+            <div class="zig-zag-row venture venture-raptor" id="raptor-demo" data-aos="fade-up">
                 <div class="zig-zag-media">
                     <video autoplay loop muted playsinline>
                         <source src="images/raptor-demo.webm" type="video/webm">
@@ -61,14 +106,30 @@
                     </video>
                 </div>
                 <div class="zig-zag-text">
-                    <h3>Raptor: AI Sales Brain</h3>
-                    <p>Watch the autonomous prospecting engine map markets in real-time. Raptor scores leads across 100+ parameters and crafts precision pitches entirely locally, ensuring total data privacy.</p>
-                    <a href="ventures/raptor/" class="extra-btn">Click to visit </a>
+                    <div class="product-meta"><span class="product-tag">Marketing AI</span><span class="product-status">Free to start</span></div>
+                    <h3>Raptor: The AI Sales Brain</h3>
+                    <p class="venture-lead">Every sales tool on the market is a specialist: one finds leads, another sends emails, another tracks calls, and none of them talk to each other. Raptor is one brain that owns the entire loop and gets smarter every time it closes a deal.</p>
+                    <p>It learns your company, hunts prospects, scores each one across 100+ parameters, writes the pitch, coaches you live on the call and learns from every outcome. The learning runs on your own computer, so your sales data stays yours.</p>
+                    <ul class="venture-points">
+                        <li>Autonomous prospecting that maps markets in real time</li>
+                        <li>A custom approach for every prospect category</li>
+                        <li>Live call intelligence: the right words at the right time</li>
+                        <li>Free CRM, email and WhatsApp automation under one login</li>
+                    </ul>
+                    <div class="venture-stats">
+                        <div><strong>100+</strong><span>Scoring parameters</span></div>
+                        <div><strong>20+</strong><span>Tools, one login</span></div>
+                        <div><strong>Free</strong><span>To start</span></div>
+                    </div>
+                    <div class="product-actions">
+                        <a href="ventures/raptor/" class="extra-btn">Explore Raptor</a>
+                        <a href="ventures/raptor/tools/" class="extra-btn btn-outline">Use Free Tools</a>
+                    </div>
                 </div>
             </div>
 
             <!-- Product 2: rta -->
-            <div class="zig-zag-row" id="rta-demo" data-aos="fade-up">
+            <div class="zig-zag-row venture venture-rta" id="rta-demo" data-aos="fade-up">
                 <div class="zig-zag-media">
                     <video autoplay loop muted playsinline>
                         <source src="images/construct-demo.webm" type="video/webm">
@@ -76,14 +137,30 @@
                     </video>
                 </div>
                 <div class="zig-zag-text">
-                    <h3>rta: Site Autonomy</h3>
-                    <p>The central nervous system for heavy infrastructure. See the autonomous safety and material management systems in action.no more thefts and accident due to human error.</p>
-                    <a href="ventures/rta/" class="extra-btn">Click to visit </a>
+                    <div class="product-meta"><span class="product-tag">Infrastructure</span><span class="product-status">Safety module free</span></div>
+                    <h3>rta: The Nervous System of Construction</h3>
+                    <p class="venture-lead">Construction still runs on spreadsheets, paper logs and guesswork, so materials disappear, safety is checked after incidents and defects surface at final inspection. rta is one automated ecosystem that manages safety, logistics and quality on your site.</p>
+                    <p>Three free Windows apps cover the ground. We believe the safety and security of human beings should not be a luxury, so the safety module is free for everyone.</p>
+                    <ul class="venture-points">
+                        <li>RTA Logistics: deliveries, gate entry, inventory and an audit ledger</li>
+                        <li>RTA Security Module: AI site security and violation monitoring</li>
+                        <li>RTA SitePlanner: real-scale grid, GPS overlay and 3D CAD checks</li>
+                        <li>Deploy on your infrastructure or ours, with no vendor lock-in</li>
+                    </ul>
+                    <div class="venture-stats">
+                        <div><strong>3</strong><span>Free Windows apps</span></div>
+                        <div><strong>Free</strong><span>Safety for everyone</span></div>
+                        <div><strong>0</strong><span>Vendor lock-in</span></div>
+                    </div>
+                    <div class="product-actions">
+                        <a href="ventures/rta/" class="extra-btn">Explore rta</a>
+                        <a href="ventures/rta/tools/" class="extra-btn btn-outline">Use Free Tools</a>
+                    </div>
                 </div>
             </div>
 
             <!-- Product 3: Coral -->
-            <div class="zig-zag-row" id="basis-demo" data-aos="fade-up">
+            <div class="zig-zag-row venture venture-coral" id="basis-demo" data-aos="fade-up">
                 <div class="zig-zag-media">
                     <video autoplay loop muted playsinline>
                         <source src="images/rover-demo.webm" type="video/webm">
@@ -91,14 +168,30 @@
                     </video>
                 </div>
                 <div class="zig-zag-text">
-                    <h3>Coral: Infrastructure management </h3>
-                    <p>Watch the urban infrastructure management in action, showcasing our innovative solutions for smart city development.currently at prototyping stage , looking for aware citizens to help gather inteliigence </p>
-                    <a href="ventures/coral/" class="extra-btn">Click to visit </a>
+                    <div class="product-meta"><span class="product-tag">Urban Management</span><span class="product-status">Prototype</span></div>
+                    <h3>Coral: Urban Intelligence for Mumbai &amp; Pune</h3>
+                    <p class="venture-lead">Citizens report, our AI sees, government acts. Coral turns everyday frustrations such as potholes, broken pipes and illegal dumping into structured, anonymous intelligence that civic bodies can act on.</p>
+                    <p>A report takes 15 seconds and your identity stays hidden. Computer vision classifies the issue and its severity and groups it with related reports. Once 15 or more matching reports are in, a scored brief with photographic evidence goes to the civic body. Coral is at the prototyping stage, and we are looking for aware citizens to help us gather intelligence.</p>
+                    <ul class="venture-points">
+                        <li>Detects potholes, illegal dumping, drainage faults and broken infrastructure</li>
+                        <li>Anonymous by design: no names or phone numbers leave your device</li>
+                        <li>Pattern recognition that predicts where the next breakdown will occur</li>
+                        <li>Free civic, safety and environment tools for everyone</li>
+                    </ul>
+                    <div class="venture-stats">
+                        <div><strong>2</strong><span>Cities: Mumbai &amp; Pune</span></div>
+                        <div><strong>15 s</strong><span>To file a report</span></div>
+                        <div><strong>0</strong><span>Data sold, ever</span></div>
+                    </div>
+                    <div class="product-actions">
+                        <a href="ventures/coral/" class="extra-btn">Explore Coral</a>
+                        <a href="ventures/coral/civic_tools/" class="extra-btn btn-outline">Use Free Tools</a>
+                    </div>
                 </div>
             </div>
             
             <!-- Product 4: Vapus -->
-            <div class="zig-zag-row" id="aura-demo" data-aos="fade-up">
+            <div class="zig-zag-row venture venture-vapus" id="aura-demo" data-aos="fade-up">
                 <div class="zig-zag-media">
                     <video autoplay loop muted playsinline>
                         <source src="images/aura-demo.webm" type="video/webm">
@@ -106,81 +199,34 @@
                     </video>
                 </div>
                 <div class="zig-zag-text">
-                    <h3>Vapus: Non invasive Monitoring -- "Alpha test" </h3>
-                    <p>Watch the Vapus engine taking vitals and monitoring from distance in action , strictly in testing , we do not claim it to be a medical device,  at prototyping stage so do not use for medical purposes </p>
-                    <a href="ventures/vapus/" class="extra-btn">Click to visit </a>
+                    <div class="product-meta"><span class="product-tag">Health</span><span class="product-status">Alpha test</span></div>
+                    <h3>Vapus: Your Lifetime Health Vault</h3>
+                    <p class="venture-lead">Your health has a story, and now it has a home. Vapus is a lifetime vault for every symptom, prescription and scan: logged once, kept forever and read only by the people you choose.</p>
+                    <p>AI works quietly in the background, turning raw entries into early warning instead of just an archive, and vitals can be read from standard video. It is strictly in testing at the prototyping stage: we do not claim it to be a medical device, so do not use it for medical purposes.</p>
+                    <ul class="venture-points">
+                        <li>Timeline, documents and medications in one vault</li>
+                        <li>Time-boxed secure links: you approve every share</li>
+                        <li>Delegates: a parent or caregiver can log or view for you</li>
+                        <li>A 3D body explorer with around 2,800 named parts</li>
+                    </ul>
+                    <div class="venture-stats">
+                        <div><strong>~2,800</strong><span>Parts in the 3D explorer</span></div>
+                        <div><strong>Free</strong><span>To start</span></div>
+                        <div><strong>Encrypted</strong><span>At rest &amp; in transit</span></div>
+                    </div>
+                    <div class="product-actions">
+                        <a href="ventures/vapus/" class="extra-btn">Explore Vapus</a>
+                        <a href="ventures/vapus/tools/" class="extra-btn btn-outline">Use Free Tools</a>
+                    </div>
                 </div>
             </div>
 
         </div>
     </section>
-
-    
-    <section class="hero-section">
-        <h1 data-aos="fade-up" data-aos-duration="1200">
-            Technology that <br><span class="gradient-text"> pushes human capabilities..</span>
-        </h1>
-        <p class="subtitle" data-aos="fade-up" data-aos-delay="200" data-aos-duration="1200">
-            An innovation ecosystem advancing Defense, Health, Infrastructure, Research and Business Intelligence.
-        </p>
-        <div class="hero-actions" data-aos="fade-up" data-aos-delay="300">
-            <a href="tour.html" class="hero-btn btn-gamified">Explore the Game</a>
-            <a href="#ecosystem" class="hero-btn btn-professional">Explore Free Tools</a>
-        </div>
-    </section>
-    <br><br>
 
     <div class="container" id="ecosystem">
-        <div class="section-label" data-aos="fade-in" data-aos-delay="400">Our Ecosystem</div>
-        <div class="grid">
-
-            <div class="card bg-raptor" data-aos="fade-up" data-aos-delay="0">
-                <span class="card-tag">Marketing AI</span>
-                <div class="card-content">
-                    <h3 class="card-title">Raptor</h3>
-                    <p class="card-desc">Start to end AI-driven growth engine automating sales pitches, marketing funnels, and client acquisition and retention, leveraging data science.</p>
-                    <div class="card-actions">
-                        <a href="ventures/raptor/tools/" class="extra-btn tools-btn">Use Free Tools</a>
-                        <a href="ventures/raptor/" class="extra-btn main-card-link">Click to Explore</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card bg-civitas" data-aos="fade-up" data-aos-delay="200">
-                <span class="card-tag">Infrastructure</span>
-                <div class="card-content">
-                    <h3 class="card-title">rta</h3>
-                    <p class="card-desc">Autonomous vehicles and system for Heavy infrastructure and sustainable construction projects laying the smart foundation for tomorrow.</p>
-                    <div class="card-actions">
-                        <a href="ventures/rta/tools/" class="extra-btn tools-btn">Use Free Tools</a>
-                        <a href="ventures/rta/" class="extra-btn main-card-link">Click to Explore</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card bg-basis" data-aos="fade-up" data-aos-delay="300">
-                <span class="card-tag">Urban Management</span>
-                <div class="card-content">
-                    <h3 class="card-title">Coral</h3>
-                    <p class="card-desc">Autonomous Smart city management: roads repair, waste collection, and river rejuvenation systems equipped with autonomous vehicles and AI.</p>
-                    <div class="card-actions">
-                        <a href="ventures/coral/civic_tools/" class="extra-btn tools-btn">Use Free Tools</a>
-                        <a href="ventures/coral/" class="extra-btn main-card-link">Click to Explore</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card bg-aura" data-aos="fade-up" data-aos-delay="100">
-                <span class="card-tag">Health</span>
-                <div class="card-content">
-                    <h3 class="card-title">Vapus</h3>
-                    <p class="card-desc">A non-invasive system predicting vitals using sensor fusion and AI, predictive health monitoring and total health ecosystem at a single place.</p>
-                    <div class="card-actions">
-                        <a href="ventures/vapus/tools/" class="extra-btn tools-btn">Use Free Tools</a>
-                        <a href="ventures/vapus/" class="extra-btn main-card-link">Click to Explore</a>
-                    </div>
-                </div>
-            </div>
+        <div class="section-label" data-aos="fade-in" data-aos-delay="400">More From the Ecosystem</div>
+        <div class="grid grid-more">
 
             <div class="card bg-sentinel" data-aos="fade-up" data-aos-delay="0">
                 <span class="card-tag">Defense</span>
@@ -258,28 +304,6 @@
         </div>
     </div>
 
-    <section class="updates-section" id="updates">
-        <div class="container" style="padding-bottom: 2rem;">
-            <div class="section-label" data-aos="fade-in">Latest Updates</div>
-            <div class="updates-grid">
-                <div class="notification-card" data-aos="fade-up" data-aos-delay="100">
-                    <span class="notification-badge">Coming Soon</span>
-                    <h3 class="notification-title">Autonomous Safety &amp; Anti-Theft Plugins</h3>
-                    <p class="notification-desc">
-                        Our new autonomous safety and anti-theft plugins are going to be available for everyone very soon. We are finalizing the logic to ensure maximum security without compromising your data privacy.
-                    </p>
-                </div>
-                <div class="notification-card" data-aos="fade-up" data-aos-delay="200">
-                    <span class="notification-badge">Coming Soon</span>
-                    <h3 class="notification-title">FreeBasic CRM &amp; Essential Sales Tools</h3>
-                    <p class="notification-desc">
-                        We are rolling out a free, foundational CRM to help you seamlessly track clients and manage contacts. Alongside this, expect a suite of simple, no-cost sales tools designed to streamline your daily operations without the premium price tag.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- ═══ ROVER FLEET SHOWCASE ════════════════════════════════ -->
     <section class="rover-showcase-section" style="padding: 100px 0;">
         <div class="container">
@@ -350,7 +374,7 @@
         </div>
     </section>
 
-    <div class="declaration-section" data-aos="fade-up" data-aos-duration="1200">
+    <div class="declaration-section" id="free-tools" data-aos="fade-up" data-aos-duration="1200">
         <div class="container declaration-container">
             <h2 class="declaration-quote">Free Tools On us</h2>
             <p class="declaration-text">
@@ -367,25 +391,33 @@
 
     <div class="stats-section" data-aos="fade-up" data-aos-duration="1200">
         <div class="container">
-            <div class="stats-grid">
-                <div class="stat-card" data-aos="zoom-in" data-aos-delay="100">
-                    <h2 class="stat-number">130<span>+</span></h2>
-                    <p class="stat-label">Open Tools</p>
-                </div>
-                <div class="stat-card" data-aos="zoom-in" data-aos-delay="200">
-                    <h2 class="stat-number">0</h2>
-                    <p class="stat-label">Data Retention</p>
-                </div>
-                <div class="stat-card" data-aos="zoom-in" data-aos-delay="300">
-                    <h2 class="stat-number">100<span>%</span></h2>
-                    <p class="stat-label">Yours</p>
-                </div>
-            </div>
             <p class="stats-cta" data-aos="fade-up" data-aos-delay="400">
                 <a href="#contact">Fill out the form below</a> to tell us more about what you want us to build next.
             </p>
         </div>
     </div>
+
+    <section class="updates-section" id="updates">
+        <div class="container" style="padding-bottom: 2rem;">
+            <div class="section-label" data-aos="fade-in">Latest Updates</div>
+            <div class="updates-grid">
+                <div class="notification-card" data-aos="fade-up" data-aos-delay="100">
+                    <span class="notification-badge">Coming Soon</span>
+                    <h3 class="notification-title">Autonomous Safety &amp; Anti-Theft Plugins</h3>
+                    <p class="notification-desc">
+                        Our new autonomous safety and anti-theft plugins are going to be available for everyone very soon. We are finalizing the logic to ensure maximum security without compromising your data privacy.
+                    </p>
+                </div>
+                <div class="notification-card" data-aos="fade-up" data-aos-delay="200">
+                    <span class="notification-badge">Coming Soon</span>
+                    <h3 class="notification-title">Free Basic CRM &amp; Essential Sales Tools</h3>
+                    <p class="notification-desc">
+                        We are rolling out a free, foundational CRM to help you seamlessly track clients and manage contacts. Alongside this, expect a suite of simple, no-cost sales tools designed to streamline your daily operations without the premium price tag.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <section class="contact-section" id="contact">
         <div class="container">
