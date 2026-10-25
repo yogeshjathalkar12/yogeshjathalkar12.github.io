@@ -2062,6 +2062,75 @@ body.dark-mode .street-sky::after { --haze: rgba(12, 10, 9, 0.95); background: l
 @media (prefers-reduced-motion: reduce) {
     .skyline, .street-lane, .street-rover img, .rover-shadow { animation: none; }
 }
+/* =========================================
+   FOOTER (laid out like Raptor's: brand, link columns, copyright line)
+   ========================================= */
+.so-footer {
+    background: linear-gradient(to bottom, transparent 0, #0b0f19 140px);
+    color: #a0a0a5;
+    padding: 8rem 4rem 2rem;
+    text-align: left;
+}
+.so-footer-grid {
+    max-width: 1240px;
+    margin: 0 auto;
+    display: grid;
+    gap: 2.5rem;
+    grid-template-columns: 1.4fr 1fr 1.1fr 1fr 0.9fr 1fr;
+}
+.so-brand {
+    display: inline-block;
+    font-size: 1.7rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: #fff;
+    text-decoration: none;
+}
+.so-brand span { color: var(--primary); }
+.so-tagline { margin: 0.9rem 0 0; max-width: 250px; font-size: 0.95rem; line-height: 1.6; color: #c7c7cc; }
+.so-byline { margin: 0.8rem 0 0; font-size: 0.78rem; letter-spacing: 0.04em; color: #8a8a93; }
+.so-socials { margin-top: 1.4rem; }
+.so-label, .so-col h4 {
+    display: block;
+    margin: 0 0 1.1rem;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #fff;
+}
+.so-col a:not(.so-brand), .so-socials a {
+    display: block;
+    margin: 0 0 0.7rem;
+    font-size: 0.88rem;
+    line-height: 1.4;
+    color: #a0a0a5;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+.so-col a:not(.so-brand):hover, .so-socials a:hover { color: var(--primary); }
+.so-footer a:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+.so-bottom {
+    max-width: 1240px;
+    margin: 3rem auto 0;
+    padding-top: 1.6rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    text-align: center;
+    font-size: 0.8rem;
+    line-height: 1.9;
+    color: #8a8a93;
+}
+.so-bottom p { margin: 0; }
+@media (max-width: 1100px) {
+    .so-footer { padding: 7rem 2rem 2rem; }
+    .so-footer-grid { grid-template-columns: repeat(3, 1fr); }
+    .so-col-brand { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+    .so-footer { padding: 6rem 1.5rem 2rem; }
+    .so-footer-grid { grid-template-columns: 1fr 1fr; gap: 2rem 1.5rem; }
+}
+
 /* Button on a Latest Updates card */
 .notification-card .notification-btn { display: inline-block; margin-top: 1.1rem; text-decoration: none; }
 

@@ -29,7 +29,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700;800&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <link rel="stylesheet" href="ventures/vapus/assets/aura-bg.css?v=bc342c8f">
-    <link rel="stylesheet" href="style.css?v=37">
+    <link rel="stylesheet" href="style.css?v=38">
     <!-- The 3D body is Vapus's own script, pointed at from here instead of copied -->
     <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.171.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.171.0/examples/jsm/"}}</script>
     <script>window.AURA_BG_OPTIONS = { extraLayers: ['muscular'], spin: 0.00008, overlay: 'images/cosmos-overlay.png' };</script>
@@ -488,20 +488,61 @@
         </div>
     </section>
 
-    <footer>
-        <div class="logo" style="color: white; margin-bottom: 1rem;">Shoonya<span>Origins</span></div>
-        <div class="footer-links">
-            <a href="https://www.linkedin.com/in/yogesh-jathalkar-67b179208/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-            <a href="/about">About</a>
-            <a href="/about/blogs" target="_blank" rel="noopener noreferrer">Blogs</a>
-            <a href="mailto:yogeshjathalkar@gmail.com">Contact Us</a>
-            
-            <a href="about/privacy.html">Privacy Policy</a>
-            <a href="about/terms.html" >Terms of Service</a>
-            <a href="about/disclaimer.html" >Legal Disclaimer</a>
+    <footer class="so-footer">
+        <div class="so-footer-grid">
+            <div class="so-col so-col-brand">
+                <a class="so-brand" href="/" aria-label="Shoonya Origins home">Shoonya<span>Origins</span></a>
+                <p class="so-tagline">Technology that pushes human capabilities, for a better future.</p>
+                <p class="so-byline">Deep tech from Pune, India</p>
+                <div class="so-socials">
+                    <span class="so-label">Socials</span>
+                    <a href="https://www.linkedin.com/in/yogesh-jathalkar-67b179208/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+                </div>
+            </div>
+            <div class="so-col">
+                <h4>Ventures</h4>
+                <a href="ventures/raptor/">Raptor</a>
+                <a href="ventures/rta/">rta</a>
+                <a href="ventures/coral/">Coral</a>
+                <a href="ventures/vapus/">Vapus</a>
+                <a href="ventures/eklavya/">Eklavya</a>
+                <a href="ventures/vapus/charaka/">Charaka</a>
+                <a href="ventures/aether/">Aether Labs</a>
+                <a href="ventures/shoonya-systems/">Shoonya Systems</a>
+            </div>
+            <div class="so-col">
+                <h4>Free Tools</h4>
+                <a href="ventures/raptor/tools/">Raptor Tools</a>
+                <a href="ventures/rta/tools/">rta Tools</a>
+                <a href="ventures/coral/civic_tools/">Coral Civic Tools</a>
+                <a href="ventures/vapus/tools/">Vapus Tools</a>
+                <a href="ventures/aether/tools/">Aether Labs Tools</a>
+            </div>
+            <div class="so-col">
+                <h4>Company</h4>
+                <a href="/about">About Shoonya Origins</a>
+                <a href="/about/blogs">Blogs</a>
+                <a href="#contact">Book a Demo</a>
+                <a href="mailto:yogeshjathalkar@gmail.com">Contact Us</a>
+            </div>
+            <div class="so-col">
+                <h4>Legal</h4>
+                <a href="about/privacy.html">Privacy Policy</a>
+                <a href="about/terms.html">Terms of Service</a>
+                <a href="about/disclaimer.html">Legal Disclaimer</a>
+            </div>
+            <div class="so-col">
+                <h4>My Account</h4>
+                <a href="#" data-open-login>Log In</a>
+                <a href="ventures/raptor/#login" >Raptor Account</a>
+                <a href="ventures/coral/#login">Coral Account</a>
+                <a href="ventures/vapus/#login">Vapus Account</a>
+            </div>
         </div>
-        <p>&copy; 2026 Shoonya Origins. All Rights Reserved.</p>
-        <p class="footer-location">Pune, India</p>
+        <div class="so-bottom">
+            <p>Copyright 2026 Shoonya Origins. All rights reserved.</p>
+            <p>Pune, India</p>
+        </div>
     </footer>
 
     <div id="cosmosBackground"></div>
@@ -1032,6 +1073,7 @@
             function open(e) { if (e) e.preventDefault(); picker.hidden = false; document.body.classList.add('login-picker-open'); closeBtn.focus(); }
             function close() { picker.hidden = true; document.body.classList.remove('login-picker-open'); btn.focus(); }
             btn.addEventListener('click', open);
+            document.querySelectorAll('[data-open-login]').forEach(function (a) { a.addEventListener('click', open); });
             closeBtn.addEventListener('click', close);
             picker.addEventListener('click', function (e) { if (e.target === picker) close(); });
             document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !picker.hidden) close(); });
