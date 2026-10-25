@@ -1,0 +1,18 @@
+[
+  {
+    "active": true,
+    "badge": "Released",
+    "title": "Autonomous Safety & Anti-Theft Plugins",
+    "text": "Our autonomous safety and anti-theft plugins are now available for everyone. The logic is built for maximum security without compromising your data privacy.",
+    "button_label": "Download from rta",
+    "button_href": "ventures/rta/#downloads"
+  },
+  {
+    "active": true,
+    "badge": "Released",
+    "title": "Free Basic CRM & Essential Sales Tools",
+    "text": "A free, foundational CRM to help you seamlessly track clients and manage contacts is now live, alongside a suite of simple, no-cost sales tools designed to streamline your daily operations without the premium price tag.",
+    "button_label": "Log in to Raptor",
+    "button_href": "ventures/raptor/#login"
+  }
+]

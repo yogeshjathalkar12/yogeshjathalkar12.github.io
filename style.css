@@ -2062,6 +2062,143 @@ body.dark-mode .street-sky::after { --haze: rgba(12, 10, 9, 0.95); background: l
 @media (prefers-reduced-motion: reduce) {
     .skyline, .street-lane, .street-rover img, .rover-shadow { animation: none; }
 }
+/* Button on a Latest Updates card */
+.notification-card .notification-btn { display: inline-block; margin-top: 1.1rem; text-decoration: none; }
+
+/* Demo request forms (top-bar popup and the form at the bottom) */
+.demo-request-form select {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-family: inherit;
+    background: var(--card-bg);
+    color: var(--text-dark);
+    transition: all 0.3s;
+}
+.demo-request-form select:focus { outline: none; border-color: var(--primary); }
+body.dark-mode .demo-request-form select { border-color: #44403c; background: rgba(12, 10, 9, 0.5); }
+.demo-request-form select option { color: #1e293b; }
+
+.phone-row { display: grid; grid-template-columns: minmax(130px, 190px) 1fr; gap: 10px; }
+.demo-request-form .form-group { margin-bottom: 1.1rem; }
+.demo-request-form .opt { font-weight: 400; color: var(--text-light); font-size: 0.85em; }
+.demo-hp { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; opacity: 0; }
+.demo-err { min-height: 1.2em; margin: 0 0 0.6rem; font-size: 0.88rem; color: #ef4444; line-height: 1.5; }
+.demo-small { margin: 0.9rem 0 0; font-size: 0.8rem; color: var(--text-light); text-align: center; }
+.demo-small a { color: inherit; text-decoration: underline; }
+.demo-thanks { text-align: center; padding: 1.5rem 0.5rem; }
+.demo-thanks[hidden] { display: none; }
+.demo-thanks h3 { font-size: 1.7rem; font-weight: 800; color: var(--text-dark); margin-bottom: 0.5rem; }
+.demo-thanks p { color: var(--text-light); }
+.demo-request-form input[aria-invalid="true"], .demo-request-form select[aria-invalid="true"] { border-color: #ef4444; }
+.demo-modal .login-picker-box { width: min(520px, 100%); }
+@media (max-width: 520px) { .phone-row { grid-template-columns: 1fr; } }
+
+/* Venture picker opened by the top-bar Log in */
+.login-picker {
+    position: fixed;
+    inset: 0;
+    z-index: 100001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(15, 23, 42, 0.55);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+}
+.login-picker[hidden] { display: none; }
+body.login-picker-open { overflow: hidden; }
+
+.login-picker-box {
+    position: relative;
+    width: min(560px, 100%);
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    padding: 2.2rem 2rem 2rem;
+    border-radius: 24px;
+    background: var(--bg-gradient);
+    border: 1px solid var(--card-border);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+}
+body.dark-mode .login-picker-box { background: #1c1917; }
+
+.login-picker-box h2 { font-size: 1.7rem; font-weight: 800; color: var(--text-dark); margin-bottom: 0.4rem; padding-right: 2rem; }
+.login-picker-sub { font-size: 0.95rem; color: var(--text-light); margin-bottom: 1.4rem; }
+
+.login-picker-close {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text-light);
+    font-size: 1.7rem;
+    line-height: 1;
+    cursor: pointer;
+}
+.login-picker-close:hover { background: var(--accent-glow); color: var(--text-dark); }
+
+.login-picker-list { display: grid; gap: 0.7rem; }
+
+.login-opt {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.15rem 1rem;
+    align-items: baseline;
+    padding: 1rem 1.2rem 1rem 1.5rem;
+    border-radius: 14px;
+    border: 1px solid var(--card-border);
+    background: var(--card-bg);
+    text-decoration: none;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.login-opt::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 12px;
+    bottom: 12px;
+    width: 4px;
+    border-radius: 4px;
+    background: var(--dot, var(--primary));
+}
+.login-opt:hover, .login-opt:focus-visible { transform: translateX(4px); border-color: var(--dot, var(--primary)); box-shadow: 0 10px 30px var(--accent-glow); outline: none; }
+.login-opt-name { font-size: 1.15rem; font-weight: 800; color: var(--text-dark); }
+.login-opt-tag { font-size: 0.7rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--text-light); }
+.login-opt-text { grid-column: 1 / -1; font-size: 0.9rem; color: var(--text-light); line-height: 1.5; }
+
+/* Log in button and the "when you log in" line on the product panels and the Eklavya card */
+.venture .extra-btn.btn-login {
+    background: transparent;
+    color: var(--v-text);
+    border: 2px solid var(--v-line);
+    box-shadow: none;
+}
+.venture .extra-btn.btn-login:hover { border-color: var(--v-accent); color: var(--v-accent); }
+
+.venture-login-note {
+    flex-basis: 100%;
+    margin: 0.6rem 0 0 !important;
+    font-size: 0.92rem !important;
+    line-height: 1.6 !important;
+}
+.venture-login-note strong { color: var(--v-text); }
+
+.card-login-note {
+    margin: 0 0 1rem;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: var(--text-light);
+}
+.card-login-note strong { color: var(--text-dark); }
+
 /* the street stops animating while it is off screen (set by a small script on the page) */
 .street.street-offscreen .skyline,
 .street.street-offscreen .street-lane,

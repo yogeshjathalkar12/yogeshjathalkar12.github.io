@@ -1570,5 +1570,17 @@ setTimeout(check,2500);
 (function(){document.querySelectorAll(".feat-tag").forEach(function(b){var t=document.getElementById(b.getAttribute("aria-controls"));if(!t)return;
 b.addEventListener("click",function(){var open=b.getAttribute("aria-expanded")==="true";t.hidden=open;b.setAttribute("aria-expanded",open?"false":"true");});});})();
 </script>
+<script>
+/* A link ending in #login (for example from the Shoonya Origins home page) opens this page's sign-in popup. */
+(function () {
+  function openLogin() {
+    if (location.hash !== '#login') return;
+    var b = document.querySelector('[data-open-auth="login"]');
+    if (b) b.click();
+  }
+  window.addEventListener('load', function () { setTimeout(openLogin, 400); });
+  window.addEventListener('hashchange', openLogin);
+})();
+</script>
 </body>
 </html>

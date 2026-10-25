@@ -2341,5 +2341,17 @@ document.addEventListener('DOMContentLoaded', () => {
   <img src="/images/rover_love1.png" id="pro-agent-avatar" alt="Shoonya AI Assistant">
 </div>
 <script src="assistant.js?v=1"></script>
+<script>
+/* A link ending in #login (for example from the Shoonya Origins home page) opens this page's sign-in popup. */
+(function () {
+  function openLogin() {
+    if (location.hash !== '#login') return;
+    var b = document.querySelector('[data-open-auth="login"]');
+    if (b) b.click();
+  }
+  window.addEventListener('load', function () { setTimeout(openLogin, 400); });
+  window.addEventListener('hashchange', openLogin);
+})();
+</script>
 </body>
 </html>

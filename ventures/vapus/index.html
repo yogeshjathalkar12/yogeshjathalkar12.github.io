@@ -1561,5 +1561,17 @@ if (bx && stage) {
     });
     </script>
 
+<script>
+/* A link ending in #login (for example from the Shoonya Origins home page) opens this page's sign-in popup. */
+(function () {
+  function openLogin() {
+    if (location.hash !== '#login') return;
+    var b = document.querySelector('[data-open-auth="login"]');
+    if (b) b.click();
+  }
+  window.addEventListener('load', function () { setTimeout(openLogin, 400); });
+  window.addEventListener('hashchange', openLogin);
+})();
+</script>
 </body>
 </html>

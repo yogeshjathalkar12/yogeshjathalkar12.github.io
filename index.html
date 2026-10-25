@@ -29,7 +29,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700;800&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <link rel="stylesheet" href="ventures/vapus/assets/aura-bg.css?v=bc342c8f">
-    <link rel="stylesheet" href="style.css?v=33">
+    <link rel="stylesheet" href="style.css?v=37">
     <!-- The 3D body is Vapus's own script, pointed at from here instead of copied -->
     <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.171.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.171.0/examples/jsm/"}}</script>
     <script>window.AURA_BG_OPTIONS = { extraLayers: ['muscular'], spin: 0.00008, overlay: 'images/cosmos-overlay.png' };</script>
@@ -46,9 +46,8 @@
     <header data-aos="fade-down" data-aos-duration="1000">
         <div class="logo" id="logoTrigger">Shoonya<span>Origins</span></div>
         <nav class="header-nav">
-            <a href="#free-tools">Tools</a>
-            <a href="/about/blogs">Blog</a>
             <a href="/about">About</a>
+            <a href="/about/blogs">Blog</a>
         </nav>
         <div class="header-actions">
             <!-- TODO: point Book Demo and Log in at their destinations once decided -->
@@ -124,6 +123,8 @@
                     <div class="product-actions">
                         <a href="ventures/raptor/" class="extra-btn">Explore Raptor</a>
                         <a href="ventures/raptor/tools/" class="extra-btn btn-outline">Use Free Tools</a>
+                        <a href="ventures/raptor/#login" class="extra-btn btn-login">Log in</a>
+                        <p class="venture-login-note"><strong>When you log in:</strong> your free CRM, free email and WhatsApp automation, and 20+ sales tools, all under one login.</p>
                     </div>
                 </div>
             </div>
@@ -155,6 +156,8 @@
                     <div class="product-actions">
                         <a href="ventures/rta/" class="extra-btn">Explore rta</a>
                         <a href="ventures/rta/tools/" class="extra-btn btn-outline">Use Free Tools</a>
+                        <a href="ventures/rta/#login" class="extra-btn btn-login">Log in</a>
+                        <p class="venture-login-note"><strong>When you log in:</strong> you can track your site from one command center: deliveries, inventory, safety alerts and issues.</p>
                     </div>
                 </div>
             </div>
@@ -186,6 +189,8 @@
                     <div class="product-actions">
                         <a href="ventures/coral/" class="extra-btn">Explore Coral</a>
                         <a href="ventures/coral/civic_tools/" class="extra-btn btn-outline">Use Free Tools</a>
+                        <a href="ventures/coral/#login" class="extra-btn btn-login">Log in</a>
+                        <p class="venture-login-note"><strong>When you log in:</strong> every report you file earns city credits, redeemable for vouchers, event passes and discounts.</p>
                     </div>
                 </div>
             </div>
@@ -217,6 +222,8 @@
                     <div class="product-actions">
                         <a href="ventures/vapus/" class="extra-btn">Explore Vapus</a>
                         <a href="ventures/vapus/tools/" class="extra-btn btn-outline">Use Free Tools</a>
+                        <a href="ventures/vapus/#login" class="extra-btn btn-login">Log in</a>
+                        <p class="venture-login-note"><strong>When you log in:</strong> your private health vault, with every symptom, prescription and scan in one place, shared only with the people you choose.</p>
                     </div>
                 </div>
             </div>
@@ -244,8 +251,10 @@
                 <div class="card-content">
                     <h3 class="card-title">Eklavya system</h3>
                     <p class="card-desc">The central platform for students for making the right decisions at right time .</p>
+                    <p class="card-login-note"><strong>When you log in:</strong> you build your career profile and get matched with scholarships, colleges and internships that fit you.</p>
                     <div class="card-actions">
                         <a href="ventures/eklavya/tools/" class="extra-btn tools-btn">Use Free Tools</a>
+                        <a href="ventures/eklavya/app/" class="extra-btn tools-btn">Log in</a>
                         <a href="ventures/eklavya/" class="extra-btn main-card-link">Click to Explore</a>
                     </div>
                 </div>
@@ -414,20 +423,24 @@
     <section class="updates-section" id="updates">
         <div class="container" style="padding-bottom: 2rem;">
             <div class="section-label" data-aos="fade-in">Latest Updates</div>
-            <div class="updates-grid">
+            <!-- These cards are filled from updates.json when the page loads. The two below are only a fallback (keep them
+                 the same as the first entries of updates.json) so the section is never empty if the file cannot be read. -->
+            <div class="updates-grid" id="updatesGrid">
                 <div class="notification-card" data-aos="fade-up" data-aos-delay="100">
-                    <span class="notification-badge">Coming Soon</span>
+                    <span class="notification-badge">Released</span>
                     <h3 class="notification-title">Autonomous Safety &amp; Anti-Theft Plugins</h3>
                     <p class="notification-desc">
-                        Our new autonomous safety and anti-theft plugins are going to be available for everyone very soon. We are finalizing the logic to ensure maximum security without compromising your data privacy.
+                        Our autonomous safety and anti-theft plugins are now available for everyone. The logic is built for maximum security without compromising your data privacy.
                     </p>
+                    <a href="ventures/rta/#downloads" class="extra-btn notification-btn">Download from rta</a>
                 </div>
                 <div class="notification-card" data-aos="fade-up" data-aos-delay="200">
-                    <span class="notification-badge">Coming Soon</span>
+                    <span class="notification-badge">Released</span>
                     <h3 class="notification-title">Free Basic CRM &amp; Essential Sales Tools</h3>
                     <p class="notification-desc">
-                        We are rolling out a free, foundational CRM to help you seamlessly track clients and manage contacts. Alongside this, expect a suite of simple, no-cost sales tools designed to streamline your daily operations without the premium price tag.
+                        A free, foundational CRM to help you seamlessly track clients and manage contacts is now live, alongside a suite of simple, no-cost sales tools designed to streamline your daily operations without the premium price tag.
                     </p>
+                    <a href="ventures/raptor/#login" class="extra-btn notification-btn">Log in to Raptor</a>
                 </div>
             </div>
         </div>
@@ -438,23 +451,39 @@
             <div class="section-label" data-aos="fade-in">Get in Touch</div>
             <h2 class="contact-heading" data-aos="fade-up">Grow with Shoonya</h2>
             <div class="form-container" data-aos="zoom-in" data-aos-duration="1000">
-                <form action="https://formsubmit.co/YOUR_EMAIL_HERE" method="POST">
-                    <input type="text" name="_honey" style="display:none">
-                    <input type="hidden" name="_next" value="https://shoonyaorigins.com">
+                <form class="demo-request-form" id="contactForm" data-source="Contact form (bottom of page)" novalidate>
+                    <input type="text" name="_honey" class="demo-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
                     <div class="form-group">
-                        <label>Full Name</label>
-                        <input type="text" name="name" required placeholder="Justin Case">
+                        <label for="cfName">Full Name</label>
+                        <input id="cfName" type="text" name="name" autocomplete="name" required placeholder="Justin Case">
                     </div>
                     <div class="form-group">
-                        <label>Email Address</label>
-                        <input type="email" name="email" required placeholder="justincase@safetyfirst.com">
+                        <label for="cfPhone">Contact number</label>
+                        <div class="phone-row">
+                            <select name="country" data-country aria-label="Country code"></select>
+                            <input id="cfPhone" type="tel" name="phone" autocomplete="tel-national" inputmode="tel" required placeholder="98765 43210">
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label>Message</label>
-                        <textarea name="message" rows="5" required placeholder="I was going to tell you a joke about a construction site, but I’m still working on it. Would love to hear your thoughts! Tell us how we can contribute ..."></textarea>
+                        <label for="cfVenture">Which venture is this about?</label>
+                        <select id="cfVenture" name="venture" data-venture></select>
                     </div>
-                    <button type="submit" class="submit-btn">Send Message</button>
+                    <div class="form-group">
+                        <label for="cfEmail">Email Address <span class="opt">(optional)</span></label>
+                        <input id="cfEmail" type="email" name="email" autocomplete="email" placeholder="justincase@safetyfirst.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="cfMsg">Message <span class="opt">(optional)</span></label>
+                        <textarea id="cfMsg" name="message" rows="4" placeholder="I was going to tell you a joke about a construction site, but I’m still working on it. Would love to hear your thoughts! Tell us how we can contribute ..."></textarea>
+                    </div>
+                    <p class="demo-err" role="alert"></p>
+                    <button type="submit" class="submit-btn">Book a demo / Send</button>
+                    <p class="demo-small">We use your details only to contact you. <a href="/about/privacy.html">Privacy</a></p>
                 </form>
+                <div class="demo-thanks" hidden>
+                    <h3>Thank you</h3>
+                    <p>We have your request and will reach out to you shortly.</p>
+                </div>
             </div>
         </div>
     </section>
@@ -788,6 +817,225 @@
                 e.stopPropagation();
             });
         }
+    </script>
+    <!-- Book a demo (top bar): same details as the form at the bottom -->
+    <div class="login-picker demo-modal" id="demoModal" role="dialog" aria-modal="true" aria-labelledby="demoModalTitle" hidden>
+        <div class="login-picker-box">
+            <button type="button" class="login-picker-close" id="demoModalClose" aria-label="Close">&times;</button>
+            <div id="demoModalStep1">
+                <h2 id="demoModalTitle">Book a demo</h2>
+                <p class="login-picker-sub">Tell us how to reach you and which venture you would like to see. We will set up a walkthrough.</p>
+                <form class="demo-request-form" id="demoModalForm" data-source="Book Demo (top bar)" novalidate>
+                    <input type="text" name="_honey" class="demo-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+                    <div class="form-group">
+                        <label for="dmName">Name</label>
+                        <input id="dmName" type="text" name="name" autocomplete="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dmPhone">Contact number</label>
+                        <div class="phone-row">
+                            <select name="country" data-country aria-label="Country code"></select>
+                            <input id="dmPhone" type="tel" name="phone" autocomplete="tel-national" inputmode="tel" required placeholder="98765 43210">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="dmVenture">Which venture?</label>
+                        <select id="dmVenture" name="venture" data-venture></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="dmEmail">Email <span class="opt">(optional)</span></label>
+                        <input id="dmEmail" type="email" name="email" autocomplete="email">
+                    </div>
+                    <p class="demo-err" role="alert"></p>
+                    <button type="submit" class="submit-btn">Book my demo</button>
+                    <p class="demo-small">We use your details only to contact you about a demo. <a href="/about/privacy.html">Privacy</a></p>
+                </form>
+            </div>
+            <div id="demoModalStep2" class="demo-thanks" hidden>
+                <h3>Thank you</h3>
+                <p>We have your request and will reach out to you shortly.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Log in: pick a venture, then go straight to that venture's sign-in -->
+    <div class="login-picker" id="loginPicker" role="dialog" aria-modal="true" aria-labelledby="loginPickerTitle" hidden>
+        <div class="login-picker-box">
+            <button type="button" class="login-picker-close" id="loginPickerClose" aria-label="Close">&times;</button>
+            <h2 id="loginPickerTitle">Log in to which venture?</h2>
+            <p class="login-picker-sub">Each venture has its own account. Choose one and we will take you to its sign-in.</p>
+            <div class="login-picker-list">
+                <a href="ventures/raptor/#login" class="login-opt" style="--dot:#a855f7">
+                    <span class="login-opt-name">Raptor</span>
+                    <span class="login-opt-tag">Marketing AI</span>
+                    <span class="login-opt-text">Free CRM, email and WhatsApp automation, and 20+ sales tools.</span>
+                </a>
+                <a href="ventures/rta/#login" class="login-opt" style="--dot:#fbbf24">
+                    <span class="login-opt-name">rta</span>
+                    <span class="login-opt-tag">Infrastructure</span>
+                    <span class="login-opt-text">Track your site: deliveries, inventory, safety alerts and issues.</span>
+                </a>
+                <a href="ventures/coral/#login" class="login-opt" style="--dot:#0891b2">
+                    <span class="login-opt-name">Coral</span>
+                    <span class="login-opt-tag">Urban Management</span>
+                    <span class="login-opt-text">Earn city credits for every report you file.</span>
+                </a>
+                <a href="ventures/vapus/#login" class="login-opt" style="--dot:#059669">
+                    <span class="login-opt-name">Vapus</span>
+                    <span class="login-opt-tag">Health</span>
+                    <span class="login-opt-text">Your private health vault, shared only with who you choose.</span>
+                </a>
+                <a href="ventures/eklavya/app/" class="login-opt" style="--dot:#2563eb">
+                    <span class="login-opt-name">Eklavya</span>
+                    <span class="login-opt-tag">Ed Tech</span>
+                    <span class="login-opt-text">Build your career profile and get matched with opportunities.</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Demo requests: the top-bar popup and the form at the bottom send the same way Raptor's "Book demo" does
+        // (FormSubmit's AJAX endpoint, JSON body, honeypot field, a thank-you step on success).
+        (function () {
+            var TO = 'https://formsubmit.co/ajax/yogesh@shoonyaorigins.com';
+            var COUNTRIES = [['India', '+91'], ['United States', '+1'], ['United Kingdom', '+44'], ['United Arab Emirates', '+971'], ['Singapore', '+65'],
+                ['Australia', '+61'], ['Canada', '+1'], ['Germany', '+49'], ['France', '+33'], ['Saudi Arabia', '+966'], ['Qatar', '+974'], ['Kuwait', '+965'],
+                ['Oman', '+968'], ['Bahrain', '+973'], ['Bangladesh', '+880'], ['Nepal', '+977'], ['Sri Lanka', '+94'], ['Pakistan', '+92'], ['Malaysia', '+60'],
+                ['Indonesia', '+62'], ['Thailand', '+66'], ['Vietnam', '+84'], ['Philippines', '+63'], ['Japan', '+81'], ['South Korea', '+82'], ['China', '+86'],
+                ['Hong Kong', '+852'], ['New Zealand', '+64'], ['South Africa', '+27'], ['Nigeria', '+234'], ['Kenya', '+254'], ['Egypt', '+20'], ['Turkey', '+90'],
+                ['Italy', '+39'], ['Spain', '+34'], ['Netherlands', '+31'], ['Switzerland', '+41'], ['Sweden', '+46'], ['Ireland', '+353'], ['Brazil', '+55'],
+                ['Mexico', '+52'], ['Russia', '+7']];
+            var VENTURES = ['Raptor', 'rta', 'Coral', 'Vapus', 'Eklavya', 'Shakti', 'Project Jeeva', 'Charaka', 'Aether Labs', 'Shoonya Systems', 'Not sure yet'];
+
+            function fill(select, items, text, selected) {
+                items.forEach(function (it) {
+                    var o = document.createElement('option');
+                    o.value = it[0]; o.textContent = text(it);
+                    if (it[0] === selected) o.selected = true;
+                    select.appendChild(o);
+                });
+            }
+            document.querySelectorAll('select[data-country]').forEach(function (s) {
+                fill(s, COUNTRIES, function (c) { return c[0] + ' (' + c[1] + ')'; }, 'India');
+            });
+            document.querySelectorAll('select[data-venture]').forEach(function (s) {
+                var ph = document.createElement('option'); ph.value = ''; ph.textContent = 'Select a venture'; ph.disabled = true; ph.selected = true; s.appendChild(ph);
+                fill(s, VENTURES.map(function (v) { return [v]; }), function (v) { return v[0]; });
+            });
+
+            function dial(form) {
+                var name = form.elements.country.value, code = '';
+                COUNTRIES.forEach(function (c) { if (c[0] === name) code = c[1]; });
+                return code;
+            }
+
+            function wire(form, onDone) {
+                var err = form.querySelector('.demo-err'), btn = form.querySelector('button[type="submit"]'), label = btn.textContent;
+                function bad(el, msg) { el.setAttribute('aria-invalid', 'true'); err.textContent = msg; el.focus(); }
+                form.addEventListener('input', function (e) { e.target.removeAttribute('aria-invalid'); err.textContent = ''; });
+                form.addEventListener('change', function (e) { e.target.removeAttribute('aria-invalid'); err.textContent = ''; });
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    var f = form.elements, name = f.name.value.trim(), phone = f.phone.value.trim(), email = f.email.value.trim();
+                    var message = f.message ? f.message.value.trim() : '';
+                    if (f._honey.value) return;
+                    if (!name) return bad(f.name, 'Please enter your name.');
+                    var digits = phone.replace(/\D/g, '');
+                    if (digits.length < 6 || digits.length > 14) return bad(f.phone, 'Please enter a valid contact number.');
+                    if (!f.venture.value) return bad(f.venture, 'Please choose a venture.');
+                    if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return bad(f.email, 'That email address does not look right.');
+                    btn.disabled = true; btn.textContent = 'Sending...'; err.textContent = '';
+                    fetch(TO, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        body: JSON.stringify({
+                            _subject: 'Demo request: ' + f.venture.value,
+                            _template: 'table',
+                            _captcha: 'false',
+                            name: name,
+                            phone: dial(form) + ' ' + phone,
+                            country: f.country.value,
+                            venture: f.venture.value,
+                            email: email || '(not given)',
+                            message: message || '(none)',
+                            source: form.getAttribute('data-source'),
+                            page: location.href
+                        })
+                    })
+                    .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok || (j.success !== true && j.success !== 'true')) throw new Error('send failed'); }); })
+                    .then(function () { form.reset(); onDone(); })
+                    .catch(function () { err.textContent = 'Could not send that just now. Please try again in a moment.'; })
+                    .then(function () { btn.disabled = false; btn.textContent = label; });
+                });
+            }
+
+            // bottom form: swap the form for a thank-you
+            var cf = document.getElementById('contactForm');
+            if (cf) wire(cf, function () { cf.hidden = true; cf.parentNode.querySelector('.demo-thanks').hidden = false; });
+
+            // top-bar popup
+            var modal = document.getElementById('demoModal'), mf = document.getElementById('demoModalForm');
+            var s1 = document.getElementById('demoModalStep1'), s2 = document.getElementById('demoModalStep2');
+            var opener = document.getElementById('demoBtn'), closeBtn = document.getElementById('demoModalClose');
+            if (modal && mf && opener) {
+                wire(mf, function () { s1.hidden = true; s2.hidden = false; closeBtn.focus(); });
+                var opened = function (e) { e.preventDefault(); s1.hidden = false; s2.hidden = true; modal.hidden = false; document.body.classList.add('login-picker-open'); document.getElementById('dmName').focus(); };
+                var closed = function () { modal.hidden = true; document.body.classList.remove('login-picker-open'); opener.focus(); };
+                opener.addEventListener('click', opened);
+                closeBtn.addEventListener('click', closed);
+                modal.addEventListener('click', function (e) { if (e.target === modal) closed(); });
+                document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !modal.hidden) closed(); });
+            }
+        })();
+    </script>
+    <script>
+        // Latest Updates: the cards come from updates.json (edit that file and push to change them).
+        // Anything wrong with the file leaves the fallback cards that are already in the page.
+        (function () {
+            var grid = document.getElementById('updatesGrid');
+            if (!grid || !window.fetch) return;
+            fetch('updates.json', { cache: 'no-cache' })
+                .then(function (r) { if (!r.ok) throw new Error('no file'); return r.json(); })
+                .then(function (items) {
+                    if (!Array.isArray(items)) return;
+                    var live = items.filter(function (u) { return u && u.active !== false && u.title; });
+                    if (!live.length) return;
+                    function el(tag, cls, text) { var n = document.createElement(tag); n.className = cls; if (text) n.textContent = text; return n; }
+                    grid.textContent = '';
+                    live.forEach(function (u, i) {
+                        var card = el('div', 'notification-card');
+                        card.setAttribute('data-aos', 'fade-up');
+                        card.setAttribute('data-aos-delay', String(100 * (i + 1)));
+                        if (u.badge) card.appendChild(el('span', 'notification-badge', u.badge));
+                        card.appendChild(el('h3', 'notification-title', u.title));
+                        if (u.text) card.appendChild(el('p', 'notification-desc', u.text));
+                        // only site-relative or https links are used as buttons
+                        if (u.button_label && u.button_href && /^(https:\/\/|[a-z0-9_\-\/#.?=&]+$)/i.test(u.button_href)) {
+                            var a = el('a', 'extra-btn notification-btn', u.button_label);
+                            a.href = u.button_href;
+                            card.appendChild(a);
+                        }
+                        grid.appendChild(card);
+                    });
+                    if (window.AOS && AOS.refreshHard) AOS.refreshHard();
+                })
+                .catch(function () { /* keep the fallback cards */ });
+        })();
+    </script>
+    <script>
+        // Top-bar Log in opens the venture picker (Esc, the X or a click outside closes it)
+        (function () {
+            var picker = document.getElementById('loginPicker');
+            var btn = document.getElementById('loginBtn');
+            var closeBtn = document.getElementById('loginPickerClose');
+            if (!picker || !btn) return;
+            function open(e) { if (e) e.preventDefault(); picker.hidden = false; document.body.classList.add('login-picker-open'); closeBtn.focus(); }
+            function close() { picker.hidden = true; document.body.classList.remove('login-picker-open'); btn.focus(); }
+            btn.addEventListener('click', open);
+            closeBtn.addEventListener('click', close);
+            picker.addEventListener('click', function (e) { if (e.target === picker) close(); });
+            document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !picker.hidden) close(); });
+        })();
     </script>
     <script>
         // The rover street only animates while it is on screen (saves work while scrolling past everything else)
