@@ -45,6 +45,7 @@ if (canvas && btn) {
   const store = { get() { try { return localStorage.getItem(KEY); } catch { return null; } }, set(v) { try { localStorage.setItem(KEY, v); } catch { /* private mode */ } } };
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const saveData = !!(navigator.connection && navigator.connection.saveData);
+  let onScreen = true;
   let want = store.get() ? store.get() === 'on' : !saveData;          // on by default, unless the visitor asked their browser to save data
   let renderer, scene, camera, body, raf = 0, state = 'idle';        // idle | loading | ready | failed
 
@@ -60,7 +61,7 @@ if (canvas && btn) {
   }
   function frame(t) {
     raf = 0;
-    if (!want || document.hidden) return;
+    if (!want || document.hidden || !onScreen) return;
     body.rotation.y = (reduced ? 0 : t * (OPT.spin || 0.00005)) + scrollY * 0.0007;
     renderer.render(scene, camera);
     raf = requestAnimationFrame(frame);
@@ -94,6 +95,8 @@ if (canvas && btn) {
   }
   btn.addEventListener('click', () => set(!want));
   document.addEventListener('visibilitychange', () => { if (!document.hidden) run(); });
+  // stop drawing while the canvas is scrolled out of view (on the Vapus page it is always in view, so nothing changes there)
+  if ('IntersectionObserver' in window) new IntersectionObserver((es) => { onScreen = es[0].isIntersecting; if (onScreen) run(); }).observe(canvas);
   addEventListener('scroll', () => { if (want && state === 'ready' && reduced) { body.rotation.y = scrollY * 0.0007; renderer.render(scene, camera); } }, { passive: true });
   label();
   if (want) (window.requestIdleCallback || ((f) => setTimeout(f, 1200)))(() => boot(), { timeout: 3000 });

@@ -29,11 +29,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700;800&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <link rel="stylesheet" href="ventures/vapus/assets/aura-bg.css?v=bc342c8f">
-    <link rel="stylesheet" href="style.css?v=32">
+    <link rel="stylesheet" href="style.css?v=33">
     <!-- The 3D body is Vapus's own script, pointed at from here instead of copied -->
     <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.171.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.171.0/examples/jsm/"}}</script>
     <script>window.AURA_BG_OPTIONS = { extraLayers: ['muscular'], spin: 0.00008, overlay: 'images/cosmos-overlay.png' };</script>
-    <script type="module" src="ventures/vapus/assets/aura-bg.js?v=home4"></script>
+    <script type="module" src="ventures/vapus/assets/aura-bg.js?v=home5"></script>
 </head>
 <body>
     <div class="lamp-container" id="lightSwitch" title="Pull to toggle">
@@ -788,6 +788,16 @@
                 e.stopPropagation();
             });
         }
+    </script>
+    <script>
+        // The rover street only animates while it is on screen (saves work while scrolling past everything else)
+        (function () {
+            var street = document.getElementById('street');
+            if (!street || !('IntersectionObserver' in window)) return;
+            new IntersectionObserver(function (es) {
+                street.classList.toggle('street-offscreen', !es[0].isIntersecting);
+            }).observe(street);
+        })();
     </script>
 </body>
 </html>

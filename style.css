@@ -1734,8 +1734,8 @@ header { padding-right: calc(3% + 4.5rem); }
     header { padding-right: 4.5rem; }
 }
 
-/* One shared glow that stays put while the page scrolls past it */
-body { background-attachment: fixed; }
+/* One shared glow that stays put while the page scrolls past it.
+   (The body gradient is deliberately not "fixed": a fixed background repaints on every scroll step and makes scrolling stutter.) */
 
 body::before {
     content: '';
@@ -1773,8 +1773,6 @@ body::before {
 
 /* Product panels sit on the page instead of on top of it */
 .venture {
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
     box-shadow: 0 18px 50px rgba(15, 23, 42, 0.09);
     border-color: rgba(255, 255, 255, 0.55);
 }
@@ -2064,6 +2062,11 @@ body.dark-mode .street-sky::after { --haze: rgba(12, 10, 9, 0.95); background: l
 @media (prefers-reduced-motion: reduce) {
     .skyline, .street-lane, .street-rover img, .rover-shadow { animation: none; }
 }
+/* the street stops animating while it is off screen (set by a small script on the page) */
+.street.street-offscreen .skyline,
+.street.street-offscreen .street-lane,
+.street.street-offscreen .street-rover img,
+.street.street-offscreen .rover-shadow { animation-play-state: paused; }
 
 /* Nudges only this sentence down; nothing below it moves because the space it takes is unchanged */
 p.subtitle { top: 1.75rem; }
