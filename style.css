@@ -1952,6 +1952,119 @@ body.dark-mode .why-title-big { background: linear-gradient(135deg, #fbbf24, #d9
     .hero-body { transform: translateX(-30vw) scale(0.6); opacity: 0.35; }
 }
 
+/* =========================================
+   ROVER ON THE STREET
+   Three skylines slide past at different speeds (far = slow, near = fast); the nearer, the
+   clearer. A haze fades the far ones into the sky. The road lane dashes slide the same way.
+   ========================================= */
+.street {
+    --street-speed: 1;
+    position: relative;
+    height: 340px;
+    margin: 2rem 0 0;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 12%, #000 88%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, #000 12%, #000 88%, transparent 100%);
+}
+
+.street-sky { position: absolute; inset: 0 0 64px 0; }
+
+.skyline {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--primary);
+    -webkit-mask-repeat: repeat-x;
+    mask-repeat: repeat-x;
+    -webkit-mask-position: 0 100%;
+    mask-position: 0 100%;
+    -webkit-mask-size: 1200px auto;
+    mask-size: 1200px auto;
+    animation: streetSlide linear infinite;
+}
+.skyline-far  { height: 220px; opacity: 0.12; -webkit-mask-image: url('images/skyline-far.svg');  mask-image: url('images/skyline-far.svg');  animation-duration: calc(90s / var(--street-speed)); }
+.skyline-mid  { height: 190px; opacity: 0.22; -webkit-mask-image: url('images/skyline-mid.svg');  mask-image: url('images/skyline-mid.svg');  animation-duration: calc(45s / var(--street-speed)); }
+.skyline-near { height: 150px; opacity: 0.42; -webkit-mask-image: url('images/skyline-near.svg'); mask-image: url('images/skyline-near.svg'); animation-duration: calc(22s / var(--street-speed)); }
+
+/* haze: the top of the scene dissolves into the page */
+.street-sky::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, var(--haze, rgba(240, 249, 255, 0.95)) 0%, rgba(240, 249, 255, 0) 70%);
+    pointer-events: none;
+}
+body.dark-mode .street-sky::after { --haze: rgba(12, 10, 9, 0.95); background: linear-gradient(to bottom, rgba(12, 10, 9, 0.95) 0%, rgba(12, 10, 9, 0) 70%); }
+
+.street-road {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 64px;
+    background: linear-gradient(to bottom, rgba(71, 85, 105, 0.5), rgba(51, 65, 85, 0.75));
+    border-top: 3px solid rgba(100, 116, 139, 0.45);
+}
+.street-lane {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 4px;
+    background: repeating-linear-gradient(to right, rgba(255, 255, 255, 0.85) 0 46px, transparent 46px 110px);
+    background-size: 220px 4px;
+    animation: laneSlide linear infinite;
+    animation-duration: calc(1.2s / var(--street-speed));
+}
+
+.street-rover {
+    position: absolute;
+    left: 50%;
+    bottom: 22px;
+    width: 150px;
+    transform: translateX(-50%);
+    z-index: 2;
+}
+.street-rover img {
+    display: block;
+    width: 100%;
+    height: auto;
+    transform-origin: 50% 100%;
+    animation: roverDrive 0.7s ease-in-out infinite;
+}
+.rover-shadow {
+    position: absolute;
+    left: 12%;
+    right: 12%;
+    bottom: -6px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.35);
+    filter: blur(4px);
+    z-index: -1;
+    animation: roverShadow 0.7s ease-in-out infinite;
+}
+
+@keyframes streetSlide { to { -webkit-mask-position: -1200px 100%; mask-position: -1200px 100%; } }
+@keyframes laneSlide { to { background-position: -220px 0; } }
+@keyframes roverDrive {
+    0%, 100% { transform: translateY(0) rotate(-0.6deg); }
+    50% { transform: translateY(-5px) rotate(0.6deg); }
+}
+@keyframes roverShadow {
+    0%, 100% { transform: scaleX(1); opacity: 0.35; }
+    50% { transform: scaleX(0.92); opacity: 0.25; }
+}
+
+@media (max-width: 768px) {
+    .street { height: 280px; }
+    .street-rover { width: 120px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .skyline, .street-lane, .street-rover img, .rover-shadow { animation: none; }
+}
+
 /* Nudges only this sentence down; nothing below it moves because the space it takes is unchanged */
 p.subtitle { top: 1.75rem; }
 

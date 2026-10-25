@@ -187,8 +187,13 @@ header {
 }
 .logo span { color: var(--accent); }
 .nav-links {
-  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  display: flex; align-items: center; gap: 6px; flex-wrap: nowrap;
+  white-space: nowrap;
 }
+/* the bar gets more room so the links stay on one line next to the logo and theme button */
+header .container { max-width: 1400px; }
+.header-inner { gap: 20px; }
+.nav-links a { white-space: nowrap; }
 .nav-free-tag {
   font-family: 'Times New Roman', Times, serif;
   color: #059669;
@@ -196,7 +201,7 @@ header {
   margin-right: 8px;
   letter-spacing: 1px;
 }
-@media (max-width: 1000px) { .nav-free-tag { display: none; } }
+@media (max-width: 1240px) { .nav-free-tag { display: none; } }
 .nav-links a {
   font-family: var(--font-body);
   font-size: 11px; font-weight: 600;
@@ -255,6 +260,18 @@ header {
   color: var(--heading); margin-bottom: 28px;
 }
 .hero h1 em { font-style: normal; color: var(--accent); text-shadow: 0 0 60px var(--glow-sm); }
+/* "Urban Intelligence" sits flush left, with only the line before it */
+.hero-eyebrow::after { display: none; }
+/* Mumbai & Pune: same font, size and colour as "Citizens" in the headline, on its own line above the numbers */
+.hero-cities {
+  flex-basis: 100%;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: clamp(48px, 8.5vw, 96px);
+  font-weight: 700; line-height: 1.05;
+  color: var(--accent); text-shadow: 0 0 60px var(--glow-sm);
+  margin-bottom: 8px;
+}
 .hero-sub {
   font-size: 17px; color: var(--muted);
   max-width: 640px; margin: 0 auto 48px;
@@ -693,6 +710,7 @@ html[data-theme="dark"] .feature-live-tag.on { background: rgba(16,185,129,0.14)
 @media (max-width: 600px) {
   .nav-links { display: none; }
   .hero h1 { font-size: 44px; }
+  .hero-cities { font-size: 44px; }
   .hero-stats { gap: 24px; }
   .detection-grid { grid-template-columns: 1fr; }
   .tech-strip { grid-template-columns: 1fr 1fr; }
@@ -706,6 +724,39 @@ html[data-theme="dark"] .feature-live-tag.on { background: rgba(16,185,129,0.14)
 }
 </style>
 <link rel="stylesheet" href="basis-footer.css" />
+<link rel="stylesheet" href="street-game.css?v=1" />
+<link rel="stylesheet" href="assistant.css?v=1" />
+<style>
+/* ROVER ON THE STREET (the same scene as the Shoonya Origins home page, in Coral's colours) */
+.street { --street-speed: 1; position: relative; height: 340px; margin: 0; overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 12%, #000 88%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 12%, #000 88%, transparent 100%); }
+.street-sky { position: absolute; inset: 0 0 64px 0; }
+.skyline { position: absolute; left: 0; right: 0; bottom: 0; background: var(--accent);
+  -webkit-mask-repeat: repeat-x; mask-repeat: repeat-x; -webkit-mask-position: 0 100%; mask-position: 0 100%;
+  -webkit-mask-size: 1200px auto; mask-size: 1200px auto; animation: streetSlide linear infinite; }
+.skyline-far  { height: 220px; opacity: 0.12; -webkit-mask-image: url('/images/skyline-far.svg');  mask-image: url('/images/skyline-far.svg');  animation-duration: calc(90s / var(--street-speed)); }
+.skyline-mid  { height: 190px; opacity: 0.22; -webkit-mask-image: url('/images/skyline-mid.svg');  mask-image: url('/images/skyline-mid.svg');  animation-duration: calc(45s / var(--street-speed)); }
+.skyline-near { height: 150px; opacity: 0.42; -webkit-mask-image: url('/images/skyline-near.svg'); mask-image: url('/images/skyline-near.svg'); animation-duration: calc(22s / var(--street-speed)); }
+.street-sky::after { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to bottom, var(--bg) 0%, transparent 70%); }
+.street-road { position: absolute; left: 0; right: 0; bottom: 0; height: 64px;
+  background: linear-gradient(to bottom, rgba(71, 85, 105, 0.5), rgba(51, 65, 85, 0.75));
+  border-top: 3px solid rgba(100, 116, 139, 0.45); }
+.street-lane { position: absolute; left: 0; right: 0; top: 50%; height: 4px;
+  background: repeating-linear-gradient(to right, rgba(255, 255, 255, 0.85) 0 46px, transparent 46px 110px);
+  background-size: 220px 4px; animation: laneSlide linear infinite; animation-duration: calc(1.2s / var(--street-speed)); }
+.street-rover { position: absolute; left: 50%; bottom: 22px; width: 150px; transform: translateX(-50%); z-index: 2; }
+.street-rover img { display: block; width: 100%; height: auto; transform-origin: 50% 100%; animation: roverDrive 0.7s ease-in-out infinite; }
+.rover-shadow { position: absolute; left: 12%; right: 12%; bottom: -6px; height: 12px; border-radius: 50%;
+  background: rgba(0, 0, 0, 0.35); filter: blur(4px); z-index: -1; animation: roverShadow 0.7s ease-in-out infinite; }
+@keyframes streetSlide { to { -webkit-mask-position: -1200px 100%; mask-position: -1200px 100%; } }
+@keyframes laneSlide { to { background-position: -220px 0; } }
+@keyframes roverDrive { 0%, 100% { transform: translateY(0) rotate(-0.6deg); } 50% { transform: translateY(-5px) rotate(0.6deg); } }
+@keyframes roverShadow { 0%, 100% { transform: scaleX(1); opacity: 0.35; } 50% { transform: scaleX(0.92); opacity: 0.25; } }
+@media (max-width: 768px) { .street { height: 280px; } .street-rover { width: 120px; } }
+@media (prefers-reduced-motion: reduce) { .skyline, .street-lane, .street-rover img, .rover-shadow { animation: none; } }
+</style>
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -739,10 +790,10 @@ html[data-theme="dark"] .feature-live-tag.on { background: rgba(16,185,129,0.14)
 <!-- ═══ HERO ══════════════════════════════════════════════════ -->
 <section class="hero z1">
   <div class="container">
-    <div class="hero-eyebrow">Urban Intelligence Platform</div>
+    <div class="hero-eyebrow">Urban Intelligence</div>
     <h1>
       The Bridge Between<br />
-      <em>Mumbai & Pune</em><br />
+      <em>Citizens</em><br />
       and Their Government.
     </h1>
     <p class="hero-sub">
@@ -753,6 +804,7 @@ html[data-theme="dark"] .feature-live-tag.on { background: rgba(16,185,129,0.14)
       <a href="#how-it-works" class="btn-ghost">See How It Works</a>
     </div>
     <div class="hero-stats">
+      <div class="hero-cities">Mumbai &amp; Pune</div>
       <div class="stat-item">
         <span class="stat-num">2</span>
         <span class="stat-label">Cities Live</span>
@@ -766,6 +818,20 @@ html[data-theme="dark"] .feature-live-tag.on { background: rgba(16,185,129,0.14)
         <span class="stat-label">Data Sold. Ever.</span>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- ═══ ROVER ON THE STREET: a looping scene, buildings fade into haze behind ═══ -->
+<section class="street z1" id="street" aria-label="Our rover driving down a city street">
+  <div class="street-sky" aria-hidden="true">
+    <div class="skyline skyline-far"></div>
+    <div class="skyline skyline-mid"></div>
+    <div class="skyline skyline-near"></div>
+  </div>
+  <div class="street-road" aria-hidden="true"><div class="street-lane"></div></div>
+  <div class="street-rover">
+    <img src="/images/rover_love1.png" alt="Shoonya rover driving down the street" width="492" height="507" loading="lazy">
+    <span class="rover-shadow" aria-hidden="true"></span>
   </div>
 </section>
 
@@ -2259,5 +2325,21 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 </script>
+<script src="street-game.js?v=1"></script>
+
+<!-- Shoonya AI assistant (same as the main site) -->
+<div id="pro-ai-agent">
+  <div id="pro-speech-bubble" style="display: none;">
+    <div id="pro-chat-history">
+      <p class="bot-msg">Shoonya AI Online. How can I assist you with our deep-tech ecosystem today?</p>
+    </div>
+    <div id="pro-input-area">
+      <input type="text" id="pro-user-input" placeholder="Ask a question..." autocomplete="off">
+      <button id="pro-send-btn" aria-label="Send">&uarr;</button>
+    </div>
+  </div>
+  <img src="/images/rover_love1.png" id="pro-agent-avatar" alt="Shoonya AI Assistant">
+</div>
+<script src="assistant.js?v=1"></script>
 </body>
 </html>

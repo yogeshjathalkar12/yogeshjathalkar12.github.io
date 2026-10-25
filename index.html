@@ -29,7 +29,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700;800&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <link rel="stylesheet" href="ventures/vapus/assets/aura-bg.css?v=bc342c8f">
-    <link rel="stylesheet" href="style.css?v=31">
+    <link rel="stylesheet" href="style.css?v=32">
     <!-- The 3D body is Vapus's own script, pointed at from here instead of copied -->
     <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.171.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.171.0/examples/jsm/"}}</script>
     <script>window.AURA_BG_OPTIONS = { extraLayers: ['muscular'], spin: 0.00008, overlay: 'images/cosmos-overlay.png' };</script>
@@ -303,6 +303,20 @@
 
         </div>
     </div>
+
+    <!-- ═══ ROVER ON THE STREET: a looping scene, buildings fade into haze behind ═══ -->
+    <section class="street" id="street" aria-label="Our rover driving down a city street">
+        <div class="street-sky" aria-hidden="true">
+            <div class="skyline skyline-far"></div>
+            <div class="skyline skyline-mid"></div>
+            <div class="skyline skyline-near"></div>
+        </div>
+        <div class="street-road" aria-hidden="true"><div class="street-lane"></div></div>
+        <div class="street-rover">
+            <img src="images/rover_love1.png" alt="Shoonya rover driving down the street" width="492" height="507" loading="lazy">
+            <span class="rover-shadow" aria-hidden="true"></span>
+        </div>
+    </section>
 
     <!-- ═══ ROVER FLEET SHOWCASE ════════════════════════════════ -->
     <section class="rover-showcase-section" style="padding: 100px 0;">

@@ -1,0 +1,111 @@
+/* Shoonya AI assistant: the same rover and chat bubble as the main site, in Coral's colours. */
+#pro-ai-agent {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 15px;
+}
+
+#pro-agent-avatar {
+  width: 75px;
+  height: auto;
+  cursor: pointer;
+  filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.2));
+  transition: transform 0.2s ease;
+}
+#pro-agent-avatar:hover { transform: scale(1.1); }
+
+#pro-speech-bubble {
+  background: var(--card);
+  border: 1px solid var(--accent);
+  border-radius: 16px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+  width: 320px;
+  max-width: calc(100vw - 60px);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform-origin: bottom right;
+}
+
+#pro-chat-history {
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  scrollbar-width: thin;
+}
+
+#pro-ai-agent .bot-msg {
+  font-family: var(--font-body, sans-serif);
+  font-size: 0.9rem;
+  color: var(--text);
+  background: var(--accent-tint2);
+  padding: 10px 14px;
+  border-radius: 12px 12px 12px 2px;
+  align-self: flex-start;
+  max-width: 90%;
+  margin: 0;
+}
+
+#pro-ai-agent .user-msg {
+  font-family: var(--font-body, sans-serif);
+  font-size: 0.9rem;
+  background: var(--accent);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 12px 12px 2px 12px;
+  align-self: flex-end;
+  max-width: 90%;
+  margin: 0;
+}
+
+#pro-input-area {
+  display: flex;
+  padding: 12px;
+  border-top: 1px solid var(--border);
+  gap: 8px;
+}
+
+#pro-user-input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font-body, sans-serif);
+  font-size: 0.85rem;
+  outline: none;
+}
+#pro-user-input:focus { border-color: var(--accent); }
+
+#pro-send-btn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-weight: bold;
+  transition: transform 0.2s;
+}
+#pro-send-btn:hover { transform: scale(1.1); }
+
+@media (max-width: 600px) {
+  #pro-ai-agent { bottom: 16px; right: 16px; }
+  #pro-agent-avatar { width: 62px; }
+}
