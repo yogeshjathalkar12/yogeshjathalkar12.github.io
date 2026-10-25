@@ -21,6 +21,7 @@ import { startCall } from '../../lib/calls';
 import { useAuth } from '../../hooks/AuthContext';
 import { type PipelineStage, loadPipelineStages, stageByKey } from '../../lib/pipelineStages';
 import { formatCurrency } from '../../lib/crmHelpers';
+import { checkTeamOverlap, noteTeamContact, reachedOut } from '../../lib/teamContactGuard';
 
 // What the email on a deal card is doing. Statuses come from deal_outreach (see db/migrations/2026-10-14_crm_outreach.sql).
 interface DealEmail { status: string; error: string | null; }
@@ -67,6 +68,12 @@ const SMS_IN_PROGRESS_OR_DONE = ['pending', 'sending', 'sent', 'delivered', 'rep
 
 export default function CrmPipeline() {
   const { session } = useAuth();
+  // One company, one team: before a message goes out, a teammate who already reached out to the company (or who owns it) is mentioned and the person
+  // confirms. Advisory only: if it cannot be checked, the message goes ahead as before (lib/teamContactGuard.ts).
+  const confirmTeamOverlap = async (deal: any): Promise<boolean> => {
+    const why = await checkTeamOverlap(supabase, deal?.companies?.name, session?.user?.id);
+    return !why || window.confirm(why.message);
+  };
   const [searchParams, setSearchParams] = useSearchParams();
   const [assigneeFilter, setAssigneeFilter] = useAssigneeFilter('pipeline');
   const [deals, setDeals] = useState<any[]>([]);
@@ -175,11 +182,13 @@ export default function CrmPipeline() {
   const handleWhatsApp = async (e: React.MouseEvent, deal: any) => {
     e.stopPropagation();
     setCallError(null);
+    if (!(await confirmTeamOverlap(deal))) return;
     setWaSendingDealId(deal.id);
     try {
       const { data, error } = await supabase.rpc('crm_wa_request', { p_deal_id: deal.id });
       if (error) throw error;
       if (data?.status === 'skipped' && data.error) setCallError(data.error);
+      if (reachedOut(data?.status)) await noteTeamContact(supabase, deal?.companies?.name, 'whatsapp');
       await fetchWhatsApp();
       if (data?.status === 'pending') {
         await dispatchCrmWhatsApp(); // send it now rather than waiting for the next check
@@ -209,10 +218,12 @@ export default function CrmPipeline() {
   const handleSms = async (e: React.MouseEvent, deal: any) => {
     e.stopPropagation();
     setCallError(null);
+    if (!(await confirmTeamOverlap(deal))) return;
     setSmsSendingDealId(deal.id);
     try {
       const data = await smsApi.requestDeal(deal.id);
       if (data.status === 'skipped' && data.error) setCallError(data.error);
+      if (reachedOut(data.status)) await noteTeamContact(supabase, deal?.companies?.name, 'sms');
       await fetchSms();
       if (data.status === 'pending') {
         await smsApi.dispatch(); // send it now rather than waiting for the next check
@@ -228,11 +239,13 @@ export default function CrmPipeline() {
   const handleEmail = async (e: React.MouseEvent, deal: any) => {
     e.stopPropagation();
     setCallError(null);
+    if (!(await confirmTeamOverlap(deal))) return;
     setEmailingDealId(deal.id);
     try {
       const { data, error } = await supabase.rpc('crm_outreach_request', { p_deal_id: deal.id });
       if (error) throw error;
       if (data?.status === 'skipped' && data.error) setCallError(data.error);
+      if (reachedOut(data?.status)) await noteTeamContact(supabase, deal?.companies?.name, 'email');
       await fetchOutreach();
     } catch (err: any) {
       setCallError(err.message || 'Could not queue the email.');

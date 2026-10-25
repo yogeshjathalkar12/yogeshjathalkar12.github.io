@@ -1,12 +1,12 @@
 {
-  "_about": "The ONE place that says which Raptor version each download is. After publishing a release, edit this file and run:  python scripts/set_release.py   It rewrites every download link and version label on the Raptor pages. Both platforms use the same version number from raptor-ui/package.json, and both files live in the same GitHub release (raptor-dist, tag v<version>). The Windows link goes through the Cloudflare Worker 'raptor-download' (source: release-proxy/worker.js in the desktop repo), which serves the file from that GitHub release with an address that does not expire, so slow downloads finish. Releasing needs no extra upload: publish on GitHub, then change the version number in the URL here.",
+  "_about": "The ONE place that says which Raptor version the pages show. The DOWNLOAD LINKS no longer carry a version: they are the stable addresses /windows and /mac on the Cloudflare Worker 'raptor-download' (source: release-proxy/worker.js in the desktop repo), which send people to the newest installer published in the raptor-dist GitHub releases, so a link can never point at an old version and a release needs no link edit. The Worker's /version answers with the newest versions as JSON: the download window (ventures/raptor/download.js) reads it, so even its version label is always current. The version numbers below are only the words written into the pages (and the fallback if /version cannot be reached). After publishing a release: change them, then run  python scripts/set_release.py",
   "windows": {
     "version": "0.1.14",
-    "url": "https://raptor-download.yogeshjathalkar.workers.dev/Raptor-Setup-0.1.14.exe"
+    "url": "https://raptor-download.yogeshjathalkar.workers.dev/windows"
   },
   "mac": {
     "version": "0.1.14",
     "file": "Raptor-0.1.14-mac-arm64.dmg",
-    "url": "https://raptor-download.yogeshjathalkar.workers.dev/Raptor-0.1.14-mac-arm64.dmg"
+    "url": "https://raptor-download.yogeshjathalkar.workers.dev/mac"
   }
 }

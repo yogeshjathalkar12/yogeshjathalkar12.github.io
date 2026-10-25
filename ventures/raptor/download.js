@@ -13,9 +13,32 @@
 
   var RELEASE_VERSION = '0.1.14';
   var LINKS = {
-    windows: 'https://raptor-download.yogeshjathalkar.workers.dev/Raptor-Setup-0.1.14.exe',
-    mac: 'https://raptor-download.yogeshjathalkar.workers.dev/Raptor-0.1.14-mac-arm64.dmg'
+    windows: 'https://raptor-download.yogeshjathalkar.workers.dev/windows',
+    mac: 'https://raptor-download.yogeshjathalkar.workers.dev/mac'
   };
+
+  // The newest versions, read from the download server (its /version page) so the window never shows an old number. RELEASE_VERSION above is only
+  // the fallback for when the server cannot be reached; the download links themselves (/windows, /mac) are always the newest anyway.
+  var fresh = { windows: '', mac: '' };
+  function ver(os) { return fresh[os] || RELEASE_VERSION; }
+  function showVersions() {
+    if (!overlay) return;
+    ['windows', 'mac'].forEach(function (os) {
+      var small = overlay.querySelector('[data-os="' + os + '"] small');
+      if (small) small.innerHTML = (os === 'windows' ? '64-bit' : 'Apple Silicon') + ' &middot; v' + ver(os);
+    });
+  }
+  function readVersions() {
+    try {
+      fetch(new URL(LINKS.windows).origin + '/version').then(function (r) { return r.ok ? r.json() : null; }).then(function (v) {
+        if (!v) return;
+        if (v.windows && /^\d+\.\d+\.\d+$/.test(v.windows.version || '')) fresh.windows = v.windows.version;
+        if (v.mac && /^\d+\.\d+\.\d+$/.test(v.mac.version || '')) fresh.mac = v.mac.version;
+        if (window.RaptorDownload) window.RaptorDownload.version = ver('windows');
+        showVersions();
+      }).catch(function () { /* offline or the server is busy: the number written in the page stays */ });
+    } catch (e) { /* an old browser without fetch/URL: same */ }
+  }
 
   var INSTALLER_LINK = /Raptor-Setup-[\d.]+\.exe|Raptor-[\d.]+-mac-arm64\.dmg|workers\.dev\/(?:windows|mac)\b/;
   var overlay, step1, step2, previous = null, last = 'windows';
@@ -41,10 +64,10 @@
       '<div class="dl-options">' +
       '<button type="button" class="dl-option" data-os="windows">' +
       '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.5l7.5-1v7H3zM11.5 4.4L21 3v8.5h-9.5zM3 12.5h7.5v7L3 18.5zM11.5 12.5H21V21l-9.5-1.4z"/></svg>' +
-      '<b>Windows</b><small>64-bit &middot; v' + RELEASE_VERSION + '</small></button>' +
+      '<b>Windows</b><small>64-bit &middot; v' + ver('windows') + '</small></button>' +
       '<button type="button" class="dl-option" data-os="mac">' +
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="11" rx="1.5"/><path d="M2 19h20"/></svg>' +
-      '<b>Mac</b><small>Apple Silicon &middot; v' + RELEASE_VERSION + '</small></button>' +
+      '<b>Mac</b><small>Apple Silicon &middot; v' + ver('mac') + '</small></button>' +
       '</div></div>' +
       '<div class="dl-step" id="dlStep2" hidden>' +
       '<div class="dl-ok"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>' +
@@ -121,4 +144,5 @@
   }, true);
 
   window.RaptorDownload = { open: open, links: LINKS, version: RELEASE_VERSION };
+  readVersions();
 })();

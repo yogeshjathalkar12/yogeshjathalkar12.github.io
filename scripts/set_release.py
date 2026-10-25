@@ -26,11 +26,11 @@ def rules(cfg):
     return [
         ("Windows download link",
          # either the GitHub address (how it used to be) or the download proxy that serves it without the 37-minute link expiry
-         re.compile(r"https://(?:github\.com/[\w.-]+/[\w.-]+/releases/download/[^\"'\s)<>]*|raptor-download\.[\w.-]+\.workers\.dev/)Raptor-Setup-[\d.]+\.exe"),
+         re.compile(r"https://(?:github\.com/[\w.-]+/[\w.-]+/releases/download/[^\"'\s)<>]*|raptor-download\.[\w.-]+\.workers\.dev/)(?:Raptor-Setup-[\d.]+\.exe|windows(?![\w.-]))"),
          win["url"]),
         ("Mac download link",
          # the GitHub address (how it used to be) or the download proxy (see the Windows rule above)
-         re.compile(r"https://(?:github\.com/[\w.-]+/[\w.-]+/releases/download/[^\"'\s)<>]*|raptor-download\.[\w.-]+\.workers\.dev/)Raptor-[\d.]+-mac-arm64\.dmg"),
+         re.compile(r"https://(?:github\.com/[\w.-]+/[\w.-]+/releases/download/[^\"'\s)<>]*|raptor-download\.[\w.-]+\.workers\.dev/)(?:Raptor-[\d.]+-mac-arm64\.dmg|mac(?![\w.-]))"),
          mac["url"]),
         ("Mac file name in the text", re.compile(r"(?<![/\w])Raptor-[\d.]+-mac-arm64\.dmg"), mac["file"]),
         ("Windows button label", re.compile(r'aria-label="Download Raptor (?:v?[\d.]+ )?for Windows"'), f'aria-label="Download Raptor {v} for Windows"'),
