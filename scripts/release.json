@@ -1,12 +1,12 @@
 {
   "_about": "The ONE place that says which Raptor version the pages show. The DOWNLOAD LINKS no longer carry a version: they are the stable addresses /windows and /mac on the Cloudflare Worker 'raptor-download' (source: release-proxy/worker.js in the desktop repo), which send people to the newest installer published in the raptor-dist GitHub releases, so a link can never point at an old version and a release needs no link edit. The Worker's /version answers with the newest versions as JSON: the download window (ventures/raptor/download.js) reads it, so even its version label is always current. The version numbers below are only the words written into the pages (and the fallback if /version cannot be reached). After publishing a release: change them, then run  python scripts/set_release.py",
   "windows": {
-    "version": "0.1.14",
+    "version": "0.1.15",
     "url": "https://raptor-download.yogeshjathalkar.workers.dev/windows"
   },
   "mac": {
-    "version": "0.1.14",
-    "file": "Raptor-0.1.14-mac-arm64.dmg",
+    "version": "0.1.15",
+    "file": "Raptor-0.1.15-mac-arm64.dmg",
     "url": "https://raptor-download.yogeshjathalkar.workers.dev/mac"
   }
 }
