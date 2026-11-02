@@ -11,7 +11,7 @@
 (function () {
   'use strict';
 
-  var RELEASE_VERSION = '0.1.16';
+  var RELEASE_VERSION = '0.1.17';
   var LINKS = {
     windows: 'https://raptor-download.yogeshjathalkar.workers.dev/windows',
     mac: 'https://raptor-download.yogeshjathalkar.workers.dev/mac'
