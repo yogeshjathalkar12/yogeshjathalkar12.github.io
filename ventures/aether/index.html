@@ -13,10 +13,34 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Aether Labs · Shoonya Origins</title>
+<script>try{var t=localStorage.getItem('aether-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap');
 
 :root {
+  --void: #ffffff;
+  --deep: #f4f7fc;
+  --panel: #eaf0f9;
+  --border: #dde5f0;
+  --border2: #c5d2e6;
+  --cyan: #0b2d6b;
+  --cyan2: #1a4596;
+  --gold: #1f56b8;
+  --gold2: #3a72d6;
+  --text: #24344f;
+  --text-dim: #5b6b84;
+  --text-bright: #071a3d;
+  --warn: #b45309;
+  --err: #c62828;
+  --good: #2e7d32;
+  --mono: 'DM Mono', monospace;
+  --serif: 'Cormorant Garamond', serif;
+  --sans: 'DM Sans', sans-serif;
+  --glow: 0 0 20px rgba(11,45,107,0.10);
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
   --void: #03050a;
   --deep: #070c14;
   --panel: #0b1220;
@@ -29,21 +53,31 @@
   --text: #b8cfe0;
   --text-dim: #4a6478;
   --text-bright: #e8f4ff;
-  --mono: 'DM Mono', monospace;
-  --serif: 'Cormorant Garamond', serif;
-  --sans: 'DM Sans', sans-serif;
+  --warn: #ffb74d;
+  --err: #ef5350;
+  --good: #66bb6a;
+  --glow: 0 0 20px color-mix(in srgb, var(--cyan) 15.0%, transparent);
+  color-scheme: dark;
 }
+
+/* THEME TOGGLE */
+.theme-toggle {
+  background: transparent; border: 1px solid var(--border2); color: var(--text-dim);
+  font-size: 14px; line-height: 1; padding: 6px 10px; cursor: pointer; transition: all 0.2s;
+}
+.theme-toggle:hover { border-color: var(--cyan); color: var(--cyan); }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body { background: var(--void); color: var(--text); font-family: var(--sans); min-height: 100vh; overflow-x: hidden; }
 
-#starfield { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+#starfield { position: fixed; inset: 0; z-index: 0; pointer-events: none; display: none; }
+html[data-theme="dark"] #starfield { display: block; }
 .ambient {
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
   background:
-    radial-gradient(ellipse 70% 50% at 15% 10%, rgba(79,195,247,0.05) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 40% at 85% 85%, rgba(201,168,76,0.04) 0%, transparent 55%);
+    radial-gradient(ellipse 70% 50% at 15% 10%, color-mix(in srgb, var(--cyan) 5.0%, transparent) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 85% 85%, color-mix(in srgb, var(--gold) 4.0%, transparent) 0%, transparent 55%);
 }
 
 /* NAV */
@@ -51,17 +85,18 @@ nav {
   position: sticky; top: 0; z-index: 200;
   display: flex; justify-content: space-between; align-items: center;
   padding: 18px 56px;
-  background: rgba(3,5,10,0.88); backdrop-filter: blur(16px);
+  background: color-mix(in srgb, var(--void) 88.0%, transparent); backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
 }
 .nav-left { display: flex; flex-direction: column; gap: 2px; }
 .nav-brand { font-family: var(--serif); font-style: italic; font-size: 22px; color: var(--cyan); letter-spacing: 2px; line-height: 1; }
 .nav-sub { font-family: var(--mono); font-size: 9px; color: var(--text-dim); letter-spacing: 3px; text-transform: uppercase; }
 .nav-links { display: flex; align-items: center; gap: 32px; }
+.nav-right { display: flex; align-items: center; gap: 24px; }
 .nav-link { font-family: var(--mono); font-size: 10px; color: var(--text-dim); text-decoration: none; letter-spacing: 2px; text-transform: uppercase; transition: color 0.2s; }
 .nav-link:hover { color: var(--cyan); }
 .nav-cta { font-family: var(--mono); font-size: 10px; color: var(--void); background: var(--cyan); text-decoration: none; padding: 8px 18px; letter-spacing: 2px; text-transform: uppercase; transition: all 0.2s; }
-.nav-cta:hover { background: var(--cyan2); box-shadow: 0 0 20px rgba(79,195,247,0.3); }
+.nav-cta:hover { background: var(--cyan2); box-shadow: 0 0 20px color-mix(in srgb, var(--cyan) 30.0%, transparent); }
 
 /* REVEAL */
 .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.8s ease, transform 0.8s ease; }
@@ -83,9 +118,9 @@ nav {
 .hero-body strong { color: var(--text); font-weight: 400; }
 .hero-actions { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
 .btn-primary { font-family: var(--mono); font-size: 11px; letter-spacing: 3px; text-transform: uppercase; text-decoration: none; color: var(--void); background: var(--cyan); padding: 14px 28px; display: inline-block; transition: all 0.2s; }
-.btn-primary:hover { background: var(--cyan2); box-shadow: 0 0 30px rgba(79,195,247,0.3); transform: translateY(-1px); }
+.btn-primary:hover { background: var(--cyan2); box-shadow: 0 0 30px color-mix(in srgb, var(--cyan) 30.0%, transparent); transform: translateY(-1px); }
 .btn-secondary { font-family: var(--mono); font-size: 11px; letter-spacing: 3px; text-transform: uppercase; text-decoration: none; color: var(--text-dim); border: 1px solid var(--border2); padding: 14px 28px; display: inline-block; transition: all 0.2s; }
-.btn-secondary:hover { color: var(--cyan); border-color: var(--cyan); background: rgba(79,195,247,0.04); }
+.btn-secondary:hover { color: var(--cyan); border-color: var(--cyan); background: color-mix(in srgb, var(--cyan) 4.0%, transparent); }
 .scroll-hint { position: absolute; bottom: 40px; left: 0; font-family: var(--mono); font-size: 9px; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; display: flex; align-items: center; gap: 10px; opacity: 0.4; animation: bob 3s ease-in-out infinite; }
 .scroll-hint::after { content: ''; display: block; width: 1px; height: 44px; background: linear-gradient(to bottom, var(--text-dim), transparent); }
 @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(6px)} }
@@ -120,8 +155,8 @@ nav {
 .what-cards { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 1px; background: var(--border); margin-bottom: 80px; border-bottom: 1px solid var(--border); padding-bottom: 80px; }
 .wcard { background: var(--void); padding: 40px 34px; transition: background 0.3s; }
 .wcard:hover { background: var(--deep); }
-.wcard.feat { background: var(--panel); box-shadow: 0 0 40px rgba(79,195,247,0.08); }
-.wcard.feat:hover { background: #0d1628; }
+.wcard.feat { background: var(--panel); box-shadow: 0 0 40px color-mix(in srgb, var(--cyan) 8.0%, transparent); }
+.wcard.feat:hover { background: var(--deep); }
 .ctag { font-family: var(--mono); font-size: 9px; color: var(--gold); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
 .ctag .dot { width:4px; height:4px; border-radius:50%; background:var(--gold); animation: blink 3s infinite; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
@@ -135,28 +170,20 @@ nav {
 .clink:hover { gap: 14px; }
 
 /* HOW */
-.how-steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--border); padding-bottom: 80px; margin-bottom: 0; border-bottom: 1px solid var(--border); }
+.how-steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--border); margin-bottom: 80px; border: 1px solid var(--border); }
 .hstep { background: var(--void); padding: 40px 34px; position: relative; overflow: hidden; transition: background 0.3s; }
 .hstep:hover { background: var(--deep); }
 .hstep-num { font-family: var(--serif); font-size: 100px; font-weight: 300; color: var(--border2); line-height: 1; position: absolute; top: 16px; right: 16px; transition: color 0.3s; }
-.hstep:hover .hstep-num { color: rgba(79,195,247,0.07); }
+.hstep:hover .hstep-num { color: color-mix(in srgb, var(--cyan) 7.0%, transparent); }
 .hstep-tag { font-family: var(--mono); font-size: 9px; color: var(--gold); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 16px; }
 .hstep-title { font-family: var(--serif); font-weight: 300; font-size: 26px; color: var(--text-bright); margin-bottom: 14px; line-height: 1.1; }
 .hstep-title em { font-style: italic; color: var(--cyan); }
 .hstep-body { font-size: 13px; color: var(--text-dim); line-height: 1.7; position: relative; z-index: 1; }
 
-/* INSTRUMENTS */
-.inst-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 28px; }
-.inst-header h2 { font-family: var(--serif); font-weight: 300; font-size: clamp(30px,3.5vw,48px); color: var(--text-bright); }
-.inst-header h2 em { font-style: italic; color: var(--cyan); }
-.inst-header a { font-family: var(--mono); font-size: 10px; color: var(--text-dim); text-decoration: none; letter-spacing: 2px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
-.inst-header a:hover { color: var(--cyan); gap: 14px; }
-.inst-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: var(--border); padding-bottom: 80px; border-bottom: 1px solid var(--border); margin-bottom: 0; }
-.iitem { background: var(--void); padding: 20px 22px; transition: background 0.2s; }
-.iitem:hover { background: var(--panel); }
-.inum { font-family: var(--mono); font-size: 9px; color: var(--text-dim); letter-spacing: 1px; margin-bottom: 6px; }
-.iname { font-family: var(--sans); font-size: 12px; color: var(--text); font-weight: 400; line-height: 1.3; }
-.ifield { font-family: var(--mono); font-size: 9px; color: var(--gold); margin-top: 6px; letter-spacing: 1px; }
+/* RESEARCH AREAS */
+.area-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 1px; background: var(--border); margin-bottom: 80px; }
+.area-grid .wcard p { margin-bottom: 0; }
+.area-grid.three { grid-template-columns: repeat(3,1fr); }
 
 /* CTA */
 .cta-wrap { padding: 100px 0 100px; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; border-bottom: 1px solid var(--border); }
@@ -165,7 +192,7 @@ nav {
 .cta-left p { font-size: 14px; color: var(--text-dim); line-height: 1.75; margin-bottom: 36px; }
 .cta-right { display: flex; flex-direction: column; gap: 12px; }
 .cta-opt { display: flex; flex-direction: column; gap: 6px; padding: 22px; border: 1px solid var(--border); text-decoration: none; transition: all 0.25s; }
-.cta-opt:hover { border-color: var(--cyan); background: rgba(79,195,247,0.03); transform: translateX(4px); }
+.cta-opt:hover { border-color: var(--cyan); background: color-mix(in srgb, var(--cyan) 3.0%, transparent); transform: translateX(4px); }
 .cta-opt-title { font-family: var(--mono); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--cyan); display: flex; align-items: center; justify-content: space-between; }
 .cta-opt-body { font-size: 13px; color: var(--text-dim); line-height: 1.6; }
 
@@ -182,12 +209,12 @@ footer { position: relative; z-index: 1; border-top: 1px solid var(--border); pa
   .section { padding: 0 24px; }
   .why-grid, .cta-wrap { grid-template-columns: 1fr; gap: 48px; }
   .what-cards, .how-steps { grid-template-columns: 1fr; }
-  .inst-grid { grid-template-columns: repeat(2,1fr); }
+  .area-grid.three { grid-template-columns: repeat(2,1fr); }
   .stats-bar { grid-template-columns: repeat(2,1fr); }
   footer { padding: 28px 24px; }
 }
 @media(max-width:600px) {
-  .inst-grid, .stats-bar { grid-template-columns: 1fr; }
+  .area-grid, .area-grid.three, .stats-bar { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -199,14 +226,16 @@ footer { position: relative; z-index: 1; border-top: 1px solid var(--border); pa
 <nav>
   <div class="nav-left">
     <div class="nav-brand">Aether Labs</div>
-    <div class="nav-sub">Shoonya Origins · Research Division</div>
+    <div class="nav-sub">Shoonya Origins · Research Platform</div>
   </div>
+  <div class="nav-right">
   <div class="nav-links">
-    <a href="#why" class="nav-link">Why</a>
-    <a href="#what" class="nav-link">What We Build</a>
-    <a href="#instruments" class="nav-link">Instruments</a>
-    <a href="#join" class="nav-link">Join</a>
-    <a href="https://shoonyaorigins.com/ventures/aether/tools/" class="nav-cta">Open Lab →</a>
+    <a href="#who" class="nav-link">Who It's For</a>
+    <a href="#platform" class="nav-link">The Platform</a>
+    <a href="#how" class="nav-link">How It Works</a>
+    <a href="https://shoonyaorigins.com/ventures/aether/app/" class="nav-cta">Open the Platform →</a>
+  </div>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme">&#127769;</button>
   </div>
 </nav>
 
@@ -215,170 +244,121 @@ footer { position: relative; z-index: 1; border-top: 1px solid var(--border); pa
   <div class="hero">
     <div class="hero-eyebrow reveal">Aether Labs · Est. 2024 · Pune, India</div>
     <h1 class="hero-title reveal d1">
-      Research<br>
-      <em>Deserves</em><br>
-      <span class="gold">Better.</span>
+      One platform<br>
+      <em>for every kind of</em><br>
+      <span class="gold">research.</span>
     </h1>
     <p class="hero-body reveal d2">
-      Aether Labs is the <strong>full-stack research ecosystem</strong> — free computational instruments, a live researcher community, and the infrastructure to move science forward, faster. No paywalls. No friction. No gatekeeping.
+      Aether Labs is the <strong>research platform</strong> of Shoonya Origins. Whatever you study, from physics and biology to engineering, data and the social sciences, Aether gives you one place to do the work, keep it organised and share it with the people who need it.
     </p>
     <div class="hero-actions reveal d3">
-      <a href="https://shoonyaorigins.com/ventures/aether/tools/" class="btn-primary">Explore the Instruments</a>
-      <a href="#join" class="btn-secondary">Join the Lab</a>
+      <a href="https://shoonyaorigins.com/ventures/aether/app/" class="btn-primary">Start Researching</a>
+      <a href="#platform" class="btn-secondary">See the Platform</a>
     </div>
     <div class="scroll-hint">Scroll</div>
   </div>
 </div>
 
-<!-- STATS -->
-<div class="section reveal">
-  <div class="stats-bar">
-    <div class="stat-cell"><div class="stat-val">20</div><div class="stat-label">Research Instruments</div></div>
-    <div class="stat-cell"><div class="stat-val">₹0</div><div class="stat-label">Cost, Forever</div></div>
-    <div class="stat-cell"><div class="stat-val">100%</div><div class="stat-label">Browser Native</div></div>
-    <div class="stat-cell"><div class="stat-val">∞</div><div class="stat-label">Potential</div></div>
-  </div>
-</div>
-
-<!-- WHY -->
-<div id="why" class="section">
-  <div class="sec-label reveal"><span class="n">01</span> The Problem</div>
-  <div class="why-grid">
-    <div class="reveal">
-      <h2 class="why-headline">
-        The tools exist.<br>
-        The knowledge exists.<br>
-        So why is research<br>still this <em>hard?</em>
-      </h2>
-    </div>
-    <div class="problems">
-      <div class="prob reveal d1">
-        <div class="prob-title">// Fragmented</div>
-        <div class="prob-body">Critical tools are scattered across proprietary software and expensive licences. A grad student in Pune shouldn't need MATLAB just to run a basic quantum calculation.</div>
-      </div>
-      <div class="prob reveal d2">
-        <div class="prob-title">// Siloed</div>
-        <div class="prob-body">Researchers work in isolation. Datasets, methods, and insights get buried in lab servers and unread appendices. The same problems get solved over and over, separately, by people who never meet.</div>
-      </div>
-      <div class="prob reveal d3">
-        <div class="prob-title">// Inaccessible</div>
-        <div class="prob-body">The infrastructure of science concentrates in elite institutions. The next great discovery might be stuck in a university with no Mathematica licence and no research network. We fix that.</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- WHAT -->
-<div id="what" class="section">
-  <div class="sec-label reveal"><span class="n">02</span> What We Build</div>
+<!-- WHO IT'S FOR -->
+<div id="who" class="section">
+  <div class="sec-label reveal"><span class="n">01</span> Who It's For</div>
   <div class="what-intro reveal">
-    <h2>The full stack,<br><em>for researchers.</em></h2>
-    <p>We build the tools you wish already existed — and give them away for free. Every instrument, every connection. Because science moves faster when its infrastructure isn't gated.</p>
+    <h2>Any field.<br><em>Any question.</em></h2>
+    <p>Aether is not built around one discipline. If your work starts with a question and ends with evidence, it belongs here.</p>
   </div>
-  <div class="what-cards">
-    <div class="wcard feat reveal">
-      <div class="ctag"><span class="dot"></span> Live Now</div>
-      <h3>Research<br><em>Instrumentation Suite</em></h3>
-      <p>Twenty precision computational instruments for physics and engineering research. From quantum tunneling to Fermi energy calculations — browser-native, numerically precise, completely free. No MATLAB. No Mathematica. No signup.</p>
-      <div class="cstat">
-        <div class="v">20</div>
-        <div class="l">Instruments<br>Available</div>
-      </div>
-      <a href="instruments.html" class="clink">Open the Suite →</a>
+  <div class="area-grid three">
+    <div class="wcard reveal">
+      <div class="ctag">Field</div>
+      <h3>Physical<br><em>Sciences</em></h3>
+      <p>Physics, chemistry, materials, earth and space science.</p>
     </div>
     <div class="wcard reveal d1">
-      <div class="ctag">Coming Soon</div>
-      <h3>Researcher<br><em>Community</em></h3>
-      <p>A live network where researchers share data, methods, and findings. Ask a question. Get an answer from someone who ran that exact experiment.</p>
-      <div class="cstat"><div class="v" style="color:var(--gold)">∞</div><div class="l">Minds<br>Connecting</div></div>
+      <div class="ctag">Field</div>
+      <h3>Life<br><em>Sciences</em></h3>
+      <p>Biology, medicine, health and environmental research.</p>
     </div>
     <div class="wcard reveal d2">
-      <div class="ctag">In Development</div>
-      <h3>Curated<br><em>Data Resources</em></h3>
-      <p>Structured datasets and reference libraries. Properly cited, freely searchable, accessible to every researcher regardless of institution.</p>
-      <div class="cstat"><div class="v" style="color:var(--gold);font-size:28px;line-height:1.4">Soon</div></div>
+      <div class="ctag">Field</div>
+      <h3>Engineering<br><em>&amp; Hardware</em></h3>
+      <p>Design, testing and building of systems, devices and structures.</p>
+    </div>
+    <div class="wcard reveal">
+      <div class="ctag">Field</div>
+      <h3>Computing<br><em>&amp; Data</em></h3>
+      <p>Computer science, AI, statistics and data-driven studies.</p>
+    </div>
+    <div class="wcard reveal d1">
+      <div class="ctag">Field</div>
+      <h3>Social<br><em>Sciences</em></h3>
+      <p>Economics, policy, behaviour, cities and communities.</p>
+    </div>
+    <div class="wcard reveal d2">
+      <div class="ctag">Field</div>
+      <h3>Everything<br><em>in between</em></h3>
+      <p>Cross-disciplinary work, and fields that don't have a name yet.</p>
     </div>
   </div>
 </div>
 
-<!-- HOW -->
-<div class="section">
+<!-- THE PLATFORM -->
+<div id="platform" class="section">
+  <div class="sec-label reveal"><span class="n">02</span> The Platform</div>
+  <div class="what-intro reveal">
+    <h2>Everything research needs,<br><em>in one place.</em></h2>
+    <p>Research gets slowed down by scattered tools, buried data and people working alone. Aether brings those pieces together.</p>
+  </div>
+  <div class="area-grid three">
+    <div class="wcard reveal">
+      <div class="ctag">// Tools</div>
+      <h3>Do the<br><em>work</em></h3>
+      <p>Computational tools for analysis, modelling and simulation, without expensive licences standing in the way.</p>
+    </div>
+    <div class="wcard reveal d1">
+      <div class="ctag">// Data</div>
+      <h3>Keep it<br><em>organised</em></h3>
+      <p>A home for datasets, methods and results, properly cited and easy to find again.</p>
+    </div>
+    <div class="wcard reveal d2">
+      <div class="ctag">// People</div>
+      <h3>Work<br><em>together</em></h3>
+      <p>Researchers, students and institutions sharing what they find, so the same problem isn't solved twice in isolation.</p>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div id="how" class="section">
   <div class="sec-label reveal"><span class="n">03</span> How It Works</div>
   <div class="how-steps">
     <div class="hstep reveal">
       <div class="hstep-num">01</div>
-      <div class="hstep-tag">// Access</div>
-      <div class="hstep-title">Open the<br><em>browser.</em></div>
-      <div class="hstep-body">Every instrument runs fully in your browser. No downloads, no accounts, no waitlists. Just you and the physics. All computation runs locally — your data never leaves your machine.</div>
+      <div class="hstep-tag">// Start</div>
+      <div class="hstep-title">Bring your<br><em>question.</em></div>
+      <div class="hstep-body">Start from whatever you are studying, in whatever field it sits.</div>
     </div>
     <div class="hstep reveal d1">
       <div class="hstep-num">02</div>
-      <div class="hstep-tag">// Compute</div>
-      <div class="hstep-title">Run precise<br><em>calculations.</em></div>
-      <div class="hstep-body">Input your parameters. Get numerically exact results — the kind that previously required a Mathematica licence or a custom Python script. Research-grade precision, free.</div>
+      <div class="hstep-tag">// Work</div>
+      <div class="hstep-title">Run the<br><em>research.</em></div>
+      <div class="hstep-body">Use the platform's tools and data to analyse, model and test your ideas.</div>
     </div>
     <div class="hstep reveal d2">
       <div class="hstep-num">03</div>
-      <div class="hstep-tag">// Connect</div>
-      <div class="hstep-title">Join the<br><em>community.</em></div>
-      <div class="hstep-body">Post your results. Ask a question. Collaborate on a dataset. The community is for researchers who are serious about the work — not the prestige. Come as you are.</div>
+      <div class="hstep-tag">// Share</div>
+      <div class="hstep-title">Share what<br><em>you find.</em></div>
+      <div class="hstep-body">Put your results in front of the people who can build on them.</div>
     </div>
   </div>
 </div>
 
-<!-- INSTRUMENTS -->
-<div id="instruments" class="section">
-  <div class="sec-label reveal"><span class="n">04</span> The Instrument Suite</div>
-  <div class="inst-header reveal">
-    <h2>20 instruments.<br><em>Zero cost.</em></h2>
-    <a href="instruments.html">View all instruments →</a>
-  </div>
-  <div class="inst-grid">
-    <div class="iitem reveal"><div class="inum">01</div><div class="iname">Double-Slit Wave Interference</div><div class="ifield">Wave Physics</div></div>
-    <div class="iitem reveal d1"><div class="inum">02</div><div class="iname">Photoelectric Effect Analysis</div><div class="ifield">Quantum Optics</div></div>
-    <div class="iitem reveal d2"><div class="inum">03</div><div class="iname">de Broglie Wavelength</div><div class="ifield">Matter Wave Physics</div></div>
-    <div class="iitem reveal d3"><div class="inum">04</div><div class="iname">Heisenberg Uncertainty Bounds</div><div class="ifield">Quantum Mechanics</div></div>
-    <div class="iitem reveal"><div class="inum">05</div><div class="iname">Quantum Tunneling Probability</div><div class="ifield">Quantum Mechanics</div></div>
-    <div class="iitem reveal d1"><div class="inum">06</div><div class="iname">Blackbody Radiation Analysis</div><div class="ifield">Thermal Physics</div></div>
-    <div class="iitem reveal d2"><div class="inum">07</div><div class="iname">Hydrogen Spectroscopy</div><div class="ifield">Atomic Physics</div></div>
-    <div class="iitem reveal d3"><div class="inum">08</div><div class="iname">PN Junction Built-in Potential</div><div class="ifield">Semiconductor Physics</div></div>
-    <div class="iitem reveal"><div class="inum">09</div><div class="iname">Carrier Concentration</div><div class="ifield">Semiconductor Physics</div></div>
-    <div class="iitem reveal d1"><div class="inum">10</div><div class="iname">RLC Circuit Resonance</div><div class="ifield">Electrodynamics</div></div>
-    <div class="iitem reveal d2"><div class="inum">11</div><div class="iname">Uncertainty Propagation</div><div class="ifield">Research Methodology</div></div>
-    <div class="iitem reveal d3"><div class="inum">12</div><div class="iname">Experimental Data Statistics</div><div class="ifield">Research Methodology</div></div>
-    <div class="iitem reveal"><div class="inum">13</div><div class="iname">Dimensional Analysis Checker</div><div class="ifield">Research Methodology</div></div>
-    <div class="iitem reveal d1"><div class="inum">14</div><div class="iname">EM Spectrum Complete Mapper</div><div class="ifield">Electrodynamics</div></div>
-    <div class="iitem reveal d2"><div class="inum">15</div><div class="iname">Diffraction Grating Spectrometer</div><div class="ifield">Optics</div></div>
-    <div class="iitem reveal d3"><div class="inum">16</div><div class="iname">Lorentz Relativistic Effects</div><div class="ifield">Special Relativity</div></div>
-    <div class="iitem reveal"><div class="inum">17</div><div class="iname">Radioactive Decay Analysis</div><div class="ifield">Nuclear Physics</div></div>
-    <div class="iitem reveal d1"><div class="inum">18</div><div class="iname">Schrödinger Particle-in-Box</div><div class="ifield">Quantum Mechanics</div></div>
-    <div class="iitem reveal d2"><div class="inum">19</div><div class="iname">Fermi Energy & Electron Gas</div><div class="ifield">Condensed Matter</div></div>
-    <div class="iitem reveal d3"><div class="inum">20</div><div class="iname">Compton Scattering</div><div class="ifield">Quantum Electrodynamics</div></div>
-  </div>
-</div>
-
-<!-- CTA -->
-<div id="join" class="section">
-  <div class="sec-label reveal"><span class="n">05</span> Be Part of It</div>
+<!-- CONTACT -->
+<div id="contact" class="section">
+  <div class="sec-label reveal"><span class="n">04</span> Get in Touch</div>
   <div class="cta-wrap">
     <div class="cta-left reveal">
-      <h2>The lab is<br><em>open.</em><br>Are you in?</h2>
-      <p>Aether Labs isn't just a set of tools. It's a vision for what research infrastructure should look like — accessible, collaborative, and free. We're building it in the open, with the researchers who need it most. That might be you.</p>
-      <a href="instruments.html" class="btn-primary">Start Using the Instruments</a>
-    </div>
-    <div class="cta-right reveal d2">
-      <a href="instruments.html" class="cta-opt">
-        <div class="cta-opt-title">Use the Instruments <span>→</span></div>
-        <div class="cta-opt-body">20 free computational tools available right now. No account. Open in any browser, immediately.</div>
-      </a>
-      <a href="#" class="cta-opt">
-        <div class="cta-opt-title">Join the Community <span>→</span></div>
-        <div class="cta-opt-body">Connect with researchers, share your work, and collaborate on problems that matter. Launching soon.</div>
-      </a>
-      <a href="mailto:research@shoonyaorigins.com" class="cta-opt">
-        <div class="cta-opt-title">Collaborate with Us <span>→</span></div>
-        <div class="cta-opt-body">Researcher, academic, or institution? We build better when we build together. Reach out.</div>
-      </a>
+      <h2>Research with<br><em>Aether.</em></h2>
+      <p>Researcher, student, academic or institution: if you want to do your research on Aether or build it with us, we would like to hear from you.</p>
+      <a href="mailto:research@shoonyaorigins.com" class="btn-primary">research@shoonyaorigins.com</a>
     </div>
   </div>
 </div>
@@ -386,15 +366,30 @@ footer { position: relative; z-index: 1; border-top: 1px solid var(--border); pa
 <footer>
   <div class="footer-brand">Aether Labs</div>
   <div class="footer-links">
-    <a href="#why" class="footer-link">Why</a>
-    <a href="#what" class="footer-link">What</a>
-    <a href="instruments.html" class="footer-link">Instruments</a>
-    <a href="#join" class="footer-link">Join</a>
+    <a href="#who" class="footer-link">Who It's For</a>
+    <a href="#platform" class="footer-link">Platform</a>
+    <a href="#how" class="footer-link">How It Works</a>
+    <a href="https://shoonyaorigins.com/ventures/aether/tools/" class="footer-link">Free Tools</a>
   </div>
-  <div class="footer-copy">© 2026 Shoonya Origins · Aether Labs R&D Division · Pune, India</div>
+  <div class="footer-copy">© 2026 Shoonya Origins · Aether Labs · Pune, India</div>
 </footer>
 
 <script>
+// THEME TOGGLE (light default, saved per browser)
+(function(){
+  var html = document.documentElement, btn = document.getElementById('themeToggle');
+  function paint(){ var d = html.getAttribute('data-theme') === 'dark';
+    if(btn){ btn.textContent = d ? '\u2600\uFE0F' : '\uD83C\uDF19'; btn.setAttribute('aria-pressed', String(d));
+      btn.title = d ? 'Switch to light theme' : 'Switch to dark theme'; } }
+  paint();
+  if(btn) btn.addEventListener('click', function(){
+    var d = html.getAttribute('data-theme') === 'dark';
+    html.setAttribute('data-theme', d ? 'light' : 'dark');
+    try{ localStorage.setItem('aether-theme', d ? 'light' : 'dark'); }catch(e){}
+    paint();
+  });
+})();
+
 // STARFIELD
 (function(){
   const canvas = document.getElementById('starfield');

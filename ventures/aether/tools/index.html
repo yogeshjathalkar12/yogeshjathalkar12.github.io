@@ -3,11 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Aether Labs · Research Instrumentation Suite</title>
+<title>Free Tools · Aether Labs</title>
+<script>try{var t=localStorage.getItem('aether-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap');
 
 :root {
+  --void: #ffffff;
+  --deep: #f4f7fc;
+  --panel: #eaf0f9;
+  --border: #dde5f0;
+  --border2: #c5d2e6;
+  --cyan: #0b2d6b;
+  --cyan2: #1a4596;
+  --gold: #1f56b8;
+  --gold2: #3a72d6;
+  --text: #24344f;
+  --text-dim: #5b6b84;
+  --text-bright: #071a3d;
+  --warn: #b45309;
+  --err: #c62828;
+  --good: #2e7d32;
+  --mono: 'DM Mono', monospace;
+  --serif: 'Cormorant Garamond', serif;
+  --sans: 'DM Sans', sans-serif;
+  --glow: 0 0 20px rgba(11,45,107,0.10);
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
   --void: #03050a;
   --deep: #070c14;
   --panel: #0b1220;
@@ -20,11 +44,19 @@
   --text: #b8cfe0;
   --text-dim: #4a6478;
   --text-bright: #e8f4ff;
-  --mono: 'DM Mono', monospace;
-  --serif: 'Cormorant Garamond', serif;
-  --sans: 'DM Sans', sans-serif;
-  --glow: 0 0 20px rgba(79,195,247,0.15);
+  --warn: #ffb74d;
+  --err: #ef5350;
+  --good: #66bb6a;
+  --glow: 0 0 20px color-mix(in srgb, var(--cyan) 15.0%, transparent);
+  color-scheme: dark;
 }
+
+/* THEME TOGGLE */
+.theme-toggle {
+  background: transparent; border: 1px solid var(--border2); color: var(--text-dim);
+  font-size: 14px; line-height: 1; padding: 6px 10px; cursor: pointer; transition: all 0.2s;
+}
+.theme-toggle:hover { border-color: var(--cyan); color: var(--cyan); }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -44,9 +76,9 @@ body::before {
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 50% at 20% 20%, rgba(79,195,247,0.04) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(201,168,76,0.03) 0%, transparent 50%),
-    repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(79,195,247,0.008) 3px, rgba(79,195,247,0.008) 4px);
+    radial-gradient(ellipse 80% 50% at 20% 20%, color-mix(in srgb, var(--cyan) 4.0%, transparent) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, color-mix(in srgb, var(--gold) 3.0%, transparent) 0%, transparent 50%),
+    repeating-linear-gradient(0deg, transparent, transparent 3px, color-mix(in srgb, var(--cyan) 0.8%, transparent) 3px, color-mix(in srgb, var(--cyan) 0.8%, transparent) 4px);
   pointer-events: none;
   z-index: 0;
 }
@@ -60,7 +92,7 @@ nav {
   justify-content: space-between;
   align-items: center;
   padding: 18px 48px;
-  background: rgba(3,5,10,0.92);
+  background: color-mix(in srgb, var(--void) 92.0%, transparent);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
 }
@@ -207,7 +239,7 @@ nav {
   transition: all 0.18s;
 }
 
-.idx:hover { color: var(--cyan); border-color: var(--cyan); background: rgba(79,195,247,0.04); }
+.idx:hover { color: var(--cyan); border-color: var(--cyan); background: color-mix(in srgb, var(--cyan) 4.0%, transparent); }
 
 /* TOOLS WRAP */
 .tools-wrap {
@@ -350,7 +382,7 @@ nav {
 
 .f input:focus, .f select:focus {
   border-color: var(--cyan);
-  box-shadow: 0 0 0 1px rgba(79,195,247,0.1);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--cyan) 10.0%, transparent);
 }
 
 .f input::placeholder { color: var(--text-dim); }
@@ -381,8 +413,8 @@ nav {
 }
 
 .calc-btn:hover {
-  background: rgba(79,195,247,0.08);
-  box-shadow: 0 0 20px rgba(79,195,247,0.1);
+  background: color-mix(in srgb, var(--cyan) 8.0%, transparent);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--cyan) 10.0%, transparent);
 }
 
 .result {
@@ -401,9 +433,9 @@ nav {
 .result .primary { color: var(--cyan); font-size: 14px; }
 .result .secondary { color: var(--gold); }
 .result .dim { color: var(--text-dim); }
-.result .warn { color: #ffb74d; }
-.result .err { color: #ef5350; }
-.result .good { color: #66bb6a; }
+.result .warn { color: var(--warn); }
+.result .err { color: var(--err); }
+.result .good { color: var(--good); }
 
 /* FOOTER */
 footer {
@@ -436,21 +468,22 @@ footer {
 <nav>
   <div class="nav-left">
     <div class="nav-brand">Aether Labs</div>
-    <div class="nav-sub">Research Instrumentation Suite</div>
+    <div class="nav-sub">Free Tools</div>
   </div>
   <div class="nav-right">
-    <div class="nav-stat">Instruments <span class="val">20</span></div>
+    <div class="nav-stat">Tools <span class="val">20</span></div>
     <div class="nav-stat">Access Cost <span class="val">₹0</span></div>
     <a href="https://shoonyaorigins.com/ventures/aether/" class="nav-back">← Return to Aether</a>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme">&#127769;</button>
   </div>
 </nav>
 
 <div class="hero">
-  <div class="hero-eyebrow">// Aether Labs · Shoonya Origins · Free Research Instrumentation</div>
-  <h1 class="hero-title">Instruments for<br><em>the Frontier.</em></h1>
-  <p class="hero-desc">Twenty computational instruments for graduate researchers, doctoral candidates, and faculty. Tools that previously required Mathematica, MATLAB, or custom scripts. Free. Browser-native. Numerically precise.</p>
+  <div class="hero-eyebrow">// Aether Labs · Shoonya Origins · Free Tools</div>
+  <h1 class="hero-title">Free physics<br><em>tools.</em></h1>
+  <p class="hero-desc">Twenty free physics and engineering calculators for students and researchers, published by Aether Labs as a free resource alongside our research. Free. Browser-native. No signup.</p>
   <div class="hero-stats">
-    <div class="stat"><div class="stat-val">20</div><div class="stat-label">Instruments</div></div>
+    <div class="stat"><div class="stat-val">20</div><div class="stat-label">Tools</div></div>
     <div class="stat"><div class="stat-val">₹0</div><div class="stat-label">Cost</div></div>
     <div class="stat"><div class="stat-val">0</div><div class="stat-label">Signups</div></div>
     <div class="stat"><div class="stat-val">Local</div><div class="stat-label">All Computation</div></div>
@@ -1308,7 +1341,7 @@ footer {
 </div><!-- end tools-wrap -->
 
 <footer>
-  <span>Aether Labs · Research Instrumentation Suite · Shoonya Origins · Pune · © 2026</span>
+  <span>Aether Labs · Free Tools · Shoonya Origins · Pune · © 2026</span>
   <span>All computation runs locally · Zero data transmitted · Free forever</span>
 </footer>
 
@@ -2086,6 +2119,65 @@ function calcCompton(){
   lines.push(`m_e c² = 511 keV | E₀/m_e c² = ${(E0_keV/511).toFixed(4)}`);
   R('r-t20', lines.join('\n'));
 }
+</script>
+<script>
+// THEME TOGGLE (light default, saved per browser)
+(function(){
+  var html = document.documentElement, btn = document.getElementById('themeToggle');
+  function paint(){ var d = html.getAttribute('data-theme') === 'dark';
+    if(btn){ btn.textContent = d ? '\u2600\uFE0F' : '\uD83C\uDF19'; btn.setAttribute('aria-pressed', String(d));
+      btn.title = d ? 'Switch to light theme' : 'Switch to dark theme'; } }
+  paint();
+  if(btn) btn.addEventListener('click', function(){
+    var d = html.getAttribute('data-theme') === 'dark';
+    html.setAttribute('data-theme', d ? 'light' : 'dark');
+    try{ localStorage.setItem('aether-theme', d ? 'light' : 'dark'); }catch(e){}
+    paint();
+  });
+})();
+</script>
+<script>
+// SAVE TO NOTEBOOK: hands a computed result to the Aether research platform.
+// The result goes through localStorage (same site), never through the URL.
+(function(){
+  var css = document.createElement('style');
+  css.textContent = '.save-btn{width:100%;margin-top:8px;background:transparent;border:1px dashed var(--border2);color:var(--text-dim);font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:9px;cursor:pointer;transition:all .2s}.save-btn:hover{border-color:var(--cyan);color:var(--cyan)}';
+  document.head.appendChild(css);
+  document.querySelectorAll('.instrument').forEach(function(inst){
+    var res = inst.querySelector('.result');
+    if(!res) return;
+    var placeholder = res.innerHTML; // the empty-state text before anything is computed
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'save-btn';
+    btn.textContent = 'Save to Aether notebook →';
+    btn.title = 'Keep this result, with its inputs, in a project lab notebook';
+    btn.addEventListener('click', function(){
+      var text = (res.innerText || '').trim();
+      var onlyWarning = res.querySelector('.warn') && !res.querySelector('.primary,.secondary,.good');
+      if(!text || res.innerHTML === placeholder || onlyWarning){
+        btn.textContent = 'Compute a result first';
+        setTimeout(function(){ btn.textContent = 'Save to Aether notebook →'; }, 1800);
+        return;
+      }
+      var sec = inst.closest('[id^="t"]');
+      var nameEl = sec && sec.querySelector('.tool-name');
+      var tool = nameEl ? nameEl.innerText.replace(/\s+/g, ' ').trim() : 'Aether free tool';
+      var inputs = {};
+      inst.querySelectorAll('.f').forEach(function(f){
+        var label = f.querySelector('label'), el = f.querySelector('input,select,textarea');
+        if(!label || !el) return;
+        var v = el.tagName === 'SELECT' ? (el.options[el.selectedIndex] || {}).text : el.value;
+        if(v !== undefined && String(v).trim() !== '') inputs[label.textContent.trim()] = String(v).trim();
+      });
+      try{
+        localStorage.setItem('aether-pending-save', JSON.stringify({ tool: tool, inputs: inputs, result: text, at: new Date().toISOString() }));
+      }catch(e){ btn.textContent = 'Your browser blocked saving'; return; }
+      window.location.href = '../app/#/save';
+    });
+    res.insertAdjacentElement('afterend', btn);
+  });
+})();
 </script>
 </body>
 </html>
