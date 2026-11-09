@@ -247,7 +247,7 @@ export async function readXlsx(buf: ArrayBuffer): Promise<RawSheet[]> {
   if (!wbXml) throw new Error('This does not look like an Excel (.xlsx) file.');
   const relsXml = (await textOf(buf, dir, 'xl/_rels/workbook.xml.rels')) || '';
   const rels = new Map<string, string>();
-  const rr = /<Relationship\b([^>]*?)\/?>/g;
+  const rr = /<(?:Relationship)\b([^>]*?)\/?>/g;
   let m: RegExpExecArray | null;
   while ((m = rr.exec(relsXml))) { const a = attrs(m[1]); if (a.Id && a.Target) rels.set(a.Id, a.Target); }
   const date1904 = /<workbookPr\b[^>]*date1904\s*=\s*"(?:1|true)"/.test(wbXml);

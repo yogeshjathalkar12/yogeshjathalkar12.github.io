@@ -11,6 +11,8 @@ import type { ColumnChoice, Existing, Links, RowKind, StageInfo, Suggestion, Tab
 import { inferDateOrder } from '../../lib/import/values';
 import type { DateOrder } from '../../lib/import/values';
 import { loadExisting, runImport } from '../../lib/import/run';
+import { applySaved, buildSaved, findSaved, forgetAll, loadAll, saveAll, upsert } from '../../lib/import/savedMappings';
+import type { KeyValueStore } from '../../lib/import/savedMappings';
 import type { DbClient, RunProgress, RunResult } from '../../lib/import/run';
 
 // The import wizard: file -> what is in it -> check -> import -> done (with Undo).
@@ -27,6 +29,8 @@ interface Tab {
   rowKind: RowKind;
   choices: ColumnChoice[];
   suggestions: ColumnSuggestion[];
+  guessed: { rowKind: RowKind; choices: ColumnChoice[] };     // what the guesses said, to start over from
+  savedNote: string | null;                                    // set when a remembered mapping was used
 }
 
 interface Props {
@@ -35,6 +39,7 @@ interface Props {
   onImported: () => void;
   client?: DbClient;                                   // tests/harness only
   loadStages?: () => Promise<StageInfo[]>;             // tests/harness only
+  store?: KeyValueStore | null;                        // where mappings are remembered (default: this browser's localStorage)
 }
 
 const KIND_LABEL: Record<RowKind, string> = { company: 'a company', contact: 'a person (contact)', deal: 'a deal' };
@@ -64,7 +69,10 @@ function mandatory(tab: Tab): string | null {
   return null;
 }
 
-export default function ImportWizardModal({ open, onClose, onImported, client, loadStages }: Props) {
+function browserStore(): KeyValueStore | null { try { return window.localStorage; } catch { return null; } }
+
+export default function ImportWizardModal({ open, onClose, onImported, client, loadStages, store }: Props) {
+  const storage = store === undefined ? browserStore() : store;
   const [step, setStep] = useState<Step>('file');
   const [tabs, setTabs] = useState<Tab[]>([]);
   const [activeTab, setActiveTab] = useState<string>('');
@@ -112,9 +120,20 @@ export default function ImportWizardModal({ open, onClose, onImported, client, l
         sheets.forEach((s, i) => {
           const table = analyseSheet(s.name, s.hidden, s.rows);
           const { suggestions, rowKind } = suggestSetup(table);
+          const guessedChoices: ColumnChoice[] = suggestions.map((x) => ({ field: x.guess.field, customName: x.header }));
+          let choices = guessedChoices, kind = rowKind, savedNote: string | null = null;
+          const found = table.verdict === 'list' ? findSaved(loadAll(storage), table.columns.map((c) => c.header)) : null;
+          if (found) {
+            const saved = applySaved(found, table.columns.map((c) => c.header));
+            choices = guessedChoices.map((g, k) => saved[k] ?? g);
+            kind = found.mapping.rowKind;
+            savedNote = `${found.exact ? 'The same columns' : `${found.matched} of ${found.total} columns`} as a file you imported on ${new Date(found.mapping.savedAt).toLocaleDateString()}: that mapping is used. Change anything you like.`;
+            setStageMap((m) => ({ ...found.mapping.stageMap, ...m }));
+            setEmptyWords((w) => w || found.mapping.emptyWords || '');
+          }
           next.push({
-            id: `${f.name}#${i}`, fileName: f.name, table, selected: table.verdict === 'list' && !s.hidden, rowKind,
-            choices: suggestions.map((x) => ({ field: x.guess.field, customName: x.header })), suggestions,
+            id: `${f.name}#${i}`, fileName: f.name, table, selected: table.verdict === 'list' && !s.hidden, rowKind: kind,
+            choices, suggestions, guessed: { rowKind, choices: guessedChoices }, savedNote,
           });
         });
       }
@@ -183,6 +202,11 @@ export default function ImportWizardModal({ open, onClose, onImported, client, l
       const names = [...new Set(selected.map((t) => t.fileName))];
       const res = await runImport(plan, existing, { source: names.join(', ').slice(0, 180), fileName: names.join(', ').slice(0, 280), onProgress: setProgress, shouldStop: () => stopRef.current }, client);
       setResult(res); setStep('done'); onImported();
+      if (res.created.companies + res.created.contacts + res.created.deals + res.updated.companies + res.updated.contacts > 0) {
+        let list = loadAll(storage);
+        for (const t of selected) list = upsert(list, buildSaved(t.table.columns.map((c) => c.header), t.choices, t.rowKind, stageMap, emptyWords, new Date().toISOString()));
+        saveAll(storage, list);                                   // so the next file with these columns maps itself
+      }
     } catch (e: any) {
       setError(String(e?.message || e)); setStep('check');
     }
@@ -223,6 +247,12 @@ export default function ImportWizardModal({ open, onClose, onImported, client, l
               ))}
             </div>
           )}
+          {loadAll(storage).length > 0 && (
+            <div style={{ ...small, marginBottom: '1rem' }}>
+              Raptor remembers how you mapped files before, so a file with the same columns maps itself.{' '}
+              <button type="button" onClick={() => { forgetAll(storage); setTabs((t) => [...t]); }} style={{ background: 'none', border: 'none', color: 'var(--dim)', textDecoration: 'underline', cursor: 'pointer', padding: 0, font: 'inherit' }}>Forget what it remembers</button>
+            </div>
+          )}
           <div style={{ display: 'flex', gap: '0.7rem' }}>
             <button type="button" style={ghostBtnStyle} onClick={onClose}>Cancel</button>
             <button type="button" style={primaryBtnStyle} disabled={!selected.length} onClick={() => { setError(null); setActiveTab(selected[0].id); setStep('map'); }}>Next: what is in these sheets</button>
@@ -250,6 +280,12 @@ export default function ImportWizardModal({ open, onClose, onImported, client, l
             </select>
             <span style={small}>{tab.table.rows.length} rows{tab.table.skipped.length ? ` · ${tab.table.skipped.length} title/total line${tab.table.skipped.length === 1 ? '' : 's'} set aside` : ''}</span>
           </div>
+          {tab.savedNote && (
+            <div style={{ ...small, border: '1px solid var(--border)', borderRadius: 4, padding: '0.6rem 0.8rem', marginBottom: '0.8rem', display: 'flex', gap: '0.8rem', alignItems: 'center' }}>
+              <span style={{ flex: 1 }}>{tab.savedNote}</span>
+              <button type="button" style={{ ...ghostBtnStyle, flex: 'none', padding: '0.4rem 0.7rem' }} onClick={() => updateTab(tab.id, (x) => ({ ...x, rowKind: x.guessed.rowKind, choices: x.guessed.choices, savedNote: null }))}>Start over</button>
+            </div>
+          )}
           {mandatory(tab) && <div style={{ color: 'var(--red)', fontSize: '0.65rem', marginBottom: '0.6rem' }}>{mandatory(tab)}</div>}
 
           <div style={{ maxHeight: 360, overflow: 'auto', border: '1px solid var(--border)', borderRadius: 4, marginBottom: '1rem' }}>

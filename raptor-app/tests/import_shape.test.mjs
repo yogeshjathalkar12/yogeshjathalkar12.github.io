@@ -31,7 +31,7 @@ function zip(files) {
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const letter = (i) => String.fromCharCode(65 + i);
 /** sheets: [{name, hidden?, rows: [[cell...]]}] where a cell is a string (shared string), number, {date: serial}, {inline: text}, null */
-function makeXlsx(sheets, { date1904 = false } = {}) {
+function makeXlsx(sheets, { date1904 = false, swapRels = false } = {}) {
   const shared = [];
   const sidx = (s) => { let i = shared.indexOf(s); if (i < 0) { shared.push(s); i = shared.length - 1; } return i; };
   const sheetXml = sheets.map((sh) => {
@@ -51,7 +51,7 @@ function makeXlsx(sheets, { date1904 = false } = {}) {
   const files = [
     ['[Content_Types].xml', '<Types/>', true],
     ['xl/workbook.xml', `<workbook xmlns:r="x"><workbookPr${date1904 ? ' date1904="1"' : ''}/><sheets>${sheets.map((s, i) => `<sheet name="${esc(s.name)}" sheetId="${i + 1}"${s.hidden ? ' state="hidden"' : ''} r:id="rId${i + 1}"/>`).join('')}</sheets></workbook>`, true],
-    ['xl/_rels/workbook.xml.rels', `<Relationships>${sheets.map((_, i) => `<Relationship Id="rId${i + 1}" Target="worksheets/sheet${i + 1}.xml" Type="x"/>`).join('')}</Relationships>`, true],
+    ['xl/_rels/workbook.xml.rels', `<Relationships>${sheets.map((_, i) => `<Relationship Id="rId${i + 1}" Target="worksheets/sheet${swapRels ? sheets.length - i : i + 1}.xml" Type="x"/>`).join('')}</Relationships>`, true],
     ['xl/styles.xml', '<styleSheet><numFmts count="1"><numFmt numFmtId="164" formatCode="dd/mm/yyyy"/></numFmts><cellXfs count="2"><xf numFmtId="0"/><xf numFmtId="164"/></cellXfs></styleSheet>', true],
     ...sheetXml.map((x, i) => [`xl/worksheets/sheet${i + 1}.xml`, x, i % 2 === 0]), // mix of deflated and stored parts
   ];
@@ -71,6 +71,12 @@ test('xlsx reader: shared and inline strings, numbers, dates, hidden sheets, esc
   assert.deepEqual(sheets[0].rows[0], ['Name', 'Phone', 'Joined', 'Note']);
   assert.deepEqual(sheets[0].rows[1], ['A <b> & C', '9876543210', '2025-12-09', 'plain']);
   assert.deepEqual(sheets[0].rows[2], ['', '', '', 'tail']);
+});
+
+test('sheets are found through the relationships written in the workbook, not by file number', async () => {
+  const buf = makeXlsx([{ name: 'First', rows: [['a1']] }, { name: 'Second', rows: [['b1']] }], { swapRels: true });
+  const sheets = await readXlsx(buf);
+  assert.deepEqual(sheets.map((s) => [s.name, s.rows[0][0]]), [['First', 'b1'], ['Second', 'a1']]);   // each name points at the part its relationship says
 });
 
 test('excel date serials: 1900 and 1904 systems, times, and which number formats are dates', () => {
