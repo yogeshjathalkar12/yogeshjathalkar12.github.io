@@ -4,6 +4,8 @@ import { supabase } from '../../lib/supabaseClient';
 import { formatCurrency } from '../../lib/crmHelpers';
 import Modal, { fieldLabelStyle, fieldInputStyle, primaryBtnStyle, ghostBtnStyle } from '../../components/crm/Modal';
 import DuplicatesModal from '../../components/crm/DuplicatesModal';
+import ImportWizardModal from '../../components/crm/ImportWizardModal';
+import ImportHistoryModal from '../../components/crm/ImportHistoryModal';
 import OwnerOnly from '../../components/OwnerOnly';
 import RecordHistory from '../../components/crm/RecordHistory';
 
@@ -22,6 +24,8 @@ export default function CrmCompanies() {
   const [showNew, setShowNew] = useState(false);
   const [activeCompany, setActiveCompany] = useState<any | null>(null);
   const [showDuplicates, setShowDuplicates] = useState(false);
+  const [showImport, setShowImport] = useState(false);
+  const [showImportHistory, setShowImportHistory] = useState(false);
 
   useEffect(() => {
     fetchAll();
@@ -103,6 +107,20 @@ export default function CrmCompanies() {
           </OwnerOnly>
           <OwnerOnly permission="create">
             <button
+              onClick={() => setShowImport(true)}
+              style={{ background: 'transparent', color: 'var(--dim)', border: '1px solid var(--border)', padding: '0.6rem 1.1rem', borderRadius: '4px', cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: '0.65rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}
+            >
+              Import
+            </button>
+          </OwnerOnly>
+          <button
+            onClick={() => setShowImportHistory(true)}
+            style={{ background: 'transparent', color: 'var(--dim)', border: '1px solid var(--border)', padding: '0.6rem 1.1rem', borderRadius: '4px', cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: '0.65rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}
+          >
+            Import History
+          </button>
+          <OwnerOnly permission="create">
+            <button
               onClick={() => setShowNew(true)}
               style={{ background: 'var(--grad)', color: '#fff', border: 'none', padding: '0.6rem 1.1rem', borderRadius: '4px', cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: '0.65rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}
             >
@@ -148,6 +166,8 @@ export default function CrmCompanies() {
         onChanged={fetchAll}
       />
       <DuplicatesModal kind="company" open={showDuplicates} onClose={() => setShowDuplicates(false)} onMerged={fetchAll} />
+      <ImportWizardModal open={showImport} onClose={() => setShowImport(false)} onImported={fetchAll} />
+      <ImportHistoryModal open={showImportHistory} onClose={() => setShowImportHistory(false)} onChanged={fetchAll} />
     </div>
   );
 }

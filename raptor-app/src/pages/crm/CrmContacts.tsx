@@ -4,7 +4,8 @@ import { supabase } from '../../lib/supabaseClient';
 import { relativeTime } from '../../lib/crmHelpers';
 import NewContactModal from '../../components/crm/NewContactModal';
 import ContactPanel from '../../components/crm/ContactPanel';
-import BulkImportModal from '../../components/crm/BulkImportModal';
+import ImportWizardModal from '../../components/crm/ImportWizardModal';
+import ImportHistoryModal from '../../components/crm/ImportHistoryModal';
 import ExportButton from '../../components/crm/ExportButton';
 import DuplicatesModal from '../../components/crm/DuplicatesModal';
 import OwnerOnly from '../../components/OwnerOnly';
@@ -12,7 +13,6 @@ import AssigneeFilter, { applyAssigneeFilter, useAssigneeFilter } from '../../co
 import { useMemberLabels } from '../../hooks/useDirectory';
 import { useAuth } from '../../hooks/AuthContext';
 import { shortName } from '../../lib/team';
-import { CONTACTS_IMPORT_SCHEMA } from '../../lib/importSchema';
 
 const STATUS_COLORS: Record<string, { bg: string; fg: string }> = {
   hot: { bg: 'rgba(239,68,68,0.1)', fg: 'var(--red)' },
@@ -31,6 +31,7 @@ export default function CrmContacts() {
   const [search, setSearch] = useState('');
   const [showNewContact, setShowNewContact] = useState(false);
   const [showImport, setShowImport] = useState(false);
+  const [showImportHistory, setShowImportHistory] = useState(false);
   const [showDuplicates, setShowDuplicates] = useState(false);
   const [activeContact, setActiveContact] = useState<any | null>(null);
 
@@ -186,8 +187,14 @@ export default function CrmContacts() {
               textTransform: 'uppercase',
             }}
           >
-            Bulk Import
+            Import
           </button></OwnerOnly>
+          <button
+            onClick={() => setShowImportHistory(true)}
+            style={{ background: 'transparent', color: 'var(--dim)', border: '1px solid var(--border)', padding: '0.6rem 1.1rem', borderRadius: '4px', cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: '0.65rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}
+          >
+            Import History
+          </button>
           <OwnerOnly permission="create"><button
             onClick={() => setShowNewContact(true)}
             style={{
@@ -280,13 +287,8 @@ export default function CrmContacts() {
       </div>
 
       <NewContactModal open={showNewContact} onClose={() => setShowNewContact(false)} onCreated={fetchAll} />
-      <BulkImportModal
-        open={showImport}
-        onClose={() => setShowImport(false)}
-        tableName="contacts"
-        schema={CONTACTS_IMPORT_SCHEMA}
-        onImported={fetchAll}
-      />
+      <ImportWizardModal open={showImport} onClose={() => setShowImport(false)} onImported={fetchAll} />
+      <ImportHistoryModal open={showImportHistory} onClose={() => setShowImportHistory(false)} onChanged={fetchAll} />
       <ContactPanel
         contact={activeContact}
         interactions={interactions}

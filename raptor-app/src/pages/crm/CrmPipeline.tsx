@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
-import BulkImportModal from '../../components/crm/BulkImportModal';
+import ImportWizardModal from '../../components/crm/ImportWizardModal';
+import ImportHistoryModal from '../../components/crm/ImportHistoryModal';
 import ExportButton from '../../components/crm/ExportButton';
 import LiveCallPanel from '../../components/crm/LiveCallPanel';
 import PipelineStagesModal from '../../components/crm/PipelineStagesModal';
@@ -16,7 +17,6 @@ import AssigneeFilter, { applyAssigneeFilter, useAssigneeFilter } from '../../co
 import { useMemberLabels } from '../../hooks/useDirectory';
 import { shortName } from '../../lib/team';
 import NewDealModal from '../../components/crm/NewDealModal';
-import { DEALS_IMPORT_SCHEMA } from '../../lib/importSchema';
 import { startCall } from '../../lib/calls';
 import { useAuth } from '../../hooks/AuthContext';
 import { type PipelineStage, loadPipelineStages, stageByKey } from '../../lib/pipelineStages';
@@ -80,6 +80,7 @@ export default function CrmPipeline() {
   const [stages, setStages] = useState<PipelineStage[]>([]);
   const [loading, setLoading] = useState(true);
   const [showImport, setShowImport] = useState(false);
+  const [showImportHistory, setShowImportHistory] = useState(false);
   const [showStageManager, setShowStageManager] = useState(false);
   const [showNewDeal, setShowNewDeal] = useState(false);
   const [activeDeal, setActiveDeal] = useState<any | null>(null);
@@ -444,8 +445,14 @@ export default function CrmPipeline() {
             letterSpacing: '0.08em', textTransform: 'uppercase',
           }}
         >
-          Bulk Import
+          Import
         </button></OwnerOnly>
+        <button
+            onClick={() => setShowImportHistory(true)}
+            style={{ background: 'transparent', color: 'var(--dim)', border: '1px solid var(--border)', padding: '0.6rem 1.1rem', borderRadius: '4px', cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: '0.65rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}
+          >
+            Import History
+          </button>
         <OwnerOnly permission="manage_pipeline"><button
           onClick={() => setShowStageManager(true)}
           style={{
@@ -636,13 +643,8 @@ export default function CrmPipeline() {
       <SmsSettingsModal open={showSmsSettings} onClose={() => setShowSmsSettings(false)} onSaved={fetchSms} />
       <WhatsAppSettingsModal open={showWaSettings} onClose={() => setShowWaSettings(false)} onSaved={fetchWhatsApp} />
 
-      <BulkImportModal
-        open={showImport}
-        onClose={() => setShowImport(false)}
-        tableName="deals"
-        schema={DEALS_IMPORT_SCHEMA}
-        onImported={fetchDeals}
-      />
+      <ImportWizardModal open={showImport} onClose={() => setShowImport(false)} onImported={fetchDeals} />
+      <ImportHistoryModal open={showImportHistory} onClose={() => setShowImportHistory(false)} onChanged={fetchDeals} />
 
       <PipelineStagesModal
         open={showStageManager}
