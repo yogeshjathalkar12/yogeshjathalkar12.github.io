@@ -401,6 +401,8 @@
         .audience-card ul { list-style: none; margin-top: 1rem; }
         .audience-card li { font-size: 0.88rem; color: var(--text-muted); padding: 6px 0 6px 22px; position: relative; line-height: 1.5; }
         .audience-card li::before { content: '→'; position: absolute; left: 0; color: var(--primary); font-weight: 700; }
+        .audience-card .project-actions { margin-top: 1.2rem; }
+        .audience-card .project-status { margin-top: 1.2rem; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; color: var(--text-muted); }
 
         /* --- SECURITY GRID --- */
         .security-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
@@ -933,6 +935,33 @@ if (bx && stage) {
                         <li>Structured symptom and adherence data, not free-text notes</li>
                         <li>No identifiable record leaves the vault without consent</li>
                     </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════ MORE HEALTH PROJECTS (moved here from the Shoonya Origins home page) ═══════════════ -->
+    <section class="block" id="health-projects">
+        <div class="block-inner">
+            <div class="block-header" data-aos="fade-up">
+                <div class="eyebrow">More Health Work From Shoonya Origins</div>
+                <h2 class="block-title">Beyond the vault: biology and clinical evidence.</h2>
+                <p class="block-sub">Two projects that sit alongside Vapus and share its health focus.</p>
+            </div>
+            <div class="audience-grid">
+                <div class="audience-card" data-aos="fade-up" data-aos-delay="0">
+                    <div class="audience-tag">In Silico Medicine</div>
+                    <h3>Project Jeeva</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">Mapping human biology through pure physics and data science. Constructing highly accurate biological digital twins to simulate complex physiological mechanisms and allopathic pharmacology.</p>
+                    <p class="project-status">Project page coming soon</p>
+                </div>
+                <div class="audience-card" data-aos="fade-up" data-aos-delay="120">
+                    <div class="audience-tag">Clinical Intelligence</div>
+                    <h3>Charaka</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">Clinical validation initiative building infrastructure to generate peer-reviewed, AI-driven clinical evidence for Ayurveda and alternative medicine.</p>
+                    <div class="project-actions">
+                        <a href="/ventures/vapus/charaka/" class="btn-ghost" style="text-decoration:none; display:inline-block;">Explore Charaka</a>
+                    </div>
                 </div>
             </div>
         </div>

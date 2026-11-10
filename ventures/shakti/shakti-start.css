@@ -1,0 +1,65 @@
+/* Start of the Shakti overview page, laid out like the start of the Raptor page:
+   a top bar (name, links, theme button), an italic line, a big two-tone statement, an italic sentence,
+   then three short columns with a bar above each. Black and white only; follows the light / dark theme. */
+
+.so-bar {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;
+  padding: 1rem clamp(1rem, 4vw, 4rem);
+  background: rgba(0, 0, 0, 0.88);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+html[data-theme="light"] .so-bar { background: rgba(255, 255, 255, 0.92); }
+
+.so-bar .brand { color: var(--text-main); text-decoration: none; }
+.so-bar .nav-links { display: flex; gap: 2.2rem; list-style: none; margin: 0; padding: 0; }
+.so-bar .nav-links a {
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 0.9rem; letter-spacing: 0.06em;
+  color: var(--text-muted); text-decoration: none;
+  transition: color 0.2s ease;
+}
+.so-bar .nav-links a:hover, .so-bar .nav-links a:focus-visible { color: var(--text-main); }
+
+.so-hero { padding: 5.5rem 0 5rem; text-align: center; border-bottom: 1px solid var(--border); }
+
+html:not(.so-alt) .so-hero .so-intro {
+  text-align: left; max-width: 760px; margin: 0 0 4.5rem;
+  font-size: clamp(1.4rem, 2.4vw, 2rem); color: var(--text-muted);
+}
+
+html:not(.so-alt) .so-hero h1 {
+  font-size: clamp(2.6rem, 6vw, 5.6rem);
+  line-height: 1; letter-spacing: 0.01em;
+  margin: 0 auto 2.2rem; max-width: 1250px;
+  color: var(--text-main);
+  text-wrap: balance;
+}
+/* the two halves sit on their own lines, so a short word never ends up alone on a third line */
+.so-hero .so-h1-a, .so-hero .so-h1-b { display: block; text-wrap: balance; }
+.so-hero .so-h1-b { color: var(--text-muted); }
+
+html:not(.so-alt) .so-hero .so-sub {
+  max-width: 760px; margin: 0 auto 4.5rem;
+  font-size: clamp(1.3rem, 2.2vw, 1.75rem); color: var(--text-muted);
+}
+
+.so-trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem; max-width: 1000px; margin: 0 auto; }
+.so-trio > div::before { content: ''; display: block; width: 36px; height: 3px; background: var(--text-main); margin: 0 auto 1.4rem; }
+html:not(.so-alt) .so-trio h3 {
+  font-family: 'Bebas Neue', 'Inter', sans-serif; font-weight: 400;
+  font-size: 1.8rem; letter-spacing: 0.03em; line-height: 1.05; margin-bottom: 0.8rem; color: var(--text-main);
+}
+html:not(.so-alt) .so-hero .so-trio p {
+  font-family: 'DM Mono', ui-monospace, monospace; font-style: normal; font-size: 0.88rem; line-height: 1.7; color: var(--text-muted);
+  max-width: 280px; margin: 0 auto;
+}
+
+@media (max-width: 800px) {
+  .so-bar { flex-wrap: wrap; justify-content: center; }
+  .so-bar .nav-links { order: 3; width: 100%; justify-content: center; gap: 1.4rem; }
+  .so-trio { grid-template-columns: 1fr; gap: 2.5rem; }
+  .so-hero { padding: 3.5rem 0; }
+  html:not(.so-alt) .so-hero .so-intro { margin-bottom: 3rem; }
+}

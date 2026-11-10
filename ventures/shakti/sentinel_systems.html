@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="so-alt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,12 +9,12 @@
     <style>
         /* SENTINEL THEME: Tactical, Dark, Alert */
         :root {
-            --bg-dark: #0f172a;       /* Navy Black */
-            --bg-card: #1e293b;       /* Lighter Navy */
-            --bg-hover: #334155;      /* Slate Hover */
-            --accent-red: #ef4444;    /* Alert Red */
-            --text-white: #f8fafc;
-            --text-grey: #94a3b8;
+            --bg-dark: #000000;       /* Black */
+            --bg-card: #0a0a0a;
+            --bg-hover: #1a1a1a;
+            --accent-red: #ffffff;    /* white (was red) */
+            --text-white: #f2f2f2;
+            --text-grey: #8a8a8a;
             --border-light: rgba(255,255,255,0.05);
         }
 
@@ -36,7 +36,7 @@
             display: flex; justify-content: space-between; align-items: center;
             padding: 1.5rem 5%; 
             border-bottom: 1px solid var(--border-light);
-            background: rgba(15, 23, 42, 0.95);
+            background: rgba(0, 0, 0, 0.95);
             position: sticky; top: 0; z-index: 100;
             backdrop-filter: blur(10px);
         }
@@ -57,7 +57,7 @@
         .hero {
             padding: 8rem 5% 6rem;
             text-align: center;
-            background: radial-gradient(circle at top, #1e293b 0%, #0f172a 70%);
+            background: #000000;
             border-bottom: 1px solid var(--border-light);
         }
         
@@ -69,9 +69,9 @@
             letter-spacing: 2px;
             font-size: 0.8rem;
             text-transform: uppercase;
-            border: 1px solid rgba(239, 68, 68, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             padding: 0.5rem 1rem;
-            background: rgba(239, 68, 68, 0.05);
+            background: rgba(255, 255, 255, 0.05);
         }
 
         h1 { font-size: 3.5rem; margin-bottom: 1.5rem; line-height: 1.1; }
@@ -91,10 +91,10 @@
         
         .btn-primary {
             background-color: var(--accent-red);
-            color: white;
+            color: #000;
             border: 1px solid var(--accent-red);
         }
-        .btn-primary:hover { background-color: #dc2626; border-color: #dc2626; }
+        .btn-primary:hover { background-color: #cfcfcf; border-color: #cfcfcf; }
 
         .btn-secondary {
             background-color: transparent;
@@ -186,7 +186,7 @@
         }
 
         /* TECH GRID */
-        .technology { background: #131c31; /* Slightly distinctive bg */ width: 100vw; max-width: 100%; }
+        .technology { background: #0a0a0a; /* Slightly distinctive bg */ width: 100vw; max-width: 100%; }
         .tech-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -273,6 +273,8 @@
         .fade-in { opacity: 0; transform: translateY(20px); transition: 0.6s ease-out; }
         .fade-in.visible { opacity: 1; transform: translateY(0); }
     </style>
+    <link rel="stylesheet" href="shakti-theme.css?v=4">
+    <script src="shakti-theme.js?v=1"></script>
 </head>
 <body>
 

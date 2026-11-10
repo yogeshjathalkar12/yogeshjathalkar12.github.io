@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAMPATI Software | Sentinel-GCS</title>
+    <meta name="description" content="The processing, localisation and control software for the SAMPATI aerostatic ESM network: built and verified in simulation, hardware integration next.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #000000;
+            --surface: #0a0a0a;
+            --surface-highlight: #111111;
+            --border: #222222;
+            --text-main: #e0e0e0;
+            --text-muted: #8a8a8a;
+            --accent: #ffffff;
+            --spacing: 2rem;
+            --ok: #ffffff;
+            --pending: #9a9a9a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 var(--spacing); }
+
+        nav {
+            padding: 2rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 4rem;
+        }
+        .nav-links { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+        .back-link { text-decoration: none; color: var(--text-muted); font-size: 0.8rem; font-family: 'Space Mono', monospace; letter-spacing: 1px; transition: color 0.3s; }
+        .back-link:hover, .back-link:focus-visible { color: var(--accent); }
+        .brand { font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; border: 1px solid var(--text-muted); padding: 0.5rem 1rem; }
+
+        .hero { padding: 6rem 0; border-bottom: 1px solid var(--border); }
+        .hero h1 {
+            font-size: clamp(2.6rem, 6vw, 5.5rem);
+            font-weight: 900;
+            line-height: 0.95;
+            margin-bottom: 2rem;
+            letter-spacing: -3px;
+            text-transform: uppercase;
+        }
+        .hero p { font-size: 1.15rem; color: var(--text-muted); max-width: 760px; margin-bottom: 3rem; }
+        .hero-tags { display: flex; gap: 1rem; font-family: 'Space Mono', monospace; font-size: 0.75rem; text-transform: uppercase; flex-wrap: wrap; }
+        .hero-tag { border: 1px solid var(--border); padding: 0.5rem 1rem; background: var(--surface); }
+        .hero-tag.ok { color: var(--ok); border-color: #3a3a3a; }
+        .hero-tag.pending { color: var(--pending); border-color: #3a3a3a; }
+
+        .notice {
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--pending);
+            background: var(--surface);
+            padding: 1.25rem 1.5rem;
+            margin: 3rem 0;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        .notice strong { color: var(--text-main); }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            border-left: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            margin-bottom: 6rem;
+        }
+        .stat-item { padding: 3rem 2rem; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); }
+        .stat-label { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 1rem; display: block; letter-spacing: 1px; }
+        .stat-value { font-size: 2.4rem; font-weight: 700; line-height: 1; margin-bottom: 0.75rem; color: var(--accent); }
+        .stat-sub { font-size: 0.85rem; color: var(--text-muted); line-height: 1.45; }
+
+        .section-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 3rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem;
+        }
+        .section-title { font-family: 'Space Mono', monospace; font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; }
+        .section-index { color: var(--text-muted); font-family: 'Space Mono', monospace; }
+        .section { margin-bottom: 7rem; }
+        .lead { color: var(--text-muted); max-width: 760px; margin-bottom: 2.5rem; }
+
+        /* pipeline */
+        .flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); }
+        .flow-step { background: var(--surface); padding: 1.5rem 1.25rem; position: relative; }
+        .flow-step .n { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--text-muted); display: block; margin-bottom: 0.6rem; }
+        .flow-step h3 { font-size: 1rem; margin-bottom: 0.5rem; }
+        .flow-step p { font-size: 0.85rem; color: var(--text-muted); }
+        .flow-branch { margin-top: 1px; background: var(--surface); border: 1px solid var(--border); border-top: none; padding: 1.25rem; font-size: 0.9rem; color: var(--text-muted); }
+        .flow-branch strong { color: var(--text-main); font-family: 'Space Mono', monospace; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; }
+
+        .tech-card {
+            background: var(--surface); border: 1px solid var(--border);
+            margin-bottom: 2rem; padding: 3rem; transition: border-color 0.3s;
+        }
+        .tech-card:hover { border-color: var(--text-muted); }
+        .tech-title { font-size: 1.8rem; margin-bottom: 1rem; font-weight: 700; letter-spacing: -1px; }
+        .tech-desc { color: var(--text-muted); margin-bottom: 2rem; font-size: 1.02rem; max-width: 720px; }
+        .specs-table { width: 100%; border-collapse: collapse; font-family: 'Space Mono', monospace; font-size: 0.85rem; }
+        .specs-table td { padding: 0.9rem 0; border-bottom: 1px solid var(--border); vertical-align: top; }
+        .specs-table td:first-child { color: var(--text-muted); width: 42%; padding-right: 1rem; }
+        .specs-table td:last-child { color: var(--accent); text-align: right; }
+        .specs-table tr:last-child td { border-bottom: none; }
+
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); }
+        .col { background: var(--bg); padding: 2.5rem; }
+        .col h3 { font-family: 'Space Mono', monospace; font-size: 0.85rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 1.5rem; }
+        .col.ok h3 { color: var(--ok); }
+        .col.pending h3 { color: var(--pending); }
+        .col ul { list-style: none; }
+        .col li { color: var(--text-muted); font-size: 0.92rem; padding: 0.55rem 0 0.55rem 1.3rem; border-bottom: 1px solid var(--border); position: relative; }
+        .col li:last-child { border-bottom: none; }
+        .col.ok li::before { content: '\2713'; position: absolute; left: 0; color: var(--ok); }
+        .col.pending li::before { content: '\25CB'; position: absolute; left: 0; color: var(--pending); }
+
+        .steps { counter-reset: s; list-style: none; border: 1px solid var(--border); }
+        .steps li { counter-increment: s; padding: 1.4rem 1.5rem 1.4rem 4rem; border-bottom: 1px solid var(--border); position: relative; color: var(--text-muted); background: var(--surface); }
+        .steps li:last-child { border-bottom: none; }
+        .steps li::before { content: counter(s, decimal-leading-zero); position: absolute; left: 1.5rem; top: 1.4rem; font-family: 'Space Mono', monospace; color: var(--accent); }
+        .steps li strong { color: var(--text-main); display: block; margin-bottom: 0.2rem; }
+
+        footer { padding: 4rem 0; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 0.8rem; }
+        .footer-logo { font-family: 'Space Mono', monospace; font-weight: 700; margin-bottom: 1rem; color: var(--accent); letter-spacing: 2px; }
+
+        @media (max-width: 768px) {
+            .hero { padding: 4rem 0; }
+            .tech-card { padding: 2rem 1.5rem; }
+            .two-col { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr; border-right: none; }
+            .stat-item { border-right: none; padding: 2rem 1.5rem; }
+            .specs-table td:last-child { text-align: left; display: block; padding-top: 0; }
+            .specs-table td:first-child { display: block; width: 100%; border-bottom: none; padding-bottom: 0; }
+        }
+        @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+    </style>
+    <link rel="stylesheet" href="shakti-theme.css?v=4">
+    <script src="shakti-theme.js?v=1"></script>
+</head>
+<body>
+
+    <div class="container">
+        <nav>
+            <div class="nav-links">
+                <a href="../../index.html" class="back-link">&larr; // SHOONYA ORIGINS</a>
+                <a href="sampati.html" class="back-link">&larr; SAMPATI</a>
+            </div>
+            <div class="brand">SAMPATI SOFTWARE</div>
+        </nav>
+
+        <section class="hero">
+            <h1>Sentinel&#8209;GCS</h1>
+            <p>The processing, localisation and control software for the SAMPATI aerostatic ESM network: from raw radio samples to a fused emitter picture and a safety-supervised aerostat. Built and verified in simulation. Hardware integration is the next stage.</p>
+            <div class="hero-tags">
+                <span class="hero-tag ok">Simulation-verified</span>
+                <span class="hero-tag pending">Not yet field-tested</span>
+                <span class="hero-tag">84 automated tests</span>
+            </div>
+        </section>
+
+        <div class="notice">
+            <strong>Status.</strong> Every figure on this page comes from software simulation, synthetic radio signals or recorded test data. None has been measured on real RF or on the flight hardware yet. This page describes the software only; it does not publish source code. Shakti models are theoretical and not certified for live defence use (see the <a href="../../about/disclaimer.html" style="color:var(--text-main)">disclaimer</a>).
+        </div>
+
+        <section class="stats-grid" aria-label="Simulation results">
+            <div class="stat-item">
+                <span class="stat-label">Simulated localisation</span>
+                <div class="stat-value">15&ndash;45 m</div>
+                <div class="stat-sub">Emitter position error with 5 nodes 50 km apart and a modelled 10 ns clock error. A simulation result, not a field measurement.</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Pulse timing</span>
+                <div class="stat-value">&lt; 1 ns</div>
+                <div class="stat-sub">Average timing bias of the pulse extractor on synthetic signals (1&ndash;4 ns scatter).</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Threat alert</span>
+                <div class="stat-value">0.25 s</div>
+                <div class="stat-sub">Simulated time from a threat radar switching on to the safety logic reacting.</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Cross-check</span>
+                <div class="stat-value">&lt; 1 cm</div>
+                <div class="stat-sub">Disagreement between the Python and C++ localisers on the same scene.</div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <span class="section-title">How it works</span>
+                <span class="section-index">01</span>
+            </div>
+            <p class="lead">Each of the five nodes listens for radar pulses. The software compares exactly when each node heard the same pulse train and works out where the emitter is, then keeps a live track of it.</p>
+            <div class="flow">
+                <div class="flow-step"><span class="n">01</span><h3>Radio samples</h3><p>From a software-defined radio, a recorded file or the built-in simulator.</p></div>
+                <div class="flow-step"><span class="n">02</span><h3>Pulse extraction</h3><p>Finds each pulse and measures its arrival time, width, power, frequency and, with two channels, bearing.</p></div>
+                <div class="flow-step"><span class="n">03</span><h3>Sort &amp; classify</h3><p>Separates interleaved emitters and labels each by type and threat level.</p></div>
+                <div class="flow-step"><span class="n">04</span><h3>Localise</h3><p>Combines arrival-time differences across nodes to fix the emitter position.</p></div>
+                <div class="flow-step"><span class="n">05</span><h3>Track &amp; report</h3><p>Fuses fixes into tracks, shows them on the console and prepares the encrypted report.</p></div>
+            </div>
+            <div class="flow-branch"><strong>Safety branch</strong> &nbsp; Flight and winch telemetry feeds Sentinel-Guard, which supervises the aerostat (wind, tether, helium, threats). It starts in dry-run: it shows what it would command and sends nothing until deliberately enabled.</div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <span class="section-title">Components</span>
+                <span class="section-index">02</span>
+            </div>
+
+            <article class="tech-card">
+                <div class="stat-label">Signal chain</div>
+                <h2 class="tech-title">Pulse extraction from radio samples</h2>
+                <p class="tech-desc">A reference implementation of the receiver&rsquo;s pulse-detection stage, usable on recorded signals today and as the golden model for a hardware or C++ version.</p>
+                <table class="specs-table">
+                    <tr><td>Inputs</td><td>Synthetic, recorded file, SDR (SoapySDR)</td></tr>
+                    <tr><td>Detection (synthetic)</td><td>98% at 20 dB SNR, 90% at 14 dB</td></tr>
+                    <tr><td>False alarms</td><td>0 in 10 M noise samples</td></tr>
+                    <tr><td>Bearing</td><td>Optional, needs two coherent channels</td></tr>
+                    <tr><td>Real-time rate</td><td>Not at wideband FPGA rates</td></tr>
+                </table>
+            </article>
+
+            <article class="tech-card">
+                <div class="stat-label">Localisation &amp; fusion</div>
+                <h2 class="tech-title">Multi-node emitter localisation</h2>
+                <p class="tech-desc">Time-difference-of-arrival positioning that resolves the range ambiguity of repeating pulse trains, works with or without a bearing channel, and degrades gracefully when nodes drop out.</p>
+                <table class="specs-table">
+                    <tr><td>Simulated error</td><td>15&ndash;45 m (CEP50 about 7&ndash;11 m)</td></tr>
+                    <tr><td>With two of five nodes lost</td><td>Emitters stay localised</td></tr>
+                    <tr><td>C++ port</td><td>About 11&times; faster localisation</td></tr>
+                    <tr><td>Not handled yet</td><td>Frequency-agile emitters</td></tr>
+                </table>
+            </article>
+
+            <article class="tech-card">
+                <div class="stat-label">Operator console</div>
+                <h2 class="tech-title">Sentinel-GCS</h2>
+                <p class="tech-desc">A live map, emitter list, spectrum waterfall and per-node status, built for a control vehicle. Sign-in with viewer and operator roles, TLS, an audit trail of every command, and health monitoring.</p>
+                <table class="specs-table">
+                    <tr><td>Access control</td><td>Login, roles, lockout, audit log</td></tr>
+                    <tr><td>Data sources</td><td>Simulator, replay, live network feed</td></tr>
+                    <tr><td>Security review</td><td>Not yet independently reviewed</td></tr>
+                </table>
+            </article>
+
+            <article class="tech-card">
+                <div class="stat-label">Safety logic</div>
+                <h2 class="tech-title">Sentinel-Guard &amp; flight link</h2>
+                <p class="tech-desc">Supervises each node using real telemetry: tether or power loss, gusts, low helium and threat radars. It declares the platform recovered only from measured altitude, and flags silent telemetry instead of acting blindly.</p>
+                <table class="specs-table">
+                    <tr><td>Default mode</td><td>Dry-run (nothing is commanded)</td></tr>
+                    <tr><td>Link</td><td>MAVLink; interface specified, firmware not yet written</td></tr>
+                    <tr><td>Tested against</td><td>Simulation and a fake connection</td></tr>
+                </table>
+            </article>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <span class="section-title">Verified and not yet verified</span>
+                <span class="section-index">03</span>
+            </div>
+            <div class="two-col">
+                <div class="col ok">
+                    <h3>Verified in software</h3>
+                    <ul>
+                        <li>Full chain from radio samples to localised emitters, in simulation</li>
+                        <li>Pulse timing, width, frequency and power accuracy on synthetic signals</li>
+                        <li>Localisation with and without a bearing channel</li>
+                        <li>Safety logic reacting correctly to simulated faults</li>
+                        <li>Python and C++ implementations agree</li>
+                        <li>Sign-in, roles and audit behaviour</li>
+                    </ul>
+                </div>
+                <div class="col pending">
+                    <h3>Needs hardware or real data</h3>
+                    <ul>
+                        <li>Any real radio signal, terrain and multipath</li>
+                        <li>SDR capture on an actual radio</li>
+                        <li>Flight and winch controller firmware</li>
+                        <li>A library of real emitters for classification</li>
+                        <li>Approved secure uplink to the user network</li>
+                        <li>Independent security review and long-duration soak testing</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <span class="section-title">Next steps</span>
+                <span class="section-index">04</span>
+            </div>
+            <ol class="steps">
+                <li><strong>Bench capture</strong>Run the pulse extractor on a real radio against a known test source and calibrate amplitude.</li>
+                <li><strong>Controller firmware</strong>Implement the flight and winch interface and test Sentinel-Guard in dry-run on the bench.</li>
+                <li><strong>Surveyed field test</strong>Measure localisation against surveyed emitters and compare with the simulation.</li>
+                <li><strong>Hardening</strong>Independent security review, long-duration run and fault-injection testing.</li>
+            </ol>
+        </section>
+
+        <footer>
+            <div class="footer-logo">SAMPATI SOFTWARE</div>
+            <p>Technical documentation available on request.</p>
+            <p style="margin-top: 1rem;">&copy; 2026 Shoonya Origins. All Rights Reserved.</p>
+        </footer>
+    </div>
+
+</body>
+</html>

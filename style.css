@@ -2131,6 +2131,36 @@ body.dark-mode .street-sky::after { --haze: rgba(12, 10, 9, 0.95); background: l
     .so-footer-grid { grid-template-columns: 1fr 1fr; gap: 2rem 1.5rem; }
 }
 
+/* Shakti card: plain black and white. A greyscale photo, flat black shading, white text, square-cornered white buttons;
+   no colour, no glow. Same in light and dark mode. */
+.card.bg-sentinel {
+    background-image: url('images/sentinel-bw.webp');
+    border: 1px solid #1a1a1a;
+}
+.card.bg-sentinel::before {
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.82) 40%, rgba(0, 0, 0, 0.35) 100%);
+}
+.card.bg-sentinel:hover { box-shadow: 0 30px 70px rgba(0, 0, 0, 0.45); }
+.bg-sentinel .card-title { color: #ffffff; text-shadow: none; }
+.bg-sentinel .card-desc { color: #d0d0d0; }
+.bg-sentinel .card-tag,
+body.dark-mode .bg-sentinel .card-tag {
+    background: #000000;
+    color: #ffffff;
+    border: 1px solid #ffffff;
+    border-radius: 2px;
+    box-shadow: none;
+    backdrop-filter: none;
+}
+.bg-sentinel .extra-btn {
+    background: #ffffff;
+    color: #000000;
+    border: 1px solid #ffffff;
+    border-radius: 2px;
+    box-shadow: none;
+}
+.bg-sentinel .extra-btn:hover { background: #000000; color: #ffffff; filter: none; box-shadow: none; transform: none; }
+
 /* Button on a Latest Updates card */
 .notification-card .notification-btn { display: inline-block; margin-top: 1.1rem; text-decoration: none; }
 

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What we do | Shakti | Shoonya Origins</title>
+    <meta name="description" content="Shakti is the defence venture of Shoonya Origins. We build technology that keeps people out of harm's way and gives those who must be there a clearer picture of what is around them.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #000000;
+            --surface: #0a0a0a;
+            --surface-highlight: #111111;
+            --border: #222222;
+            --text-main: #e0e0e0;
+            --text-muted: #8a8a8a;
+            --accent: #ffffff;
+            --spacing: 2rem;
+            --ok: #ffffff;
+            --pending: #9a9a9a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        a { color: inherit; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 var(--spacing); }
+
+        nav {
+            padding: 2rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 4rem;
+        }
+        .back-link { text-decoration: none; color: var(--text-muted); font-size: 0.8rem; font-family: 'Space Mono', monospace; letter-spacing: 1px; transition: color 0.3s; }
+        .back-link:hover, .back-link:focus-visible { color: var(--accent); }
+        .brand { font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; border: 1px solid var(--text-muted); padding: 0.5rem 1rem; }
+
+        .hero { padding: 6rem 0; border-bottom: 1px solid var(--border); }
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 7rem);
+            font-weight: 900;
+            line-height: 0.9;
+            margin-bottom: 2rem;
+            letter-spacing: -4px;
+            text-transform: uppercase;
+        }
+        .hero p { font-size: 1.2rem; color: var(--text-muted); max-width: 760px; margin-bottom: 3rem; }
+        .hero-tags { display: flex; gap: 1rem; font-family: 'Space Mono', monospace; font-size: 0.75rem; text-transform: uppercase; flex-wrap: wrap; }
+        .hero-tag { border: 1px solid var(--border); padding: 0.5rem 1rem; background: var(--surface); }
+
+        .section { margin: 6rem 0; }
+        .section-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 3rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem;
+        }
+        .section-title { font-family: 'Space Mono', monospace; font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; }
+        .section-index { color: var(--text-muted); font-family: 'Space Mono', monospace; }
+        .lead { color: var(--text-muted); max-width: 760px; margin-bottom: 2.5rem; font-size: 1.05rem; }
+
+        .pillars { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); }
+        .pillar { background: var(--bg); padding: 3rem 2.5rem; }
+        .pillar .n { font-family: 'Space Mono', monospace; font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 1.5rem; letter-spacing: 1px; }
+        .pillar h3 { font-size: 1.35rem; margin-bottom: 1rem; color: var(--accent); letter-spacing: -0.5px; }
+        .pillar p { color: var(--text-muted); font-size: 0.97rem; }
+
+        .projects { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 2rem; }
+        .project-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            transition: border-color 0.3s;
+        }
+        .project-card:hover { border-color: var(--text-muted); }
+        .project-meta { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; font-family: 'Space Mono', monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; }
+        .project-tag { color: var(--text-muted); }
+        .project-status { color: var(--pending); }
+        .project-card h3 { font-size: 1.9rem; font-weight: 900; letter-spacing: -1px; margin-bottom: 1rem; text-transform: uppercase; }
+        .project-card p { color: var(--text-muted); font-size: 0.97rem; margin-bottom: 1.5rem; }
+        .project-links { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: auto; }
+
+        .notice {
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--pending);
+            background: var(--surface);
+            padding: 1.25rem 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.92rem;
+        }
+        .notice strong { color: var(--text-main); }
+
+        .btn {
+            font-family: 'Space Mono', monospace; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;
+            text-decoration: none; color: var(--accent); border: 1px solid var(--text-muted); padding: 0.6rem 1.1rem;
+            transition: background 0.3s, color 0.3s; display: inline-block;
+        }
+        .btn:hover, .btn:focus-visible { background: var(--accent); color: #000; }
+
+        footer { padding: 4rem 0; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 0.8rem; }
+        .footer-logo { font-family: 'Space Mono', monospace; font-weight: 700; margin-bottom: 1rem; color: var(--accent); letter-spacing: 2px; }
+
+        @media (max-width: 768px) {
+            .hero { padding: 4rem 0; }
+            .hero h1 { letter-spacing: -2px; }
+            .pillar { padding: 2rem 1.5rem; }
+            .projects { grid-template-columns: 1fr; }
+            .project-card { padding: 2rem 1.5rem; }
+        }
+        @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+    </style>
+    <link rel="stylesheet" href="shakti-theme.css?v=4">
+    <script src="shakti-theme.js?v=1"></script>
+</head>
+<body>
+
+    <div class="container">
+        <nav>
+            <a href="index.html" class="back-link">&larr; // SHAKTI</a>
+            <div class="brand">SHAKTI</div>
+        </nav>
+
+        <section class="hero">
+            <h1>What we do</h1>
+            <p>Shakti is the defence venture of Shoonya Origins. We build technology that keeps people out of harm&rsquo;s way, and gives the people who must be there a clearer picture of what is around them.</p>
+            <div class="hero-tags">
+                <span class="hero-tag">Defence</span>
+                <span class="hero-tag">Unmanned systems</span>
+                <span class="hero-tag">Wearables</span>
+                <span class="hero-tag">Computing</span>
+            </div>
+        </section>
+
+        <section class="section" id="our-work">
+            <div class="section-header">
+                <span class="section-title">Our work</span>
+                <span class="section-index">01</span>
+            </div>
+            <p class="lead">Our work falls into three areas.</p>
+            <div class="pillars">
+                <div class="pillar">
+                    <span class="n">01</span>
+                    <h3>Unmanned &amp; automated systems</h3>
+                    <p>Ground and aerial platforms, and persistent sensing systems, that take on dull, dirty and dangerous work, such as moving supplies and watching difficult borders, so fewer people have to.</p>
+                </div>
+                <div class="pillar">
+                    <span class="n">02</span>
+                    <h3>Wearable smart devices</h3>
+                    <p>Compact devices for people in the field, built for combat conditions, that improve awareness and communication when it matters most.</p>
+                </div>
+                <div class="pillar">
+                    <span class="n">03</span>
+                    <h3>Computing systems</h3>
+                    <p>Software and computing that turn raw sensor data into clear, usable information where the work is actually happening.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="who-for">
+            <div class="section-header">
+                <span class="section-title">Who we work for</span>
+                <span class="section-index">02</span>
+            </div>
+            <p class="lead">India&rsquo;s defence forces, and the programmes that equip them. Where we can, we build so that a capability does not depend on systems controlled by anyone else.</p>
+        </section>
+
+        <section class="section" id="now">
+            <div class="section-header">
+                <span class="section-title">What we are building now</span>
+                <span class="section-index">03</span>
+            </div>
+            <div class="projects">
+                <article class="project-card">
+                    <div class="project-meta">
+                        <span class="project-tag">Surveillance &middot; Electronic support</span>
+                        <span class="project-status">Design &amp; software stage</span>
+                    </div>
+                    <h3>SAMPATI</h3>
+                    <p>A network that finds where radar emitters are along high-altitude borders, without relying on satellites.</p>
+                    <div class="project-links">
+                        <a class="btn" href="sampati.html">Overview</a>
+                    </div>
+                </article>
+
+                <article class="project-card">
+                    <div class="project-meta">
+                        <span class="project-tag">Logistics &middot; Autonomous trucks</span>
+                        <span class="project-status">Software stage</span>
+                    </div>
+                    <h3>VAHAK-AI</h3>
+                    <p>Lets existing Army heavy trucks drive themselves over rough terrain, keep navigating when satellite signals are jammed, and move as a coordinated convoy.</p>
+                    <div class="project-links">
+                        <a class="btn" href="vahak-ai.html">Overview</a>
+                    </div>
+                </article>
+
+                <article class="project-card">
+                    <div class="project-meta">
+                        <span class="project-tag">Space domain awareness &middot; Air Force</span>
+                        <span class="project-status">Software stage</span>
+                    </div>
+                    <h3>ASTRR-SYSTEM</h3>
+                    <p>Gives the Indian Air Force its own picture of what is in orbit and what is coming down, and warns of collisions, hostile satellite moves, falling debris and missile launches.</p>
+                    <div class="project-links">
+                        <a class="btn" href="astrr-system.html">Overview</a>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="notice">
+                <strong>Informational only.</strong> This page describes research and development. We do not host tactical software on this site, and Shakti models are theoretical and not certified for live defence use. See the <a href="../../about/disclaimer.html">disclaimer</a>.
+            </div>
+        </section>
+
+        <section class="section">
+            <a class="btn" href="index.html">&larr; Back to Shakti</a>
+        </section>
+
+        <footer>
+            <div class="footer-logo">SHAKTI</div>
+            <p>A Shoonya Origins venture.</p>
+            <p style="margin-top: 1rem;">&copy; 2026 Shoonya Origins. All Rights Reserved.</p>
+        </footer>
+    </div>
+
+</body>
+</html>

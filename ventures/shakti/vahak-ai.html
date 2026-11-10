@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VAHAK-AI | Shakti | Shoonya Origins</title>
+    <meta name="description" content="VAHAK-AI is a retrofit kit and software stack that lets existing Indian Army heavy trucks drive themselves over rough terrain, navigate without foreign satellites and travel as a coordinated convoy.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #000000;
+            --surface: #0a0a0a;
+            --surface-highlight: #111111;
+            --border: #222222;
+            --text-main: #e0e0e0;
+            --text-muted: #8a8a8a;
+            --accent: #ffffff;
+            --spacing: 2rem;
+            --ok: #ffffff;
+            --pending: #9a9a9a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        a { color: inherit; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 var(--spacing); }
+
+        nav {
+            padding: 2rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 4rem;
+        }
+        .back-link { text-decoration: none; color: var(--text-muted); font-size: 0.8rem; font-family: 'Space Mono', monospace; letter-spacing: 1px; transition: color 0.3s; }
+        .back-link:hover, .back-link:focus-visible { color: var(--accent); }
+        .brand { font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; border: 1px solid var(--text-muted); padding: 0.5rem 1rem; }
+
+        .hero { padding: 6rem 0; border-bottom: 1px solid var(--border); }
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 7rem);
+            font-weight: 900;
+            line-height: 0.9;
+            margin-bottom: 2rem;
+            letter-spacing: -4px;
+            text-transform: uppercase;
+        }
+        .hero p { font-size: 1.2rem; color: var(--text-muted); max-width: 760px; margin-bottom: 3rem; }
+        .hero-tags { display: flex; gap: 1rem; font-family: 'Space Mono', monospace; font-size: 0.75rem; text-transform: uppercase; flex-wrap: wrap; }
+        .hero-tag { border: 1px solid var(--border); padding: 0.5rem 1rem; background: var(--surface); }
+
+        .section { margin: 6rem 0; }
+        .section-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 3rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem;
+        }
+        .section-title { font-family: 'Space Mono', monospace; font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; }
+        .section-index { color: var(--text-muted); font-family: 'Space Mono', monospace; }
+        .lead { color: var(--text-muted); max-width: 760px; margin-bottom: 2.5rem; font-size: 1.05rem; }
+        .lead + .lead { margin-top: -1rem; }
+
+        .quote {
+            border-left: 3px solid var(--text-muted);
+            padding: 0.25rem 0 0.25rem 1.5rem;
+            font-size: 1.25rem;
+            line-height: 1.5;
+            color: var(--accent);
+            max-width: 760px;
+            margin-top: 2.5rem;
+        }
+
+        .pillars { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); }
+        .pillar { background: var(--bg); padding: 3rem 2.5rem; }
+        .pillar .n { font-family: 'Space Mono', monospace; font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 1.5rem; letter-spacing: 1px; }
+        .pillar h3 { font-size: 1.35rem; margin-bottom: 1rem; color: var(--accent); letter-spacing: -0.5px; }
+        .pillar p { color: var(--text-muted); font-size: 0.97rem; }
+
+        .status-list { border: 1px solid var(--border); background: var(--surface); }
+        .status-row {
+            display: grid;
+            grid-template-columns: 180px 1fr 130px;
+            gap: 1.5rem;
+            align-items: start;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .status-row:last-child { border-bottom: 0; }
+        .status-name { font-family: 'Space Mono', monospace; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); }
+        .status-text { color: var(--text-muted); font-size: 0.95rem; }
+        .chip { justify-self: end; text-align: center; font-family: 'Space Mono', monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; border: 1px solid var(--border); padding: 0.25rem 0.75rem; white-space: nowrap; }
+        .chip.ok { color: var(--ok); border-color: var(--ok); }
+        .chip.pending { color: var(--pending); border-color: var(--pending); }
+
+        .notice {
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--pending);
+            background: var(--surface);
+            padding: 1.25rem 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.92rem;
+        }
+        .notice strong { color: var(--text-main); }
+
+        .btn {
+            font-family: 'Space Mono', monospace; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;
+            text-decoration: none; color: var(--accent); border: 1px solid var(--text-muted); padding: 0.6rem 1.1rem;
+            transition: background 0.3s, color 0.3s; display: inline-block;
+        }
+        .btn:hover, .btn:focus-visible { background: var(--accent); color: #000; }
+
+        footer { padding: 4rem 0; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 0.8rem; }
+        .footer-logo { font-family: 'Space Mono', monospace; font-weight: 700; margin-bottom: 1rem; color: var(--accent); letter-spacing: 2px; }
+
+        @media (max-width: 768px) {
+            .hero { padding: 4rem 0; }
+            .hero h1 { letter-spacing: -2px; }
+            .pillar { padding: 2rem 1.5rem; }
+            .status-row { grid-template-columns: 1fr; gap: 0.5rem; padding: 1.25rem 1.5rem; }
+            .chip { justify-self: start; }
+        }
+        @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+    </style>
+    <link rel="stylesheet" href="shakti-theme.css?v=4">
+    <script src="shakti-theme.js?v=1"></script>
+</head>
+<body>
+
+    <div class="container">
+        <nav>
+            <a href="index.html" class="back-link">&larr; // SHAKTI</a>
+            <div class="brand">VAHAK-AI</div>
+        </nav>
+
+        <section class="hero">
+            <h1>VAHAK-AI</h1>
+            <p>A retrofit kit and software stack that lets the Indian Army&rsquo;s existing heavy trucks drive themselves over rough terrain, keep navigating when satellite signals are jammed, and travel as a coordinated convoy.</p>
+            <div class="hero-tags">
+                <span class="hero-tag">Defence logistics</span>
+                <span class="hero-tag">Autonomous ground vehicles</span>
+                <span class="hero-tag">Retrofit kit</span>
+                <span class="hero-tag">Indigenous navigation</span>
+            </div>
+        </section>
+
+        <section class="section" id="problem">
+            <div class="section-header">
+                <span class="section-title">The problem</span>
+                <span class="section-index">01</span>
+            </div>
+            <p class="lead">Army supply trucks carry heavy loads over high-altitude passes, soft desert sand and flooded jungle tracks. The driver faces the terrain and, on predictable supply routes, the threat of ambush, both at once.</p>
+            <p class="lead">Autonomy built for roads does not carry over. Off-road there are no lane markings, signals or detailed maps, and a loaded truck has to judge whether the ground will hold it before it commits.</p>
+            <p class="quote">The Army does not need a self-driving car. It needs a truck that can look after itself.</p>
+        </section>
+
+        <section class="section" id="what-it-is">
+            <div class="section-header">
+                <span class="section-title">What VAHAK-AI is</span>
+                <span class="section-index">02</span>
+            </div>
+            <p class="lead">VAHAK-AI adds autonomy to the trucks the Army already operates instead of replacing them. A soldier in the cab can take back control at any moment, and cutting power to the kit returns the truck to fully manual driving.</p>
+            <div class="pillars">
+                <div class="pillar">
+                    <span class="n">01</span>
+                    <h3>Drive-by-wire retrofit</h3>
+                    <p>A bolt-on kit that steers, brakes, accelerates and changes gear, designed to be fitted to existing heavy trucks without rebuilding them.</p>
+                </div>
+                <div class="pillar">
+                    <span class="n">02</span>
+                    <h3>Terrain-aware driving</h3>
+                    <p>The truck reads the ground ahead, sorts it into safe, risky and impassable, and plans a path that accounts for its own weight and load.</p>
+                </div>
+                <div class="pillar">
+                    <span class="n">03</span>
+                    <h3>Sovereign navigation</h3>
+                    <p>India&rsquo;s NavIC is the primary position source. If it is jammed or lost, the truck keeps its position from its own motion sensors and cameras.</p>
+                </div>
+                <div class="pillar">
+                    <span class="n">04</span>
+                    <h3>Convoy coordination</h3>
+                    <p>One lead truck carries the full sensor set and the trucks behind follow its path over an encrypted link, which keeps the cost of equipping a convoy down.</p>
+                </div>
+                <div class="pillar">
+                    <span class="n">05</span>
+                    <h3>Command dashboard</h3>
+                    <p>A fleet view for the forward operations team showing where each truck is, how it is doing and which vehicle is likely to need maintenance before it fails.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="status">
+            <div class="section-header">
+                <span class="section-title">Where it stands</span>
+                <span class="section-index">03</span>
+            </div>
+            <p class="lead">VAHAK-AI has been proposed against the Indian Army&rsquo;s autonomous load carrier trucks challenge. Here is what exists today and what does not.</p>
+            <div class="status-list">
+                <div class="status-row">
+                    <span class="status-name">Programme</span>
+                    <span class="status-text">Proposal submitted in May 2026 to iDEX ADITI 4.0, problem statement 8: Autonomous Load Carrier Trucks.</span>
+                    <span class="chip ok">Submitted</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-name">Software</span>
+                    <span class="status-text">The vehicle software and the command dashboard are written and pass their automated tests, including the safety rules, navigation filter, path planner and encrypted convoy messaging.</span>
+                    <span class="chip ok">Built</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-name">On a vehicle</span>
+                    <span class="status-text">Not yet. The software has not run on a truck, and the retrofit hardware has not been built or fitted.</span>
+                    <span class="chip pending">Not started</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-name">Terrain model</span>
+                    <span class="status-text">Needs training on Indian terrain imagery before the truck can classify ground. Autonomy stays off without it.</span>
+                    <span class="chip pending">Pending data</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="notice">
+                <strong>Informational only.</strong> This page describes research and development. We do not host tactical software on this site, and VAHAK-AI is not certified for live defence use. See the <a href="../../about/disclaimer.html">disclaimer</a>.
+            </div>
+        </section>
+
+        <section class="section">
+            <a class="btn" href="index.html">&larr; Back to Shakti</a>
+        </section>
+
+        <footer>
+            <div class="footer-logo">SHAKTI</div>
+            <p>A Shoonya Origins venture.</p>
+            <p style="margin-top: 1rem;">&copy; 2026 Shoonya Origins. All Rights Reserved.</p>
+        </footer>
+    </div>
+
+</body>
+</html>

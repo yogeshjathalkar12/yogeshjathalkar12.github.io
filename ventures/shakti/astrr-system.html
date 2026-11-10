@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASTRR-SYSTEM | Shakti | Shoonya Origins</title>
+    <meta name="description" content="ASTRR-SYSTEM is a space domain awareness system that gives the Indian Air Force its own picture of what is in orbit and what is coming down, so it does not depend on foreign data. It warns of collisions, hostile satellite moves, falling debris and missile launches.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #000000;
+            --surface: #0a0a0a;
+            --surface-highlight: #111111;
+            --border: #222222;
+            --text-main: #e0e0e0;
+            --text-muted: #8a8a8a;
+            --accent: #ffffff;
+            --spacing: 2rem;
+            --ok: #ffffff;
+            --pending: #9a9a9a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        a { color: inherit; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 var(--spacing); }
+
+        nav {
+            padding: 2rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 4rem;
+        }
+        .back-link { text-decoration: none; color: var(--text-muted); font-size: 0.8rem; font-family: 'Space Mono', monospace; letter-spacing: 1px; transition: color 0.3s; }
+        .back-link:hover, .back-link:focus-visible { color: var(--accent); }
+        .brand { font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; border: 1px solid var(--text-muted); padding: 0.5rem 1rem; }
+
+        .hero { padding: 6rem 0; border-bottom: 1px solid var(--border); }
+        .hero h1 {
+            font-size: clamp(2.6rem, 7vw, 6rem);
+            font-weight: 900;
+            line-height: 0.9;
+            margin-bottom: 2rem;
+            letter-spacing: -4px;
+            text-transform: uppercase;
+        }
+        .hero p { font-size: 1.2rem; color: var(--text-muted); max-width: 760px; margin-bottom: 3rem; }
+        .hero-tags { display: flex; gap: 1rem; font-family: 'Space Mono', monospace; font-size: 0.75rem; text-transform: uppercase; flex-wrap: wrap; }
+        .hero-tag { border: 1px solid var(--border); padding: 0.5rem 1rem; background: var(--surface); }
+
+        .section { margin: 6rem 0; }
+        .section-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 3rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem;
+        }
+        .section-title { font-family: 'Space Mono', monospace; font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; }
+        .section-index { color: var(--text-muted); font-family: 'Space Mono', monospace; }
+        .lead { color: var(--text-muted); max-width: 760px; margin-bottom: 2.5rem; font-size: 1.05rem; }
+        .lead + .lead { margin-top: -1rem; }
+
+        .pillars { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); }
+        .pillar { background: var(--bg); padding: 3rem 2.5rem; }
+        .pillar .n { font-family: 'Space Mono', monospace; font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 1.5rem; letter-spacing: 1px; }
+        .pillar h3 { font-size: 1.35rem; margin-bottom: 1rem; color: var(--accent); letter-spacing: -0.5px; }
+        .pillar p { color: var(--text-muted); font-size: 0.97rem; }
+
+        .notice {
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--pending);
+            background: var(--surface);
+            padding: 1.25rem 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.92rem;
+        }
+        .notice strong { color: var(--text-main); }
+
+        .btn {
+            font-family: 'Space Mono', monospace; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;
+            text-decoration: none; color: var(--accent); border: 1px solid var(--text-muted); padding: 0.6rem 1.1rem;
+            transition: background 0.3s, color 0.3s; display: inline-block;
+        }
+        .btn:hover, .btn:focus-visible { background: var(--accent); color: #000; }
+
+        footer { padding: 4rem 0; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 0.8rem; }
+        .footer-logo { font-family: 'Space Mono', monospace; font-weight: 700; margin-bottom: 1rem; color: var(--accent); letter-spacing: 2px; }
+
+        @media (max-width: 768px) {
+            .hero { padding: 4rem 0; }
+            .hero h1 { letter-spacing: -2px; }
+            .pillar { padding: 2rem 1.5rem; }
+        }
+        @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+    </style>
+    <link rel="stylesheet" href="shakti-theme.css?v=4">
+    <script src="shakti-theme.js?v=1"></script>
+</head>
+<body>
+
+    <div class="container">
+        <nav>
+            <a href="index.html" class="back-link">&larr; // SHAKTI</a>
+            <div class="brand">ASTRR-SYSTEM</div>
+        </nav>
+
+        <section class="hero">
+            <h1>ASTRR-SYSTEM</h1>
+            <p>A space domain awareness system that gives the Indian Air Force its own picture of what is in orbit and what is coming down, so that seeing space does not depend on data from anyone else.</p>
+            <div class="hero-tags">
+                <span class="hero-tag">Space domain awareness</span>
+                <span class="hero-tag">Air Force</span>
+                <span class="hero-tag">Early warning</span>
+                <span class="hero-tag">Operator training</span>
+            </div>
+        </section>
+
+        <section class="section" id="problem">
+            <div class="section-header">
+                <span class="section-title">The problem</span>
+                <span class="section-index">01</span>
+            </div>
+            <p class="lead">India&rsquo;s view of space relies heavily on tracking data supplied by foreign networks. In a conflict, that feed can be cut, and the picture goes with it.</p>
+            <p class="lead">Even with the data, some things are hard to see: satellites that stay quiet to optical and radar tracking, objects that change course with little warning, and missiles that cross a region in minutes.</p>
+        </section>
+
+        <section class="section" id="what-it-is">
+            <div class="section-header">
+                <span class="section-title">What ASTRR-SYSTEM does</span>
+                <span class="section-index">02</span>
+            </div>
+            <p class="lead">ASTRR-SYSTEM watches the space above India and tells operators what matters, how serious it is and how long they have to act.</p>
+            <div class="pillars">
+                <div class="pillar">
+                    <span class="n">01</span>
+                    <h3>Watches the sky above a region</h3>
+                    <p>Shows every object passing over an area of interest, so a commander can see what is overhead around a conflict zone or a key asset.</p>
+                </div>
+                <div class="pillar">
+                    <span class="n">02</span>
+                    <h3>Protects Indian satellites</h3>
+                    <p>Warns when another object comes close to an Indian satellite, and works out how likely a collision is, so real risks stand apart from false alarms.</p>
+                </div>
+                <div class="pillar">
+                    <span class="n">03</span>
+                    <h3>Spots hostile moves</h3>
+                    <p>Notices when a satellite changes its orbit and judges whether the move looks routine or threatening, with a threat rating for each.</p>
+                </div>
+                <div class="pillar">
+                    <span class="n">04</span>
+                    <h3>Identifies unknown objects</h3>
+                    <p>Works out what an unidentified object is, including satellites that stay hidden from optical and radar tracking.</p>
+                </div>
+                <div class="pillar">
+                    <span class="n">05</span>
+                    <h3>Warns of falling objects</h3>
+                    <p>Predicts where a re-entering object could come down and alerts the sites inside the area at risk.</p>
+                </div>
+                <div class="pillar">
+                    <span class="n">06</span>
+                    <h3>Reacts to missile launches</h3>
+                    <p>Recognises ballistic and hypersonic threats within seconds and shows where they are heading.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="notice">
+                <strong>Informational only.</strong> This page describes research and development. We do not host tactical software on this site, and ASTRR-SYSTEM is not certified for live defence use. See the <a href="../../about/disclaimer.html">disclaimer</a>.
+            </div>
+        </section>
+
+        <section class="section">
+            <a class="btn" href="index.html">&larr; Back to Shakti</a>
+        </section>
+
+        <footer>
+            <div class="footer-logo">SHAKTI</div>
+            <p>A Shoonya Origins venture.</p>
+            <p style="margin-top: 1rem;">&copy; 2026 Shoonya Origins. All Rights Reserved.</p>
+        </footer>
+    </div>
+
+</body>
+</html>
