@@ -18,7 +18,7 @@
     ['Hong Kong', '+852'], ['New Zealand', '+64'], ['South Africa', '+27'], ['Nigeria', '+234'], ['Kenya', '+254'], ['Egypt', '+20'], ['Turkey', '+90'],
     ['Italy', '+39'], ['Spain', '+34'], ['Netherlands', '+31'], ['Switzerland', '+41'], ['Sweden', '+46'], ['Ireland', '+353'], ['Brazil', '+55'],
     ['Mexico', '+52'], ['Russia', '+7']];
-  var VENTURES = ['Raptor', 'rta', 'Coral', 'Vapus', 'Eklavya', 'Shakti', 'Project Jeeva', 'Charaka', 'Aether Labs', 'Shoonya Systems', 'Not sure yet'];
+  var VENTURES = ['Raptor', 'rta', 'Coral', 'Vapus', 'Eklavya', 'Shakti', 'Aether Labs', 'Shoonya Systems', 'Not sure yet'];
 
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
 

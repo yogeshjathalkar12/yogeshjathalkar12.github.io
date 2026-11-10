@@ -107,6 +107,42 @@ html:not(.so-alt) .project-card p,
 html:not(.so-alt) .pillar p { font-family: 'Instrument Serif', Georgia, serif; font-size: 1.15rem; line-height: 1.5; }
 html:not(.so-alt) .project-card .context { font-family: 'Inter', system-ui, sans-serif; font-size: 0.85rem; }
 
+/* Footer: the name and a line on the left, link columns, then the copyright and the notice. Follows the theme. */
+html:not(.so-alt) footer.so-sfooter {
+  margin-top: 5rem; padding: 4rem 0 2rem;
+  border-top: 1px solid var(--border);
+  text-align: left; color: var(--text-muted); font-size: 0.9rem;
+}
+.so-sfooter-grid { display: grid; grid-template-columns: 1.6fr 1.1fr 0.9fr 1fr 1.1fr; gap: 2.5rem; }
+.so-sf-name {
+  display: inline-block; text-decoration: none; color: var(--text-main);
+  font-family: 'Bebas Neue', 'Inter', sans-serif; font-size: 2.2rem; letter-spacing: 0.1em; line-height: 1;
+}
+.so-sf-line {
+  margin: 1rem 0 0; max-width: 280px;
+  font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-size: 1.25rem; line-height: 1.4; color: var(--text-muted);
+}
+.so-sf-by { margin: 1rem 0 0; font-family: 'DM Mono', ui-monospace, monospace; font-size: 0.78rem; color: var(--text-muted); }
+.so-sf-col h4 {
+  margin: 0 0 1.1rem; font-family: 'DM Mono', ui-monospace, monospace; font-weight: 500;
+  font-size: 0.85rem; letter-spacing: 0.04em; color: var(--text-main);
+}
+.so-sf-col a {
+  display: block; margin: 0 0 0.7rem; text-decoration: none; color: var(--text-muted);
+  font-family: 'DM Mono', ui-monospace, monospace; font-size: 0.85rem; line-height: 1.4; transition: color 0.2s ease;
+}
+.so-sf-col a:hover, .so-sf-col a:focus-visible { color: var(--text-main); }
+.so-sf-bottom {
+  margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); text-align: center;
+  font-family: 'DM Mono', ui-monospace, monospace; font-size: 0.78rem; line-height: 1.8; color: var(--text-muted);
+}
+.so-sf-bottom p { margin: 0 auto; max-width: 760px; }
+@media (max-width: 900px) {
+  .so-sfooter-grid { grid-template-columns: 1fr 1fr; }
+  .so-sf-brand { grid-column: 1 / -1; }
+}
+@media (max-width: 520px) { .so-sfooter-grid { grid-template-columns: 1fr; } }
+
 /* the theme button, placed next to the page name in the top bar */
 .so-nav-end { display: flex; align-items: center; gap: 0.75rem; }
 .so-theme-toggle {
