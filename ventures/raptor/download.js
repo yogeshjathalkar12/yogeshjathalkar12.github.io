@@ -11,21 +11,21 @@
 (function () {
   'use strict';
 
-  var RELEASE_VERSION = '0.1.18';
+  // The version fallback is the ONE variable in release.js (window.RAPTOR_RELEASE); nothing here carries a version number.
   var LINKS = {
     windows: 'https://raptor-download.yogeshjathalkar.workers.dev/windows',
     mac: 'https://raptor-download.yogeshjathalkar.workers.dev/mac'
   };
 
-  // The newest versions, read from the download server (its /version page) so the window never shows an old number. RELEASE_VERSION above is only
-  // the fallback for when the server cannot be reached; the download links themselves (/windows, /mac) are always the newest anyway.
+  // The newest versions, read from the download server (its /version page) so the window never shows an old number. release.js (loaded just before this file) already
+  // does the same and keeps window.RAPTOR_RELEASE current; the download links themselves (/windows, /mac) are always the newest anyway.
   var fresh = { windows: '', mac: '' };
-  function ver(os) { return fresh[os] || RELEASE_VERSION; }
+  function ver(os) { return fresh[os] || (window.RAPTOR_RELEASE && window.RAPTOR_RELEASE[os]) || ''; }
   function showVersions() {
     if (!overlay) return;
     ['windows', 'mac'].forEach(function (os) {
       var small = overlay.querySelector('[data-os="' + os + '"] small');
-      if (small) small.innerHTML = (os === 'windows' ? '64-bit' : 'Apple Silicon') + ' &middot; v' + ver(os);
+      if (small) small.innerHTML = (os === 'windows' ? '64-bit' : 'Apple Silicon') + (ver(os) ? ' &middot; v' + ver(os) : '');
     });
   }
   function readVersions() {
@@ -143,6 +143,6 @@
     open(osOf(el));
   }, true);
 
-  window.RaptorDownload = { open: open, links: LINKS, version: RELEASE_VERSION };
+  window.RaptorDownload = { open: open, links: LINKS, version: ver('windows') };
   readVersions();
 })();

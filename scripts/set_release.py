@@ -34,11 +34,16 @@ def rules(cfg):
          mac["url"]),
         ("Mac file name in the text", re.compile(r"(?<![/\w])Raptor-[\d.]+-mac-arm64\.dmg"), mac["file"]),
         ("Windows button label", re.compile(r'aria-label="Download Raptor (?:v?[\d.]+ )?for Windows"'), f'aria-label="Download Raptor {v} for Windows"'),
-        ("Chooser version", re.compile(r"var RELEASE_VERSION = '[\d.]+';"), f"var RELEASE_VERSION = '{v}';"),
-        ("Windows version line", re.compile(rf"Windows x64 {DOT} (?:Stable Release|Version [\d.]+)"), f"Windows x64 {DOT} Version {v}"),
+        # The version words are live markers (see ventures/raptor/release.js): the page fills them from the download server at load time, so a release
+        # needs no page edit at all. The numbers written INSIDE the markers (and in release.js) are only the fallback for a browser without scripts, a
+        # search engine, or an unreachable server; this keeps them in step with release.json.
+        ("Windows version marker", re.compile(r'<span data-raptor-version="windows">[\d.]+</span>'), f'<span data-raptor-version="windows">{v}</span>'),
+        ("Mac version marker", re.compile(r'<span data-raptor-version="mac">[\d.]+</span>'), f'<span data-raptor-version="mac">{mac["version"]}</span>'),
+        ("Fallback variable (release.js)",
+         re.compile(r"window\.RAPTOR_RELEASE = \{ windows: '[\d.]+', mac: '[\d.]+', macFile: 'Raptor-[\d.]+-mac-arm64\.dmg' \};"),
+         f"window.RAPTOR_RELEASE = {{ windows: '{v}', mac: '{mac['version']}', macFile: '{mac['file']}' }};"),
+        # the FAQ sentence also sits in the page's structured data (JSON-LD), which cannot be filled by a script
         ("FAQ version note", re.compile(r"\((?:stable v1\.0|version [\d.]+)\)"), f"(version {v})"),
-        ("CTA version chip", re.compile(r'<span class="cta-micro-item">(?:Stable v1\.0|Version [\d.]+)</span>'),
-         f'<span class="cta-micro-item">Version {v}</span>'),
     ]
 
 
@@ -50,7 +55,7 @@ def main(check_only: bool) -> int:
     for folder, dirs, files in os.walk(PAGES):
         dirs[:] = [d for d in dirs if not (folder == PAGES and d in SKIP_DIRS)]
         for name in files:
-            if not (name.endswith(".html") or name == "download.js"):      # download.js holds the chooser's addresses
+            if not (name.endswith(".html") or name in ("download.js", "release.js")):      # download.js holds the chooser's addresses, release.js the fallback version
                 continue
             path = os.path.join(folder, name)
             with open(path, encoding="utf-8", newline="") as f:

@@ -149,6 +149,7 @@
 <!-- SB-BG-HEAD:END -->
 <link rel="stylesheet" href="/ventures/raptor/buttons.css?v=1">
 <link rel="stylesheet" href="/ventures/raptor/download.css?v=1">
+<script src="/ventures/raptor/release.js?v=1"></script>
 <script src="/ventures/raptor/download.js?v=3" defer></script>
 </head>
 <body>
@@ -192,7 +193,7 @@
         <a href="https://raptor-download.yogeshjathalkar.workers.dev/windows"
            class="btn-main"
            style="padding: 1.5rem 3rem; font-size: 0.9rem; box-shadow: 0 0 30px rgba(168,85,247,0.3);"
-           aria-label="Download Raptor 0.1.18 for Windows">
+           aria-label="Download Raptor 0.1.18 for Windows" data-raptor-label="Download Raptor {windows} for Windows">
           Download Raptor for windows
         </a>
       </div>
@@ -298,7 +299,7 @@
         <a href="https://raptor-download.yogeshjathalkar.workers.dev/windows"
            class="btn-main"
            style="padding: 1.5rem 3rem; font-size: 0.9rem; box-shadow: 0 0 30px rgba(168,85,247,0.3);"
-           aria-label="Download Raptor 0.1.18 for Windows">
+           aria-label="Download Raptor 0.1.18 for Windows" data-raptor-label="Download Raptor {windows} for Windows">
           Download Raptor
         </a>
         <a href="https://raptor-download.yogeshjathalkar.workers.dev/mac"
@@ -314,7 +315,7 @@
         </a>
       </div>
       <p style="color: var(--dim2); font-size: 0.55rem; letter-spacing: 0.3em; margin-top: 1.5rem; text-transform: uppercase;">
-        Windows x64 · Version 0.1.18 · Free to Start · <a href="/ventures/raptor/install-mac.html" style="color:inherit;text-decoration:underline;">Mac (Apple Silicon) beta install guide</a>
+        Windows x64 · Version <span data-raptor-version="windows">0.1.18</span> · Free to Start · <a href="/ventures/raptor/install-mac.html" style="color:inherit;text-decoration:underline;">Mac (Apple Silicon) beta install guide</a>
       </p>
     </div>
 
@@ -863,7 +864,7 @@ if (el) {
       </div>
       <div class="faq-answer" itemscope itemtype="https://schema.org/Answer">
         <div class="faq-answer-inner" itemprop="text">
-          Download Raptor for Windows directly from this page (version 0.1.18). A Mac (Apple Silicon) beta is also available, with an install guide. For teams and enterprise deployments, visit the pricing page or email contact@shoonyaorigins.com to discuss a custom onboarding. Raptor starts building your identity model on day one — the sooner you start, the faster the brain grows.
+          Download Raptor for Windows directly from this page (version <span data-raptor-version="windows">0.1.18</span>). A Mac (Apple Silicon) beta is also available, with an install guide. For teams and enterprise deployments, visit the pricing page or email contact@shoonyaorigins.com to discuss a custom onboarding. Raptor starts building your identity model on day one — the sooner you start, the faster the brain grows.
         </div>
       </div>
     </div>
@@ -979,7 +980,7 @@ if (el) {
     <span class="cta-micro-item">No credit card to start</span>
     <span class="cta-micro-item">Windows x64</span>
     <span class="cta-micro-item">Mac beta</span>
-    <span class="cta-micro-item">Version 0.1.18</span>
+    <span class="cta-micro-item">Version <span data-raptor-version="windows">0.1.18</span></span>
   </div>
 </div>
 <footer class="rx-footer">
