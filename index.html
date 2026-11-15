@@ -1132,8 +1132,8 @@
     </script>
     <script>
         // LOADING QUEUE. The page paints at once with picture posters; then, in this order:
-        //   1. the four demo videos, one after another (Raptor, rta, Coral, Vapus), each loaded fully before the next
-        //   2. the 3D body (desktop and normal connections only)
+        //   1. the 3D body (desktop and normal connections only), waited for until it shows
+        //   2. the four demo videos, one after another (Raptor, rta, Coral, Vapus), each loaded fully before the next
         //   3. analytics and the Apollo tracker
         // A video whose panel scrolls into view jumps the queue. Videos play only while they are on screen.
         (function () {
@@ -1189,7 +1189,7 @@
             function load3D() {
                 var canvas = document.getElementById('aura-bg-canvas');
                 var btn = document.getElementById('aura-bg-toggle');
-                var wanted = !saveData && !slow && window.matchMedia('(min-width: 700px)').matches;
+                var wanted = !saveData && !slow2g && window.matchMedia('(min-width: 700px)').matches;   // only 2g and data-saver skip the body: browsers often call ordinary broadband '3g'
                 if (!wanted) {                          // phones and slow or data-saving connections: no 3D body
                     if (canvas) canvas.remove();
                     if (btn) btn.remove();
@@ -1203,12 +1203,25 @@
                     });
             }
 
+            // resolves when the 3D body is showing, or has been given up on, or after maxMs (so the videos are never held up for long)
+            function bodyShowing(maxMs) {
+                return new Promise(function (resolve) {
+                    var t0 = Date.now();
+                    (function look() {
+                        var c = document.getElementById('aura-bg-canvas');
+                        if (!c || c.classList.contains('on') || Date.now() - t0 > maxMs) return resolve();
+                        setTimeout(look, 400);
+                    })();
+                });
+            }
+
             function run() {
-                var chain = Promise.resolve();
+                // The 3D body is the first thing on the page, so it goes first; the videos (further down) follow, one after another.
+                var chain = load3D().then(function () { return bodyShowing(60000); });
                 if (!saveData && !slow2g) {
                     vids.forEach(function (v) { chain = chain.then(function () { return loadVideo(v); }); });
                 }
-                chain.then(load3D).then(function () { window.loadTrackers(); });
+                chain.then(function () { window.loadTrackers(); });
                 setTimeout(window.loadTrackers, 30000);   // if the queue is slow, analytics still starts
             }
 
