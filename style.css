@@ -2530,3 +2530,8 @@ body.dark-mode .notif-dot { border-color: #1a1d29; }
 #pro-agent-avatar { box-shadow: 0 10px 24px rgba(124, 58, 237, .28); background: #fff; }
 #pro-agent-avatar { box-shadow: 0 10px 24px rgba(90, 70, 190, .3); background: #fff; }
 body.dark-mode #pro-agent-avatar { box-shadow: 0 10px 24px rgba(0, 0, 0, .55); background: #1a1d3a; }
+
+/* Still of the cosmic body where the live 3D one stands; it fades out once the live body is showing */
+.hero-body-photo { position: absolute; left: 12vw; top: 43.3vh; height: 67.9vh; width: auto; transform: translate(-50%, -50%); z-index: 1; pointer-events: none; user-select: none; opacity: 1; transition: opacity 1s ease; }
+.aura-bg-body.on ~ .hero-body-photo { opacity: 0; }
+@media (max-width: 900px) { .hero-body-photo { left: 0; top: 33.3vh; height: 52vh; opacity: .35; } .aura-bg-body.on ~ .hero-body-photo { opacity: 0; } }
