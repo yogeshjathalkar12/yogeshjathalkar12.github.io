@@ -2,22 +2,25 @@
 <html lang="en">
 <head>
     <link rel="preload" as="image" href="images/rover.webp">
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XV0W5ZV0RQ"></script>
     <script>
+        // Analytics and the Apollo tracker are the same as before, but they start last (loadTrackers() is called by the
+        // loading queue near the end of this page), so they never compete with what the visitor came to see.
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
         gtag('config', 'G-XV0W5ZV0RQ');
-    </script>
-    <script>
-        function initApollo(){
-            var n=Math.random().toString(36).substring(7),o=document.createElement("script");
-            o.src="https://assets.apollo.io/micro/website-tracker/tracker.iife.js?nocache="+n;
-            o.async=true; o.defer=true;
-            o.onload=function(){window.trackingFunctions.onLoad({appId:"69e9e2c18fee4b000dacb54c"})};
+        window.loadTrackers = function () {
+            if (window.__trackersLoaded) return;
+            window.__trackersLoaded = true;
+            var g = document.createElement('script');
+            g.async = true; g.src = 'https://www.googletagmanager.com/gtag/js?id=G-XV0W5ZV0RQ';
+            document.head.appendChild(g);
+            var n = Math.random().toString(36).substring(7), o = document.createElement('script');
+            o.src = 'https://assets.apollo.io/micro/website-tracker/tracker.iife.js?nocache=' + n;
+            o.async = true; o.defer = true;
+            o.onload = function () { window.trackingFunctions.onLoad({ appId: '69e9e2c18fee4b000dacb54c' }); };
             document.head.appendChild(o);
-        }
-        initApollo();
+        };
     </script>
 
     <meta charset="UTF-8">
@@ -26,14 +29,13 @@
     <link rel="icon" type="image/png" href="images/favicon.png">
     <meta name="google-site-verification" content="B8lE_HL53IWDazD-NuitU_ISBLoD6tV-ZgGqyIu8K-E" />
 
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700;800&family=Bebas+Neue&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <link rel="stylesheet" href="ventures/vapus/assets/aura-bg.css?v=bc342c8f">
-    <link rel="stylesheet" href="style.css?v=41">
+    <link rel="stylesheet" href="style.css?v=67">
     <!-- The 3D body is Vapus's own script, pointed at from here instead of copied -->
     <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.171.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.171.0/examples/jsm/"}}</script>
     <script>window.AURA_BG_OPTIONS = { extraLayers: ['muscular'], spin: 0.00008, overlay: 'images/cosmos-overlay.png' };</script>
-    <script type="module" src="ventures/vapus/assets/aura-bg.js?v=home5"></script>
 </head>
 <body>
     <div class="lamp-container" id="lightSwitch" title="Pull to toggle">
@@ -46,6 +48,7 @@
     <header data-aos="fade-down" data-aos-duration="1000">
         <div class="logo" id="logoTrigger">Shoonya<span>Origins</span></div>
         <nav class="header-nav">
+            <a href="#explore-products">Ventures</a>
             <a href="/about">About</a>
             <a href="/about/blogs">Blog</a>
         </nav>
@@ -59,464 +62,272 @@
     
     <section class="hero-section">
         <canvas class="aura-bg-body hero-body" id="aura-bg-canvas" aria-hidden="true"></canvas>
-        <button type="button" class="aura-bg-toggle" id="aura-bg-toggle" aria-pressed="true" title="Show or hide the 3D body"><i class="dot"></i><span>3D body backdrop: on</span></button>
+        <button type="button" class="aura-bg-toggle" id="aura-bg-toggle" aria-pressed="true" title="Show or hide the 3D body" style="display:none"><i class="dot"></i><span>3D body backdrop: on</span></button>
         <h1 data-aos="fade-up" data-aos-duration="1200">
-            <span class="hero-line"><span class="hero-sub hero-sub-top">We create</span>Technology that</span><br>
-            <span class="hero-line"><span class="gradient-text"> pushes human capabilities</span><span class="hero-sub hero-sub-bottom">for a better future</span></span>
+            <span class="hero-line"><span class="hero-sub hero-sub-top">We innovate</span>Technology that</span><br>
+            <span class="hero-line"><span class="gradient-text"> pushes human capabilit<span class="hero-ies">ies<span class="hero-sub hero-sub-bottom">for a better future</span></span></span></span>
         </h1>
         <br><br><br>
         <p class="subtitle" data-aos="fade-up" data-aos-delay="200" data-aos-duration="1200">
-            We are an innovation ecosystem advancing Defense, Health, Infrastructure, Research and Business Intelligence.
+            We are an innovation ecosystem advancing Health, Infrastructure, Research, Business Intelligence and Defense.
         </p>
     </section>
 
     <!-- WHAT AND WHY WE BUILD SECTION -->
-    <section class="why-section container" id="why-we-build">
-        <h2 class="why-title" data-aos="fade-up">
-            <span class="why-title-big">We Build</span>
-        </h2>
+    <!-- OUR VENTURES: bento grid -->
+    <section class="explore-products bn-section container" id="explore-products">
+        <div class="bn-grid">
+            <a class="bn-tile bn-raptor" href="ventures/raptor/" data-aos="fade-up"><div class="bn-bg" style="background-image:url(images/poster-raptor.webp)"></div><div class="bn-shade"></div><span class="bn-arrow">&rarr;</span><div class="bn-tag">Marketing AI</div><h3>Raptor</h3><p>A self-learning AI sales brain: prospecting, pitches and live call coaching. Your data stays on your computer.</p></a>
+            <a class="bn-tile bn-rta" href="ventures/rta/" data-aos="fade-up" data-aos-delay="80"><div class="bn-bg" style="background-image:url(images/poster-rta.webp)"></div><div class="bn-shade"></div><span class="bn-arrow">&rarr;</span><div class="bn-tag">Infrastructure</div><h3>rta</h3><p>Safety, logistics and quality on construction and manufacturing sites.</p></a>
+            <a class="bn-tile bn-coral" href="ventures/coral/" data-aos="fade-up" data-aos-delay="120"><div class="bn-bg" style="background-image:url(images/poster-coral.webp)"></div><div class="bn-shade"></div><span class="bn-arrow">&rarr;</span><div class="bn-tag">Urban</div><h3>Coral</h3><p>Citizens report, AI sees, government acts.</p></a>
+            <a class="bn-tile bn-vapus" href="ventures/vapus/" data-aos="fade-up" data-aos-delay="160"><div class="bn-bg" style="background-image:url(images/poster-vapus.webp)"></div><div class="bn-shade"></div><span class="bn-arrow">&rarr;</span><div class="bn-tag">Health</div><h3>Vapus</h3><p>Your lifetime health vault.</p></a>
+            <a class="bn-tile bn-shakti" href="ventures/shakti/" data-aos="fade-up"><div class="bn-bg" style="background-image:url(images/sentinel-bw.webp)"></div><div class="bn-shade"></div><span class="bn-arrow">&rarr;</span><div class="bn-tag">Defence</div><h3>Shakti</h3><p>Courage is human. The risk shouldn&rsquo;t have to be.</p></a>
+            <a class="bn-tile bn-eklavya" href="ventures/eklavya/" data-aos="fade-up" data-aos-delay="80"><div class="bn-bg" style="background-image:url(ventures/eklavya/assets/logo.png)"></div><div class="bn-shade"></div><span class="bn-arrow">&rarr;</span><div class="bn-tag">Ed tech</div><h3>Eklavya</h3><p>Career guidance from age 12.</p></a>
+            <a class="bn-tile bn-aether" href="ventures/aether/" data-aos="fade-up" data-aos-delay="120"><div class="bn-bg" style="background-image:url(images/aether.webp)"></div><div class="bn-shade"></div><span class="bn-arrow">&rarr;</span><div class="bn-tag">Research</div><h3>Aether Labs</h3><p>One platform for all research.</p></a>
+            <a class="bn-tile bn-systems" href="ventures/shoonya-systems/" data-aos="fade-up"><div class="bn-bg" style="background-image:url(images/systems.webp)"></div><div class="bn-shade"></div><span class="bn-arrow">&rarr;</span><div class="bn-tag">Software</div><h3>Shoonya Systems</h3><p>Enterprise software on core technology and research we do ourselves.</p></a>
+            <a class="bn-tile bn-tools" href="ventures/aether/" data-aos="fade-up" data-aos-delay="80"><span class="bn-arrow">&rarr;</span><b>130+</b><div><div class="bn-tag">Free tools</div><h3>Professional tools, no sign-up, on us.</h3></div></a>
+        </div>
+    </section>
 
-        <div class="why-body">
-            <div class="why-col" data-aos="fade-up">
-                <span class="why-kicker">What</span>
-                <p class="why-lead">Shoonya Origins is a deep-tech company building technology at the intersection of mathematics and physics: computer vision, physical AI, quantum machine learning, biological modelling and more. We take that thinking into fields where it has rarely been applied, and bring it to the world through focused ventures.</p>
+    <section class="why-band" id="why-we-build">
+        <div class="why-band-in">
+            <div class="why-band-col" data-aos="fade-up">
+                <h2>We model the system underneath.</h2>
+                <p>Shoonya Origins is a deep-tech company building technology at the intersection of mathematics and physics: computer vision, physical AI, quantum machine learning, biological modelling and more. We take that thinking into fields where it has rarely been applied, and bring it to the world through focused ventures.</p>
                 <p>Most tools in a field only record data. We model the system underneath: biology in health, human relationships in sales, physical environments in construction and manufacturing.</p>
             </div>
-            <div class="why-col" data-aos="fade-up" data-aos-delay="150">
-                <span class="why-kicker">Why</span>
-                <p class="why-lead">We are drawn to problems that are hard, messy and close to the brink of mattering. We believe the technologies that shape the next era of humanity will come from deep mathematical and physical understanding. Software is simply the medium we use to express it.</p>
+            <div class="why-band-col" data-aos="fade-up" data-aos-delay="150">
+                <h2>Hard, messy, close to mattering.</h2>
+                <p>We are drawn to problems that are hard, messy and close to the brink of mattering. We believe the technologies that shape the next era of humanity will come from deep mathematical and physical understanding. Software is simply the medium we use to express it.</p>
             </div>
         </div>
     </section>
 
     <!-- EXPLORE OUR PRODUCTS SECTION -->
-    <section class="explore-products container" id="explore-products">
-        <div class="section-label" data-aos="fade-in">Explore Our Products</div>
-        <h2 class="section-heading" data-aos="fade-up">Deep-Tech in Action</h2>
+    <section class="explore-products container" id="ventures-detail">
+        <h2 class="section-heading" data-aos="fade-up">See our deep-tech products in action</h2>
 
-        <div class="zig-zag-container">
-            
-            <!-- Product 1: Raptor -->
-            <div class="zig-zag-row venture venture-raptor" id="raptor-demo" data-aos="fade-up">
-                <div class="zig-zag-media">
-                    <video autoplay loop muted playsinline>
-                        <source src="images/raptor-demo.webm" type="video/webm">
-                        Your browser does not support the video tag.
-                    </video>
+        <div class="vs">
+            <div class="vs-stage">
+                <div class="vs-screen">
+                <div class="vs-layer " data-i="0"><video muted loop playsinline preload="none" width="960" height="490" poster="images/poster-raptor.webp" data-src="images/raptor-demo.webm"></video></div>
+                <div class="vs-layer " data-i="1"><video muted loop playsinline preload="none" width="960" height="512" poster="images/poster-rta.webp" data-src="images/construct-demo.webm"></video></div>
+                <div class="vs-layer " data-i="2"><video muted loop playsinline preload="none" width="960" height="540" poster="images/poster-coral.webp" data-src="images/rover-demo.webm"></video></div>
+                <div class="vs-layer " data-i="3"><video muted loop playsinline preload="none" width="960" height="540" poster="images/poster-vapus.webp" data-src="images/aura-demo.webm"></video></div>
+                <div class="vs-layer " data-i="4"><img src="images/sentinel-bw.webp" alt="Unmanned aircraft and a robotic ground vehicle with soldiers, in black and white" loading="lazy"></div>
+                <div class="vs-layer logo" data-i="5"><img src="ventures/eklavya/assets/logo.png" alt="Eklavya: a bow and arrow with a flame" loading="lazy"></div>
+                <div class="vs-layer " data-i="6"><img src="images/aether.webp" alt="A researcher working on a laboratory experiment" loading="lazy"></div>
+                <div class="vs-layer " data-i="7"><img src="images/systems.webp" alt="A row of server racks in a data centre" loading="lazy"></div>
                 </div>
-                <div class="zig-zag-text">
-                    <div class="product-meta"><span class="product-tag">Marketing AI</span><span class="product-status">Free to start</span></div>
-                    <h3>Raptor: The AI Sales Brain</h3>
-                    <p class="venture-lead">Every sales tool on the market is a specialist: one finds leads, another sends emails, another tracks calls, and none of them talk to each other. Raptor is one brain that owns the entire loop and gets smarter every time it closes a deal.</p>
-                    <p>It learns your company, hunts prospects, scores each one across 100+ parameters, writes the pitch, coaches you live on the call and learns from every outcome. The learning runs on your own computer, so your sales data stays yours.</p>
-                    <ul class="venture-points">
-                        <li>Autonomous prospecting that maps markets in real time</li>
-                        <li>A custom approach for every prospect category</li>
-                        <li>Live call intelligence: the right words at the right time</li>
-                        <li>Free CRM, email and WhatsApp automation under one login</li>
-                    </ul>
-                    <div class="venture-stats">
-                        <div><strong>100+</strong><span>Scoring parameters</span></div>
-                        <div><strong>20+</strong><span>Tools, one login</span></div>
-                        <div><strong>Free</strong><span>To start</span></div>
-                    </div>
-                    <div class="product-actions">
-                        <a href="ventures/raptor/" class="extra-btn">Explore Raptor</a>
-                        <a href="ventures/raptor/tools/" class="extra-btn btn-outline">Use Free Tools</a>
-                        <a href="ventures/raptor/#login" class="extra-btn btn-login">Log in</a>
-                        <p class="venture-login-note"><strong>When you log in:</strong> your free CRM, free email and WhatsApp automation, and 20+ sales tools, all under one login.</p>
-                    </div>
-                </div>
+                <nav class="vs-index" aria-label="Ventures"><a href="#raptor-demo">01 Raptor</a><a href="#rta-demo">02 rta</a><a href="#basis-demo">03 Coral</a><a href="#aura-demo">04 Vapus</a><a href="#shakti-demo">05 Shakti</a><a href="#eklavya-demo">06 Eklavya</a><a href="#aether-demo">07 Aether Labs</a><a href="#systems-demo">08 Shoonya Systems</a></nav>
             </div>
-
-            <!-- Product 2: rta -->
-            <div class="zig-zag-row venture venture-rta" id="rta-demo" data-aos="fade-up">
-                <div class="zig-zag-media">
-                    <video autoplay loop muted playsinline>
-                        <source src="images/construct-demo.webm" type="video/webm">
-                        Your browser does not support the video tag.
-                    </video>
-                </div>
+            <div class="vs-steps">
+            <article class="vs-step venture venture-raptor" id="raptor-demo" data-i="0">
                 <div class="zig-zag-text">
-                    <div class="product-meta"><span class="product-tag">Infrastructure</span><span class="product-status">Safety module free</span></div>
-                    <h3>rta: The Nervous System of Construction</h3>
-                    <p class="venture-lead">Construction still runs on spreadsheets, paper logs and guesswork, so materials disappear, safety is checked after incidents and defects surface at final inspection. rta is one automated ecosystem that manages safety, logistics and quality on your site.</p>
-                    <p>Three free Windows apps cover the ground. We believe the safety and security of human beings should not be a luxury, so the safety module is free for everyone.</p>
-                    <ul class="venture-points">
-                        <li>RTA Logistics: deliveries, gate entry, inventory and an audit ledger</li>
-                        <li>RTA Security Module: AI site security and violation monitoring</li>
-                        <li>RTA SitePlanner: real-scale grid, GPS overlay and 3D CAD checks</li>
-                        <li>Deploy on your infrastructure or ours, with no vendor lock-in</li>
-                    </ul>
-                    <div class="venture-stats">
-                        <div><strong>3</strong><span>Free Windows apps</span></div>
-                        <div><strong>Free</strong><span>Safety for everyone</span></div>
-                        <div><strong>0</strong><span>Vendor lock-in</span></div>
-                    </div>
-                    <div class="product-actions">
-                        <a href="ventures/rta/" class="extra-btn">Explore rta</a>
-                        <a href="ventures/rta/tools/" class="extra-btn btn-outline">Use Free Tools</a>
-                        <a href="ventures/rta/#login" class="extra-btn btn-login">Log in</a>
-                        <p class="venture-login-note"><strong>When you log in:</strong> you can track your site from one command center: deliveries, inventory, safety alerts and issues.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Product 3: Coral -->
-            <div class="zig-zag-row venture venture-coral" id="basis-demo" data-aos="fade-up">
-                <div class="zig-zag-media">
-                    <video autoplay loop muted playsinline>
-                        <source src="images/rover-demo.webm" type="video/webm">
-                        Your browser does not support the video tag.
-                    </video>
-                </div>
-                <div class="zig-zag-text">
-                    <div class="product-meta"><span class="product-tag">Urban Management</span><span class="product-status">Prototype</span></div>
-                    <h3>Coral: Urban Intelligence for Mumbai &amp; Pune</h3>
-                    <p class="venture-lead">Citizens report, our AI sees, government acts. Coral turns everyday frustrations such as potholes, broken pipes and illegal dumping into structured, anonymous intelligence that civic bodies can act on.</p>
-                    <p>A report takes 15 seconds and your identity stays hidden. Computer vision classifies the issue and its severity and groups it with related reports. Once 15 or more matching reports are in, a scored brief with photographic evidence goes to the civic body. Coral is at the prototyping stage, and we are looking for aware citizens to help us gather intelligence.</p>
-                    <ul class="venture-points">
-                        <li>Detects potholes, illegal dumping, drainage faults and broken infrastructure</li>
-                        <li>Anonymous by design: no names or phone numbers leave your device</li>
-                        <li>Pattern recognition that predicts where the next breakdown will occur</li>
-                        <li>Free civic, safety and environment tools for everyone</li>
-                    </ul>
-                    <div class="venture-stats">
-                        <div><strong>2</strong><span>Cities: Mumbai &amp; Pune</span></div>
-                        <div><strong>15 s</strong><span>To file a report</span></div>
-                        <div><strong>0</strong><span>Data sold, ever</span></div>
-                    </div>
-                    <div class="product-actions">
-                        <a href="ventures/coral/" class="extra-btn">Explore Coral</a>
-                        <a href="ventures/coral/civic_tools/" class="extra-btn btn-outline">Use Free Tools</a>
-                        <a href="ventures/coral/#login" class="extra-btn btn-login">Log in</a>
-                        <p class="venture-login-note"><strong>When you log in:</strong> every report you file earns city credits, redeemable for vouchers, event passes and discounts.</p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Product 4: Vapus -->
-            <div class="zig-zag-row venture venture-vapus" id="aura-demo" data-aos="fade-up">
-                <div class="zig-zag-media">
-                    <video autoplay loop muted playsinline>
-                        <source src="images/aura-demo.webm" type="video/webm">
-                        Your browser does not support the video tag.
-                    </video>
-                </div>
-                <div class="zig-zag-text">
-                    <div class="product-meta"><span class="product-tag">Health</span><span class="product-status">Alpha test</span></div>
-                    <h3>Vapus: Your Lifetime Health Vault</h3>
-                    <p class="venture-lead">Your health has a story, and now it has a home. Vapus is a lifetime vault for every symptom, prescription and scan: logged once, kept forever and read only by the people you choose.</p>
-                    <p>AI works quietly in the background, turning raw entries into early warning instead of just an archive, and vitals can be read from standard video. It is strictly in testing at the prototyping stage: we do not claim it to be a medical device, so do not use it for medical purposes.</p>
-                    <ul class="venture-points">
-                        <li>Timeline, documents and medications in one vault</li>
-                        <li>Time-boxed secure links: you approve every share</li>
-                        <li>Delegates: a parent or caregiver can log or view for you</li>
-                        <li>A 3D body explorer with around 2,800 named parts</li>
-                    </ul>
-                    <div class="venture-stats">
-                        <div><strong>~2,800</strong><span>Parts in the 3D explorer</span></div>
-                        <div><strong>Free</strong><span>To start</span></div>
-                        <div><strong>Encrypted</strong><span>At rest &amp; in transit</span></div>
-                    </div>
-                    <div class="product-actions">
-                        <a href="ventures/vapus/" class="extra-btn">Explore Vapus</a>
-                        <a href="ventures/vapus/tools/" class="extra-btn btn-outline">Use Free Tools</a>
-                        <a href="ventures/vapus/#login" class="extra-btn btn-login">Log in</a>
-                        <p class="venture-login-note"><strong>When you log in:</strong> your private health vault, with every symptom, prescription and scan in one place, shared only with the people you choose.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Product 5: Shakti -->
-            <div class="zig-zag-row venture venture-shakti" id="shakti-demo" data-aos="fade-up">
-                <div class="zig-zag-media">
-                    <img src="images/sentinel-bw.webp" alt="Unmanned aircraft and a robotic ground vehicle with soldiers, in black and white" loading="lazy">
-                </div>
-                <div class="zig-zag-text">
-                    <div class="product-meta"><span class="product-tag">Defence</span><span class="product-status">Research &amp; development</span></div>
-                    <h3>Shakti: Defence Technology That Protects People</h3>
-                    <p class="venture-lead">Shakti is the defence venture of Shoonya Origins. We build next-generation automated technology for unmanned defence, wearable smart devices for combat environments, and the computing systems that connect them.</p>
-                    <p>Courage is human. The risk shouldn&rsquo;t have to be. Shakti works on technology that keeps people out of harm&rsquo;s way and gives those who must be there a clearer picture of what is around them, with a human operator making the final decision.</p>
-                    <ul class="venture-points">
-                        <li>SAMPATI: tethered aerostats that locate radar emitters without relying on satellites</li>
-                        <li>VAHAK-AI: a retrofit kit that lets Army heavy trucks drive themselves and keep navigating when satellite signals are jammed</li>
-                        <li>ASTRR-SYSTEM: a picture of what is in orbit that does not depend on foreign data</li>
-                        <li>NETRA: open-source intelligence analysis that runs on the user&rsquo;s own computer</li>
-                    </ul>
-                    <div class="venture-stats">
-                        <div><strong>6</strong><span>Projects</span></div>
-                        <div><strong>3</strong><span>Areas: unmanned, wearable, computing</span></div>
-                        <div><strong>0</strong><span>Tactical software hosted</span></div>
-                    </div>
-                    <div class="product-actions">
-                        <a href="ventures/shakti/" class="extra-btn">Explore Shakti</a>
-                        <p class="venture-login-note"><strong>Please note:</strong> Shakti pages are informational. They describe research and development, and the models are theoretical and not certified for live defence use.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Product 6: Eklavya -->
-            <div class="zig-zag-row venture venture-eklavya" id="eklavya-demo" data-aos="fade-up">
-                <div class="zig-zag-media media-logo">
-                    <img src="ventures/eklavya/assets/logo.png" alt="Eklavya: a bow and arrow with a flame" loading="lazy">
-                </div>
-                <div class="zig-zag-text">
-                    <div class="product-meta"><span class="product-tag">Ed Tech</span><span class="product-status">Web platform live</span></div>
-                    <h3>Eklavya: Continuous Career Guidance</h3>
-                    <p class="venture-lead">Eklavya helps students build an evolving profile of their interests, skills and achievements from age 12 through professional life, and uses it to surface the scholarships, colleges, internships and careers that actually fit them.</p>
-                    <p>It is built directly into a real learning platform, so course activity, quiz performance and practice sessions strengthen your profile automatically, not just what you type into a form. Named after the legendary student who reached mastery through dedication, it is made for India&rsquo;s reality, where most students get career counselling only at a few critical moments.</p>
-                    <ul class="venture-points">
-                        <li>A profile that grows with the student, from age 12 onwards</li>
-                        <li>Matches to scholarships, colleges, internships and jobs based on their own profile</li>
-                        <li>A simple, conversational way to start building a profile</li>
-                        <li>Interest-based communities and a curated database of opportunities</li>
-                    </ul>
-                    <div class="venture-stats">
-                        <div><strong>Age 12</strong><span>Where the profile starts</span></div>
-                        <div><strong>4</strong><span>Life stages: 12&ndash;15, 16&ndash;18, 19&ndash;22, 23+</span></div>
-                        <div><strong>Web</strong><span>Platform live today</span></div>
-                    </div>
-                    <div class="product-actions">
-                        <a href="ventures/eklavya/" class="extra-btn">Explore Eklavya</a>
-                        <a href="ventures/eklavya/app/" class="extra-btn btn-login">Log in</a>
-                        <p class="venture-login-note"><strong>When you log in:</strong> you build your career profile and get matched with scholarships, colleges and internships that fit you.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Product 7: Aether Labs -->
-            <div class="zig-zag-row venture venture-aether" id="aether-demo" data-aos="fade-up">
-                <div class="zig-zag-media">
-                    <img src="images/aether.webp" alt="A researcher working on a laboratory experiment" loading="lazy">
-                </div>
-                <div class="zig-zag-text">
-                    <div class="product-meta"><span class="product-tag">Research</span><span class="product-status">Research platform</span></div>
-                    <h3>Aether Labs: One Platform for Every Kind of Research</h3>
-                    <p class="venture-lead">Aether Labs is the research platform of Shoonya Origins. Whatever you study, from physics and biology to engineering, data and the social sciences, Aether gives you one place to do the work, keep it organised and share it with the people who need it.</p>
-                    <p>Research gets slowed down by scattered tools, buried data and people working alone. Aether brings those pieces together: computational tools for analysis, modelling and simulation without expensive licences in the way, a home for datasets and results that are properly cited, and a way to share what you find so the same problem isn&rsquo;t solved twice in isolation.</p>
-                    <ul class="venture-points">
-                        <li>Tools for analysis, modelling and simulation</li>
-                        <li>Datasets, methods and results kept organised and cited</li>
-                        <li>Researchers, students and institutions working together</li>
-                        <li>Open to any field: physical, life, engineering, computing and social sciences</li>
-                    </ul>
-                    <div class="venture-stats">
-                        <div><strong>20</strong><span>Research instruments</span></div>
-                        <div><strong>6</strong><span>Kinds of field it serves</span></div>
-                        <div><strong>Free</strong><span>To use the instruments</span></div>
-                    </div>
-                    <div class="product-actions">
-                        <a href="ventures/aether/" class="extra-btn">Explore Aether Labs</a>
-                        <a href="ventures/aether/tools/" class="extra-btn btn-outline">Use Free Tools</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Product 8: Shoonya Systems -->
-            <div class="zig-zag-row venture venture-systems" id="systems-demo" data-aos="fade-up">
-                <div class="zig-zag-media">
-                    <img src="images/systems.webp" alt="A row of server racks in a data centre" loading="lazy">
-                </div>
-                <div class="zig-zag-text">
-                    <div class="product-meta"><span class="product-tag">Software &amp; research</span><span class="product-status">Enterprise solutions</span></div>
-                    <h3>Shoonya Systems: Digital Architecture for the Enterprise</h3>
-                    <p class="venture-lead">From custom ERP systems and military-grade databases to consumer-facing mobile applications, Shoonya Systems builds the tools that power modern industry.</p>
-                    <p>No templates, just engineering: applications tailored to your business logic, AI tools and database systems built to handle massive throughput, and internal tools that streamline complex workflows. Everything is built for longevity, on stability, security and scale.</p>
-                    <p>Behind those tools is core technology we develop ourselves: local and native AI, data science and big data, and research in computer science, from computer vision and understanding human language to sustainable AI and new algorithms for complex problems.</p>
-                    <ul class="venture-points">
-                        <li>Custom mobile and web applications, scalable and high-performance</li>
-                        <li>Enterprise AI and database management for heavy workloads</li>
-                        <li>Productivity tools and automation scripts for corporate workflows</li>
-                        <li>Local and native AI that runs on your own machines, under your control</li>
-                        <li>Research in computer vision, language understanding and sustainable AI</li>
-                        <li>AI, data science and big data, from raw data to answers</li>
-                    </ul>
-                    <div class="venture-stats">
-                        <div><strong>3</strong><span>Core services</span></div>
-                        <div><strong>7</strong><span>Areas of core technology</span></div>
-                        <div><strong>0</strong><span>Templates: built to your logic</span></div>
-                    </div>
-                    <div class="product-actions">
-                        <a href="ventures/shoonya-systems/" class="extra-btn">Explore Shoonya Systems</a>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </section>
-
-    <!-- ═══ ROVER ON THE STREET: a looping scene, buildings fade into haze behind ═══ -->
-    <section class="street" id="street" aria-label="Our rover driving down a city street">
-        <div class="street-sky" aria-hidden="true">
-            <div class="skyline skyline-far"></div>
-            <div class="skyline skyline-mid"></div>
-            <div class="skyline skyline-near"></div>
-        </div>
-        <div class="street-road" aria-hidden="true"><div class="street-lane"></div></div>
-        <div class="street-rover">
-            <img src="images/rover_love1.png" alt="Shoonya rover driving down the street" width="492" height="507" loading="lazy">
-            <span class="rover-shadow" aria-hidden="true"></span>
-        </div>
-    </section>
-
-    <!-- ═══ ROVER FLEET SHOWCASE ════════════════════════════════ -->
-    <section class="rover-showcase-section" style="padding: 100px 0;">
-        <div class="container">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;">
-
-                <!-- LEFT: Video Block -->
-                <div id="videoBlock" data-aos="fade-right" data-aos-duration="1000" style="
-                    position: relative;
-                    border-radius: 20px;
-                    overflow: hidden;
-                    border: 1px solid rgba(255, 255, 255, 0.15);
-                    box-shadow: 0 24px 80px rgba(0, 255, 255, 0.05);
-                    cursor: pointer;
-                    background: #0a0a0a;
-                    aspect-ratio: 16/9;
-                ">
-                    <div id="playOverlay" style="
-                        position: absolute; inset: 0;
-                        display: flex; flex-direction: column;
-                        align-items: center; justify-content: center;
-                        gap: 16px;
-                        background: rgba(0, 0, 0, 0.4);
-                        transition: background 0.3s ease;
-                        z-index: 2;
-                    ">
-                        <div style="
-                            width: 64px; height: 64px; border-radius: 50%;
-                            background: #00d4ff;
-                            display: flex; align-items: center; justify-content: center;
-                            box-shadow: 0 0 0 12px rgba(0, 212, 255, 0.15);
-                        ">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#000">
-                                <polygon points="5,3 19,12 5,21"/>
-                            </svg>
+                            <div class="product-meta"><span class="product-tag">Marketing AI</span><span class="product-status">Free to start</span></div>
+                            <h3>Raptor: The AI Sales Brain</h3>
+                            <p class="venture-lead">Every sales tool on the market is a specialist: one finds leads, another sends emails, another tracks calls, and none of them talk to each other. Raptor is one brain that owns the entire loop and gets smarter every time it closes a deal.</p>
+                            <p>It learns your company, hunts prospects, scores each one across 100+ parameters, writes the pitch, coaches you live on the call and learns from every outcome. The learning runs on your own computer, so your sales data stays yours.</p>
+                            <ul class="venture-points">
+                                <li>Autonomous prospecting that maps markets in real time</li>
+                                <li>A custom approach for every prospect category</li>
+                                <li>Live call intelligence: the right words at the right time</li>
+                                <li>Free CRM, email and WhatsApp automation under one login</li>
+                            </ul>
+                            <div class="venture-stats">
+                                <div><strong>100+</strong><span>Scoring parameters</span></div>
+                                <div><strong>20+</strong><span>Tools, one login</span></div>
+                                <div><strong>Free</strong><span>To start</span></div>
+                            </div>
+                            <div class="product-actions">
+                                <a href="ventures/raptor/" class="extra-btn">Explore Raptor</a>
+                                <a href="ventures/raptor/tools/" class="extra-btn btn-outline">Use Free Tools</a>
+                                <a href="ventures/raptor/#login" class="extra-btn btn-login">Log in</a>
+                                <p class="venture-login-note"><strong>When you log in:</strong> your free CRM, free email and WhatsApp automation, and 20+ sales tools, all under one login.</p>
+                            </div>
                         </div>
-                        <span style="
-                            font-family: 'Space Mono', monospace; font-size: 11px;
-                            letter-spacing: 3px; text-transform: uppercase;
-                            color: #e2eaf0;
-                        ">Watch The Fleet In Action</span>
-                    </div>
-                    <video id="basisVideo" style="
-                        position: absolute; inset: 0;
-                        width: 100%; height: 100%;
-                        object-fit: cover; display: none;
-                    " controls>
-                        <!-- Ensure the path points to your rover demo -->
-                        <source src="ventures/coral/images/ad_video.webm" type="video/webm" />
-                        Your browser does not support the video tag.
-                    </video>
-                </div>
-
-                <!-- RIGHT: Text Block -->
-                <div data-aos="fade-left" data-aos-duration="1000">
-                    <div class="section-label" style="margin-bottom: 12px;">Autonomous Fleet Deployment</div>
-                    
-                    <h2 class="section-heading" style="text-align: left; margin-bottom: 24px; font-size: clamp(32px, 4vw, 48px); line-height: 1.1;">
-                        Intelligence everywhere.<br />
-                        <span class="gradient-text">Rovers where it matters.</span>
-                    </h2>
-                    
-                    <p style="font-size: 1.1rem; color: rgba(0, 0, 0, 0.7); line-height: 1.8; margin-bottom: 0;">
-                        Our ecosystem extends beyond software. The physical autonomous rover programme—acting as the heavy-lifting and ground-level verification layer for <strong>rta</strong> and <strong>Coral</strong>—begins physical patrols in Mumbai and Pune before scaling into a national network.
-                    </p>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <div class="declaration-section" id="free-tools" data-aos="fade-up" data-aos-duration="1200">
-        <div class="container declaration-container">
-            <h2 class="declaration-quote">Free Tools On us</h2>
-            <p class="declaration-text">
-                At Shoonya Origins, we believe that fundamental logic—the decision trees and calculations that drive our industries—should never be a luxury.
-            </p>
-            <p class="declaration-text">
-                We are releasing 130+ Professional Intelligence Tools across our 6 ventures, open to everyone. From this moment on, critical software won't be locked behind signups or paid tiers. You won't have to wonder if your data is being used against you. Every calculation stays local; every decision is yours.
-            </p>
-            <p class="declaration-text highlight">
-                These tools are on us. Many more to come.
-            </p>
-        </div>
-    </div>
-
-    <div class="stats-section" data-aos="fade-up" data-aos-duration="1200">
-        <div class="container">
-            <p class="stats-cta" data-aos="fade-up" data-aos-delay="400">
-                <a href="#contact">Fill out the form below</a> to tell us more about what you want us to build next.
-            </p>
-        </div>
-    </div>
-
-    <section class="updates-section" id="updates">
-        <div class="container" style="padding-bottom: 2rem;">
-            <div class="section-label" data-aos="fade-in">Latest Updates</div>
-            <!-- These cards are filled from updates.json when the page loads. The two below are only a fallback (keep them
-                 the same as the first entries of updates.json) so the section is never empty if the file cannot be read. -->
-            <div class="updates-grid" id="updatesGrid">
-                <div class="notification-card" data-aos="fade-up" data-aos-delay="100">
-                    <span class="notification-badge">Released</span>
-                    <h3 class="notification-title">Autonomous Safety &amp; Anti-Theft Plugins</h3>
-                    <p class="notification-desc">
-                        Our autonomous safety and anti-theft plugins are now available for everyone. The logic is built for maximum security without compromising your data privacy.
-                    </p>
-                    <a href="ventures/rta/#downloads" class="extra-btn notification-btn">Download from rta</a>
-                </div>
-                <div class="notification-card" data-aos="fade-up" data-aos-delay="200">
-                    <span class="notification-badge">Released</span>
-                    <h3 class="notification-title">Free Basic CRM &amp; Essential Sales Tools</h3>
-                    <p class="notification-desc">
-                        A free, foundational CRM to help you seamlessly track clients and manage contacts is now live, alongside a suite of simple, no-cost sales tools designed to streamline your daily operations without the premium price tag.
-                    </p>
-                    <a href="ventures/raptor/#login" class="extra-btn notification-btn">Log in to Raptor</a>
-                </div>
+            </article>
+            <article class="vs-step venture venture-rta" id="rta-demo" data-i="1">
+                <div class="zig-zag-text">
+                            <div class="product-meta"><span class="product-tag">Infrastructure</span><span class="product-status">Safety module free</span></div>
+                            <h3>rta: The Nervous System of Construction</h3>
+                            <p class="venture-lead">Construction still runs on spreadsheets, paper logs and guesswork, so materials disappear, safety is checked after incidents and defects surface at final inspection. rta is one automated ecosystem that manages safety, logistics and quality on your site.</p>
+                            <p>Three free Windows apps cover the ground. We believe the safety and security of human beings should not be a luxury, so the safety module is free for everyone.</p>
+                            <ul class="venture-points">
+                                <li>RTA Logistics: deliveries, gate entry, inventory and an audit ledger</li>
+                                <li>RTA Security Module: AI site security and violation monitoring</li>
+                                <li>RTA SitePlanner: real-scale grid, GPS overlay and 3D CAD checks</li>
+                                <li>Deploy on your infrastructure or ours, with no vendor lock-in</li>
+                            </ul>
+                            <div class="venture-stats">
+                                <div><strong>3</strong><span>Free Windows apps</span></div>
+                                <div><strong>Free</strong><span>Safety for everyone</span></div>
+                                <div><strong>0</strong><span>Vendor lock-in</span></div>
+                            </div>
+                            <div class="product-actions">
+                                <a href="ventures/rta/" class="extra-btn">Explore rta</a>
+                                <a href="ventures/rta/tools/" class="extra-btn btn-outline">Use Free Tools</a>
+                                <a href="ventures/rta/#login" class="extra-btn btn-login">Log in</a>
+                                <p class="venture-login-note"><strong>When you log in:</strong> you can track your site from one command center: deliveries, inventory, safety alerts and issues.</p>
+                            </div>
+                        </div>
+            </article>
+            <article class="vs-step venture venture-coral" id="basis-demo" data-i="2">
+                <div class="zig-zag-text">
+                            <div class="product-meta"><span class="product-tag">Urban Management</span><span class="product-status">Prototype</span></div>
+                            <h3>Coral: Urban Intelligence for Mumbai &amp; Pune</h3>
+                            <p class="venture-lead">Citizens report, our AI sees, government acts. Coral turns everyday frustrations such as potholes, broken pipes and illegal dumping into structured, anonymous intelligence that civic bodies can act on.</p>
+                            <p>A report takes 15 seconds and your identity stays hidden. Computer vision classifies the issue and its severity and groups it with related reports. Once 15 or more matching reports are in, a scored brief with photographic evidence goes to the civic body. Coral is at the prototyping stage, and we are looking for aware citizens to help us gather intelligence.</p>
+                            <ul class="venture-points">
+                                <li>Detects potholes, illegal dumping, drainage faults and broken infrastructure</li>
+                                <li>Anonymous by design: no names or phone numbers leave your device</li>
+                                <li>Pattern recognition that predicts where the next breakdown will occur</li>
+                                <li>Free civic, safety and environment tools for everyone</li>
+                            </ul>
+                            <div class="venture-stats">
+                                <div><strong>2</strong><span>Cities: Mumbai &amp; Pune</span></div>
+                                <div><strong>15 s</strong><span>To file a report</span></div>
+                                <div><strong>0</strong><span>Data sold, ever</span></div>
+                            </div>
+                            <div class="product-actions">
+                                <a href="ventures/coral/" class="extra-btn">Explore Coral</a>
+                                <a href="ventures/coral/civic_tools/" class="extra-btn btn-outline">Use Free Tools</a>
+                                <a href="ventures/coral/#login" class="extra-btn btn-login">Log in</a>
+                                <p class="venture-login-note"><strong>When you log in:</strong> every report you file earns city credits, redeemable for vouchers, event passes and discounts.</p>
+                            </div>
+                        </div>
+            </article>
+            <article class="vs-step venture venture-vapus" id="aura-demo" data-i="3">
+                <div class="zig-zag-text">
+                            <div class="product-meta"><span class="product-tag">Health</span><span class="product-status">Alpha test</span></div>
+                            <h3>Vapus: Your Lifetime Health Vault</h3>
+                            <p class="venture-lead">Your health has a story, and now it has a home. Vapus is a lifetime vault for every symptom, prescription and scan: logged once, kept forever and read only by the people you choose.</p>
+                            <p>AI works quietly in the background, turning raw entries into early warning instead of just an archive, and vitals can be read from standard video. It is strictly in testing at the prototyping stage: we do not claim it to be a medical device, so do not use it for medical purposes.</p>
+                            <ul class="venture-points">
+                                <li>Timeline, documents and medications in one vault</li>
+                                <li>Time-boxed secure links: you approve every share</li>
+                                <li>Delegates: a parent or caregiver can log or view for you</li>
+                                <li>A 3D body explorer with around 2,800 named parts</li>
+                            </ul>
+                            <div class="venture-stats">
+                                <div><strong>~2,800</strong><span>Parts in the 3D explorer</span></div>
+                                <div><strong>Free</strong><span>To start</span></div>
+                                <div><strong>Encrypted</strong><span>At rest &amp; in transit</span></div>
+                            </div>
+                            <div class="product-actions">
+                                <a href="ventures/vapus/" class="extra-btn">Explore Vapus</a>
+                                <a href="ventures/vapus/tools/" class="extra-btn btn-outline">Use Free Tools</a>
+                                <a href="ventures/vapus/#login" class="extra-btn btn-login">Log in</a>
+                                <p class="venture-login-note"><strong>When you log in:</strong> your private health vault, with every symptom, prescription and scan in one place, shared only with the people you choose.</p>
+                            </div>
+                        </div>
+            </article>
+            <article class="vs-step venture venture-shakti" id="shakti-demo" data-i="4">
+                <div class="zig-zag-text">
+                            <div class="product-meta"><span class="product-tag">Defence</span><span class="product-status">Research &amp; development</span></div>
+                            <h3>Shakti: Defence Technology That Protects People</h3>
+                            <p class="venture-lead">Shakti is the defence venture of Shoonya Origins. We build next-generation automated technology for unmanned defence, wearable smart devices for combat environments, and the computing systems that connect them.</p>
+                            <p>Courage is human. The risk shouldn&rsquo;t have to be. Shakti works on technology that keeps people out of harm&rsquo;s way and gives those who must be there a clearer picture of what is around them, with a human operator making the final decision.</p>
+                            <ul class="venture-points">
+                                <li>SAMPATI: tethered aerostats that locate radar emitters without relying on satellites</li>
+                                <li>VAHAK-AI: a retrofit kit that lets Army heavy trucks drive themselves and keep navigating when satellite signals are jammed</li>
+                                <li>ASTRR-SYSTEM: a picture of what is in orbit that does not depend on foreign data</li>
+                                <li>NETRA: open-source intelligence analysis that runs on the user&rsquo;s own computer</li>
+                            </ul>
+                            <div class="venture-stats">
+                                <div><strong>6</strong><span>Projects</span></div>
+                                <div><strong>3</strong><span>Areas: unmanned, wearable, computing</span></div>
+                                <div><strong>0</strong><span>Tactical software hosted</span></div>
+                            </div>
+                            <div class="product-actions">
+                                <a href="ventures/shakti/" class="extra-btn">Explore Shakti</a>
+                                <p class="venture-login-note"><strong>Please note:</strong> Shakti pages are informational. They describe research and development, and the models are theoretical and not certified for live defence use.</p>
+                            </div>
+                        </div>
+            </article>
+            <article class="vs-step venture venture-eklavya" id="eklavya-demo" data-i="5">
+                <div class="zig-zag-text">
+                            <div class="product-meta"><span class="product-tag">Ed Tech</span><span class="product-status">Web platform live</span></div>
+                            <h3>Eklavya: Continuous Career Guidance</h3>
+                            <p class="venture-lead">Eklavya helps students build an evolving profile of their interests, skills and achievements from age 12 through professional life, and uses it to surface the scholarships, colleges, internships and careers that actually fit them.</p>
+                            <p>It is built directly into a real learning platform, so course activity, quiz performance and practice sessions strengthen your profile automatically, not just what you type into a form. Named after the legendary student who reached mastery through dedication, it is made for India&rsquo;s reality, where most students get career counselling only at a few critical moments.</p>
+                            <ul class="venture-points">
+                                <li>A profile that grows with the student, from age 12 onwards</li>
+                                <li>Matches to scholarships, colleges, internships and jobs based on their own profile</li>
+                                <li>A simple, conversational way to start building a profile</li>
+                                <li>Interest-based communities and a curated database of opportunities</li>
+                            </ul>
+                            <div class="venture-stats">
+                                <div><strong>Age 12</strong><span>Where the profile starts</span></div>
+                                <div><strong>4</strong><span>Life stages: 12&ndash;15, 16&ndash;18, 19&ndash;22, 23+</span></div>
+                                <div><strong>Web</strong><span>Platform live today</span></div>
+                            </div>
+                            <div class="product-actions">
+                                <a href="ventures/eklavya/" class="extra-btn">Explore Eklavya</a>
+                                <a href="ventures/eklavya/app/" class="extra-btn btn-login">Log in</a>
+                                <p class="venture-login-note"><strong>When you log in:</strong> you build your career profile and get matched with scholarships, colleges and internships that fit you.</p>
+                            </div>
+                        </div>
+            </article>
+            <article class="vs-step venture venture-aether" id="aether-demo" data-i="6">
+                <div class="zig-zag-text">
+                            <div class="product-meta"><span class="product-tag">Research</span><span class="product-status">Research platform</span></div>
+                            <h3>Aether Labs: One Platform for Every Kind of Research</h3>
+                            <p class="venture-lead">Aether Labs is the research platform of Shoonya Origins. Whatever you study, from physics and biology to engineering, data and the social sciences, Aether gives you one place to do the work, keep it organised and share it with the people who need it.</p>
+                            <p>Research gets slowed down by scattered tools, buried data and people working alone. Aether brings those pieces together: computational tools for analysis, modelling and simulation without expensive licences in the way, a home for datasets and results that are properly cited, and a way to share what you find so the same problem isn&rsquo;t solved twice in isolation.</p>
+                            <ul class="venture-points">
+                                <li>Tools for analysis, modelling and simulation</li>
+                                <li>Datasets, methods and results kept organised and cited</li>
+                                <li>Researchers, students and institutions working together</li>
+                                <li>Open to any field: physical, life, engineering, computing and social sciences</li>
+                            </ul>
+                            <div class="venture-stats">
+                                <div><strong>20</strong><span>Research instruments</span></div>
+                                <div><strong>6</strong><span>Kinds of field it serves</span></div>
+                                <div><strong>Free</strong><span>To use the instruments</span></div>
+                            </div>
+                            <div class="product-actions">
+                                <a href="ventures/aether/" class="extra-btn">Explore Aether Labs</a>
+                                <a href="ventures/aether/tools/" class="extra-btn btn-outline">Use Free Tools</a>
+                            </div>
+                        </div>
+            </article>
+            <article class="vs-step venture venture-systems" id="systems-demo" data-i="7">
+                <div class="zig-zag-text">
+                            <div class="product-meta"><span class="product-tag">Software &amp; research</span><span class="product-status">Enterprise solutions</span></div>
+                            <h3>Shoonya Systems: Digital Architecture for the Enterprise</h3>
+                            <p class="venture-lead">From custom ERP systems and military-grade databases to consumer-facing mobile applications, Shoonya Systems builds the tools that power modern industry.</p>
+                            <p>No templates, just engineering: applications tailored to your business logic, AI tools and database systems built to handle massive throughput, and internal tools that streamline complex workflows. Everything is built for longevity, on stability, security and scale.</p>
+                            <p>Behind those tools is core technology we develop ourselves: local and native AI, data science and big data, and research in computer science, from computer vision and understanding human language to sustainable AI and new algorithms for complex problems.</p>
+                            <ul class="venture-points">
+                                <li>Custom mobile and web applications, scalable and high-performance</li>
+                                <li>Enterprise AI and database management for heavy workloads</li>
+                                <li>Productivity tools and automation scripts for corporate workflows</li>
+                                <li>Local and native AI that runs on your own machines, under your control</li>
+                                <li>Research in computer vision, language understanding and sustainable AI</li>
+                                <li>AI, data science and big data, from raw data to answers</li>
+                            </ul>
+                            <div class="venture-stats">
+                                <div><strong>3</strong><span>Core services</span></div>
+                                <div><strong>7</strong><span>Areas of core technology</span></div>
+                                <div><strong>0</strong><span>Templates: built to your logic</span></div>
+                            </div>
+                            <div class="product-actions">
+                                <a href="ventures/shoonya-systems/" class="extra-btn">Explore Shoonya Systems</a>
+                            </div>
+                        </div>
+            </article>
             </div>
         </div>
     </section>
 
     <section class="contact-section" id="contact">
         <div class="container">
-            <div class="section-label" data-aos="fade-in">Get in Touch</div>
             <h2 class="contact-heading" data-aos="fade-up">Grow with Shoonya</h2>
-            <div class="form-container" data-aos="zoom-in" data-aos-duration="1000">
-                <form class="demo-request-form" id="contactForm" data-source="Contact form (bottom of page)" novalidate>
-                    <input type="text" name="_honey" class="demo-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
-                    <div class="form-group">
-                        <label for="cfName">Full Name</label>
-                        <input id="cfName" type="text" name="name" autocomplete="name" required placeholder="Justin Case">
-                    </div>
-                    <div class="form-group">
-                        <label for="cfPhone">Contact number</label>
-                        <div class="phone-row">
-                            <select name="country" data-country aria-label="Country code"></select>
-                            <input id="cfPhone" type="tel" name="phone" autocomplete="tel-national" inputmode="tel" required placeholder="98765 43210">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="cfVenture">Which venture is this about?</label>
-                        <select id="cfVenture" name="venture" data-venture></select>
-                    </div>
-                    <div class="form-group">
-                        <label for="cfEmail">Email Address <span class="opt">(optional)</span></label>
-                        <input id="cfEmail" type="email" name="email" autocomplete="email" placeholder="justincase@safetyfirst.com">
-                    </div>
-                    <div class="form-group">
-                        <label for="cfMsg">Message <span class="opt">(optional)</span></label>
-                        <textarea id="cfMsg" name="message" rows="4" placeholder="I was going to tell you a joke about a construction site, but I’m still working on it. Would love to hear your thoughts! Tell us how we can contribute ..."></textarea>
-                    </div>
-                    <p class="demo-err" role="alert"></p>
-                    <button type="submit" class="submit-btn">Book a demo / Send</button>
-                    <p class="demo-small">We use your details only to contact you. <a href="/about/privacy.html">Privacy</a></p>
-                </form>
-                <div class="demo-thanks" hidden>
-                    <h3>Thank you</h3>
-                    <p>We have your request and will reach out to you shortly.</p>
-                </div>
+            <div class="grow-cta" data-aos="zoom-in" data-aos-duration="1000">
+                <p class="grow-lead">Tell us what you want to build next. A short demo, no pressure.</p>
+                <button type="button" class="grow-btn" id="growDemoBtn"><span>Book a demo</span><i aria-hidden="true">&rarr;</i></button>
+                <svg class="grow-cursor" id="growCursor" viewBox="0 0 24 24" width="34" height="34" aria-hidden="true"><path d="M4 2l15 9.5-6.4 1.4 3.9 7.2-2.9 1.6-3.9-7.2L5.2 19z" fill="#111" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>
             </div>
         </div>
     </section>
@@ -605,7 +416,7 @@
                 <button id="pro-send-btn">&uarr;</button>
             </div>
         </div>
-        <img src="images/rover_love1.png" id="pro-agent-avatar" alt="Shoonya AI Assistant">
+        <img src="images/chat-profile-light.svg" id="pro-agent-avatar" alt="Shoonya AI Assistant" width="72" height="72">
     </div>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
@@ -865,32 +676,48 @@
                 if (e.key === 'Enter') handleChat();
             });
         });
-
-        // =========================================
-        // 6. Video Play on Tap (Rover Showcase)
-        // =========================================
-        const videoBlock = document.getElementById('videoBlock');
-        const basisVideo = document.getElementById('basisVideo');
-        const playOverlay = document.getElementById('playOverlay');
-
-        if (videoBlock) {
-            videoBlock.addEventListener('click', function() {
-                basisVideo.style.display = 'block';
-                playOverlay.style.display = 'none';
-                basisVideo.load();
-                const playPromise = basisVideo.play();
-                if (playPromise !== undefined) {
-                    playPromise.catch(err => {
-                        console.warn('Autoplay blocked:', err);
-                    });
-                }
-            });
-
-            basisVideo.addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
-        }
     </script>
+    <!-- Notifications: the latest updates (from updates.json); opens by itself just before Grow with Shoonya, closes when they scroll on -->
+    <button type="button" class="notif-bell" id="notifBell" aria-label="Latest updates" aria-expanded="false" aria-controls="notifPanel">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 22a2.4 2.4 0 0 0 2.4-2.4h-4.8A2.4 2.4 0 0 0 12 22zm7-6.4V11a7 7 0 0 0-5.2-6.8V3.4a1.8 1.8 0 0 0-3.6 0v.8A7 7 0 0 0 5 11v4.6l-2 2V19h18v-1.4z" fill="currentColor"/></svg>
+        <span class="notif-dot" id="notifDot" hidden></span>
+    </button>
+    <aside class="notif-panel" id="notifPanel" aria-label="Latest updates" hidden>
+        <div class="notif-head"><b>Latest updates</b><button type="button" id="notifClose" aria-label="Close">&times;</button></div>
+        <div class="notif-list" id="notifList"></div>
+    </aside>
+
+    <!-- Scroll-triggered demo request: after a few scrolls and again at the end of the page -->
+    <div class="login-picker lead-pop" id="leadPop" role="dialog" aria-modal="true" aria-labelledby="leadPopTitle" hidden>
+        <div class="login-picker-box">
+            <button type="button" class="login-picker-close" id="leadPopClose" aria-label="Close">&times;</button>
+            <div id="leadPopStep1">
+                <h2 id="leadPopTitle">Curious? See it live.</h2>
+                <p class="login-picker-sub">Pick what interests you and leave your email. We will reach out.</p>
+                <form class="lp-form" id="leadPopForm" novalidate>
+                    <input type="text" name="_honey" class="demo-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+                    <input type="hidden" name="venture" value="">
+                    <div class="lp-chips" role="group" aria-label="Venture"><button type="button" class="lp-chip" data-v="Raptor">Raptor</button><button type="button" class="lp-chip" data-v="rta">rta</button><button type="button" class="lp-chip" data-v="Coral">Coral</button><button type="button" class="lp-chip" data-v="Vapus">Vapus</button><button type="button" class="lp-chip" data-v="Eklavya">Eklavya</button><button type="button" class="lp-chip" data-v="Shakti">Shakti</button><button type="button" class="lp-chip" data-v="Aether Labs">Aether Labs</button><button type="button" class="lp-chip" data-v="Shoonya Systems">Shoonya Systems</button><button type="button" class="lp-chip" data-v="Not sure yet">Not sure yet</button></div>
+                    <div class="lp-row">
+                        <input type="email" name="email" autocomplete="email" placeholder="Your email" aria-label="Your email">
+                        <button type="submit" class="submit-btn">Show me</button>
+                    </div>
+                    <a href="#" class="lp-addphone" id="lpAddPhone">+ Add a phone number (optional)</a>
+                    <div class="phone-row lp-phone" hidden>
+                        <select name="country" data-country aria-label="Country code"></select>
+                        <input type="tel" name="phone" autocomplete="tel-national" inputmode="tel" placeholder="98765 43210" aria-label="Phone number">
+                    </div>
+                    <p class="demo-err" role="alert"></p>
+                    <p class="demo-small"><a href="#" id="leadPopLater">Not now</a></p>
+                </form>
+            </div>
+            <div id="leadPopStep2" class="demo-thanks" hidden>
+                <h3>Thank you</h3>
+                <p>We have your request and will reach out to you shortly.</p>
+            </div>
+        </div>
+    </div>
+
     <!-- Book a demo (top bar): same details as the form at the bottom -->
     <div class="login-picker demo-modal" id="demoModal" role="dialog" aria-modal="true" aria-labelledby="demoModalTitle" hidden>
         <div class="login-picker-box">
@@ -1015,7 +842,7 @@
                     if (!name) return bad(f.name, 'Please enter your name.');
                     var digits = phone.replace(/\D/g, '');
                     if (digits.length < 6 || digits.length > 14) return bad(f.phone, 'Please enter a valid contact number.');
-                    if (!f.venture.value) return bad(f.venture, 'Please choose a venture.');
+                    if (!f.venture.value) { err.textContent = 'Tap the venture you are curious about.'; return; }
                     if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return bad(f.email, 'That email address does not look right.');
                     btn.disabled = true; btn.textContent = 'Sending...'; err.textContent = '';
                     fetch(TO, {
@@ -1062,37 +889,199 @@
         })();
     </script>
     <script>
-        // Latest Updates: the cards come from updates.json (edit that file and push to change them).
-        // Anything wrong with the file leaves the fallback cards that are already in the page.
+        // Notification bell: reads updates.json (a built-in copy of the first two is the fallback).
         (function () {
-            var grid = document.getElementById('updatesGrid');
-            if (!grid || !window.fetch) return;
-            fetch('updates.json', { cache: 'no-cache' })
-                .then(function (r) { if (!r.ok) throw new Error('no file'); return r.json(); })
-                .then(function (items) {
-                    if (!Array.isArray(items)) return;
-                    var live = items.filter(function (u) { return u && u.active !== false && u.title; });
-                    if (!live.length) return;
-                    function el(tag, cls, text) { var n = document.createElement(tag); n.className = cls; if (text) n.textContent = text; return n; }
-                    grid.textContent = '';
-                    live.forEach(function (u, i) {
-                        var card = el('div', 'notification-card');
-                        card.setAttribute('data-aos', 'fade-up');
-                        card.setAttribute('data-aos-delay', String(100 * (i + 1)));
-                        if (u.badge) card.appendChild(el('span', 'notification-badge', u.badge));
-                        card.appendChild(el('h3', 'notification-title', u.title));
-                        if (u.text) card.appendChild(el('p', 'notification-desc', u.text));
-                        // only site-relative or https links are used as buttons
-                        if (u.button_label && u.button_href && /^(https:\/\/|[a-z0-9_\-\/#.?=&]+$)/i.test(u.button_href)) {
-                            var a = el('a', 'extra-btn notification-btn', u.button_label);
-                            a.href = u.button_href;
-                            card.appendChild(a);
-                        }
-                        grid.appendChild(card);
-                    });
-                    if (window.AOS && AOS.refreshHard) AOS.refreshHard();
+            var bell = document.getElementById('notifBell'), panel = document.getElementById('notifPanel'), list = document.getElementById('notifList');
+            var dot = document.getElementById('notifDot'), sec = document.getElementById('contact');
+            if (!bell || !panel || !sec) return;
+            var autoOpened = false, armed = true;
+            function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+
+            var FALLBACK = [
+                { badge: 'Released', title: 'Autonomous Safety & Anti-Theft Plugins', text: 'Our autonomous safety and anti-theft plugins are now available for everyone. The logic is built for maximum security without compromising your data privacy.', label: 'Download from rta', href: 'ventures/rta/#downloads' },
+                { badge: 'Released', title: 'Free Basic CRM & Essential Sales Tools', text: 'A free, foundational CRM to help you seamlessly track clients and manage contacts is now live, alongside a suite of simple, no-cost sales tools designed to streamline your daily operations without the premium price tag.', label: 'Log in to Raptor', href: 'ventures/raptor/#login' }
+            ];
+            var data = FALLBACK;
+            function items() { return data; }
+            if (window.fetch) {
+                fetch('updates.json', { cache: 'no-cache' })
+                    .then(function (r) { if (!r.ok) throw new Error('no file'); return r.json(); })
+                    .then(function (list) {
+                        if (!Array.isArray(list)) return;
+                        var live = list.filter(function (u) { return u && u.active !== false && u.title; }).map(function (u) {
+                            var ok = u.button_label && u.button_href && /^(https:\/\/|[a-z0-9_\-\/#.?=&]+$)/i.test(u.button_href);
+                            return { badge: u.badge || '', title: u.title, text: u.text || '', label: ok ? u.button_label : '', href: ok ? u.button_href : '' };
+                        });
+                        if (live.length) { data = live; refreshDot(); if (!panel.hidden) render(); }
+                    })
+                    .catch(function () { /* keep the built-in two */ });
+            }
+            function signature() { return items().map(function (i) { return i.title; }).join('|'); }
+            function render() {
+                list.textContent = '';
+                items().forEach(function (i) {
+                    var box = document.createElement('div'); box.className = 'notif-item';
+                    if (i.badge) { var b = document.createElement('span'); b.className = 'notif-badge'; b.textContent = i.badge; box.appendChild(b); }
+                    var h = document.createElement('h4'); h.textContent = i.title; box.appendChild(h);
+                    if (i.text) { var p = document.createElement('p'); p.textContent = i.text; box.appendChild(p); }
+                    if (i.label && i.href) { var a = document.createElement('a'); a.textContent = i.label + ' \u2192'; a.href = i.href; box.appendChild(a); }
+                    list.appendChild(box);
+                });
+            }
+            function refreshDot() { dot.hidden = !signature() || store('so-notif-seen') === signature(); }
+            function open(auto) {
+                render(); panel.hidden = false; bell.setAttribute('aria-expanded', 'true'); autoOpened = !!auto;
+                requestAnimationFrame(function () { panel.classList.add('on'); });
+                store('so-notif-seen', signature()); dot.hidden = true;
+            }
+            function close() {
+                panel.classList.remove('on'); bell.setAttribute('aria-expanded', 'false'); autoOpened = false;
+                setTimeout(function () { if (!panel.classList.contains('on')) panel.hidden = true; }, 300);
+            }
+            bell.addEventListener('click', function () { if (panel.hidden || !panel.classList.contains('on')) open(false); else close(); });
+            document.getElementById('notifClose').addEventListener('click', close);
+            document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !panel.hidden) close(); });
+
+            // open when the "Grow with Shoonya" section is about to come into view, close (only if it opened by itself) when the visitor has scrolled on
+            function check() {
+                var r = sec.getBoundingClientRect(), h = innerHeight;
+                var inView = r.top < h * 0.95 && r.top > h * 0.5;
+                if (inView && armed) { armed = false; if (panel.hidden || !panel.classList.contains('on')) open(true); }
+                if (autoOpened && (r.top < h * 0.3 || r.top > h * 1.05)) close();
+                if (!armed && r.top > h * 1.1) armed = true;
+            }
+            addEventListener('scroll', check, { passive: true });
+            setTimeout(function () { refreshDot(); check(); }, 900);
+            setTimeout(refreshDot, 3000);   // after updates.json has replaced the fallback cards
+        })();
+    </script>
+    <script>
+        // The chat icon follows the page theme: the pale dissolving profile on the light theme, the dusk one on the dark theme.
+        (function () {
+            var img = document.getElementById('pro-agent-avatar');
+            if (!img) return;
+            function sync() { var want = document.body.classList.contains('dark-mode') ? 'images/chat-profile-dark.svg' : 'images/chat-profile-light.svg'; if (img.getAttribute('src') !== want) img.setAttribute('src', want); }
+            new MutationObserver(sync).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+            sync();
+        })();
+    </script>
+    <script>
+        // Scroll-triggered demo request. Shows after a few scrolls (about 40% down, and at least 12 seconds on the page) and
+        // again at the end of the page, never more than twice a visit, and never again once a request has been sent.
+        (function () {
+            var TO = 'https://formsubmit.co/ajax/yogesh@shoonyaorigins.com';
+            var pop = document.getElementById('leadPop'), form = document.getElementById('leadPopForm');
+            if (!pop || !form) return;
+            var s1 = document.getElementById('leadPopStep1'), s2 = document.getElementById('leadPopStep2');
+            var err = form.querySelector('.demo-err'), btn = form.querySelector('button[type="submit"]'), chips = form.querySelectorAll('.lp-chip');
+            var shown = 0, opened = false, source = '', t0 = Date.now();
+
+            function get(store, k) { try { return store.getItem(k); } catch (e) { return null; } }
+            function set(store, k, v) { try { store.setItem(k, v); } catch (e) {} }
+            function sent() { return get(localStorage, 'so-demo-requested') === '1'; }
+            function busy() {   // another dialog is already open
+                return !document.getElementById('demoModal').hidden || !document.getElementById('loginPicker').hidden;
+            }
+
+            function show(why) {
+                if (opened || sent() || busy() || shown >= 2 || parseInt(get(sessionStorage, 'so-pop-count') || '0', 10) >= 2) return;
+                shown++; opened = true; source = why;
+                set(sessionStorage, 'so-pop-count', String(parseInt(get(sessionStorage, 'so-pop-count') || '0', 10) + 1));
+                s1.hidden = false; s2.hidden = true; err.textContent = '';
+                pop.hidden = false; document.body.classList.add('login-picker-open');
+                form.elements.email.focus();
+            }
+            function hide() { pop.hidden = true; opened = false; document.body.classList.remove('login-picker-open'); }
+
+            var done1 = false, done2 = false;
+            function onScroll() {
+                var depth = (window.scrollY + window.innerHeight) / document.documentElement.scrollHeight;
+                if (!done1 && depth >= 0.4 && Date.now() - t0 >= 12000) { done1 = true; show('Popup after scrolling'); }
+                if (!done2 && depth >= 0.97) { done2 = true; show('Popup at the end of the page'); }
+            }
+            window.addEventListener('scroll', onScroll, { passive: true });
+            setTimeout(onScroll, 12100);   // the 12 seconds may pass while the visitor is not scrolling
+
+            document.getElementById('leadPopClose').addEventListener('click', hide);
+            document.getElementById('leadPopLater').addEventListener('click', function (e) { e.preventDefault(); hide(); });
+            pop.addEventListener('click', function (e) { if (e.target === pop) hide(); });
+            document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !pop.hidden) hide(); });
+            chips.forEach(function (c) { c.addEventListener('click', function () {
+                chips.forEach(function (o) { o.classList.remove('on'); }); c.classList.add('on');
+                form.elements.venture.value = c.getAttribute('data-v'); err.textContent = '';
+                form.elements.email.focus();
+            }); });
+            document.getElementById('lpAddPhone').addEventListener('click', function (e) {
+                e.preventDefault(); form.querySelector('.lp-phone').hidden = false; this.hidden = true; form.elements.phone.focus();
+            });
+            form.addEventListener('input', function (e) { e.target.removeAttribute('aria-invalid'); err.textContent = ''; });
+            form.addEventListener('change', function (e) { e.target.removeAttribute('aria-invalid'); err.textContent = ''; });
+
+            function bad(el, msg) { el.setAttribute('aria-invalid', 'true'); err.textContent = msg; el.focus(); }
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                var f = form.elements, email = f.email.value.trim(), phone = f.phone.value.trim();
+                if (f._honey.value) return;
+                if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return bad(f.email, 'Please enter a valid email address.');
+                var digits = phone.replace(/\D/g, '');
+                if (phone && (digits.length < 6 || digits.length > 14)) return bad(f.phone, 'That number does not look right. You can also leave it empty.');
+                if (!f.venture.value) { err.textContent = 'Tap the venture you are curious about.'; return; }
+                var code = (f.country.options[f.country.selectedIndex].text.match(/\((\+\d+)\)/) || [])[1] || '';
+                btn.disabled = true; btn.textContent = 'Sending...'; err.textContent = '';
+                fetch(TO, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({
+                        _subject: 'Demo request: ' + f.venture.value, _template: 'table', _captcha: 'false',
+                        name: '(not given)', email: email, phone: phone ? code + ' ' + phone : '(not given)',
+                        country: phone ? f.country.value : '(not given)', venture: f.venture.value,
+                        message: '(none)', source: source, page: location.href
+                    })
                 })
-                .catch(function () { /* keep the fallback cards */ });
+                .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok || (j.success !== true && j.success !== 'true')) throw new Error('send failed'); }); })
+                .then(function () { set(localStorage, 'so-demo-requested', '1'); form.reset(); chips.forEach(function (o) { o.classList.remove('on'); }); s1.hidden = true; s2.hidden = false; setTimeout(hide, 4000); })
+                .catch(function () { err.textContent = 'Could not send that just now. Please try again in a moment.'; })
+                .then(function () { btn.disabled = false; btn.textContent = 'Request my demo'; });
+            });
+        })();
+    </script>
+    <script>
+        // "Grow with Shoonya": the button opens the same demo dialog as the top bar, and a cursor glides in and clicks it
+        // once the visitor reaches the section (again if they leave and come back).
+        (function () {
+            var btn = document.getElementById('growDemoBtn'), cur = document.getElementById('growCursor');
+            var sec = document.getElementById('contact');
+            if (!btn || !cur || !sec) return;
+            btn.addEventListener('click', function () { var top = document.getElementById('demoBtn'); if (top) top.click(); });
+
+            var still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+            var running = false, armed = true, timers = [];
+            function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
+            function put(x, y, ms) { cur.style.transition = ms ? 'transform ' + ms + 'ms cubic-bezier(.22,.8,.2,1), opacity .4s' : 'opacity .4s'; cur.style.transform = 'translate(' + x + 'px,' + y + 'px)'; }
+            function play() {
+                if (running || still) return;
+                running = true;
+                var host = cur.offsetParent || btn.parentNode, hb = host.getBoundingClientRect(), bb = btn.getBoundingClientRect();
+                var tx = bb.left - hb.left + bb.width * 0.62, ty = bb.top - hb.top + bb.height * 0.55;
+                put(tx + 260, ty + 190, 0); cur.style.opacity = '0';
+                later(function () { cur.style.opacity = '1'; put(tx, ty, 1500); }, 60);
+                later(function () { btn.classList.add('hover'); }, 1350);
+                later(function () { cur.classList.add('press'); btn.classList.add('press'); }, 1900);
+                later(function () { cur.classList.remove('press'); btn.classList.remove('press'); btn.classList.add('ripple'); }, 2100);
+                later(function () { btn.classList.remove('ripple'); }, 2800);
+                later(function () { cur.style.opacity = '0'; put(tx + 120, ty + 90, 900); }, 3200);
+                later(function () { btn.classList.remove('hover'); running = false; }, 4200);
+            }
+            function stop() { timers.forEach(clearTimeout); timers = []; running = false; cur.style.opacity = '0'; btn.classList.remove('hover', 'press', 'ripple'); cur.classList.remove('press'); }
+            function check() {
+                var r = sec.getBoundingClientRect(), vis = r.top < innerHeight * 0.55 && r.bottom > innerHeight * 0.35;
+                if (vis && armed) { armed = false; play(); }
+                if (!vis && !armed && (r.top > innerHeight || r.bottom < 0)) { armed = true; stop(); }
+            }
+            addEventListener('scroll', check, { passive: true });
+            addEventListener('resize', check);
+            setTimeout(check, 600);
+            btn.addEventListener('pointerenter', stop);
         })();
     </script>
     <script>
@@ -1112,13 +1101,118 @@
         })();
     </script>
     <script>
-        // The rover street only animates while it is on screen (saves work while scrolling past everything else)
+        // Ventures: the screen on the left stays in place and shows the venture that is in the middle of the page.
         (function () {
-            var street = document.getElementById('street');
-            if (!street || !('IntersectionObserver' in window)) return;
-            new IntersectionObserver(function (es) {
-                street.classList.toggle('street-offscreen', !es[0].isIntersecting);
-            }).observe(street);
+            var steps = [].slice.call(document.querySelectorAll('.vs-step')), layers = [].slice.call(document.querySelectorAll('.vs-layer'));
+            var chips = [].slice.call(document.querySelectorAll('.vs-index a'));
+            if (!steps.length) return;
+            var active = -1;
+            function set(i) {
+                if (i === active) return; active = i;
+                layers.forEach(function (l, k) {
+                    l.classList.toggle('on', k === i);
+                    var v = l.querySelector('video');
+                    if (v && v.dataset.state === 'ready') { if (k === i) { var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); } else v.pause(); }
+                });
+                steps.forEach(function (s, k) { s.classList.toggle('on', k === i); });
+                chips.forEach(function (a, k) { a.classList.toggle('on', k === i); });
+            }
+            var ticking = false;
+            function pick() {
+                ticking = false;
+                var mid = innerHeight * 0.5, best = 0, bd = 1e9;
+                steps.forEach(function (s, k) { var r = s.getBoundingClientRect(), d = Math.abs((r.top + r.bottom) / 2 - mid); if (d < bd) { bd = d; best = k; } });
+                set(best);
+            }
+            function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(pick); } }
+            addEventListener('scroll', onScroll, { passive: true }); addEventListener('resize', onScroll);
+            pick();
+        })();
+    </script>
+    <script>
+        // LOADING QUEUE. The page paints at once with picture posters; then, in this order:
+        //   1. the four demo videos, one after another (Raptor, rta, Coral, Vapus), each loaded fully before the next
+        //   2. the 3D body (desktop and normal connections only)
+        //   3. analytics and the Apollo tracker
+        // A video whose panel scrolls into view jumps the queue. Videos play only while they are on screen.
+        (function () {
+            var conn = navigator.connection || {};
+            var saveData = !!conn.saveData;
+            var type = conn.effectiveType || '';
+            var slow2g = /(^|-)2g$/.test(type);          // very slow: pictures only, videos load when they come into view
+            var slow = slow2g || type === '3g';            // slow: also no 3D body
+            var vids = [].slice.call(document.querySelectorAll('video[data-src]'));
+
+            function play(v) { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+
+            function loadVideo(v) {
+                return new Promise(function (resolve) {
+                    if (v.dataset.state) { resolve(); return; }
+                    v.dataset.state = 'loading';
+                    var finished = false;
+                    function finish(ok) {
+                        if (finished) return;
+                        finished = true;
+                        v.dataset.state = ok ? 'ready' : 'failed';
+                        if (ok && v.__visible) play(v);
+                        resolve();
+                    }
+                    v.addEventListener('canplaythrough', function () { finish(true); }, { once: true });
+                    v.addEventListener('error', function () { finish(false); }, { once: true });
+                    setTimeout(function () { finish(v.readyState >= 3); }, 20000);   // never hold up the queue for long
+                    v.preload = 'auto';
+                    v.src = v.dataset.src;
+                    v.load();
+                });
+            }
+
+            // play while visible, pause while not; a panel that comes into view before its turn is loaded straight away
+            if ('IntersectionObserver' in window) {
+                var io = new IntersectionObserver(function (entries) {
+                    entries.forEach(function (e) {
+                        var v = e.target;
+                        v.__visible = e.isIntersecting;
+                        if (e.isIntersecting) {
+                            if (!v.dataset.state) loadVideo(v);
+                            else if (v.dataset.state === 'ready') play(v);
+                        } else if (v.dataset.state === 'ready') {
+                            v.pause();
+                        }
+                    });
+                }, { rootMargin: '200px 0px', threshold: 0.01 });
+                vids.forEach(function (v) { io.observe(v); });
+            } else {
+                vids.forEach(function (v) { v.__visible = true; });
+            }
+
+            function load3D() {
+                var canvas = document.getElementById('aura-bg-canvas');
+                var btn = document.getElementById('aura-bg-toggle');
+                var wanted = !saveData && !slow && window.matchMedia('(min-width: 700px)').matches;
+                if (!wanted) {                          // phones and slow or data-saving connections: no 3D body
+                    if (canvas) canvas.remove();
+                    if (btn) btn.remove();
+                    return Promise.resolve();
+                }
+                return import('./ventures/vapus/assets/aura-bg.js?v=home5')
+                    .then(function () { var b = document.getElementById('aura-bg-toggle'); if (b) b.style.display = ''; })
+                    .catch(function () {
+                        if (canvas) canvas.remove();
+                        if (btn) btn.remove();
+                    });
+            }
+
+            function run() {
+                var chain = Promise.resolve();
+                if (!saveData && !slow2g) {
+                    vids.forEach(function (v) { chain = chain.then(function () { return loadVideo(v); }); });
+                }
+                chain.then(load3D).then(function () { window.loadTrackers(); });
+                setTimeout(window.loadTrackers, 30000);   // if the queue is slow, analytics still starts
+            }
+
+            if (document.readyState === 'complete') setTimeout(run, 200);
+            else window.addEventListener('load', function () { setTimeout(run, 200); });
         })();
     </script>
 </body>
