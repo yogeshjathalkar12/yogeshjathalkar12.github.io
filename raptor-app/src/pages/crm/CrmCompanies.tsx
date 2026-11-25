@@ -1,10 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { formatCurrency } from '../../lib/crmHelpers';
 import Modal, { fieldLabelStyle, fieldInputStyle, primaryBtnStyle, ghostBtnStyle } from '../../components/crm/Modal';
 import DuplicatesModal from '../../components/crm/DuplicatesModal';
 import CustomFieldsSection, { CustomFieldsInputs } from '../../components/crm/CustomFieldsSection';
+import ViewTable from '../../components/crm/ViewTable';
+import type { UiColumn } from '../../components/crm/ViewTable';
+import { customFieldColumns } from '../../lib/viewColumns';
+import { loadFieldDefs } from '../../lib/customFields';
+import type { CustomFieldDef } from '../../lib/customFields';
+import { useAuth } from '../../hooks/AuthContext';
 import { COMPANY_FIELDS, blankCompanyForm, cleanCustomValues, companyToForm, filledCompanyDetails, formToCompany } from '../../lib/companyFields';
 import type { CompanyForm } from '../../lib/companyFields';
 import ImportWizardModal from '../../components/crm/ImportWizardModal';
@@ -29,6 +35,9 @@ export default function CrmCompanies() {
   const [showDuplicates, setShowDuplicates] = useState(false);
   const [showImport, setShowImport] = useState(false);
   const [showImportHistory, setShowImportHistory] = useState(false);
+  const [defs, setDefs] = useState<CustomFieldDef[]>([]);
+  const [importLabels, setImportLabels] = useState<Record<string, string>>({});
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchAll();
@@ -43,15 +52,21 @@ export default function CrmCompanies() {
 
   async function fetchAll() {
     try {
-      const [companiesRes, contactsRes, dealsRes] = await Promise.all([
+      const [companiesRes, contactsRes, dealsRes, fieldDefs, importsRes] = await Promise.all([
         supabase.from('companies').select('*').order('created_at', { ascending: false }),
         supabase.from('contacts').select('id, name, company_id'),
         supabase.from('deals').select('id, title, value, company_id'),
+        loadFieldDefs('company').catch(() => [] as CustomFieldDef[]),
+        Promise.resolve(supabase.from('crm_imports').select('id, source_name, file_name, started_at')).catch(() => ({ data: [] as any[] })),   // the import log may not exist yet
       ]);
       if (companiesRes.error) throw companiesRes.error;
       if (contactsRes.error) throw contactsRes.error;
       if (dealsRes.error) throw dealsRes.error;
 
+      setDefs(fieldDefs);
+      const labels: Record<string, string> = {};
+      for (const i of (importsRes as any).data || []) labels[i.id] = `${i.source_name || i.file_name || 'Import'} · ${String(i.started_at || '').slice(0, 10)}`;
+      setImportLabels(labels);
       setCompanies(companiesRes.data || []);
       setActiveCompany((prev: any) => (prev ? (companiesRes.data || []).find((c: any) => c.id === prev.id) || null : prev));
 
@@ -83,12 +98,31 @@ export default function CrmCompanies() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [companies]);
 
+  const columns: UiColumn<any>[] = useMemo(() => {
+    const importedOptions = [...new Set(Object.values(importLabels))];
+    const built: UiColumn<any>[] = [
+      { id: 'name', label: 'Name', kind: 'text', value: (c) => c.name, locked: true, bold: true },
+      { id: 'website', label: 'Website', kind: 'text', value: (c) => (c.website_url ? c.website_url.replace(/^https?:\/\//, '') : null), defaultVisible: true, dim: true },
+      { id: 'contacts', label: 'Contacts', kind: 'number', value: (c) => (contactsByCompany[c.id] || []).length, defaultVisible: true },
+      { id: 'deals', label: 'Deals', kind: 'number', value: (c) => (dealsByCompany[c.id] || []).length, defaultVisible: true },
+      { id: 'phone', label: 'Phone', kind: 'text', value: (c) => c.phone, dim: true },
+      { id: 'email', label: 'Email', kind: 'text', value: (c) => c.email, dim: true },
+      { id: 'city', label: 'City / region', kind: 'text', value: (c) => c.city, dim: true },
+      { id: 'industry', label: 'Industry', kind: 'text', value: (c) => c.industry, dim: true },
+      { id: 'address', label: 'Address', kind: 'text', value: (c) => c.address, dim: true },
+      { id: 'description', label: 'Description', kind: 'text', value: (c) => c.description, dim: true },
+      { id: 'imported', label: 'Imported from', kind: 'select', value: (c) => (c.import_batch_id ? importLabels[c.import_batch_id] || 'an import' : null), options: importedOptions, dim: true },
+      { id: 'created', label: 'Added', kind: 'date', value: (c) => c.created_at, dim: true },
+    ];
+    return [...built, ...customFieldColumns(defs, (c: any) => c.custom_fields, companies)];
+  }, [defs, importLabels, contactsByCompany, dealsByCompany, companies]);
+
   if (loading) {
     return <div style={{ padding: '2rem', color: 'var(--dim)' }}>Loading companies…</div>;
   }
 
   const q = search.trim().toLowerCase();
-  const filtered = companies.filter((c) => !q || (c.name || '').toLowerCase().includes(q));
+  const filtered = companies.filter((c) => !q || [c.name, c.website_url, c.email, c.phone, c.city, c.industry, c.address].some((v) => (v || '').toLowerCase().includes(q)));
 
   return (
     <div>
@@ -133,32 +167,14 @@ export default function CrmCompanies() {
         </div>
       </div>
 
-      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontFamily: 'var(--mono)', fontSize: '0.75rem' }}>
-          <thead>
-            <tr style={{ background: 'var(--surface2)', color: 'var(--dim)', borderBottom: '1px solid var(--border)' }}>
-              <th style={{ padding: '0.9rem 1rem' }}>Name</th>
-              <th style={{ padding: '0.9rem 1rem' }}>Website</th>
-              <th style={{ padding: '0.9rem 1rem' }}>Contacts</th>
-              <th style={{ padding: '0.9rem 1rem' }}>Deals</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.length === 0 ? (
-              <tr><td colSpan={4} style={{ padding: '2rem', textAlign: 'center', color: 'var(--dim)' }}>{companies.length === 0 ? 'No companies yet.' : 'No companies match your search.'}</td></tr>
-            ) : (
-              filtered.map((c) => (
-                <tr key={c.id} onClick={() => setActiveCompany(c)} style={{ borderBottom: '1px solid var(--border)', cursor: 'pointer' }}>
-                  <td style={{ padding: '1rem', fontWeight: 'bold' }}>{c.name}</td>
-                  <td style={{ padding: '1rem', color: 'var(--dim)' }}>{c.website_url ? c.website_url.replace(/^https?:\/\//, '') : '—'}</td>
-                  <td style={{ padding: '1rem' }}>{(contactsByCompany[c.id] || []).length}</td>
-                  <td style={{ padding: '1rem' }}>{(dealsByCompany[c.id] || []).length}</td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+      <ViewTable
+        columns={columns}
+        rows={filtered}
+        storageKey={`companies:${user?.id || 'anon'}`}
+        rowKey={(c) => c.id}
+        onRowClick={(c) => setActiveCompany(c)}
+        emptyText={companies.length === 0 ? 'No companies yet.' : 'No companies match your search.'}
+      />
 
       <NewCompanyModal open={showNew} onClose={() => setShowNew(false)} onCreated={fetchAll} />
       <CompanyDetailModal

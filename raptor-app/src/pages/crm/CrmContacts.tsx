@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { relativeTime } from '../../lib/crmHelpers';
@@ -7,6 +7,11 @@ import ContactPanel from '../../components/crm/ContactPanel';
 import ImportWizardModal from '../../components/crm/ImportWizardModal';
 import ImportHistoryModal from '../../components/crm/ImportHistoryModal';
 import ExportButton from '../../components/crm/ExportButton';
+import ViewTable from '../../components/crm/ViewTable';
+import type { UiColumn } from '../../components/crm/ViewTable';
+import { customFieldColumns } from '../../lib/viewColumns';
+import { loadFieldDefs } from '../../lib/customFields';
+import type { CustomFieldDef } from '../../lib/customFields';
 import DuplicatesModal from '../../components/crm/DuplicatesModal';
 import OwnerOnly from '../../components/OwnerOnly';
 import AssigneeFilter, { applyAssigneeFilter, useAssigneeFilter } from '../../components/crm/AssigneeFilter';
@@ -34,6 +39,8 @@ export default function CrmContacts() {
   const [showImportHistory, setShowImportHistory] = useState(false);
   const [showDuplicates, setShowDuplicates] = useState(false);
   const [activeContact, setActiveContact] = useState<any | null>(null);
+  const [defs, setDefs] = useState<CustomFieldDef[]>([]);
+  const [importLabels, setImportLabels] = useState<Record<string, string>>({});
 
   useEffect(() => {
     fetchAll();
@@ -51,7 +58,7 @@ export default function CrmContacts() {
 
   async function fetchAll() {
     try {
-      const [contactsRes, dealsRes, interactionsRes] = await Promise.all([
+      const [contactsRes, dealsRes, interactionsRes, fieldDefs, importsRes] = await Promise.all([
         supabase
           .from('contacts')
           .select('*, companies(id, name)')
@@ -62,12 +69,18 @@ export default function CrmContacts() {
           .select('*, contacts(id, name)')
           .order('created_at', { ascending: false })
           .limit(200),
+        loadFieldDefs('contact').catch(() => [] as CustomFieldDef[]),
+        Promise.resolve(supabase.from('crm_imports').select('id, source_name, file_name, started_at')).catch(() => ({ data: [] as any[] })),   // the import log may not exist yet
       ]);
 
       if (contactsRes.error) throw contactsRes.error;
       if (dealsRes.error) throw dealsRes.error;
       if (interactionsRes.error) throw interactionsRes.error;
 
+      setDefs(fieldDefs);
+      const labels: Record<string, string> = {};
+      for (const i of (importsRes as any).data || []) labels[i.id] = `${i.source_name || i.file_name || 'Import'} · ${String(i.started_at || '').slice(0, 10)}`;
+      setImportLabels(labels);
       setContacts(contactsRes.data || []);
       setDeals(dealsRes.data || []);
       setInteractions(interactionsRes.data || []);
@@ -111,6 +124,32 @@ export default function CrmContacts() {
   function activeDealCount(contactId: string) {
     return deals.filter((d) => d.contact_id === contactId && d.stage !== 'won' && d.stage !== 'lost').length;
   }
+
+  const columns: UiColumn<any>[] = useMemo(() => {
+    const importedOptions = [...new Set(Object.values(importLabels))];
+    const built: UiColumn<any>[] = [
+      { id: 'name', label: 'Name', kind: 'text', value: (c) => c.name, locked: true, bold: true },
+      { id: 'company', label: 'Company', kind: 'text', value: (c) => c.companies?.name, defaultVisible: true, dim: true },
+      { id: 'last_touch', label: 'Last Touch', kind: 'date', value: (c) => c.last_interaction_at, defaultVisible: true, dim: true, render: (c) => relativeTime(c.last_interaction_at) },
+      {
+        id: 'status', label: 'Status', kind: 'select', value: (c) => c.status || 'cold', options: ['new', 'cold', 'active', 'hot'], defaultVisible: true,
+        render: (c) => {
+          const colors = STATUS_COLORS[c.status || 'cold'] || STATUS_COLORS.cold;
+          return <span style={{ background: colors.bg, color: colors.fg, padding: '0.2rem 0.6rem', borderRadius: '12px', fontSize: '0.6rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{c.status || 'cold'}</span>;
+        },
+      },
+      { id: 'assigned', label: 'Assigned', kind: 'text', value: (c) => (c.assignee_id ? shortName(assigneeLabels[c.assignee_id]) : null), defaultVisible: true, dim: true },
+      { id: 'active_deals', label: 'Active Deals', kind: 'number', value: (c) => activeDealCount(c.id), defaultVisible: true },
+      { id: 'email', label: 'Email', kind: 'text', value: (c) => c.email, dim: true },
+      { id: 'phone', label: 'Phone', kind: 'text', value: (c) => c.phone, dim: true },
+      { id: 'linkedin', label: 'LinkedIn', kind: 'text', value: (c) => c.linkedin_url, dim: true },
+      { id: 'lead_score', label: 'Lead score', kind: 'number', value: (c) => c.lead_score },
+      { id: 'imported', label: 'Imported from', kind: 'select', value: (c) => (c.import_batch_id ? importLabels[c.import_batch_id] || 'an import' : null), options: importedOptions, dim: true },
+      { id: 'created', label: 'Added', kind: 'date', value: (c) => c.created_at, dim: true },
+    ];
+    return [...built, ...customFieldColumns(defs, (c: any) => c.custom_fields, contacts)];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defs, importLabels, contacts, deals, assigneeLabels]);
 
   if (loading) {
     return <div style={{ padding: '2rem', color: 'var(--dim)' }}>Loading contacts…</div>;
@@ -215,76 +254,14 @@ export default function CrmContacts() {
         </div>
       </div>
 
-      <div
-        style={{
-          background: 'var(--surface)',
-          border: '1px solid var(--border)',
-          borderRadius: '6px',
-          overflow: 'hidden',
-        }}
-      >
-        <table
-          style={{
-            width: '100%',
-            borderCollapse: 'collapse',
-            textAlign: 'left',
-            fontFamily: 'var(--mono)',
-            fontSize: '0.75rem',
-          }}
-        >
-          <thead>
-            <tr style={{ background: 'var(--surface2)', color: 'var(--dim)', borderBottom: '1px solid var(--border)' }}>
-              <th style={{ padding: '0.9rem 1rem' }}>Name</th>
-              <th style={{ padding: '0.9rem 1rem' }}>Company</th>
-              <th style={{ padding: '0.9rem 1rem' }}>Last Touch</th>
-              <th style={{ padding: '0.9rem 1rem' }}>Status</th>
-              <th style={{ padding: '0.9rem 1rem' }}>Assigned</th>
-              <th style={{ padding: '0.9rem 1rem' }}>Active Deals</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.length === 0 ? (
-              <tr>
-                <td colSpan={6} style={{ padding: '2rem', textAlign: 'center', color: 'var(--dim)' }}>
-                  {contacts.length === 0 ? 'No contacts yet.' : 'No contacts match your search.'}
-                </td>
-              </tr>
-            ) : (
-              rows.map((c) => {
-                const colors = STATUS_COLORS[c.status || 'cold'] || STATUS_COLORS.cold;
-                return (
-                  <tr
-                    key={c.id}
-                    onClick={() => setActiveContact(c)}
-                    style={{ borderBottom: '1px solid var(--border)', cursor: 'pointer' }}
-                  >
-                    <td style={{ padding: '1rem', fontWeight: 'bold' }}>{c.name}</td>
-                    <td style={{ padding: '1rem', color: 'var(--dim)' }}>{c.companies?.name || '—'}</td>
-                    <td style={{ padding: '1rem', color: 'var(--dim)' }}>{relativeTime(c.last_interaction_at)}</td>
-                    <td style={{ padding: '1rem' }}>
-                      <span
-                        style={{
-                          background: colors.bg,
-                          color: colors.fg,
-                          padding: '0.2rem 0.6rem',
-                          borderRadius: '12px',
-                          fontSize: '0.6rem',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.05em',
-                        }}
-                      >
-                        {c.status || 'cold'}
-                      </span>
-                    </td>
-                    <td style={{ padding: '1rem', color: 'var(--dim)' }}>{c.assignee_id ? shortName(assigneeLabels[c.assignee_id]) : '—'}</td>
-                    <td style={{ padding: '1rem' }}>{activeDealCount(c.id)}</td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
+      <ViewTable
+        columns={columns}
+        rows={rows}
+        storageKey={`contacts:${user?.id || 'anon'}`}
+        rowKey={(c) => c.id}
+        onRowClick={(c) => setActiveContact(c)}
+        emptyText={contacts.length === 0 ? 'No contacts yet.' : 'No contacts match your search.'}
+      />
 
       <NewContactModal open={showNewContact} onClose={() => setShowNewContact(false)} onCreated={fetchAll} />
       <ImportWizardModal open={showImport} onClose={() => setShowImport(false)} onImported={fetchAll} />
