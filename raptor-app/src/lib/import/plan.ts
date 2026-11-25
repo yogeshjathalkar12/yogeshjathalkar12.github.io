@@ -352,7 +352,8 @@ export interface CompanyCreate { id: string; rec: CompanyRec }
 export interface ContactCreate { id: string; companyId: string | null; rec: ContactRec }
 export interface DealCreate { id: string; companyId: string | null; contactId: string | null; rec: DealRec }
 export interface ProspectCreate { id: string; entityName: string; companyId: string | null; rec: CompanyRec; contacts: ContactRec[] }
-export interface UpdatePlan { table: 'companies' | 'contacts'; id: string; name: string; patch: Record<string, string> }   // keys: column or 'cf:<defId>' or 'cfnew:<entity>:<name>'
+export interface UpdateChange { key: string; label: string; before: string | null; after: string; kind: 'fill' | 'overwrite' }
+export interface UpdatePlan { table: 'companies' | 'contacts'; id: string; name: string; patch: Record<string, string>; changes: UpdateChange[] }   // patch keys: column or 'cf:<defId>' or 'cfnew:<entity>:<name>'
 
 export interface Plan {
   companies: { create: CompanyCreate[]; update: UpdatePlan[]; unchanged: number };
@@ -367,17 +368,49 @@ export interface Plan {
 const COMPANY_COLS = ['website_url', 'phone', 'email', 'address', 'city', 'industry', 'description'] as const;
 const isEmptyVal = (v: any) => v === null || v === undefined || v === '' || (typeof v === 'string' && v.trim() === '');
 
-function customPatch(entity: Entity, custom: Record<string, string>, existingCustom: Record<string, any> | null, defs: Map<string, string>, wanted: Set<string>): Record<string, string> {
+const COLUMN_LABEL: Record<string, string> = {
+  website_url: 'Website', phone: 'Phone', email: 'Email', address: 'Address', city: 'City / region', industry: 'Industry', description: 'Description',
+  first_name: 'First name', last_name: 'Last name', linkedin_url: 'LinkedIn', company_id: 'Company',
+};
+
+/** Two values that mean the same thing (so overwriting one with the other would change nothing): phones by digits, websites
+ *  without protocol / www / trailing slash, everything else ignoring case and extra spaces. */
+export function sameValue(key: string, a: any, b: any): boolean {
+  const x = String(a ?? '').trim(), y = String(b ?? '').trim();
+  if (x === y) return true;
+  if (key === 'phone') {
+    // the same number, one written with the country code and one without ("+91 98765 43210" / "098765 43210"): the shorter one's digits end the longer one
+    const dx = x.replace(/\D/g, '').replace(/^0+/, ''), dy = y.replace(/\D/g, '').replace(/^0+/, '');
+    if (dx === '' || dy === '') return false;
+    const [short, long] = dx.length <= dy.length ? [dx, dy] : [dy, dx];
+    return short === long || (short.length >= 7 && long.endsWith(short));
+  }
+  if (key === 'website_url') { const n = (v: string) => v.toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/+$/, ''); return n(x) === n(y); }
+  return x.toLowerCase().replace(/\s+/g, ' ') === y.toLowerCase().replace(/\s+/g, ' ');
+}
+
+/** What an import does to a record that already exists. Fill mode (default): only empty fields. Overwrite mode: also fields that
+ *  hold a different value, but never blank a value out, never rename a record and never move a person to another company. */
+interface Mode { overwrite: boolean }
+function decide(mode: Mode, key: string, label: string, current: any, incoming: string | undefined, changes: UpdateChange[], patch: Record<string, string>) {
+  if (!incoming || isEmptyVal(incoming)) return;
+  if (isEmptyVal(current)) { patch[key] = incoming; changes.push({ key, label, before: null, after: incoming, kind: 'fill' }); return; }
+  if (mode.overwrite && !sameValue(key.startsWith('cf:') ? 'cf' : key, current, incoming)) { patch[key] = incoming; changes.push({ key, label, before: String(current), after: incoming, kind: 'overwrite' }); }
+}
+
+function customPatch(entity: Entity, custom: Record<string, string>, existingCustom: Record<string, any> | null, defs: Map<string, string>, wanted: Set<string>, mode: Mode, changes: UpdateChange[]): Record<string, string> {
   const patch: Record<string, string> = {};
   for (const [name, value] of Object.entries(custom)) {
     const id = defs.get(name.toLowerCase());
-    if (id) { if (isEmptyVal(existingCustom?.[id])) patch[`cf:${id}`] = value; } else { patch[`cfnew:${entity}:${name}`] = value; wanted.add(`${entity}\u0000${name}`); }
+    if (id) decide(mode, `cf:${id}`, name, existingCustom?.[id], value, changes, patch);
+    else { patch[`cfnew:${entity}:${name}`] = value; changes.push({ key: `cfnew:${entity}:${name}`, label: name, before: null, after: value, kind: 'fill' }); wanted.add(`${entity}\u0000${name}`); }
   }
   return patch;
 }
 
-export function planImport(parsed: Parsed, existing: Existing, links: Links = {}, newId: () => string = () => crypto.randomUUID(), opts: { prospects?: boolean } = {}): Plan {
+export function planImport(parsed: Parsed, existing: Existing, links: Links = {}, newId: () => string = () => crypto.randomUUID(), opts: { prospects?: boolean; overwrite?: boolean } = {}): Plan {
   const wanted = new Set<string>();
+  const mode: Mode = { overwrite: !!opts.overwrite };
   const exByKey = new Map<string, Existing['companies'][number]>();
   for (const c of [...existing.companies].sort((a, b) => String(a.created_at || '').localeCompare(String(b.created_at || '')))) {
     const k = normalizeCompanyName(c.name);
@@ -400,9 +433,10 @@ export function planImport(parsed: Parsed, existing: Existing, links: Links = {}
     if (match) {
       companyId.set(c.key, match.id);
       const patch: Record<string, string> = {};
-      for (const col of COMPANY_COLS) { const v = c[col]; if (v && isEmptyVal((match as any)[col])) patch[col] = v; }
-      Object.assign(patch, customPatch('company', c.custom, match.custom_fields, existing.defs.company, wanted));
-      if (Object.keys(patch).length) plan.companies.update.push({ table: 'companies', id: match.id, name: match.name, patch }); else plan.companies.unchanged++;
+      const changes: UpdateChange[] = [];
+      for (const col of COMPANY_COLS) decide(mode, col, COLUMN_LABEL[col], (match as any)[col], c[col], changes, patch);
+      Object.assign(patch, customPatch('company', c.custom, match.custom_fields, existing.defs.company, wanted, mode, changes));
+      if (Object.keys(patch).length) plan.companies.update.push({ table: 'companies', id: match.id, name: match.name, patch, changes }); else plan.companies.unchanged++;
     } else {
       const id = newId();
       companyId.set(c.key, id);
@@ -425,14 +459,15 @@ export function planImport(parsed: Parsed, existing: Existing, links: Links = {}
     if (match) {
       contactId.set(c.key, match.id);
       const patch: Record<string, string> = {};
-      if (c.first_name && isEmptyVal(match.first_name)) patch.first_name = c.first_name;
-      if (c.last_name && isEmptyVal(match.last_name)) patch.last_name = c.last_name;
-      if (c.email && isEmptyVal(match.email)) patch.email = c.email;
-      if (c.phone && isEmptyVal(match.phone)) patch.phone = c.phone;
-      if (c.linkedin_url && isEmptyVal(match.linkedin_url)) patch.linkedin_url = c.linkedin_url;
-      if (cid && isEmptyVal(match.company_id)) patch.company_id = cid;   // an existing or a just-created company
-      Object.assign(patch, customPatch('contact', c.custom, match.custom_fields, existing.defs.contact, wanted));
-      if (Object.keys(patch).length) plan.contacts.update.push({ table: 'contacts', id: match.id, name: match.name, patch }); else plan.contacts.unchanged++;
+      const changes: UpdateChange[] = [];
+      decide(mode, 'first_name', COLUMN_LABEL.first_name, match.first_name, c.first_name, changes, patch);
+      decide(mode, 'last_name', COLUMN_LABEL.last_name, match.last_name, c.last_name, changes, patch);
+      decide(mode, 'email', COLUMN_LABEL.email, match.email, c.email, changes, patch);
+      decide(mode, 'phone', COLUMN_LABEL.phone, match.phone, c.phone, changes, patch);
+      decide(mode, 'linkedin_url', COLUMN_LABEL.linkedin_url, match.linkedin_url, c.linkedin_url, changes, patch);
+      if (cid && isEmptyVal(match.company_id)) { patch.company_id = cid; changes.push({ key: 'company_id', label: 'Company', before: null, after: c.companyKey ? (parsed.companies.get(c.companyKey)?.name || 'a company') : 'a company', kind: 'fill' }); }   // an existing or a just-created company; never moved to another one, even in overwrite mode
+      Object.assign(patch, customPatch('contact', c.custom, match.custom_fields, existing.defs.contact, wanted, mode, changes));
+      if (Object.keys(patch).length) plan.contacts.update.push({ table: 'contacts', id: match.id, name: match.name, patch, changes }); else plan.contacts.unchanged++;
     } else {
       const id = newId();
       contactId.set(c.key, id);

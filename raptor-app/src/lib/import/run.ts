@@ -31,6 +31,8 @@ export interface RunOptions {
   fileName: string;
   /** who the new contacts and deals belong to (a team member's user id); unset = the database's own default */
   assigneeId?: string | null;
+  /** true: existing records also get their DIFFERENT values replaced (never blanked); false (default): only empty fields are filled */
+  overwrite?: boolean;
   onProgress?: (p: RunProgress) => void;
   shouldStop?: () => boolean;
   chunkSize?: number;
@@ -186,7 +188,7 @@ export async function runImport(plan: Plan, existing: Existing, opts: RunOptions
             else patch[k] = v;
           }
           if (Object.keys(patch).length) {
-            const { data, error } = await client.rpc('crm_import_apply_update', { p_batch: batchId, p_table: u.table, p_id: u.id, p_patch: patch, p_only_empty: true });
+            const { data, error } = await client.rpc('crm_import_apply_update', { p_batch: batchId, p_table: u.table, p_id: u.id, p_patch: patch, p_only_empty: !opts.overwrite });
             if (error) failed.push({ table: u.table, name: u.name, message: msg(error) });
             else {
               const n = Array.isArray(data?.applied) ? data.applied.length : 0;

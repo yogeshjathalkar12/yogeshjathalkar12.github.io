@@ -98,13 +98,15 @@ export default function ImportWizardModal({ open, onClose, onImported, client, l
   const [sourceTag, setSourceTag] = useState('');
   const [ownerId, setOwnerId] = useState('');
   const [country, setCountry] = useState('');
+  const [overwrite, setOverwrite] = useState(false);
+  const [showChanges, setShowChanges] = useState(false);
   const { entries: directory } = useDirectory();
   const [showLeftOut, setShowLeftOut] = useState(false);
   const stopRef = useRef(false);
 
   function reset() {
     setStep('file'); setTabs([]); setActiveTab(''); setError(null); setReading(false); setEmptyWords(''); setDateOrder(''); setStageMap({});
-    setExisting(null); setDecisions({}); setProgress(null); setResult(null); setUndoing(false); setUndoNote(null); setUndone(false); setShowLeftOut(false); setSourceTag(''); setOwnerId(''); setCountry(''); stopRef.current = false;
+    setExisting(null); setDecisions({}); setProgress(null); setResult(null); setUndoing(false); setUndoNote(null); setUndone(false); setShowLeftOut(false); setSourceTag(''); setOwnerId(''); setCountry(''); setOverwrite(false); setShowChanges(false); stopRef.current = false;
   }
   useEffect(() => { if (!open) reset(); }, [open]);
 
@@ -222,7 +224,21 @@ export default function ImportWizardModal({ open, onClose, onImported, client, l
     for (const s of suggestions) if (decisions[s.id] === 'same') l[s.file.key] = s.other.kind === 'existing' ? { existingId: s.other.id } : { intoKey: s.other.key };
     return l;
   }, [suggestions, decisions]);
-  const plan = useMemo(() => (parsed && existing ? planImport(Object.keys(links).length ? applyFileLinks(parsed, links) : parsed, existing, links, undefined, { prospects: alsoProspects }) : null), [parsed, existing, links, alsoProspects]);
+  const planFill = useMemo(() => (parsed && existing ? planImport(Object.keys(links).length ? applyFileLinks(parsed, links) : parsed, existing, links, undefined, { prospects: alsoProspects }) : null), [parsed, existing, links, alsoProspects]);
+  const hasExisting = !!planFill && planFill.companies.update.length + planFill.companies.unchanged + planFill.contacts.update.length + planFill.contacts.unchanged > 0;
+  const planOver = useMemo(() => (hasExisting && parsed && existing ? planImport(Object.keys(links).length ? applyFileLinks(parsed, links) : parsed, existing, links, undefined, { prospects: alsoProspects, overwrite: true }) : null), [hasExisting, parsed, existing, links, alsoProspects]);
+  const plan = overwrite && planOver ? planOver : planFill;
+  /** every value an import would change on an existing record, with the record's name, for the preview and the list to download */
+  const changeRows = useMemo(() => (plan ? [...plan.companies.update.map((u) => ({ ...u, what: 'company' })), ...plan.contacts.update.map((u) => ({ ...u, what: 'person' }))].flatMap((u) => u.changes.map((c) => ({ name: u.name, what: u.what, ...c }))) : []), [plan]);
+  const overCounts = useMemo(() => {
+    const rows = planOver ? [...planOver.companies.update, ...planOver.contacts.update] : [];
+    const all = rows.flatMap((u) => u.changes);
+    return { records: rows.length, replaced: all.filter((c) => c.kind === 'overwrite').length, filled: all.filter((c) => c.kind === 'fill').length };
+  }, [planOver]);
+  const fillCounts = useMemo(() => {
+    const rows = planFill ? [...planFill.companies.update, ...planFill.contacts.update] : [];
+    return { records: rows.length, filled: rows.flatMap((u) => u.changes).length };
+  }, [planFill]);
 
   const total = plan ? plan.companies.create.length + plan.contacts.create.length + plan.deals.create.length + plan.prospects.create.length + plan.companies.update.length + plan.contacts.update.length : 0;
 
@@ -231,7 +247,7 @@ export default function ImportWizardModal({ open, onClose, onImported, client, l
     setStep('running'); setError(null); stopRef.current = false; setProgress({ phase: 'Starting', done: 0, total: 1 });
     try {
       const names = [...new Set(selected.map((t) => t.fileName))];
-      const res = await runImport(plan, existing, { source: (sourceTag.trim() || names.join(', ')).slice(0, 180), fileName: names.join(', ').slice(0, 280), assigneeId: ownerId || null, onProgress: setProgress, shouldStop: () => stopRef.current }, client);
+      const res = await runImport(plan, existing, { source: (sourceTag.trim() || names.join(', ')).slice(0, 180), fileName: names.join(', ').slice(0, 280), assigneeId: ownerId || null, overwrite, onProgress: setProgress, shouldStop: () => stopRef.current }, client);
       setResult(res); setStep('done'); onImported();
       if (res.created.companies + res.created.contacts + res.created.deals + res.updated.companies + res.updated.contacts > 0) {
         let list = loadAll(storage);
@@ -241,6 +257,11 @@ export default function ImportWizardModal({ open, onClose, onImported, client, l
     } catch (e: any) {
       setError(String(e?.message || e)); setStep('check');
     }
+  }
+
+  function downloadChanges() {
+    const lines = ['record,kind,field,current value,value from the file,what happens', ...changeRows.map((c) => [c.name, c.what, c.label, c.before ?? '', c.after, c.kind === 'overwrite' ? 'replaced' : 'filled'].map(csvCell).join(','))];
+    downloadText('import-changes-to-existing-records.csv', lines.join(String.fromCharCode(10)));
   }
 
   function downloadAttention() {
@@ -433,8 +454,39 @@ export default function ImportWizardModal({ open, onClose, onImported, client, l
           <div style={{ ...small, marginBottom: '1rem' }}>
             {plan.counts.rowsUsed} of {plan.counts.rowsRead} rows used.
             {plan.counts.mergedInFile > 0 && <> {plan.counts.mergedInFile} repeated rows (the same company or person again) were combined into one; the first value wins and every extra email or phone is kept.</>}
-            {' '}Existing records are never overwritten: only empty fields are filled.
+            {' '}{overwrite ? 'Existing records get the file’s different values (never blanked, never renamed); the list below shows each one.' : 'Existing records are never overwritten: only empty fields are filled.'}
           </div>
+
+          {hasExisting && (
+            <div style={{ border: '1px solid var(--border)', borderRadius: 4, padding: '0.7rem 0.9rem', marginBottom: '1rem' }}>
+              <label style={fieldLabelStyle}>Companies and people that are already in your CRM</label>
+              <label style={{ ...small, display: 'flex', gap: '0.6rem', alignItems: 'flex-start', cursor: 'pointer', marginBottom: '0.4rem' }}>
+                <input type="radio" name="update-mode" checked={!overwrite} onChange={() => setOverwrite(false)} style={{ marginTop: 3 }} />
+                <span><strong style={{ color: 'var(--white)' }}>Fill empty fields only.</strong> Keep everything that is already there. {fillCounts.filled} value{fillCounts.filled === 1 ? '' : 's'} would be filled on {fillCounts.records} record{fillCounts.records === 1 ? '' : 's'}.</span>
+              </label>
+              <label style={{ ...small, display: 'flex', gap: '0.6rem', alignItems: 'flex-start', cursor: 'pointer' }}>
+                <input type="radio" name="update-mode" checked={overwrite} onChange={() => setOverwrite(true)} style={{ marginTop: 3 }} />
+                <span><strong style={{ color: 'var(--white)' }}>Overwrite with this file.</strong> Replace a value that is different with the file&apos;s value: {overCounts.replaced} value{overCounts.replaced === 1 ? '' : 's'} replaced and {overCounts.filled} filled on {overCounts.records} record{overCounts.records === 1 ? '' : 's'}. An empty cell in your file never erases anything, names are never changed and a person is never moved to another company. Undo puts the old values back (unless someone changed them since).</span>
+              </label>
+              {overwrite && changeRows.length > 0 && (
+                <div style={{ marginTop: 8 }}>
+                  <button type="button" onClick={() => setShowChanges((v) => !v)} style={{ ...ghostBtnStyle, flex: 'none', padding: '0.45rem 0.8rem' }}>Preview of the changes {showChanges ? '▲' : '▼'}</button>{' '}
+                  <button type="button" onClick={downloadChanges} style={{ ...ghostBtnStyle, flex: 'none', padding: '0.45rem 0.8rem' }}>Download full list</button>
+                  {showChanges && (
+                    <div style={{ maxHeight: 220, overflowY: 'auto', border: '1px solid var(--border)', borderRadius: 4, marginTop: 8 }}>
+                      {changeRows.filter((c) => c.kind === 'overwrite').slice(0, 100).map((c, i) => (
+                        <div key={i} style={{ padding: '0.45rem 0.8rem', borderBottom: '1px solid var(--border)', fontSize: '0.6rem' }}>
+                          <strong>{c.name}</strong> · {c.label}: <span style={{ color: 'var(--red)' }}>{c.before}</span> → <span style={{ color: 'var(--white)' }}>{c.after}</span>
+                        </div>
+                      ))}
+                      {overCounts.replaced === 0 && <div style={{ padding: '0.6rem 0.8rem', ...small }}>No existing value would be replaced: the file only adds what was empty.</div>}
+                      {overCounts.replaced > 100 && <div style={{ padding: '0.6rem 0.8rem', ...small }}>…and {overCounts.replaced - 100} more replaced values. The downloaded list has all of them.</div>}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           <div style={{ border: '1px solid var(--border)', borderRadius: 4, padding: '0.7rem 0.9rem', marginBottom: '1rem' }}>
             <label style={fieldLabelStyle}>Source tag (how this import is listed in Import history and in the “Imported from” column)</label>
@@ -540,7 +592,7 @@ export default function ImportWizardModal({ open, onClose, onImported, client, l
             <>
               <div style={{ fontSize: '0.8rem', color: result.failed.length ? 'var(--white)' : 'var(--green)', marginBottom: '0.8rem' }}>
                 {result.stopped ? 'Stopped. ' : ''}Added {result.created.companies} companies, {result.created.contacts} contacts, {result.created.deals} deals{result.created.prospects ? ` and ${result.created.prospects} prospects` : ''}.
-                {(result.updated.companies + result.updated.contacts) > 0 && <> Filled {result.fieldsFilled} empty fields on {result.updated.companies + result.updated.contacts} existing records.</>}
+                {(result.updated.companies + result.updated.contacts) > 0 && <> {overwrite ? 'Changed' : 'Filled'} {result.fieldsFilled} {overwrite ? 'values' : 'empty fields'} on {result.updated.companies + result.updated.contacts} existing records.</>}
               </div>
               {undoNote && <div style={{ ...small, color: 'var(--green)', marginBottom: '0.8rem' }}>{undoNote}</div>}
               {result.failed.length > 0 && (
