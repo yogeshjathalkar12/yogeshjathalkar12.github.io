@@ -16,6 +16,8 @@ import type { DateOrder } from '../../lib/import/values';
 import { loadExisting, runImport } from '../../lib/import/run';
 import { applySaved, buildSaved, findSaved, forgetAll, loadAll, saveAll, upsert } from '../../lib/import/savedMappings';
 import type { KeyValueStore } from '../../lib/import/savedMappings';
+import { forgetShared, loadShared, mergeMappings, saveShared } from '../../lib/import/sharedMappings';
+import { useOrg } from '../../hooks/OrgContext';
 import type { DbClient, RunProgress, RunResult } from '../../lib/import/run';
 
 // The import wizard: file -> what is in it -> check -> import -> done (with Undo).
@@ -101,12 +103,15 @@ export default function ImportWizardModal({ open, onClose, onImported, client, l
   const [overwrite, setOverwrite] = useState(false);
   const [showChanges, setShowChanges] = useState(false);
   const { entries: directory } = useDirectory();
+  const { isOwner, isAdmin } = useOrg();
+  const [teamSaved, setTeamSaved] = useState<boolean | null>(null);
+  const [teamNote, setTeamNote] = useState<string | null>(null);
   const [showLeftOut, setShowLeftOut] = useState(false);
   const stopRef = useRef(false);
 
   function reset() {
     setStep('file'); setTabs([]); setActiveTab(''); setError(null); setReading(false); setEmptyWords(''); setDateOrder(''); setStageMap({});
-    setExisting(null); setDecisions({}); setProgress(null); setResult(null); setUndoing(false); setUndoNote(null); setUndone(false); setShowLeftOut(false); setSourceTag(''); setOwnerId(''); setCountry(''); setOverwrite(false); setShowChanges(false); stopRef.current = false;
+    setExisting(null); setDecisions({}); setProgress(null); setResult(null); setUndoing(false); setUndoNote(null); setUndone(false); setShowLeftOut(false); setSourceTag(''); setOwnerId(''); setCountry(''); setOverwrite(false); setShowChanges(false); setTeamSaved(null); setTeamNote(null); stopRef.current = false;
   }
   useEffect(() => { if (!open) reset(); }, [open]);
 
@@ -124,6 +129,7 @@ export default function ImportWizardModal({ open, onClose, onImported, client, l
     setReading(true); setError(null);
     try {
       const next: Tab[] = [];
+      const known = mergeMappings(loadAll(storage), await loadShared(client));      // this browser's mappings and the team's, the newer one for the same columns
       for (const f of files) {
         const sheets = await readWorkbookFile(f);
         sheets.forEach((s, i) => {
@@ -131,12 +137,12 @@ export default function ImportWizardModal({ open, onClose, onImported, client, l
           const { suggestions, rowKind } = suggestSetup(table);
           const guessedChoices: ColumnChoice[] = suggestions.map((x) => ({ field: x.guess.field, customName: x.header, customType: x.fieldType.type, customOptions: x.fieldType.options }));
           let choices = guessedChoices, kind = rowKind, savedNote: string | null = null;
-          const found = table.verdict === 'list' ? findSaved(loadAll(storage), table.columns.map((c) => c.header)) : null;
+          const found = table.verdict === 'list' ? findSaved(known, table.columns.map((c) => c.header)) : null;
           if (found) {
             const saved = applySaved(found, table.columns.map((c) => c.header));
             choices = guessedChoices.map((g, k) => saved[k] ?? g);
             kind = found.mapping.rowKind;
-            savedNote = `${found.exact ? 'The same columns' : `${found.matched} of ${found.total} columns`} as a file you imported on ${new Date(found.mapping.savedAt).toLocaleDateString()}: that mapping is used. Change anything you like.`;
+            savedNote = `${found.exact ? 'The same columns' : `${found.matched} of ${found.total} columns`} as a file ${found.mapping.shared ? 'your team' : 'you'} imported on ${new Date(found.mapping.savedAt).toLocaleDateString()}: that mapping is used. Change anything you like.`;
             setStageMap((m) => ({ ...found.mapping.stageMap, ...m }));
             setEmptyWords((w) => w || found.mapping.emptyWords || '');
           }
@@ -251,8 +257,10 @@ export default function ImportWizardModal({ open, onClose, onImported, client, l
       setResult(res); setStep('done'); onImported();
       if (res.created.companies + res.created.contacts + res.created.deals + res.updated.companies + res.updated.contacts > 0) {
         let list = loadAll(storage);
-        for (const t of selected) list = upsert(list, buildSaved(t.table.columns.map((c) => c.header), t.choices, t.rowKind, stageMap, emptyWords, new Date().toISOString()));
+        const made = selected.map((t) => buildSaved(t.table.columns.map((c) => c.header), t.choices, t.rowKind, stageMap, emptyWords, new Date().toISOString()));
+        for (const m of made) list = upsert(list, m);
         saveAll(storage, list);                                   // so the next file with these columns maps itself
+        Promise.all(made.map((m) => saveShared(m, client))).then((r) => setTeamSaved(r.length > 0 && r.every(Boolean)));   // and for the whole team, when the database part is installed
       }
     } catch (e: any) {
       setError(String(e?.message || e)); setStep('check');
@@ -297,6 +305,13 @@ export default function ImportWizardModal({ open, onClose, onImported, client, l
                   </span>
                 </label>
               ))}
+            </div>
+          )}
+          {(isOwner || isAdmin) && (
+            <div style={{ ...small, marginBottom: '1rem' }}>
+              Mappings are shared with your team.{' '}
+              <button type="button" onClick={async () => { if (!window.confirm('Make everyone in your team forget all saved import mappings? Files will then be matched by guessing until they are imported again.')) return; const n = await forgetShared(client); setTeamNote(n === null ? 'The team’s mappings could not be cleared (shared mappings may not be set up yet).' : `${n} shared mapping${n === 1 ? '' : 's'} removed.`); }} style={{ background: 'none', border: 'none', color: 'var(--dim)', textDecoration: 'underline', cursor: 'pointer', padding: 0, font: 'inherit' }}>Make the team forget them</button>
+              {teamNote && <span> {teamNote}</span>}
             </div>
           )}
           {loadAll(storage).length > 0 && (
@@ -595,6 +610,7 @@ export default function ImportWizardModal({ open, onClose, onImported, client, l
                 {(result.updated.companies + result.updated.contacts) > 0 && <> {overwrite ? 'Changed' : 'Filled'} {result.fieldsFilled} {overwrite ? 'values' : 'empty fields'} on {result.updated.companies + result.updated.contacts} existing records.</>}
               </div>
               {undoNote && <div style={{ ...small, color: 'var(--green)', marginBottom: '0.8rem' }}>{undoNote}</div>}
+              {teamSaved === true && <div style={{ ...small, marginBottom: '0.8rem' }}>The way you matched the columns is saved for your team: a teammate importing a file with the same columns starts from it.</div>}
               {result.failed.length > 0 && (
                 <div style={{ marginBottom: '1rem' }}>
                   <div style={{ fontSize: '0.65rem', color: 'var(--red)', marginBottom: 6 }}>{result.failed.length} problem{result.failed.length === 1 ? '' : 's'}:</div>

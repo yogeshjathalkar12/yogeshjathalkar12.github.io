@@ -21,6 +21,8 @@ export interface SavedMapping {
   emptyWords: string;
   savedAt: string;
   uses: number;
+  /** read from the team's copy in the cloud (never stored in this browser as such) */
+  shared?: boolean;
 }
 
 export const STORAGE_KEY = 'raptor_import_mappings_v1';
