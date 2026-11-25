@@ -4,6 +4,9 @@ import { supabase } from '../../lib/supabaseClient';
 import { formatCurrency } from '../../lib/crmHelpers';
 import Modal, { fieldLabelStyle, fieldInputStyle, primaryBtnStyle, ghostBtnStyle } from '../../components/crm/Modal';
 import DuplicatesModal from '../../components/crm/DuplicatesModal';
+import CustomFieldsSection, { CustomFieldsInputs } from '../../components/crm/CustomFieldsSection';
+import { COMPANY_FIELDS, blankCompanyForm, cleanCustomValues, companyToForm, filledCompanyDetails, formToCompany } from '../../lib/companyFields';
+import type { CompanyForm } from '../../lib/companyFields';
 import ImportWizardModal from '../../components/crm/ImportWizardModal';
 import ImportHistoryModal from '../../components/crm/ImportHistoryModal';
 import OwnerOnly from '../../components/OwnerOnly';
@@ -172,22 +175,42 @@ export default function CrmCompanies() {
   );
 }
 
+function CompanyFormBoxes({ form, onChange }: { form: CompanyForm; onChange: (next: CompanyForm) => void }) {
+  return (
+    <>
+      <label style={fieldLabelStyle}>Name</label>
+      <input style={fieldInputStyle} value={form.name} onChange={(e) => onChange({ ...form, name: e.target.value })} required placeholder="e.g. Acme Corp" />
+      <label style={fieldLabelStyle}>Website (optional)</label>
+      <input style={fieldInputStyle} value={form.website_url} onChange={(e) => onChange({ ...form, website_url: e.target.value })} placeholder="https://theircompany.com" />
+      {COMPANY_FIELDS.map((f) => (
+        <div key={f.key}>
+          <label style={fieldLabelStyle}>{f.label} (optional)</label>
+          {f.multiline
+            ? <textarea style={{ ...fieldInputStyle, minHeight: 60, resize: 'vertical' }} value={form[f.key]} onChange={(e) => onChange({ ...form, [f.key]: e.target.value })} placeholder={f.placeholder} />
+            : <input style={fieldInputStyle} value={form[f.key]} onChange={(e) => onChange({ ...form, [f.key]: e.target.value })} placeholder={f.placeholder} />}
+        </div>
+      ))}
+    </>
+  );
+}
+
 function NewCompanyModal({ open, onClose, onCreated }: { open: boolean; onClose: () => void; onCreated: () => void }) {
-  const [name, setName] = useState('');
-  const [websiteUrl, setWebsiteUrl] = useState('');
+  const [form, setForm] = useState<CompanyForm>(blankCompanyForm());
+  const [custom, setCustom] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => { if (open) { setName(''); setWebsiteUrl(''); setError(null); } }, [open]);
+  useEffect(() => { if (open) { setForm(blankCompanyForm()); setCustom({}); setError(null); } }, [open]);
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
-    const trimmed = name.trim();
-    if (!trimmed) { setError('Name is required.'); return; }
     setSaving(true);
     setError(null);
     try {
-      const { error: insertErr } = await supabase.from('companies').insert({ name: trimmed, website_url: websiteUrl.trim() || null });
+      const row: Record<string, any> = formToCompany(form);
+      const values = cleanCustomValues(custom);
+      if (Object.keys(values).length) row.custom_fields = values;
+      const { error: insertErr } = await supabase.from('companies').insert(row);
       if (insertErr) throw insertErr;
       onCreated();
       onClose();
@@ -201,10 +224,8 @@ function NewCompanyModal({ open, onClose, onCreated }: { open: boolean; onClose:
   return (
     <Modal open={open} onClose={onClose} title="New Company">
       <form onSubmit={handleCreate}>
-        <label style={fieldLabelStyle}>Name</label>
-        <input style={fieldInputStyle} value={name} onChange={(e) => setName(e.target.value)} required placeholder="e.g. Acme Corp" />
-        <label style={fieldLabelStyle}>Website (optional)</label>
-        <input style={fieldInputStyle} value={websiteUrl} onChange={(e) => setWebsiteUrl(e.target.value)} placeholder="https://theircompany.com" />
+        <CompanyFormBoxes form={form} onChange={setForm} />
+        <CustomFieldsInputs entityType="company" values={custom} onChange={(id, v) => setCustom((c) => ({ ...c, [id]: v }))} />
         {error && <div style={{ color: 'var(--red)', fontSize: '0.65rem', marginBottom: '1rem' }}>{error}</div>}
         <div style={{ display: 'flex', gap: '0.7rem' }}>
           <button type="button" style={ghostBtnStyle} onClick={onClose} disabled={saving}>Cancel</button>
@@ -217,27 +238,24 @@ function NewCompanyModal({ open, onClose, onCreated }: { open: boolean; onClose:
 
 function CompanyDetailModal({ company, contacts, deals, onClose, onChanged }: { company: any | null; contacts: any[]; deals: any[]; onClose: () => void; onChanged: () => void }) {
   const [editing, setEditing] = useState(false);
-  const [editName, setEditName] = useState('');
-  const [editWebsite, setEditWebsite] = useState('');
+  const [editForm, setEditForm] = useState<CompanyForm>(blankCompanyForm());
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setEditing(false);
     setError(null);
-    if (company) { setEditName(company.name || ''); setEditWebsite(company.website_url || ''); }
+    setEditForm(companyToForm(company));
   }, [company?.id]);
 
   if (!company) return null;
 
   async function handleSaveEdit(e: React.FormEvent) {
     e.preventDefault();
-    const trimmed = editName.trim();
-    if (!trimmed) { setError('Name is required.'); return; }
     setSaving(true);
     setError(null);
     try {
-      const { error: updateErr } = await supabase.from('companies').update({ name: trimmed, website_url: editWebsite.trim() || null }).eq('id', company.id);
+      const { error: updateErr } = await supabase.from('companies').update(formToCompany(editForm)).eq('id', company.id);
       if (updateErr) throw updateErr;
       onChanged();
       setEditing(false);
@@ -272,10 +290,7 @@ function CompanyDetailModal({ company, contacts, deals, onClose, onChanged }: { 
     <Modal open={!!company} onClose={onClose} title={editing ? 'Edit Company' : company.name}>
       {editing ? (
         <form onSubmit={handleSaveEdit}>
-          <label style={fieldLabelStyle}>Name</label>
-          <input style={fieldInputStyle} value={editName} onChange={(e) => setEditName(e.target.value)} required />
-          <label style={fieldLabelStyle}>Website</label>
-          <input style={fieldInputStyle} value={editWebsite} onChange={(e) => setEditWebsite(e.target.value)} placeholder="https://theircompany.com" />
+          <CompanyFormBoxes form={editForm} onChange={setEditForm} />
           {error && <div style={{ color: 'var(--red)', fontSize: '0.65rem', marginBottom: '1rem' }}>{error}</div>}
           <div style={{ display: 'flex', gap: '0.7rem' }}>
             <button type="button" style={ghostBtnStyle} onClick={() => setEditing(false)} disabled={saving}>Cancel</button>
@@ -287,6 +302,15 @@ function CompanyDetailModal({ company, contacts, deals, onClose, onChanged }: { 
           <div style={{ fontSize: '0.65rem', color: 'var(--dim)', marginBottom: '1.2rem' }}>
             {company.website_url || '— no website on file'} · added {new Date(company.created_at).toLocaleDateString()}
           </div>
+
+          {filledCompanyDetails(company).map((d) => (
+            <div key={d.key} style={{ display: 'flex', gap: '1rem', fontSize: '0.7rem', padding: '0.4rem 0', borderBottom: '1px solid var(--border)', alignItems: 'flex-start' }}>
+              <span style={{ flex: '0 0 110px', color: 'var(--dim)' }}>{d.label}</span>
+              <span style={{ flex: 1, whiteSpace: d.multiline ? 'pre-wrap' : 'normal', wordBreak: 'break-word' }}>{d.value}</span>
+            </div>
+          ))}
+
+          <CustomFieldsSection entityType="company" entity={company} onChanged={onChanged} />
 
           <div style={{ fontSize: '0.55rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--dim)', margin: '1rem 0 0.5rem' }}>Contacts ({contacts.length})</div>
           {contacts.length === 0 ? (
@@ -304,12 +328,12 @@ function CompanyDetailModal({ company, contacts, deals, onClose, onChanged }: { 
             </div>
           ))}
 
-          <RecordHistory table="companies" recordId={company.id} refreshKey={[company.name, company.website_url].join('|')} />
+          <RecordHistory table="companies" recordId={company.id} refreshKey={[company.name, company.website_url, company.phone, company.email, company.address, company.city, company.industry, company.description].join('|')} />
 
           {error && <div style={{ color: 'var(--red)', fontSize: '0.65rem', margin: '1rem 0' }}>{error}</div>}
 
           <div style={{ display: 'flex', gap: '0.7rem', marginTop: '1.2rem' }}>
-            <OwnerOnly permission="edit"><button type="button" style={ghostBtnStyle} onClick={() => setEditing(true)}>Edit</button></OwnerOnly>
+            <OwnerOnly permission="edit"><button type="button" style={ghostBtnStyle} onClick={() => { setEditForm(companyToForm(company)); setEditing(true); }}>Edit</button></OwnerOnly>
             <OwnerOnly permission="delete"><button type="button" style={{ ...ghostBtnStyle, color: 'var(--red)', borderColor: 'rgba(239,68,68,0.3)' }} onClick={handleDelete} disabled={saving}>Delete</button></OwnerOnly>
           </div>
         </>

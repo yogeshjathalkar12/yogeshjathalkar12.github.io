@@ -8,7 +8,7 @@ import { supabase } from './supabaseClient';
 // renaming a field never orphans already-saved values - same key-vs-label
 // split as pipelineStages.ts's stage.key vs stage.label.
 export type CustomFieldType = 'text' | 'number' | 'date' | 'select';
-export type CustomFieldEntity = 'contact' | 'deal';
+export type CustomFieldEntity = 'contact' | 'deal' | 'company';
 
 export interface CustomFieldDef {
   id: string;

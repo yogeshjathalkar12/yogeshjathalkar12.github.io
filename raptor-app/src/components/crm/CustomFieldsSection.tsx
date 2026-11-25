@@ -4,7 +4,62 @@ import { fieldLabelStyle, fieldInputStyle, ghostBtnStyle } from './Modal';
 import { type CustomFieldDef, type CustomFieldEntity, type CustomFieldType, loadFieldDefs, createFieldDef, deleteFieldDef } from '../../lib/customFields';
 import { useOrg } from '../../hooks/OrgContext';
 
-const TABLE_BY_ENTITY: Record<CustomFieldEntity, string> = { contact: 'contacts', deal: 'deals' };
+const TABLE_BY_ENTITY: Record<CustomFieldEntity, string> = { contact: 'contacts', deal: 'deals', company: 'companies' };
+
+// One box for one custom field. It keeps what is being typed in the box and saves only when the person leaves the box (or presses Enter, or picks from a
+// dropdown), instead of saving on every key press: before, each letter was a database write and the box was locked while it saved, which made typing
+// a sentence into a text field jerky. `live` (the New forms) reports every change instead, because nothing is saved until the form's own Save.
+export function FieldInput({ def, value, disabled, onCommit, live = false }: {
+  def: CustomFieldDef; value: unknown; disabled?: boolean; onCommit: (v: string) => void; live?: boolean;
+}) {
+  const stored = value === null || value === undefined ? '' : String(value);
+  const [draft, setDraft] = useState(stored);
+  useEffect(() => { setDraft(stored); }, [stored]);
+  const style = { ...fieldInputStyle, marginBottom: 0, flex: 1 } as const;
+
+  if (def.field_type === 'select' && def.options && def.options.length) {
+    const options = draft && !def.options.includes(draft) ? [draft, ...def.options] : def.options;     // a value typed or imported earlier is still shown
+    return (
+      <select style={style} value={draft} disabled={disabled} onChange={(e) => { setDraft(e.target.value); onCommit(e.target.value); }}>
+        <option value="">—</option>
+        {options.map((o) => <option key={o} value={o}>{o}</option>)}
+      </select>
+    );
+  }
+  return (
+    <input
+      type={def.field_type === 'date' ? 'date' : def.field_type === 'number' ? 'number' : 'text'}
+      style={style}
+      value={draft}
+      disabled={disabled}
+      onChange={(e) => { setDraft(e.target.value); if (live) onCommit(e.target.value); }}
+      onBlur={() => { if (!live && draft !== stored) onCommit(draft); }}
+      onKeyDown={(e) => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur(); }}
+    />
+  );
+}
+
+// The boxes of a New form: this account's custom fields for one kind of record, filled in before the record exists. Nothing is saved here; the form
+// that contains it stores the values together with the record.
+export function CustomFieldsInputs({ entityType, values, onChange }: { entityType: CustomFieldEntity; values: Record<string, string>; onChange: (id: string, value: string) => void }) {
+  const [defs, setDefs] = useState<CustomFieldDef[]>([]);
+  const { can } = useOrg();
+  useEffect(() => {
+    loadFieldDefs(entityType).then(setDefs).catch((e) => console.error('Failed to load custom fields:', e));
+  }, [entityType]);
+  if (defs.length === 0 || !can('create')) return null;
+  return (
+    <div style={{ marginBottom: '0.6rem' }}>
+      <label style={fieldLabelStyle}>Custom fields</label>
+      {defs.map((def) => (
+        <div key={def.id} style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.6rem' }}>
+          <span style={{ fontSize: '0.65rem', color: 'var(--dim)', flex: '0 0 110px' }}>{def.name}</span>
+          <FieldInput def={def} value={values[def.id]} live onCommit={(v) => onChange(def.id, v)} />
+        </div>
+      ))}
+    </div>
+  );
+}
 
 interface CustomFieldsSectionProps {
   entityType: CustomFieldEntity;
@@ -12,7 +67,7 @@ interface CustomFieldsSectionProps {
   onChanged: () => void;
 }
 
-// Renders this account's custom fields for one contact/deal, bound
+// Renders this account's custom fields for one contact/deal/company, bound
 // directly to its `custom_fields` jsonb column. A "Manage" toggle reveals
 // add/delete-field controls - same role as the desktop app's
 // CustomFieldsSection.js, kept in sync by hand across the two codebases.
@@ -65,7 +120,7 @@ export default function CustomFieldsSection({ entityType, entity, onChanged }: C
   };
 
   const handleDeleteField = async (def: CustomFieldDef) => {
-    if (!confirm(`Delete the "${def.name}" field? This removes it (and its saved values) for every ${entityType}.`)) return;
+    if (!confirm(`Delete the "${def.name}" field? It disappears from every ${entityType}. The values already saved are no longer shown (they are not erased from the record).`)) return;
     setSaving(true);
     setError(null);
     try {
@@ -106,13 +161,7 @@ export default function CustomFieldsSection({ entityType, entity, onChanged }: C
       {defs.map((def) => (
         <div key={def.id} style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginTop: '0.6rem' }}>
           <span style={{ fontSize: '0.65rem', color: 'var(--dim)', flex: '0 0 110px' }}>{def.name}</span>
-          <input
-            type={def.field_type === 'date' ? 'date' : def.field_type === 'number' ? 'number' : 'text'}
-            style={{ ...fieldInputStyle, marginBottom: 0, flex: 1 }}
-            value={entity.custom_fields?.[def.id] ?? ''}
-            onChange={(e) => saveValue(def.id, e.target.value)}
-            disabled={saving || !canEditValues}
-          />
+          <FieldInput def={def} value={entity.custom_fields?.[def.id]} disabled={saving || !canEditValues} onCommit={(v) => saveValue(def.id, v)} />
           {managing && (
             <button type="button" style={{ ...ghostBtnStyle, flex: 'none', fontSize: '0.5rem', padding: '0.2rem 0.5rem' }} onClick={() => handleDeleteField(def)} disabled={saving}>✕</button>
           )}
@@ -121,7 +170,7 @@ export default function CustomFieldsSection({ entityType, entity, onChanged }: C
 
       {managing && (
         <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.8rem' }}>
-          <input placeholder="e.g. Industry" style={{ ...fieldInputStyle, marginBottom: 0, flex: 1 }} value={newName} onChange={(e) => setNewName(e.target.value)} />
+          <input placeholder="e.g. Sales cycle" style={{ ...fieldInputStyle, marginBottom: 0, flex: 1 }} value={newName} onChange={(e) => setNewName(e.target.value)} />
           <select style={{ ...fieldInputStyle, marginBottom: 0, width: 100 }} value={newType} onChange={(e) => setNewType(e.target.value as CustomFieldType)}>
             <option value="text">Text</option>
             <option value="number">Number</option>

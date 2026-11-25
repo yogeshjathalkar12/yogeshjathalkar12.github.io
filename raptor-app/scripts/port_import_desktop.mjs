@@ -52,5 +52,13 @@ for (const name of ['Modal', 'ImportUndoPanel', 'ImportHistoryModal', 'ImportWiz
   written.push(write(`${name}.js`, js));
 }
 
+// ---- the company details list (src/lib/companyFields.ts) -> the desktop's CRM folder, next to the pages that use it
+{
+  const js = strip(fs.readFileSync(path.join(ROOT, 'src/lib/companyFields.ts'), 'utf8'), 'companyFields.ts', false);
+  const file = path.join(path.dirname(OUT), 'companyFields.js');
+  fs.writeFileSync(file, HEADER + js.split(String.fromCharCode(13, 10)).join(String.fromCharCode(10)));
+  written.push(file);
+}
+
 console.log(`wrote ${written.length} files into ${OUT}`);
 for (const f of written) console.log('  ' + path.relative(OUT, f));
