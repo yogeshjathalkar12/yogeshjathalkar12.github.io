@@ -4,54 +4,60 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="robots" content="noindex">
-<title>Unlimited Grout Simulator — Floor 1</title>
+<title>Unlimited Grout Simulator</title>
 <style>
   :root { --bg:#f7f3ec; --ink:#2a2523; --grout:#c2570f; --grout-d:#8f3f08; --card:#fff; --edge:#e6dfd3; }
   @media (prefers-color-scheme: dark) { :root { --bg:#1c1816; --ink:#f4eee6; --card:#26211f; --edge:#3a3330; } }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   html, body { margin:0; height:100%; }
-  body { background:var(--bg); color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-         display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; padding:10px; user-select:none; }
-  #stage { position:relative; width:min(100%, 880px); aspect-ratio:16/9; border-radius:16px; overflow:hidden; background:#cfe3ea; box-shadow:0 10px 30px rgba(0,0,0,.2); }
+  html, body { height:100dvh; overflow:hidden; }
+  body { --sw:min(100vw, calc((100dvh - 78px) * 16 / 9)); background:#14110f; color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+         display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; padding:0; user-select:none; }
+  #stage { position:relative; width:var(--sw); aspect-ratio:16/9; overflow:hidden; background:#cfe3ea; }
   canvas { width:100%; height:100%; display:block; }
-  #caption { position:absolute; left:10px; right:10px; top:8px; text-align:center; font-weight:700; font-size:clamp(12px,2.4vw,19px);
-             color:#fff; text-shadow:0 2px 4px rgba(0,0,0,.6); pointer-events:none; min-height:1.4em; }
+  #caption { position:absolute; left:10px; right:10px; bottom:42px; text-align:center; font-weight:700; font-size:clamp(12px,2.6vw,20px);
+             color:#fff; text-shadow:0 2px 5px rgba(0,0,0,.75); pointer-events:none; min-height:1.4em; }
   .overlay { position:absolute; inset:0; display:none; flex-direction:column; align-items:center; justify-content:center; gap:12px;
              background:rgba(20,16,14,.82); color:#fff; text-align:center; padding:16px; }
   .overlay.on { display:flex; }
   .overlay h2 { margin:0; font-size:clamp(1.3rem,4.4vw,2.4rem); line-height:1.15; }
   .overlay p { margin:0; font-size:clamp(.95rem,2.4vw,1.2rem); opacity:.9; max-width:28em; }
-  .overlay .big { color:var(--grout); font-weight:800; }
-  .btn { background:var(--grout); color:#fff; border:0; border-radius:12px; font-weight:800; font-size:1.05rem; padding:12px 22px; cursor:pointer; touch-action:manipulation; }
+  #ovTitle { background:transparent; justify-content:space-between; padding:6% 16px 5%; pointer-events:none; }
+  #ovTitle h1 { margin:0; font-size:clamp(1.5rem,6.4vw,3.6rem); line-height:1.1; letter-spacing:-.02em; color:#2a2523; text-shadow:0 2px 0 rgba(255,255,255,.7); }
+  #ovTitle h1 em { font-style:normal; color:var(--grout); }
+  #ovTitle .btn { pointer-events:auto; }
+  .btn { background:var(--grout); color:#fff; border:0; border-radius:12px; font-weight:800; font-size:1.05rem; padding:12px 28px; cursor:pointer; touch-action:manipulation; }
   .btn.alt { background:#4a403a; }
   .btn:active { background:var(--grout-d); }
   .row { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
-  #controls { width:min(100%, 880px); display:flex; gap:10px; }
-  #controls button { flex:1; height:72px; border:0; border-radius:16px; font-size:1.2rem; font-weight:800; color:#fff; touch-action:none; cursor:pointer; }
-  #bhar { background:var(--grout); } #jump { background:#35508a; }
+  #controls { width:var(--sw); display:flex; gap:8px; padding:0 8px; }
+  #controls button { flex:1; height:68px; border:0; border-radius:16px; font-size:clamp(.8rem,3.2vw,1.1rem); font-weight:800; color:#fff; touch-action:none; cursor:pointer; }
+  #bhar { background:var(--grout); } #jump { background:#35508a; } #crouch { background:#4d6b52; } #sup { background:#6b2fa0; opacity:.35; }
+  #sup.ready { opacity:1; box-shadow:0 0 0 3px #ffd34d, 0 0 18px #ffd34d; }
   #controls button.down { filter:brightness(.8); transform:scale(.98); }
-  #hint { font-size:13px; opacity:.7; text-align:center; }
-  #snd { position:absolute; right:8px; bottom:8px; background:rgba(0,0,0,.45); color:#fff; border:0; border-radius:8px; padding:6px 10px; cursor:pointer; font-size:12px; }
+  #hint { display:none; }
+  #fs { position:absolute; right:92px; bottom:8px; background:rgba(0,0,0,.45); color:#fff; border:0; border-radius:8px; padding:6px 10px; cursor:pointer; font-size:12px; z-index:3; }
+  body.m-title #controls, body.m-title #hint, body.m-intro #controls, body.m-intro #hint { visibility:hidden; }
+  #snd { position:absolute; right:8px; bottom:8px; background:rgba(0,0,0,.45); color:#fff; border:0; border-radius:8px; padding:6px 10px; cursor:pointer; font-size:12px; z-index:3; }
 </style>
 </head>
-<body>
+<body class="m-title">
 <div id="stage">
   <canvas id="c" width="800" height="450"></canvas>
   <div id="caption"></div>
   <button id="snd" aria-label="Toggle sound">Sound on</button>
+  <button id="fs" aria-label="Full screen">Full screen</button>
 
   <div class="overlay on" id="ovTitle">
-    <p id="t1" style="font-size:clamp(1.1rem,3.4vw,1.8rem);font-weight:700">Mistri, maan jao...<br>police mana karke gayi hai.</p>
-    <h2 class="big" id="t2" style="opacity:0">Grout bhar denge.</h2>
-    <button class="btn" id="startBtn" style="opacity:0">Start climbing</button>
-    <p style="font-size:.85rem;opacity:.7">Space / Up = jump &nbsp;·&nbsp; Down / B (hold) = bhar do</p>
+    <h1>When in doubt, <em>bhar do grout</em></h1>
+    <button class="btn" id="startBtn">Start</button>
   </div>
   <div class="overlay" id="ovFail">
     <h2 id="failMsg">Thoda grout kam pada.</h2>
     <button class="btn" id="retryBtn">Try again</button>
   </div>
   <div class="overlay" id="ovWin">
-    <h2>Floor 1 cleared!</h2>
+    <h2>Thekedar defeated!</h2>
     <p><b>Thekedar:</b> Theek hai... chalega.<br><b>Mistri:</b> Chalega nahi, daudega.</p>
     <p id="stats"></p>
     <div class="row">
@@ -63,43 +69,92 @@
 </div>
 
 <div id="controls">
-  <button id="bhar" aria-label="Hold to bhar do">HOLD: BHAR DO</button>
+  <button id="bhar" aria-label="Bhar do">BHAR DO</button>
+  <button id="crouch" aria-label="Crouch">CROUCH</button>
   <button id="jump" aria-label="Jump">JUMP</button>
+  <button id="sup" aria-label="Super move">SUPER</button>
 </div>
-<div id="hint">Fill the gaps before you reach them. Jump the bricks. Then fill Thekedar's maang.</div>
+<div id="hint">Tap BHAR DO to fill a gap ahead. Jump the bricks, but don't jump into the high pillars. At the end, fight Thekedar.</div>
 
 <script>
 (function () {
   "use strict";
-  var W = 800, H = 450, GROUND = 360, SPEED = 230, MX = 160, LEN = 3700;
+  var W = 800, H = 450, GROUND = 360, SPEED = 230, MX = 160, LEN = 5000, RANGE = 170, TH_X = 580, TH_H = 190;
   var cv = document.getElementById("c"), ctx = cv.getContext("2d");
-  var cap = document.getElementById("caption");
+  var cap = document.getElementById("caption"), supBtn = document.getElementById("sup"), supReady = false;
+  var stageEl = document.getElementById("stage");
 
   // ---------- assets ----------
-  var imgM = new Image(), imgT = new Image(), loaded = 0;
-  imgM.onload = imgT.onload = function () { loaded++; };
-  imgM.src = "mistri.svg"; imgT.src = "thekedar.svg";
+  // Vector art is drawn once into small canvases, because re-drawing an SVG image every frame is slow.
+  var imgM = new Image(), imgT = new Image(), imgN = new Image(), loaded = 0, baked = {};
+  function bake(img, w, h) {
+    var c = document.createElement("canvas"); c.width = Math.ceil(w * 2); c.height = Math.ceil(h * 2);
+    c.getContext("2d").drawImage(img, 0, 0, c.width, c.height); return c;
+  }
+  function allLoaded() {
+    loaded++;
+    if (loaded < 3) return;
+    try {
+      if (imgM.naturalWidth) { baked.m = bake(imgM, 62.5, 100); baked.mc = bake(imgM, 66, 62); }
+      if (imgT.naturalWidth) baked.t = bake(imgT, 190 * 220 / 320, 190);
+      if (imgN.naturalWidth) {            // mural: the photo cropped to the mural's shape
+        var pw = 190, ph = 240, cw = imgN.naturalHeight * (pw / ph), cx0 = Math.max(0, (imgN.naturalWidth - cw) / 2 + 6);
+        var c = document.createElement("canvas"); c.width = pw * 2; c.height = ph * 2;
+        c.getContext("2d").drawImage(imgN, cx0, 8, Math.min(cw, imgN.naturalWidth - cx0), imgN.naturalHeight - 8, 0, 0, c.width, c.height);
+        baked.n = c;
+      }
+    } catch (e) {}
+  }
+  imgM.onload = imgT.onload = imgN.onload = allLoaded;
+  imgM.onerror = imgT.onerror = imgN.onerror = allLoaded;   // a missing file must never lock the Start button
+  imgM.src = "mistri.svg"; imgT.src = "thekedar.svg"; imgN.src = "naseem.jpg";
+
+  // ---------- sharp canvas at any screen size ----------
+  var scaleNow = 0;
+  function fitCanvas() {
+    var cssW = stageEl.clientWidth || 800, dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var sc = Math.max(1, Math.min(cssW * dpr / W, 2.4));
+    if (Math.abs(sc - scaleNow) < 0.01) return;
+    scaleNow = sc; cv.width = Math.round(W * sc); cv.height = Math.round(H * sc);
+    ctx.setTransform(sc, 0, 0, sc, 0, 0);
+  }
+  addEventListener("resize", fitCanvas);
+  document.addEventListener("fullscreenchange", function () { setTimeout(fitCanvas, 60); });
+  document.addEventListener("webkitfullscreenchange", function () { setTimeout(fitCanvas, 60); });
 
   // ---------- level data (world x) ----------
-  var GAPS0 = [[700,70],[1150,90],[1600,80],[2000,100],[2450,90],[2900,110],[3300,90]];
-  var BRICKS0 = [900,1400,1850,2250,2700,3100];
+  // Layout rule: a jump flies ~160px and can start up to ~170px early, so a pillar (jumping into it hurts)
+  // keeps 300px or more clear of every gap and brick on both sides.
+  var GAPS0 = [[650,48],[1750,52],[2450,56],[3550,52],[4550,60]];   // narrow: any jump near one clears it
+  var GAP_EDGE = 12;   // feet must be this far inside the gap to fall
+  var BRICKS0 = [1000,2100,3250,4250];
+  var PILLARS0 = [1350,2850,3900];
+  var PILLAR_W = 60, PILLAR_BOTTOM = GROUND - 150, STAND_H = 96, CROUCH_H = 50;
 
   // ---------- state ----------
-  var S = {};
-  function reset() {
-    S = { mode: "title", cam: 0, y: GROUND, vy: 0, falling: false, inv: 0, t: 0,
-          gaps: GAPS0.map(function (g) { return { x: g[0], w: g[1], fill: 0 }; }),
-          bricks: BRICKS0.map(function (x) { return { x: x }; }),
-          rolling: [], particles: [], filled: 0, combo: 0, bestCombo: 0, hits: 0,
-          maang: 0, nextBrick: 1.2, said: {}, bossT: 0, stun: 0 };
+  var S = {}, mode = "title";
+  function setMode(m) { mode = S.mode = m; document.body.className = "m-" + m; }
+  function freshLevel() {
+    return { mode: mode, cam: 0, y: GROUND, vy: 0, falling: false, crouch: false, inv: 0, t: 0,
+      gaps: GAPS0.map(function (g) { return { x: g[0], w: g[1], fill: 0 }; }),
+      bricks: BRICKS0.map(function (x) { return { x: x }; }),
+      pillars: PILLARS0.map(function (x) { return { x: x }; }),
+      particles: [], filled: 0, combo: 0, bestCombo: 0, hits: 0,
+      hp: 100, thp: 100, meter: 0, cd: 0, blobs: [], projs: [], wave: null,
+      tNext: 1.4, nextType: "low", warn: 0, shake: 0, thFlash: 0, thX: 900, fi: 0,
+      said: {}, it: 0, cx: 285, cy: GROUND, cvy: 0, cvx: 0, jumped: false, maangShown: 0, thMaang: 0 };
   }
-  reset();
+  S = freshLevel(); setMode("title");
 
-  var keys = { jump: false, bhar: false }, wantJump = false;
+  var keys = { crouch: false, bhar: false }, wantJump = false, fillTap = false, superTap = false;
 
   // ---------- audio ----------
   var AC = null, soundOn = true;
-  function audio() { if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} } return AC; }
+  function audio() {
+    if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} }
+    if (AC && AC.state === "suspended") { try { AC.resume(); } catch (e) {} }   // browsers start audio paused until a tap
+    return AC;
+  }
   function beep(f, d, type, vol, slide) {
     if (!soundOn || !audio()) return;
     var o = AC.createOscillator(), g = AC.createGain(); o.type = type || "square";
@@ -107,173 +162,278 @@
     g.gain.value = vol || 0.05; g.gain.linearRampToValueAtTime(0.0001, AC.currentTime + d);
     o.connect(g); g.connect(AC.destination); o.start(); o.stop(AC.currentTime + d);
   }
+  var noiseBuf = null;
   function squelch() {
     if (!soundOn || !audio()) return;
-    var n = AC.sampleRate * 0.12, b = AC.createBuffer(1, n, AC.sampleRate), d = b.getChannelData(0);
-    for (var i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n) * 0.35;
+    if (!noiseBuf) {   // made once, then reused
+      var n = Math.floor(AC.sampleRate * 0.12); noiseBuf = AC.createBuffer(1, n, AC.sampleRate); var d = noiseBuf.getChannelData(0);
+      for (var i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n) * 0.35;
+    }
     var s = AC.createBufferSource(), f = AC.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = 500;
-    s.buffer = b; s.connect(f); f.connect(AC.destination); s.start();
+    s.buffer = noiseBuf; s.connect(f); f.connect(AC.destination); s.start();
   }
-  document.getElementById("snd").onclick = function () {
-    soundOn = !soundOn; this.textContent = soundOn ? "Sound on" : "Sound off";
-  };
+  document.getElementById("snd").onclick = function () { soundOn = !soundOn; this.textContent = soundOn ? "Sound on" : "Sound off"; };
 
   // ---------- caption ----------
   var capTimer = 0;
   function say(who, text, ms) {
-    cap.textContent = who + ": " + text;
+    cap.textContent = (who ? who + ": " : "") + text;
     clearTimeout(capTimer); capTimer = setTimeout(function () { cap.textContent = ""; }, ms || 2600);
   }
+  function clearSay() { clearTimeout(capTimer); cap.textContent = ""; }
 
   // ---------- input ----------
   function doJump() { wantJump = true; }
+  var K_CROUCH = { ArrowDown: 1, KeyS: 1 }, K_GROUT = { KeyB: 1, ShiftLeft: 1, KeyJ: 1 }, K_SUPER = { KeyV: 1, Enter: 1, KeyK: 1 };
   addEventListener("keydown", function (e) {
-    if (e.repeat) { if (e.code === "Space" || e.code === "ArrowUp" || e.code === "ArrowDown") e.preventDefault(); return; }
+    if (e.repeat) { if (e.code === "Space" || e.code.indexOf("Arrow") === 0) e.preventDefault(); return; }
     if (e.code === "Space" || e.code === "ArrowUp" || e.code === "KeyW") { e.preventDefault(); doJump(); }
-    if (e.code === "ArrowDown" || e.code === "KeyB" || e.code === "ShiftLeft" || e.code === "KeyS") { e.preventDefault(); keys.bhar = true; }
+    if (K_CROUCH[e.code]) { e.preventDefault(); keys.crouch = true; }
+    if (K_GROUT[e.code]) { e.preventDefault(); keys.bhar = true; fillTap = true; }
+    if (K_SUPER[e.code]) { e.preventDefault(); superTap = true; }
   });
   addEventListener("keyup", function (e) {
-    if (e.code === "ArrowDown" || e.code === "KeyB" || e.code === "ShiftLeft" || e.code === "KeyS") keys.bhar = false;
+    if (e.code === "Space") e.preventDefault();      // stops a focused button from being "clicked" by Space
+    if (K_CROUCH[e.code]) keys.crouch = false;
+    if (K_GROUT[e.code]) keys.bhar = false;
   });
   function bindBtn(id, down, up) {
     var el = document.getElementById(id);
-    el.addEventListener("pointerdown", function (e) { e.preventDefault(); el.classList.add("down"); try { el.setPointerCapture(e.pointerId); } catch (x) {} down(); });
+    el.addEventListener("pointerdown", function (e) { e.preventDefault(); el.classList.add("down"); try { el.setPointerCapture(e.pointerId); } catch (x) {} audio(); down(); });
     ["pointerup", "pointercancel", "pointerleave"].forEach(function (ev) { el.addEventListener(ev, function () { el.classList.remove("down"); up(); }); });
   }
   bindBtn("jump", doJump, function () {});
-  bindBtn("bhar", function () { keys.bhar = true; audio(); }, function () { keys.bhar = false; });
+  bindBtn("crouch", function () { keys.crouch = true; }, function () { keys.crouch = false; });
+  bindBtn("bhar", function () { keys.bhar = true; fillTap = true; }, function () { keys.bhar = false; });
+  bindBtn("sup", function () { superTap = true; }, function () {});
 
   // ---------- UI flow ----------
   var ovTitle = document.getElementById("ovTitle"), ovFail = document.getElementById("ovFail"), ovWin = document.getElementById("ovWin");
-  function showTitle() {
-    ovTitle.classList.add("on"); ovFail.classList.remove("on"); ovWin.classList.remove("on");
-    var t2 = document.getElementById("t2"), sb = document.getElementById("startBtn");
-    t2.style.opacity = 0; sb.style.opacity = 0;
-    setTimeout(function () { t2.style.transition = "opacity .6s"; t2.style.opacity = 1; }, 1600);
-    setTimeout(function () { sb.style.transition = "opacity .6s"; sb.style.opacity = 1; }, 2600);
-  }
-  showTitle();
-  function begin() {
-    audio(); reset(); S.mode = "play";
+  function hideAll() {
     ovTitle.classList.remove("on"); ovFail.classList.remove("on"); ovWin.classList.remove("on");
-    say("Thekedar", "Tiles ke beech 2 inch ka gap kyu chhoda?!", 3000);
-    setTimeout(function () { if (S.mode === "play") say("Mistri", "Ventilation ke liye, saab. Grout bhar denge.", 3000); }, 3100);
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();   // keys then go to the game, not a button
   }
-  document.getElementById("startBtn").onclick = function () { if (loaded >= 2) begin(); };
-  document.getElementById("retryBtn").onclick = begin;
-  document.getElementById("againBtn").onclick = begin;
+  document.getElementById("controls").addEventListener("contextmenu", function (e) { e.preventDefault(); });
+  function beginIntro() {            // from the title screen
+    audio(); hideAll(); clearSay(); S = freshLevel(); setMode("intro");
+  }
+  function beginLevel() {            // retry / play again: straight into the run
+    audio(); hideAll(); clearSay(); S = freshLevel(); setMode("play");
+  }
+  // full screen (needs a tap or click, so it runs from the Start button and the Full screen button)
+  function isFS() { return !!(document.fullscreenElement || document.webkitFullscreenElement); }
+  function enterFS() {
+    var el = document.documentElement, rq = el.requestFullscreen || el.webkitRequestFullscreen;
+    if (!rq) return;
+    try {
+      var p = rq.call(el);
+      var lock = function () { try { if (screen.orientation && screen.orientation.lock) screen.orientation.lock("landscape").catch(function () {}); } catch (e) {} };
+      if (p && p.then) p.then(lock).catch(function () {}); else lock();
+    } catch (e) {}
+  }
+  function exitFS() { var ex = document.exitFullscreen || document.webkitExitFullscreen; if (ex) try { ex.call(document); } catch (e) {} }
+  var fsBtn = document.getElementById("fs");
+  fsBtn.onclick = function () { if (isFS()) exitFS(); else enterFS(); };
+  function syncFS() { fsBtn.textContent = isFS() ? "Exit full screen" : "Full screen"; }
+  document.addEventListener("fullscreenchange", syncFS); document.addEventListener("webkitfullscreenchange", syncFS);
+  document.getElementById("startBtn").onclick = function () { if (loaded >= 3) { enterFS(); beginIntro(); } };
+  document.getElementById("retryBtn").onclick = beginLevel;
+  document.getElementById("againBtn").onclick = beginLevel;
   var FAILS = ["Thoda grout kam pada.", "Gap ne tumhe bhar diya.", "Neev mein grout bhar dete to bachte.", "Tension mat lo... bas dobara try karo."];
-  function fail() {
-    if (S.mode === "fail") return; S.mode = "fail";
+  var BOSS_FAILS = ["Thekedar ne bhaga diya. Dobara try karo.", "Tension ne tumhe haraa diya.", "Grout meter bharo, phir super lagao."];
+  function fail(boss) {
+    if (S.mode === "fail") return; setMode("fail"); S.failBoss = !!boss;
     beep(300, 0.5, "sawtooth", 0.06, 80);
-    document.getElementById("failMsg").textContent = FAILS[Math.floor(Math.random() * FAILS.length)];
+    var list = boss ? BOSS_FAILS : FAILS;
+    document.getElementById("failMsg").textContent = list[Math.floor(Math.random() * list.length)];
     setTimeout(function () { ovFail.classList.add("on"); }, 350);
   }
   function win() {
-    if (S.mode === "win") return; S.mode = "win";
+    if (S.mode === "win") return; setMode("win");
     beep(523, 0.15, "triangle", 0.07); setTimeout(function () { beep(659, 0.15, "triangle", 0.07); }, 150);
     setTimeout(function () { beep(784, 0.35, "triangle", 0.07); }, 300);
     document.getElementById("stats").textContent =
-      "Gaps filled: " + S.filled + " / " + S.gaps.length + "  ·  Best combo: " + S.bestCombo + "  ·  Bricks hit: " + S.hits;
-    setTimeout(function () { ovWin.classList.add("on"); }, 500);
+      "Gaps filled: " + S.filled + " / " + S.gaps.length + "  ·  Health left: " + Math.max(1, Math.round(S.hp)) + "%  ·  Hits taken on the run: " + S.hits;
+    setTimeout(function () { ovWin.classList.add("on"); }, 700);
   }
 
-  // ---------- update ----------
+  // ---------- helpers ----------
   function overGap(mx) {
     for (var i = 0; i < S.gaps.length; i++) { var g = S.gaps[i];
-      if (g.fill < 1 && mx > g.x + 6 && mx < g.x + g.w - 6) return g; }
+      if (g.fill < 1 && mx > g.x + GAP_EDGE && mx < g.x + g.w - GAP_EDGE) return g; }
     return null;
   }
   function spray(x, y, n) {
     for (var i = 0; i < n; i++) S.particles.push({ x: x, y: y, vx: 60 + Math.random() * 120, vy: -40 + Math.random() * 120, life: 0.5 });
   }
+  function mistriHeight() { return S.crouch ? CROUCH_H : STAND_H; }
+
+  // vertical motion shared by play and boss
+  function physics(dt, checkGaps) {
+    var grounded = S.y >= GROUND && !S.falling;
+    if (wantJump) { wantJump = false; if (grounded) { S.vy = -660; beep(420, 0.12, "square", 0.04, 700); } }
+    S.crouch = keys.crouch && grounded;
+    var wasAir = S.y < GROUND - 0.5 || S.vy < 0;          // true for a jump, false for plain walking
+    S.vy += 1900 * dt; S.y += S.vy * dt;
+    if (!S.falling && S.y >= GROUND) {
+      var gp = checkGaps ? overGap(S.cam + MX) : null;
+      if (gp && wasAir) {                                   // a jump that lands inside a gap grabs the far edge: no fall
+        S.cam = gp.x + gp.w + 8 - MX; S.y = GROUND; S.vy = 0; beep(520, 0.08, "triangle", 0.05); say("Mistri", "Bach gaya!", 900);
+      } else if (gp) { S.falling = true; S.combo = 0; }     // walked in without jumping: falls
+      else { S.y = GROUND; S.vy = 0; }
+    }
+  }
+
+  // ---------- update ----------
   function update(dt) {
     S.t += dt;
+    if (S.shake > 0) S.shake -= dt;
+    if (S.thFlash > 0) S.thFlash -= dt;
+    var fp = fillTap, sp = superTap; fillTap = false; superTap = false;
     var m = S.mode;
-    // jump
-    var grounded = S.y >= GROUND && !S.falling;
-    if (wantJump) { wantJump = false; if ((m === "play" || m === "boss") && grounded) { S.vy = -660; beep(420, 0.12, "square", 0.04, 700); } }
 
-    var filling = false;
-    if (m === "play") {
-      var mx = S.cam + MX;
-      // fill nearest gap in range
-      if (keys.bhar && grounded) {
-        var target = null;
-        for (var i = 0; i < S.gaps.length; i++) { var g = S.gaps[i];
-          if (g.fill < 1 && g.x + g.w > mx && g.x < mx + 150) { target = g; break; } }
-        if (target) {
-          filling = true;
-          var before = target.fill;
-          target.fill = Math.min(1, target.fill + dt / 0.55);
-          if (Math.random() < 0.3) squelch();
-          spray(MX + 28, S.y - 72, 2);
-          if (before < 1 && target.fill >= 1) {
-            S.filled++; S.combo++; S.bestCombo = Math.max(S.bestCombo, S.combo);
-            beep(660, 0.1, "triangle", 0.06);
-            var lines = ["Bhar diya!", "Ek aur gap bhar diya.", "Grout bhar diya!", "Sab theek hai."];
-            say("Mistri", lines[S.filled % lines.length], 1300);
-          }
-        }
-      }
-      var sp = (keys.bhar && grounded) ? SPEED * 0.28 : SPEED;
-      if (!S.falling) S.cam += sp * dt;
-      if (S.cam + MX >= LEN) { S.mode = "boss"; S.cam = LEN - MX; S.nextBrick = 1.0; say("Thekedar", "Yeh kya tamasha hai?! Hatt!", 2200); }
-      // bricks
-      if (S.inv > 0) S.inv -= dt;
-      mx = S.cam + MX;
-      for (var j = 0; j < S.bricks.length; j++) { var b = S.bricks[j];
-        if (S.inv <= 0 && !S.falling && mx + 16 > b.x && mx - 16 < b.x + 36 && S.y > GROUND - 32) {
-          S.inv = 1.0; S.hits++; S.combo = 0; S.cam = Math.max(0, S.cam - 110); beep(150, 0.2, "sawtooth", 0.06, 90);
-          say("Thekedar", "Tension le! Tension!", 1500); } }
-    } else if (m === "boss") {
-      if (S.inv > 0) S.inv -= dt;
-      S.bossT += dt;
-      if (keys.bhar && grounded && S.stun <= 0) {
-        S.maang = Math.min(1, S.maang + dt / 2.2); filling = true;
-        if (Math.random() < 0.3) squelch(); spray(MX + 28, S.y - 72, 2);
-      } else S.maang = Math.max(0, S.maang - dt / 5);
-      S.nextBrick -= dt;
-      if (S.nextBrick <= 0 && S.stun <= 0) { S.rolling.push({ x: 560 }); S.nextBrick = 1.6 + Math.random() * 0.8; }
-      for (var k = S.rolling.length - 1; k >= 0; k--) { var r = S.rolling[k]; r.x -= 300 * dt;
-        if (r.x < -40) { S.rolling.splice(k, 1); continue; }
-        if (S.inv <= 0 && MX + 16 > r.x && MX - 16 < r.x + 34 && S.y > GROUND - 30) {
-          S.inv = 1.0; S.maang = Math.max(0, S.maang - 0.25); beep(150, 0.2, "sawtooth", 0.06, 90); S.rolling.splice(k, 1); } }
-      if (S.maang >= 1) { S.stun = 1; S.rolling = []; win(); }
-    }
-    // vertical
-    if (m === "play" || m === "boss" || S.falling) {
-      S.vy += 1900 * dt; S.y += S.vy * dt;
-      if (!S.falling && S.y >= GROUND) {
-        var gp = (m === "play") ? overGap(S.cam + MX) : null;
-        if (gp) { S.falling = true; S.combo = 0; } else { S.y = GROUND; S.vy = 0; }
-      }
-      if (S.falling && S.y > H + 80) fail();
-    }
-    // particles
+    if (m === "intro") updateIntro(dt);
+    else if (m === "play") updatePlay(dt, fp);
+    else if (m === "fightIntro") updateFightIntro(dt);
+    else if (m === "boss") updateBoss(dt, fp, sp);
+    else { wantJump = false; }
+
     for (var p = S.particles.length - 1; p >= 0; p--) { var q = S.particles[p];
       q.life -= dt; q.x += q.vx * dt; q.y += q.vy * dt; q.vy += 500 * dt; if (q.life <= 0) S.particles.splice(p, 1); }
   }
 
+  // --- intro cutscene ---
+  function updateIntro(dt) {
+    wantJump = false;
+    var it = S.it += dt, TX = 430;
+    if (it < 1.0) { var k = it / 1.0; S.thX = 900 + (TX - 900) * (1 - (1 - k) * (1 - k)); } else S.thX = TX;
+    if (it >= 1.0 && !S.said.a) { S.said.a = 1; say("Thekedar", "Mistri maan jao, police mana karke gayi hai.", 3600); }
+    if (it >= 4.8 && !S.said.b) { S.said.b = 1; say("Mistri", "Grout bhar denge.", 1600); }
+    if (it >= 6.3) {
+      if (!S.jumped) {
+        S.cx += 330 * dt;
+        if (S.cx >= 340) { S.jumped = true; S.cvy = -935; S.cvx = 270; }
+      } else {
+        S.cx += (S.cy < GROUND || S.cvy < 0 ? S.cvx : 330) * dt;
+        if (S.cy < GROUND || S.cvy < 0) {
+          S.cy += S.cvy * dt; S.cvy += 1900 * dt;
+          if (S.cvy >= 0 && !S.said.c) {           // apex, right over his head
+            S.said.c = 1; S.thMaang = 1; squelch(); spray(S.cx + 20, S.cy - 60, 14); beep(660, 0.12, "triangle", 0.06);
+            say("Thekedar", "Mera maang!! Pakdo usse!", 2200);
+          }
+          if (S.cy >= GROUND) { S.cy = GROUND; S.cvy = 0; S.cvx = 0; }
+        }
+      }
+      if (S.cx > 900) { clearSay(); S = freshLevel(); setMode("play"); }
+    }
+    if (S.thMaang > 0) S.maangShown = Math.min(1, S.maangShown + dt / 0.3);
+  }
+
+  // --- the run ---
+  function updatePlay(dt, fp) {
+    var mx = S.cam + MX;
+    if (fp) {                                   // one tap fills the whole nearest gap in reach
+      var target = null;
+      for (var i = 0; i < S.gaps.length; i++) { var g = S.gaps[i];
+        if (g.fill < 1 && !g.pour && g.x + g.w > mx && g.x < mx + RANGE) { target = g; break; } }
+      if (target) { target.pour = true; squelch(); spray(MX + 28, S.y - 72, 10); } else beep(200, 0.06, "square", 0.03);
+    }
+    for (var pi = 0; pi < S.gaps.length; pi++) { var pg = S.gaps[pi];
+      if (pg.pour && pg.fill < 1) {
+        pg.fill = Math.min(1, pg.fill + dt / 0.18);
+        if (pg.fill >= 1) {
+          pg.pour = false; S.filled++; S.combo++; S.bestCombo = Math.max(S.bestCombo, S.combo); S.meter = Math.min(100, S.meter + 5);
+          beep(660, 0.1, "triangle", 0.06);
+          var lines = ["Bhar diya!", "Ek aur gap bhar diya.", "Grout bhar diya!", "Sab theek hai."];
+          say("Mistri", lines[S.filled % lines.length], 1300);
+        }
+      } }
+    if (!S.falling) S.cam += SPEED * dt;
+    if (S.cam + MX >= LEN) { S.cam = LEN - MX; setMode("fightIntro"); S.fi = 0; S.thX = 900; S.projs = []; S.blobs = []; return; }
+    if (S.inv > 0) S.inv -= dt;
+    physics(dt, true);
+    mx = S.cam + MX;
+    if (S.inv <= 0 && !S.falling) {
+      var topY = S.y - mistriHeight();
+      for (var j = 0; j < S.bricks.length; j++) { var b = S.bricks[j];
+        if (mx + 16 > b.x && mx - 16 < b.x + 36 && S.y > GROUND - 32) { knock(110, "Tension le! Tension!"); break; } }
+      for (var k = 0; k < S.pillars.length && S.inv <= 0; k++) { var pl = S.pillars[k];
+        if (mx + 18 > pl.x && mx - 18 < pl.x + PILLAR_W && topY < PILLAR_BOTTOM) { knock(110, "Sir bacha ke! Jhuk jao!"); break; } }
+    }
+    if (S.falling && S.y > H + 80) fail(false);
+  }
+  function knock(px, line) {
+    S.inv = 1.0; S.hits++; S.combo = 0; S.cam = Math.max(0, S.cam - px);
+    // never let a knock-back drop Mistri into a gap he had jumped over
+    for (var tries = 0; tries < 3; tries++) { var gp = overGap(S.cam + MX); if (!gp) break; S.cam = Math.max(0, gp.x - GAP_EDGE - 4 - MX); }
+    beep(150, 0.2, "sawtooth", 0.06, 90); say("Thekedar", line, 1500);
+  }
+
+  // --- walk-in before the fight ---
+  function updateFightIntro(dt) {
+    S.fi += dt; physics(dt, false);
+    S.thX = S.fi < 1.0 ? 900 + (TH_X - 900) * (1 - Math.pow(1 - S.fi, 2)) : TH_X;
+    if (S.fi > 0.2 && !S.said.f1) { S.said.f1 = 1; say("Thekedar", "Ab bhaag ke dikha!", 1700); }
+    if (S.fi > 1.9 && !S.said.f2) { S.said.f2 = 1; say("Mistri", "Bhaagna kya? Bhar denge.", 1500); }
+    if (S.fi > 3.4) { setMode("boss"); S.tNext = 1.2; S.hp = 100; S.thp = 100; clearSay();
+      say("", "Hit him with grout. Jump the low bricks, crouch the flying files. Fill the meter for SUPER.", 3600); }
+  }
+
+  // --- the fight ---
+  function updateBoss(dt, fp, sp) {
+    if (S.inv > 0) S.inv -= dt;
+    if (S.cd > 0) S.cd -= dt;
+    physics(dt, false);
+    // Mistri attacks
+    if (fp && S.cd <= 0) { S.cd = 0.35; S.blobs.push({ x: MX + 34, y: S.y - mistriHeight() * 0.7 }); squelch(); }
+    if (sp && S.meter >= 100) { S.meter = 0; S.wave = { x: MX + 30, hit: false }; S.shake = 0.4; beep(180, 0.5, "sawtooth", 0.08, 700); say("Mistri", "GROUT BHAR DIYA!", 1500); }
+    for (var i = S.blobs.length - 1; i >= 0; i--) { var b = S.blobs[i]; b.x += 560 * dt;
+      if (b.x >= TH_X + 30) { S.thp -= 3; S.meter = Math.min(100, S.meter + 6); S.thFlash = 0.15; spray(b.x, b.y, 6); beep(520, 0.07, "triangle", 0.05); S.blobs.splice(i, 1); }
+      else if (b.x > W) S.blobs.splice(i, 1); }
+    if (S.wave) { S.wave.x += 650 * dt;
+      if (!S.wave.hit && S.wave.x >= TH_X + 20) { S.wave.hit = true; S.thp -= 25; S.thFlash = 0.5; S.shake = 0.5; spray(TH_X + 40, GROUND - 100, 30); beep(120, 0.4, "sawtooth", 0.08, 60); }
+      if (S.wave.x > W + 60) S.wave = null; }
+    // Thekedar attacks (telegraphed)
+    S.tNext -= dt;
+    if (S.tNext <= 0.45 && !S.warn) { S.warn = 0.45; }
+    if (S.tNext <= 0) {
+      S.projs.push(S.nextType === "low" ? { type: "low", x: TH_X } : { type: "high", x: TH_X });
+      S.nextType = Math.random() < 0.5 ? "low" : "high";
+      S.tNext = (1.3 + Math.random() * 0.9) * (S.thp < 50 ? 0.75 : 1); S.warn = 0;
+    }
+    for (var k = S.projs.length - 1; k >= 0; k--) { var r = S.projs[k]; r.x -= (r.type === "low" ? 300 : 330) * dt;
+      if (r.x < -50) { S.projs.splice(k, 1); continue; }
+      if (S.inv <= 0 && MX + 16 > r.x && MX - 16 < r.x + 34) {
+        var top = S.y - mistriHeight(), hit = false;
+        if (r.type === "low") hit = S.y > GROUND - 32;
+        else hit = top < GROUND - 66 && S.y > GROUND - 100;
+        if (hit) { S.hp -= 12; S.inv = 0.9; S.shake = 0.15; S.projs.splice(k, 1); beep(150, 0.2, "sawtooth", 0.06, 90); } } }
+    if (S.thp <= 0) { S.thp = 0; S.projs = []; win(); }
+    else if (S.hp <= 0) { S.hp = 0; fail(true); }
+  }
+
   // ---------- draw ----------
-  function drawBg(cam) {
+  function wallTiles(cam, parallax) {
     ctx.fillStyle = "#cfe3ea"; ctx.fillRect(0, 0, W, GROUND);
     ctx.strokeStyle = "#b3cdd7"; ctx.lineWidth = 2;
-    var off = -((cam * 0.5) % 60);
+    var off = -((cam * parallax) % 60);
     for (var x = off; x < W; x += 60) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, GROUND); ctx.stroke(); }
     for (var y = 30; y < GROUND; y += 60) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
-    // mirrors
+  }
+  function drawBg(cam) {
+    wallTiles(cam, 0.5);
     var moff = -((cam * 0.5) % 600);
     for (var k = -1; k < 3; k++) { var mx = moff + k * 600 + 240;
       ctx.fillStyle = "#e9f6fb"; ctx.fillRect(mx, 90, 100, 130); ctx.strokeStyle = "#8aa7b3"; ctx.lineWidth = 5; ctx.strokeRect(mx, 90, 100, 130);
       ctx.strokeStyle = "rgba(255,255,255,.8)"; ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(mx + 18, 200); ctx.lineTo(mx + 46, 108); ctx.stroke(); }
   }
-  function drawFloor(cam) {
+  function drawFloor(cam, gaps) {
     ctx.fillStyle = "#8c8f94"; ctx.fillRect(0, GROUND, W, H - GROUND);
     ctx.fillStyle = "#a6aab0"; ctx.fillRect(0, GROUND, W, 6);
     ctx.strokeStyle = "#7a7d82"; ctx.lineWidth = 2;
     var off = -(cam % 80);
     for (var x = off; x < W; x += 80) { ctx.beginPath(); ctx.moveTo(x, GROUND + 6); ctx.lineTo(x, H); ctx.stroke(); }
+    if (!gaps) return;
     for (var i = 0; i < S.gaps.length; i++) { var g = S.gaps[i], sx = g.x - cam;
       if (sx > W || sx + g.w < 0) continue;
       ctx.fillStyle = "#14110f"; ctx.fillRect(sx, GROUND, g.w, H - GROUND);
@@ -283,69 +443,138 @@
       if (g.fill < 1) { ctx.fillStyle = "#c2570f"; ctx.font = "bold 13px system-ui"; ctx.textAlign = "center"; ctx.fillText("GAP", sx + g.w / 2, GROUND - 8); }
     }
   }
-  function drawBrick(x, y, w, label) {
+  function drawBrick(x, y, w) {
     ctx.fillStyle = "#b5532b"; ctx.fillRect(x, y, w, w); ctx.strokeStyle = "#7a3418"; ctx.lineWidth = 2; ctx.strokeRect(x, y, w, w);
     ctx.strokeStyle = "#8f4220"; ctx.beginPath(); ctx.moveTo(x, y + w / 2); ctx.lineTo(x + w, y + w / 2); ctx.moveTo(x + w / 2, y); ctx.lineTo(x + w / 2, y + w / 2); ctx.stroke();
   }
-  function drawMistri() {
-    var h = 100, w = h * 200 / 320, x = MX - w / 2, y = S.y - h;
-    var run = (S.mode === "play" || S.mode === "boss") && !S.falling && S.y >= GROUND;
-    var bob = run ? Math.sin(S.t * 14) * 3 : 0;
-    var blink = S.inv > 0 && Math.floor(S.t * 12) % 2 === 0;
-    if (blink) ctx.globalAlpha = 0.35;
-    ctx.save(); ctx.translate(MX, S.y); if (S.falling) ctx.rotate(Math.min(1.2, S.vy / 900)); ctx.translate(-MX, -S.y);
-    if (imgM.complete) ctx.drawImage(imgM, x, y + bob, w, h);
-    ctx.restore(); ctx.globalAlpha = 1;
-    // grout dripping from trowel while holding
-    if (keys.bhar && S.y >= GROUND && !S.falling && (S.mode === "play" || S.mode === "boss")) {
-      ctx.fillStyle = "#c2570f"; ctx.beginPath(); ctx.arc(MX + 30, S.y - 66 + (S.t * 120) % 40, 4, 0, 6.3); ctx.fill();
-      if (S.mode === "play") { ctx.setLineDash([4, 5]); ctx.strokeStyle = "rgba(194,87,15,.6)"; ctx.lineWidth = 2;
-        ctx.strokeRect(MX, GROUND - 40, 150, 40); ctx.setLineDash([]); }
-    }
+  function drawPillar(x) {
+    ctx.fillStyle = "#9aa3ad"; ctx.fillRect(x, 0, PILLAR_W, PILLAR_BOTTOM);
+    ctx.fillStyle = "#838c96"; ctx.fillRect(x, 0, 10, PILLAR_BOTTOM); ctx.fillRect(x + PILLAR_W - 10, 0, 10, PILLAR_BOTTOM);
+    ctx.fillStyle = "#6e7781"; ctx.fillRect(x - 4, PILLAR_BOTTOM - 10, PILLAR_W + 8, 10);
+    ctx.strokeStyle = "#c2570f"; ctx.lineWidth = 3; ctx.setLineDash([6, 5]); ctx.beginPath(); ctx.moveTo(x - 4, PILLAR_BOTTOM + 2); ctx.lineTo(x + PILLAR_W + 4, PILLAR_BOTTOM + 2); ctx.stroke(); ctx.setLineDash([]);
   }
-  function drawThekedar() {
-    var h = 190, w = h * 220 / 320, x = 580, y = GROUND - h + Math.sin(S.bossT * 5) * 3;
-    if (S.stun > 0) { ctx.save(); ctx.translate(x + w / 2, GROUND); ctx.rotate(0.06); ctx.translate(-(x + w / 2), -GROUND); }
-    if (imgT.complete) ctx.drawImage(imgT, x, y, w, h);
-    // maang fill progress (hair parting at ~ (113,38) in the 220x320 art)
+  // Mistri at (x, y = feet). o: {crouch, alpha, rot, bob}
+  function drawMistriAt(x, y, o) {
+    o = o || {};
+    var h = o.crouch ? 62 : 100, w = (o.crouch ? 66 : 62.5);
+    ctx.save();
+    if (o.alpha != null) ctx.globalAlpha = o.alpha;
+    if (o.rot) { ctx.translate(x, y); ctx.rotate(o.rot); ctx.translate(-x, -y); }
+    var src = o.crouch ? (baked.mc || imgM) : (baked.m || imgM);
+    ctx.drawImage(src, x - w / 2, y - h + (o.bob || 0), w, h);
+    ctx.restore();
+  }
+  function drawThekedarAt(x, flash, warnMark, tilt, maangFill) {
+    var h = TH_H, w = h * 220 / 320, y = GROUND - h + Math.sin(S.t * 5) * 3;
+    ctx.save();
+    if (tilt) { ctx.translate(x + w / 2, GROUND); ctx.rotate(tilt); ctx.translate(-(x + w / 2), -GROUND); }
+    if (flash > 0 && Math.floor(S.t * 30) % 2 === 0) ctx.globalAlpha = 0.55;
+    ctx.drawImage(baked.t || imgT, x, y, w, h);
+    ctx.globalAlpha = 1;
     var s = h / 320, ax = x + 110 * s, ay = y + 30 * s, bx = x + 122 * s, by = y + 48 * s;
     ctx.strokeStyle = "#ffd9a8"; ctx.lineWidth = 3; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke(); ctx.setLineDash([]);
-    ctx.strokeStyle = "#c2570f"; ctx.lineWidth = 6; ctx.lineCap = "round"; ctx.beginPath(); ctx.moveTo(ax, ay);
-    ctx.lineTo(ax + (bx - ax) * S.maang, ay + (by - ay) * S.maang); ctx.stroke(); ctx.lineCap = "butt";
-    if (S.stun > 0) ctx.restore();
-    // meter
-    ctx.fillStyle = "rgba(0,0,0,.45)"; ctx.fillRect(560, 24, 200, 12);
-    ctx.fillStyle = "#c2570f"; ctx.fillRect(560, 24, 200 * S.maang, 12);
-    ctx.fillStyle = "#fff"; ctx.font = "bold 12px system-ui"; ctx.textAlign = "left"; ctx.fillText("MAANG", 562, 20);
+    if (maangFill > 0) { ctx.strokeStyle = "#c2570f"; ctx.lineWidth = 6; ctx.lineCap = "round"; ctx.beginPath(); ctx.moveTo(ax, ay);
+      ctx.lineTo(ax + (bx - ax) * maangFill, ay + (by - ay) * maangFill); ctx.stroke(); ctx.lineCap = "butt"; }
+    if (warnMark) { ctx.fillStyle = "#e0301e"; ctx.font = "bold 40px system-ui"; ctx.textAlign = "center"; ctx.fillText("!", x + w / 2, y - 6); }
+    ctx.restore();
   }
+
+  function drawTitleScene() {
+    wallTiles(0, 0);
+    // floor
+    ctx.fillStyle = "#8c8f94"; ctx.fillRect(0, GROUND, W, H - GROUND); ctx.fillStyle = "#a6aab0"; ctx.fillRect(0, GROUND, W, 6);
+    // the mural of Naseem, half grouted
+    var px = 330, py = 112, pw = 190, ph = 240;
+    ctx.fillStyle = "#6e645d"; ctx.fillRect(px - 8, py - 8, pw + 16, ph + 16);
+    ctx.fillStyle = "#efe6d6"; ctx.fillRect(px, py, pw, ph);
+    if (baked.n) ctx.drawImage(baked.n, px, py, pw, ph);
+    // tile mosaic grid over the whole mural
+    ctx.strokeStyle = "rgba(60,40,30,.28)"; ctx.lineWidth = 1;
+    for (var gx = px; gx <= px + pw; gx += 11.5) { ctx.beginPath(); ctx.moveTo(gx, py); ctx.lineTo(gx, py + ph); ctx.stroke(); }
+    for (var gy = py; gy <= py + ph; gy += 11.5) { ctx.beginPath(); ctx.moveTo(px, gy); ctx.lineTo(px + pw, gy); ctx.stroke(); }
+    // part that is still bare tile
+    var done = 0.52 + 0.06 * Math.sin(S.t * 1.3), cut = px + pw * done;
+    ctx.fillStyle = "#d9d2c6"; ctx.fillRect(cut, py, px + pw - cut, ph);
+    ctx.strokeStyle = "rgba(60,40,30,.28)";
+    for (var hx = cut - ((cut - px) % 11.5) + 11.5; hx <= px + pw; hx += 11.5) { ctx.beginPath(); ctx.moveTo(hx, py); ctx.lineTo(hx, py + ph); ctx.stroke(); }
+    for (var hy = py; hy <= py + ph; hy += 11.5) { ctx.beginPath(); ctx.moveTo(cut, hy); ctx.lineTo(px + pw, hy); ctx.stroke(); }
+    ctx.strokeStyle = "#c2570f"; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(cut, py); ctx.lineTo(cut, py + ph); ctx.stroke();
+    // Mistri working: a little rock as the trowel moves
+    var work = Math.sin(S.t * 5);
+    drawMistriAt(285, GROUND, { rot: work * 0.03, bob: Math.abs(work) * -2 });
+    // grout bucket
+    ctx.fillStyle = "#8a9099"; ctx.fillRect(215, GROUND - 22, 30, 22); ctx.fillStyle = "#c2570f"; ctx.fillRect(217, GROUND - 24, 26, 5);
+  }
+
   function drawHud() {
-    ctx.fillStyle = "rgba(0,0,0,.45)"; ctx.fillRect(0, 36, W, 26);
+    ctx.fillStyle = "rgba(0,0,0,.45)"; ctx.fillRect(0, 0, W, 26);
     ctx.fillStyle = "#fff"; ctx.font = "bold 14px system-ui"; ctx.textAlign = "left";
-    ctx.fillText("Floor 1 · The Bathroom", 12, 54);
-    ctx.textAlign = "right"; ctx.fillText("Filled " + S.filled + "/" + S.gaps.length + "   Combo " + S.combo + "x", W - 12, 54);
-    // progress
+    ctx.fillText("Floor 1 · The Bathroom", 12, 18);
+    ctx.textAlign = "right"; ctx.fillText("Filled " + S.filled + "/" + S.gaps.length + "   Combo " + S.combo + "x   Grout " + S.meter + "%", W - 70, 18);
     var pr = Math.min(1, S.cam / (LEN - MX));
-    ctx.fillStyle = "rgba(255,255,255,.35)"; ctx.fillRect(0, 62, W, 4);
-    ctx.fillStyle = "#c2570f"; ctx.fillRect(0, 62, W * pr, 4);
+    ctx.fillStyle = "rgba(255,255,255,.35)"; ctx.fillRect(0, 26, W, 4);
+    ctx.fillStyle = "#c2570f"; ctx.fillRect(0, 26, W * pr, 4);
   }
+  function bar(x, y, w, h, frac, color, label, align) {
+    ctx.fillStyle = "rgba(0,0,0,.55)"; ctx.fillRect(x, y, w, h);
+    ctx.fillStyle = color; var fw = Math.max(0, w * frac);
+    ctx.fillRect(align === "r" ? x + w - fw : x, y, fw, h);
+    ctx.strokeStyle = "#fff"; ctx.lineWidth = 2; ctx.strokeRect(x, y, w, h);
+    ctx.fillStyle = "#fff"; ctx.font = "bold 12px system-ui"; ctx.textAlign = align === "r" ? "right" : "left";
+    ctx.fillText(label, align === "r" ? x + w : x, y - 4);
+  }
+  function drawFightHud() {
+    bar(14, 26, 300, 18, S.hp / 100, "#3ba55d", "MISTRI", "l");
+    var full = S.meter >= 100;
+    bar(14, 62, 220, 12, S.meter / 100, full && Math.floor(S.t * 8) % 2 ? "#ffd34d" : "#c2570f", full ? "GROUT METER: SUPER READY!" : "GROUT METER", "l");
+    bar(W - 314, 26, 300, 18, S.thp / 100, "#d64541", "THEKEDAR", "r");
+  }
+
   function draw() {
-    var cam = S.cam;
-    drawBg(cam); drawFloor(cam);
-    for (var i = 0; i < S.bricks.length; i++) { var b = S.bricks[i], sx = b.x - cam; if (sx > -40 && sx < W) drawBrick(sx, GROUND - 36, 36); }
-    if (S.mode === "boss" || S.mode === "win") drawThekedar();
-    for (var k = 0; k < S.rolling.length; k++) drawBrick(S.rolling[k].x, GROUND - 34, 34);
-    drawMistri();
+    var m = S.mode;
+    ctx.save();
+    if (S.shake > 0) ctx.translate((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 8);
+    if (m === "title") { drawTitleScene(); ctx.restore(); return; }
+    if (m === "intro") {
+      drawBg(0); drawFloor(0, false);
+      drawThekedarAt(S.thX, 0, false, 0, S.maangShown);
+      drawMistriAt(S.cx, S.cy);
+      ctx.fillStyle = "#c2570f"; for (var a = 0; a < S.particles.length; a++) { var qa = S.particles[a]; ctx.globalAlpha = Math.max(0, qa.life * 2); ctx.fillRect(qa.x, qa.y, 4, 4); }
+      ctx.globalAlpha = 1; ctx.restore(); return;
+    }
+    var cam = S.cam, fighting = (m === "fightIntro" || m === "boss" || m === "win" || (m === "fail" && S.failBoss));
+    drawBg(cam); drawFloor(cam, !fighting);
+    if (!fighting) {
+      for (var i = 0; i < S.bricks.length; i++) { var b = S.bricks[i], sx = b.x - cam; if (sx > -40 && sx < W) drawBrick(sx, GROUND - 36, 36); }
+      for (var k = 0; k < S.pillars.length; k++) { var pl = S.pillars[k], px = pl.x - cam; if (px > -80 && px < W) drawPillar(px); }
+    } else {
+      var warn = m === "boss" && S.tNext <= 0.45;
+      drawThekedarAt(S.thX, S.thFlash, warn, m === "win" ? 0.06 : 0, m === "win" ? 1 : (1 - S.thp / 100) * 0.9);
+      for (var r = 0; r < S.projs.length; r++) { var pr = S.projs[r];
+        if (pr.type === "low") drawBrick(pr.x, GROUND - 34, 34);
+        else { ctx.fillStyle = "#f4f1e8"; ctx.fillRect(pr.x, GROUND - 100, 34, 32); ctx.strokeStyle = "#9aa3ad"; ctx.lineWidth = 2; ctx.strokeRect(pr.x, GROUND - 100, 34, 32);
+          ctx.beginPath(); ctx.moveTo(pr.x + 6, GROUND - 90); ctx.lineTo(pr.x + 28, GROUND - 90); ctx.moveTo(pr.x + 6, GROUND - 82); ctx.lineTo(pr.x + 28, GROUND - 82); ctx.stroke(); } }
+      ctx.fillStyle = "#c2570f";
+      for (var bl = 0; bl < S.blobs.length; bl++) { ctx.beginPath(); ctx.arc(S.blobs[bl].x, S.blobs[bl].y, 7, 0, 6.3); ctx.fill(); }
+      if (S.wave) { ctx.fillStyle = "rgba(194,87,15,.85)"; ctx.fillRect(S.wave.x - 40, GROUND - 120, 44, 120); ctx.fillStyle = "#ffb067"; ctx.fillRect(S.wave.x - 12, GROUND - 120, 16, 120); }
+    }
+    var inv = S.inv > 0 && Math.floor(S.t * 12) % 2 === 0;
+    drawMistriAt(MX, S.y, { crouch: S.crouch, alpha: inv ? 0.35 : 1, rot: S.falling ? Math.min(1.2, S.vy / 900) : 0, bob: (!S.falling && S.y >= GROUND && m !== "win" && !S.crouch) ? Math.sin(S.t * 14) * 3 : 0 });
+    if (m === "play") { ctx.setLineDash([4, 6]); ctx.strokeStyle = "rgba(194,87,15,.45)"; ctx.lineWidth = 2; ctx.strokeRect(MX, GROUND - 40, RANGE, 40); ctx.setLineDash([]); }
     ctx.fillStyle = "#c2570f";
     for (var p = 0; p < S.particles.length; p++) { var q = S.particles[p]; ctx.globalAlpha = Math.max(0, q.life * 2); ctx.fillRect(q.x, q.y, 4, 4); }
     ctx.globalAlpha = 1;
-    drawHud();
+    if (fighting) drawFightHud(); else drawHud();
+    ctx.restore();
+    var ready = m === "boss" && S.meter >= 100;
+    if (ready !== supReady) { supReady = ready; supBtn.classList.toggle("ready", ready); }
   }
 
+  fitCanvas();
   var last = 0;
   function frame(ts) {
     var dt = Math.min(0.033, (ts - last) / 1000 || 0.016); last = ts;
-    if (S.mode !== "title") update(dt); else S.t += dt;
-    draw(); requestAnimationFrame(frame);
+    update(dt); draw(); requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
 
@@ -354,32 +583,34 @@
     var c = document.createElement("canvas"); c.width = 1080; c.height = 1920; var x = c.getContext("2d");
     var g = x.createLinearGradient(0, 0, 0, 1920); g.addColorStop(0, "#f7f3ec"); g.addColorStop(1, "#ecdcc8"); x.fillStyle = g; x.fillRect(0, 0, 1080, 1920);
     x.fillStyle = "#2a2523"; x.fillRect(60, 60, 960, 24);
-    x.textAlign = "center"; x.fillStyle = "#c2570f"; x.font = "bold 120px system-ui"; x.fillText("FLOOR 1", 540, 280);
-    x.fillStyle = "#2a2523"; x.font = "bold 70px system-ui"; x.fillText("CLEARED", 540, 370);
-    x.font = "44px system-ui"; x.fillText("Gaps filled: " + S.filled + " / " + S.gaps.length, 540, 470);
-    x.fillText("Best combo: " + S.bestCombo + "x", 540, 535);
-    x.fillText("Maang bhari: 1", 540, 600);
-    var title = S.hits === 0 && S.filled === S.gaps.length ? "Doctor of Groutology" : (S.filled >= 5 ? "Grout Guru" : "Beginner Mistri");
-    x.fillStyle = "#c2570f"; x.font = "bold 64px system-ui"; x.fillText(title, 540, 720);
+    x.textAlign = "center"; x.fillStyle = "#c2570f"; x.font = "bold 110px system-ui"; x.fillText("THEKEDAR", 540, 280);
+    x.fillStyle = "#2a2523"; x.font = "bold 90px system-ui"; x.fillText("DEFEATED", 540, 380);
+    x.font = "44px system-ui"; x.fillText("Gaps filled: " + S.filled + " / " + S.gaps.length, 540, 480);
+    x.fillText("Health left: " + Math.max(1, Math.round(S.hp)) + "%", 540, 545);
+    x.fillText("Maang bhari: 1", 540, 610);
+    var title = S.hp >= 76 && S.hits === 0 ? "Doctor of Groutology" : (S.hp >= 40 ? "Grout Guru" : "Beginner Mistri");
+    x.fillStyle = "#c2570f"; x.font = "bold 64px system-ui"; x.fillText(title, 540, 730);
     if (imgM.complete) x.drawImage(imgM, 140, 800, 340, 544);
-    if (imgT.complete) x.drawImage(imgT, 560, 780, 380, 553);
-    x.strokeStyle = "#c2570f"; x.lineWidth = 12; x.lineCap = "round"; x.beginPath(); x.moveTo(560 + 110 * 380 / 220 * 0.69 + 4, 780 + 30 * 1.727 * 0.99); x.lineTo(560 + 122 * 1.727 + 4, 780 + 48 * 1.727); x.stroke();
+    if (imgT.complete) { x.drawImage(imgT, 560, 780, 380, 553);
+      var sc = 380 / 220;
+      x.strokeStyle = "#c2570f"; x.lineWidth = 12; x.lineCap = "round"; x.beginPath(); x.moveTo(560 + 110 * sc, 780 + 30 * sc); x.lineTo(560 + 122 * sc, 780 + 48 * sc); x.stroke(); }
     x.fillStyle = "#2a2523"; x.font = "bold 72px system-ui"; x.fillText("When in doubt,", 540, 1560);
     x.fillStyle = "#c2570f"; x.fillText("bhar do grout", 540, 1650);
     x.fillStyle = "#6e645d"; x.font = "36px system-ui"; x.fillText("shoonyaorigins.com/ventures/games", 540, 1790);
     c.toBlob(function (blob) {
-      var file = new File([blob], "grout-floor-1.png", { type: "image/png" });
+      var file = new File([blob], "grout-boss-defeated.png", { type: "image/png" });
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        navigator.share({ files: [file], title: "Unlimited Grout Simulator", text: "Floor 1 cleared. When in doubt, bhar do grout." }).catch(function () {});
+        navigator.share({ files: [file], title: "Unlimited Grout Simulator", text: "I defeated Thekedar. When in doubt, bhar do grout." }).catch(function () {});
       } else {
-        var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "grout-floor-1.png"; a.click();
+        var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "grout-boss-defeated.png"; a.click();
         setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
       }
     }, "image/png");
   };
 
-  // test hook (read-only view of the state, plus a way to set keys)
-  window.__grout = { state: function () { return S; }, keys: keys, jump: doJump };
+  // test hook
+  window.__grout = { state: function () { return S; }, keys: keys, jump: doJump, tap: function () { fillTap = true; }, sup: function () { superTap = true; },
+    step: function (dt) { update(dt); draw(); } };
 })();
 </script>
 </body>
