@@ -2,6 +2,9 @@
 // Turns one raw cell into a clean value, or says why it cannot. Pure functions, no network, no assumptions about a country:
 // nothing here knows India, rupees or day-first dates; where the text is ambiguous the function says so instead of guessing.
 
+import { applyCountry } from './countries.ts';
+import type { Country } from './countries.ts';
+
 // ------------------------------------------------------------------ empty and placeholder text
 
 const PLACEHOLDER_EXACT = new Set([
@@ -55,7 +58,7 @@ export function parseEmails(raw: string): EmailResult {
 // ------------------------------------------------------------------ phone
 
 export interface PhoneItem { value: string; digits: number }
-export interface PhoneResult { primary: string | null; others: string[]; problems: string[] }
+export interface PhoneResult { primary: string | null; others: string[]; problems: string[]; notes: string[] }
 
 /** One phone-looking piece: '+91 98765 43210', '020-2567 1234', '9876543210.0' ... Returns null with a reason when impossible. */
 export function cleanOnePhone(piece: string): { value: string } | { problem: string } {
@@ -85,23 +88,25 @@ export function cleanOnePhone(piece: string): { value: string } | { problem: str
 
 const PHONE_SPLIT = /\s*(?:[;\n|]|\s\/\s|\/(?=\s*\+?\d)|,(?=\s*\+?\(?\d)|\s+(?:or|and|&)\s+)\s*/i;
 
-export function parsePhones(raw: string): PhoneResult {
+export function parsePhones(raw: string, country?: Country | null): PhoneResult {
   const text = cleanText(raw);
-  if (!text) return { primary: null, others: [], problems: [] };
+  if (!text) return { primary: null, others: [], problems: [], notes: [] };
   // keep a lone number intact; only split when it is clearly several (a comma inside "12,345" is not a separator)
   const pieces = text.split(PHONE_SPLIT).map((p) => p.trim()).filter(Boolean);
   const good: string[] = [];
   const problems: string[] = [];
+  const notes: string[] = [];
   const seen = new Set<string>();
   for (const p of pieces) {
     const r = cleanOnePhone(p);
     if ('problem' in r) { problems.push(r.problem); continue; }
+    if (country) { const c = applyCountry(r.value, country); r.value = c.value; if (c.note) notes.push(c.note); }
     const key = r.value.replace(/\D/g, '');
     if (seen.has(key)) continue;
     seen.add(key);
     good.push(r.value);
   }
-  return { primary: good[0] ?? null, others: good.slice(1), problems };
+  return { primary: good[0] ?? null, others: good.slice(1), problems, notes };
 }
 
 // ------------------------------------------------------------------ web address

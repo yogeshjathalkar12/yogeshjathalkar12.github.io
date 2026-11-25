@@ -18,6 +18,7 @@ import type { DateOrder } from './values.ts';
 import type { FieldId } from './columnGuess.ts';
 import type { SheetTable } from './sheetShape.ts';
 import { allKeys, bookNormalizeName } from './prospects.ts';
+import { COUNTRY_BY_CODE } from './countries.ts';
 
 export type Entity = 'company' | 'contact' | 'deal';
 export type RowKind = Entity;
@@ -31,6 +32,8 @@ export interface ImportOptions {
   stageMap: Record<string, string>;    // lower-cased raw value -> stage key
   stageKeys: Set<string>;
   defaultStage: string;
+  /** ISO code of the country to add to phone numbers that have none; unset = numbers are kept exactly as written */
+  defaultCountry?: string;
 }
 
 export interface SourceRef { sheet: string; row: number }
@@ -75,6 +78,7 @@ function nameFromEmail(email: string): string {
 // ------------------------------------------------------------------ rows -> records
 
 export function parseTables(setups: TableSetup[], opts: ImportOptions): Parsed {
+  const country = opts.defaultCountry ? COUNTRY_BY_CODE.get(opts.defaultCountry) ?? null : null;
   const out: Parsed = { customDefs: new Map(), companies: new Map(), contacts: new Map(), deals: [], outcomes: [], rowsRead: 0, rowsUsed: 0, merged: { companies: 0, contacts: 0 }, conflicts: 0 };
 
   for (const setup of setups) {
@@ -106,8 +110,8 @@ export function parseTables(setups: TableSetup[], opts: ImportOptions): Parsed {
         company = { key: normalizeCompanyName(companyName), name: companyName, custom: {}, otherEmails: [], otherPhones: [], rows: [ref] };
         const email = f['company.email'] ? parseEmails(f['company.email']) : null;
         if (email) { company.email = email.primary ?? undefined; company.otherEmails = email.others; email.problems.forEach((p) => msgs.push(`Company email left out: ${p}`)); }
-        const phone = f['company.phone'] ? parsePhones(f['company.phone']) : null;
-        if (phone) { company.phone = phone.primary ?? undefined; company.otherPhones = phone.others; phone.problems.forEach((p) => msgs.push(`Company phone left out: ${p}`)); }
+        const phone = f['company.phone'] ? parsePhones(f['company.phone'], country) : null;
+        if (phone) { company.phone = phone.primary ?? undefined; company.otherPhones = phone.others; phone.problems.forEach((p) => msgs.push(`Company phone left out: ${p}`)); phone.notes.forEach((p) => msgs.push(`Company phone: ${p}`)); }
         const url = f['company.website_url'] ? parseUrl(f['company.website_url']) : null;
         if (url) { company.website_url = url.url ?? undefined; company.domain = url.domain ?? undefined; url.problems.forEach((p) => msgs.push(`Website left out: ${p}`)); }
         for (const k of ['address', 'city', 'industry', 'description'] as const) { const v = f[`company.${k}` as FieldId]; if (v) company[k] = v; }
@@ -116,9 +120,10 @@ export function parseTables(setups: TableSetup[], opts: ImportOptions): Parsed {
       // --- contacts
       const contacts: ContactRec[] = [];
       const cEmail = f['contact.email'] ? parseEmails(f['contact.email']) : null;
-      const cPhone = f['contact.phone'] ? parsePhones(f['contact.phone']) : null;
+      const cPhone = f['contact.phone'] ? parsePhones(f['contact.phone'], country) : null;
       cEmail?.problems.forEach((p) => msgs.push(`Contact email left out: ${p}`));
       cPhone?.problems.forEach((p) => msgs.push(`Contact phone left out: ${p}`));
+      cPhone?.notes.forEach((p) => msgs.push(`Contact phone: ${p}`));
       const emails = cEmail ? [cEmail.primary, ...cEmail.others].filter(Boolean) as string[] : [];
       const phones = cPhone ? [cPhone.primary, ...cPhone.others].filter(Boolean) as string[] : [];
       let people = f['contact.name'] ? parsePeople(f['contact.name']).people : [];

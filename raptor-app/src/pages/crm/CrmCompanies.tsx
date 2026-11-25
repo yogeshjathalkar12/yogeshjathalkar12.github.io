@@ -181,6 +181,7 @@ export default function CrmCompanies() {
         company={activeCompany}
         contacts={activeCompany ? contactsByCompany[activeCompany.id] || [] : []}
         deals={activeCompany ? dealsByCompany[activeCompany.id] || [] : []}
+        importLabel={activeCompany?.import_batch_id ? importLabels[activeCompany.import_batch_id] || 'an import' : null}
         onClose={() => setActiveCompany(null)}
         onChanged={fetchAll}
       />
@@ -252,7 +253,7 @@ function NewCompanyModal({ open, onClose, onCreated }: { open: boolean; onClose:
   );
 }
 
-function CompanyDetailModal({ company, contacts, deals, onClose, onChanged }: { company: any | null; contacts: any[]; deals: any[]; onClose: () => void; onChanged: () => void }) {
+function CompanyDetailModal({ company, contacts, deals, importLabel, onClose, onChanged }: { company: any | null; contacts: any[]; deals: any[]; importLabel?: string | null; onClose: () => void; onChanged: () => void }) {
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState<CompanyForm>(blankCompanyForm());
   const [saving, setSaving] = useState(false);
@@ -316,7 +317,7 @@ function CompanyDetailModal({ company, contacts, deals, onClose, onChanged }: { 
       ) : (
         <>
           <div style={{ fontSize: '0.65rem', color: 'var(--dim)', marginBottom: '1.2rem' }}>
-            {company.website_url || '— no website on file'} · added {new Date(company.created_at).toLocaleDateString()}
+            {company.website_url || '— no website on file'} · added {new Date(company.created_at).toLocaleDateString()}{importLabel ? ` · imported from ${importLabel}` : ''}
           </div>
 
           {filledCompanyDetails(company).map((d) => (

@@ -29,6 +29,8 @@ export interface RunResult {
 export interface RunOptions {
   source: string;
   fileName: string;
+  /** who the new contacts and deals belong to (a team member's user id); unset = the database's own default */
+  assigneeId?: string | null;
   onProgress?: (p: RunProgress) => void;
   shouldStop?: () => boolean;
   chunkSize?: number;
@@ -148,13 +150,13 @@ export async function runImport(plan: Plan, existing: Existing, opts: RunOptions
     if (!stopped) {
       created.contacts = await insertAll('contacts', 'Adding contacts', plan.contacts.create.map((c) => ({
         id: c.id, name: c.rec.name,
-        row: clean({ id: c.id, name: c.rec.name, first_name: c.rec.first_name, last_name: c.rec.last_name, email: c.rec.email, phone: c.rec.phone, linkedin_url: c.rec.linkedin_url, status: c.rec.status || 'cold', company_id: c.companyId && !badCompanies.has(c.companyId) ? c.companyId : undefined, custom_fields: customJson('contact', c.rec.custom), import_batch_id: batchId }),
+        row: clean({ id: c.id, name: c.rec.name, first_name: c.rec.first_name, last_name: c.rec.last_name, email: c.rec.email, phone: c.rec.phone, linkedin_url: c.rec.linkedin_url, status: c.rec.status || 'cold', company_id: c.companyId && !badCompanies.has(c.companyId) ? c.companyId : undefined, custom_fields: customJson('contact', c.rec.custom), assignee_id: opts.assigneeId || undefined, import_batch_id: batchId }),
       })), (id) => badContacts.add(id));
     }
     if (!stopped) {
       created.deals = await insertAll('deals', 'Adding deals', plan.deals.create.map((d) => ({
         id: d.id, name: d.rec.title,
-        row: clean({ id: d.id, title: d.rec.title, value: d.rec.value, stage: d.rec.stage, meeting_at: d.rec.meeting_at, company_id: d.companyId && !badCompanies.has(d.companyId) ? d.companyId : undefined, contact_id: d.contactId && !badContacts.has(d.contactId) ? d.contactId : undefined, custom_fields: customJson('deal', d.rec.custom), import_batch_id: batchId }),
+        row: clean({ id: d.id, title: d.rec.title, value: d.rec.value, stage: d.rec.stage, meeting_at: d.rec.meeting_at, company_id: d.companyId && !badCompanies.has(d.companyId) ? d.companyId : undefined, contact_id: d.contactId && !badContacts.has(d.contactId) ? d.contactId : undefined, custom_fields: customJson('deal', d.rec.custom), assignee_id: opts.assigneeId || undefined, import_batch_id: batchId }),
       })), () => undefined);
     }
 

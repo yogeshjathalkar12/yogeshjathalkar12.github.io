@@ -8,7 +8,10 @@ import { FIELDS, FIELD_BY_ID, suggestSetup, retargetField } from '../../lib/impo
 import type { ColumnSuggestion, FieldId } from '../../lib/import/columnGuess';
 import { applyFileLinks, distinctValues, findSuggestions, parseTables, planImport, suggestStage } from '../../lib/import/plan';
 import type { ColumnChoice, Existing, FieldType, Links, RowKind, StageInfo, Suggestion, TableSetup } from '../../lib/import/plan';
-import { inferDateOrder } from '../../lib/import/values';
+import { inferDateOrder, parsePhones } from '../../lib/import/values';
+import { COUNTRIES } from '../../lib/import/countries';
+import { useDirectory } from '../../hooks/useDirectory';
+import { shortName } from '../../lib/team';
 import type { DateOrder } from '../../lib/import/values';
 import { loadExisting, runImport } from '../../lib/import/run';
 import { applySaved, buildSaved, findSaved, forgetAll, loadAll, saveAll, upsert } from '../../lib/import/savedMappings';
@@ -92,12 +95,16 @@ export default function ImportWizardModal({ open, onClose, onImported, client, l
   const [undoNote, setUndoNote] = useState<string | null>(null);
   const [undone, setUndone] = useState(false);
   const [alsoProspects, setAlsoProspects] = useState(true);
+  const [sourceTag, setSourceTag] = useState('');
+  const [ownerId, setOwnerId] = useState('');
+  const [country, setCountry] = useState('');
+  const { entries: directory } = useDirectory();
   const [showLeftOut, setShowLeftOut] = useState(false);
   const stopRef = useRef(false);
 
   function reset() {
     setStep('file'); setTabs([]); setActiveTab(''); setError(null); setReading(false); setEmptyWords(''); setDateOrder(''); setStageMap({});
-    setExisting(null); setDecisions({}); setProgress(null); setResult(null); setUndoing(false); setUndoNote(null); setUndone(false); setShowLeftOut(false); stopRef.current = false;
+    setExisting(null); setDecisions({}); setProgress(null); setResult(null); setUndoing(false); setUndoNote(null); setUndone(false); setShowLeftOut(false); setSourceTag(''); setOwnerId(''); setCountry(''); stopRef.current = false;
   }
   useEffect(() => { if (!open) reset(); }, [open]);
 
@@ -180,8 +187,19 @@ export default function ImportWizardModal({ open, onClose, onImported, client, l
   const options = useMemo(() => ({
     dateOrder: effectiveDateOrder,
     extraPlaceholders: new Set(emptyWords.split(',').map((w) => w.trim().toLowerCase()).filter(Boolean)),
-    stageMap, stageKeys: new Set(stages.map((s) => s.key)), defaultStage: defaultStage || 'lead',
-  }), [effectiveDateOrder, emptyWords, stageMap, stages, defaultStage]);
+    stageMap, stageKeys: new Set(stages.map((s) => s.key)), defaultStage: defaultStage || 'lead', defaultCountry: country || undefined,
+  }), [effectiveDateOrder, emptyWords, stageMap, stages, defaultStage, country]);
+
+  // phone numbers in the chosen columns that carry no country code (the question "which country?" is only asked when this is more than 0)
+  const phoneStats = useMemo(() => {
+    let total = 0, without = 0;
+    for (const s of setups) s.choices.forEach((c, i) => {
+      if (c.field !== 'company.phone' && c.field !== 'contact.phone') return;
+      for (const r of s.table.rows) { if (!r[i]) continue; const p = parsePhones(r[i]); for (const v of [p.primary, ...p.others]) if (v) { total++; if (!/^\+/.test(v)) without++; } }
+    });
+    return { total, without };
+  }, [setups]);
+  const assignable = directory.filter((e) => e.can_assign);
 
   const mapProblem = useMemo(() => {
     if (!selected.length) return 'Tick at least one sheet.';
@@ -213,7 +231,7 @@ export default function ImportWizardModal({ open, onClose, onImported, client, l
     setStep('running'); setError(null); stopRef.current = false; setProgress({ phase: 'Starting', done: 0, total: 1 });
     try {
       const names = [...new Set(selected.map((t) => t.fileName))];
-      const res = await runImport(plan, existing, { source: names.join(', ').slice(0, 180), fileName: names.join(', ').slice(0, 280), onProgress: setProgress, shouldStop: () => stopRef.current }, client);
+      const res = await runImport(plan, existing, { source: (sourceTag.trim() || names.join(', ')).slice(0, 180), fileName: names.join(', ').slice(0, 280), assigneeId: ownerId || null, onProgress: setProgress, shouldStop: () => stopRef.current }, client);
       setResult(res); setStep('done'); onImported();
       if (res.created.companies + res.created.contacts + res.created.deals + res.updated.companies + res.updated.contacts > 0) {
         let list = loadAll(storage);
@@ -416,6 +434,31 @@ export default function ImportWizardModal({ open, onClose, onImported, client, l
             {plan.counts.rowsUsed} of {plan.counts.rowsRead} rows used.
             {plan.counts.mergedInFile > 0 && <> {plan.counts.mergedInFile} repeated rows (the same company or person again) were combined into one; the first value wins and every extra email or phone is kept.</>}
             {' '}Existing records are never overwritten: only empty fields are filled.
+          </div>
+
+          <div style={{ border: '1px solid var(--border)', borderRadius: 4, padding: '0.7rem 0.9rem', marginBottom: '1rem' }}>
+            <label style={fieldLabelStyle}>Source tag (how this import is listed in Import history and in the “Imported from” column)</label>
+            <input value={sourceTag} onChange={(e) => setSourceTag(e.target.value)} placeholder={[...new Set(selected.map((t) => t.fileName))].join(', ').slice(0, 80)} style={{ ...selectStyle, marginBottom: '0.7rem' }} />
+            {(plan.contacts.create.length > 0 || plan.deals.create.length > 0) && assignable.length > 0 && (
+              <>
+                <label style={fieldLabelStyle}>Owner of the new people and deals</label>
+                <select aria-label="Owner of the new records" style={{ ...selectStyle, marginBottom: '0.3rem' }} value={ownerId} onChange={(e) => setOwnerId(e.target.value)}>
+                  <option value="">No owner chosen (as when you add one by hand)</option>
+                  {assignable.map((o) => <option key={o.user_id} value={o.user_id}>{shortName(o.email)}{o.is_me ? ' (me)' : ''}{o.is_owner ? ' — owner' : ''}</option>)}
+                </select>
+                {ownerId && <div style={{ ...small, marginBottom: '0.7rem' }}>The owner gets a notification for each record assigned to them. Companies have no owner.</div>}
+              </>
+            )}
+            {phoneStats.without > 0 && (
+              <>
+                <label style={{ ...fieldLabelStyle, marginTop: '0.4rem' }}>{phoneStats.without} of {phoneStats.total} phone numbers have no country code. Country they are from</label>
+                <select aria-label="Country for phone numbers without a code" style={selectStyle} value={country} onChange={(e) => setCountry(e.target.value)}>
+                  <option value="">Keep them exactly as written</option>
+                  {COUNTRIES.map((c) => <option key={c.code} value={c.code}>{c.name} (+{c.dial})</option>)}
+                </select>
+                <div style={{ ...small, marginTop: 4 }}>Raptor does not guess this. Numbers that already start with + or 00 are never changed, and a number that does not fit the country is left as written and listed below.</div>
+              </>
+            )}
           </div>
 
           {plan.companies.create.length + plan.companies.update.length + plan.companies.unchanged > 0 && (

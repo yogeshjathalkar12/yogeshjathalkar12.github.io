@@ -34,7 +34,7 @@ test('emails: first is primary, the rest are kept, nothing is dropped, junk is r
 });
 
 test('phones: several in one cell, formats kept, Excel damage rejected', () => {
-  assert.deepEqual(parsePhones('+91 98765 43210 / 020 2567 1234'), { primary: '+91 98765 43210', others: ['020 2567 1234'], problems: [] });
+  assert.deepEqual(parsePhones('+91 98765 43210 / 020 2567 1234'), { primary: '+91 98765 43210', others: ['020 2567 1234'], problems: [], notes: [] });
   assert.equal(parsePhones('9876543210.0').primary, '9876543210');
   assert.equal(parsePhones('(555) 123-4567').primary, '(555) 123-4567');
   assert.equal(parsePhones('0044 20 7946 0958').primary, '+44 20 7946 0958');
