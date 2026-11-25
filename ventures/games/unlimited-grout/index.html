@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="robots" content="noindex">
+<title>Unlimited Grout Simulator — Floor 1</title>
+<style>
+  :root { --bg:#f7f3ec; --ink:#2a2523; --grout:#c2570f; --grout-d:#8f3f08; --card:#fff; --edge:#e6dfd3; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#1c1816; --ink:#f4eee6; --card:#26211f; --edge:#3a3330; } }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { margin:0; height:100%; }
+  body { background:var(--bg); color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+         display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; padding:10px; user-select:none; }
+  #stage { position:relative; width:min(100%, 880px); aspect-ratio:16/9; border-radius:16px; overflow:hidden; background:#cfe3ea; box-shadow:0 10px 30px rgba(0,0,0,.2); }
+  canvas { width:100%; height:100%; display:block; }
+  #caption { position:absolute; left:10px; right:10px; top:8px; text-align:center; font-weight:700; font-size:clamp(12px,2.4vw,19px);
+             color:#fff; text-shadow:0 2px 4px rgba(0,0,0,.6); pointer-events:none; min-height:1.4em; }
+  .overlay { position:absolute; inset:0; display:none; flex-direction:column; align-items:center; justify-content:center; gap:12px;
+             background:rgba(20,16,14,.82); color:#fff; text-align:center; padding:16px; }
+  .overlay.on { display:flex; }
+  .overlay h2 { margin:0; font-size:clamp(1.3rem,4.4vw,2.4rem); line-height:1.15; }
+  .overlay p { margin:0; font-size:clamp(.95rem,2.4vw,1.2rem); opacity:.9; max-width:28em; }
+  .overlay .big { color:var(--grout); font-weight:800; }
+  .btn { background:var(--grout); color:#fff; border:0; border-radius:12px; font-weight:800; font-size:1.05rem; padding:12px 22px; cursor:pointer; touch-action:manipulation; }
+  .btn.alt { background:#4a403a; }
+  .btn:active { background:var(--grout-d); }
+  .row { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+  #controls { width:min(100%, 880px); display:flex; gap:10px; }
+  #controls button { flex:1; height:72px; border:0; border-radius:16px; font-size:1.2rem; font-weight:800; color:#fff; touch-action:none; cursor:pointer; }
+  #bhar { background:var(--grout); } #jump { background:#35508a; }
+  #controls button.down { filter:brightness(.8); transform:scale(.98); }
+  #hint { font-size:13px; opacity:.7; text-align:center; }
+  #snd { position:absolute; right:8px; bottom:8px; background:rgba(0,0,0,.45); color:#fff; border:0; border-radius:8px; padding:6px 10px; cursor:pointer; font-size:12px; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="c" width="800" height="450"></canvas>
+  <div id="caption"></div>
+  <button id="snd" aria-label="Toggle sound">Sound on</button>
+
+  <div class="overlay on" id="ovTitle">
+    <p id="t1" style="font-size:clamp(1.1rem,3.4vw,1.8rem);font-weight:700">Mistri, maan jao...<br>police mana karke gayi hai.</p>
+    <h2 class="big" id="t2" style="opacity:0">Grout bhar denge.</h2>
+    <button class="btn" id="startBtn" style="opacity:0">Start climbing</button>
+    <p style="font-size:.85rem;opacity:.7">Space / Up = jump &nbsp;·&nbsp; Down / B (hold) = bhar do</p>
+  </div>
+  <div class="overlay" id="ovFail">
+    <h2 id="failMsg">Thoda grout kam pada.</h2>
+    <button class="btn" id="retryBtn">Try again</button>
+  </div>
+  <div class="overlay" id="ovWin">
+    <h2>Floor 1 cleared!</h2>
+    <p><b>Thekedar:</b> Theek hai... chalega.<br><b>Mistri:</b> Chalega nahi, daudega.</p>
+    <p id="stats"></p>
+    <div class="row">
+      <button class="btn" id="shareBtn">Share my card</button>
+      <button class="btn alt" id="againBtn">Play again</button>
+    </div>
+    <p style="font-size:.85rem;opacity:.7">Floor 2: The Crooked Staircase, coming soon</p>
+  </div>
+</div>
+
+<div id="controls">
+  <button id="bhar" aria-label="Hold to bhar do">HOLD: BHAR DO</button>
+  <button id="jump" aria-label="Jump">JUMP</button>
+</div>
+<div id="hint">Fill the gaps before you reach them. Jump the bricks. Then fill Thekedar's maang.</div>
+
+<script>
+(function () {
+  "use strict";
+  var W = 800, H = 450, GROUND = 360, SPEED = 230, MX = 160, LEN = 3700;
+  var cv = document.getElementById("c"), ctx = cv.getContext("2d");
+  var cap = document.getElementById("caption");
+
+  // ---------- assets ----------
+  var imgM = new Image(), imgT = new Image(), loaded = 0;
+  imgM.onload = imgT.onload = function () { loaded++; };
+  imgM.src = "mistri.svg"; imgT.src = "thekedar.svg";
+
+  // ---------- level data (world x) ----------
+  var GAPS0 = [[700,70],[1150,90],[1600,80],[2000,100],[2450,90],[2900,110],[3300,90]];
+  var BRICKS0 = [900,1400,1850,2250,2700,3100];
+
+  // ---------- state ----------
+  var S = {};
+  function reset() {
+    S = { mode: "title", cam: 0, y: GROUND, vy: 0, falling: false, inv: 0, t: 0,
+          gaps: GAPS0.map(function (g) { return { x: g[0], w: g[1], fill: 0 }; }),
+          bricks: BRICKS0.map(function (x) { return { x: x }; }),
+          rolling: [], particles: [], filled: 0, combo: 0, bestCombo: 0, hits: 0,
+          maang: 0, nextBrick: 1.2, said: {}, bossT: 0, stun: 0 };
+  }
+  reset();
+
+  var keys = { jump: false, bhar: false }, wantJump = false;
+
+  // ---------- audio ----------
+  var AC = null, soundOn = true;
+  function audio() { if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} } return AC; }
+  function beep(f, d, type, vol, slide) {
+    if (!soundOn || !audio()) return;
+    var o = AC.createOscillator(), g = AC.createGain(); o.type = type || "square";
+    o.frequency.value = f; if (slide) o.frequency.linearRampToValueAtTime(slide, AC.currentTime + d);
+    g.gain.value = vol || 0.05; g.gain.linearRampToValueAtTime(0.0001, AC.currentTime + d);
+    o.connect(g); g.connect(AC.destination); o.start(); o.stop(AC.currentTime + d);
+  }
+  function squelch() {
+    if (!soundOn || !audio()) return;
+    var n = AC.sampleRate * 0.12, b = AC.createBuffer(1, n, AC.sampleRate), d = b.getChannelData(0);
+    for (var i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n) * 0.35;
+    var s = AC.createBufferSource(), f = AC.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = 500;
+    s.buffer = b; s.connect(f); f.connect(AC.destination); s.start();
+  }
+  document.getElementById("snd").onclick = function () {
+    soundOn = !soundOn; this.textContent = soundOn ? "Sound on" : "Sound off";
+  };
+
+  // ---------- caption ----------
+  var capTimer = 0;
+  function say(who, text, ms) {
+    cap.textContent = who + ": " + text;
+    clearTimeout(capTimer); capTimer = setTimeout(function () { cap.textContent = ""; }, ms || 2600);
+  }
+
+  // ---------- input ----------
+  function doJump() { wantJump = true; }
+  addEventListener("keydown", function (e) {
+    if (e.repeat) { if (e.code === "Space" || e.code === "ArrowUp" || e.code === "ArrowDown") e.preventDefault(); return; }
+    if (e.code === "Space" || e.code === "ArrowUp" || e.code === "KeyW") { e.preventDefault(); doJump(); }
+    if (e.code === "ArrowDown" || e.code === "KeyB" || e.code === "ShiftLeft" || e.code === "KeyS") { e.preventDefault(); keys.bhar = true; }
+  });
+  addEventListener("keyup", function (e) {
+    if (e.code === "ArrowDown" || e.code === "KeyB" || e.code === "ShiftLeft" || e.code === "KeyS") keys.bhar = false;
+  });
+  function bindBtn(id, down, up) {
+    var el = document.getElementById(id);
+    el.addEventListener("pointerdown", function (e) { e.preventDefault(); el.classList.add("down"); try { el.setPointerCapture(e.pointerId); } catch (x) {} down(); });
+    ["pointerup", "pointercancel", "pointerleave"].forEach(function (ev) { el.addEventListener(ev, function () { el.classList.remove("down"); up(); }); });
+  }
+  bindBtn("jump", doJump, function () {});
+  bindBtn("bhar", function () { keys.bhar = true; audio(); }, function () { keys.bhar = false; });
+
+  // ---------- UI flow ----------
+  var ovTitle = document.getElementById("ovTitle"), ovFail = document.getElementById("ovFail"), ovWin = document.getElementById("ovWin");
+  function showTitle() {
+    ovTitle.classList.add("on"); ovFail.classList.remove("on"); ovWin.classList.remove("on");
+    var t2 = document.getElementById("t2"), sb = document.getElementById("startBtn");
+    t2.style.opacity = 0; sb.style.opacity = 0;
+    setTimeout(function () { t2.style.transition = "opacity .6s"; t2.style.opacity = 1; }, 1600);
+    setTimeout(function () { sb.style.transition = "opacity .6s"; sb.style.opacity = 1; }, 2600);
+  }
+  showTitle();
+  function begin() {
+    audio(); reset(); S.mode = "play";
+    ovTitle.classList.remove("on"); ovFail.classList.remove("on"); ovWin.classList.remove("on");
+    say("Thekedar", "Tiles ke beech 2 inch ka gap kyu chhoda?!", 3000);
+    setTimeout(function () { if (S.mode === "play") say("Mistri", "Ventilation ke liye, saab. Grout bhar denge.", 3000); }, 3100);
+  }
+  document.getElementById("startBtn").onclick = function () { if (loaded >= 2) begin(); };
+  document.getElementById("retryBtn").onclick = begin;
+  document.getElementById("againBtn").onclick = begin;
+  var FAILS = ["Thoda grout kam pada.", "Gap ne tumhe bhar diya.", "Neev mein grout bhar dete to bachte.", "Tension mat lo... bas dobara try karo."];
+  function fail() {
+    if (S.mode === "fail") return; S.mode = "fail";
+    beep(300, 0.5, "sawtooth", 0.06, 80);
+    document.getElementById("failMsg").textContent = FAILS[Math.floor(Math.random() * FAILS.length)];
+    setTimeout(function () { ovFail.classList.add("on"); }, 350);
+  }
+  function win() {
+    if (S.mode === "win") return; S.mode = "win";
+    beep(523, 0.15, "triangle", 0.07); setTimeout(function () { beep(659, 0.15, "triangle", 0.07); }, 150);
+    setTimeout(function () { beep(784, 0.35, "triangle", 0.07); }, 300);
+    document.getElementById("stats").textContent =
+      "Gaps filled: " + S.filled + " / " + S.gaps.length + "  ·  Best combo: " + S.bestCombo + "  ·  Bricks hit: " + S.hits;
+    setTimeout(function () { ovWin.classList.add("on"); }, 500);
+  }
+
+  // ---------- update ----------
+  function overGap(mx) {
+    for (var i = 0; i < S.gaps.length; i++) { var g = S.gaps[i];
+      if (g.fill < 1 && mx > g.x + 6 && mx < g.x + g.w - 6) return g; }
+    return null;
+  }
+  function spray(x, y, n) {
+    for (var i = 0; i < n; i++) S.particles.push({ x: x, y: y, vx: 60 + Math.random() * 120, vy: -40 + Math.random() * 120, life: 0.5 });
+  }
+  function update(dt) {
+    S.t += dt;
+    var m = S.mode;
+    // jump
+    var grounded = S.y >= GROUND && !S.falling;
+    if (wantJump) { wantJump = false; if ((m === "play" || m === "boss") && grounded) { S.vy = -660; beep(420, 0.12, "square", 0.04, 700); } }
+
+    var filling = false;
+    if (m === "play") {
+      var mx = S.cam + MX;
+      // fill nearest gap in range
+      if (keys.bhar && grounded) {
+        var target = null;
+        for (var i = 0; i < S.gaps.length; i++) { var g = S.gaps[i];
+          if (g.fill < 1 && g.x + g.w > mx && g.x < mx + 150) { target = g; break; } }
+        if (target) {
+          filling = true;
+          var before = target.fill;
+          target.fill = Math.min(1, target.fill + dt / 0.55);
+          if (Math.random() < 0.3) squelch();
+          spray(MX + 28, S.y - 72, 2);
+          if (before < 1 && target.fill >= 1) {
+            S.filled++; S.combo++; S.bestCombo = Math.max(S.bestCombo, S.combo);
+            beep(660, 0.1, "triangle", 0.06);
+            var lines = ["Bhar diya!", "Ek aur gap bhar diya.", "Grout bhar diya!", "Sab theek hai."];
+            say("Mistri", lines[S.filled % lines.length], 1300);
+          }
+        }
+      }
+      var sp = (keys.bhar && grounded) ? SPEED * 0.28 : SPEED;
+      if (!S.falling) S.cam += sp * dt;
+      if (S.cam + MX >= LEN) { S.mode = "boss"; S.cam = LEN - MX; S.nextBrick = 1.0; say("Thekedar", "Yeh kya tamasha hai?! Hatt!", 2200); }
+      // bricks
+      if (S.inv > 0) S.inv -= dt;
+      mx = S.cam + MX;
+      for (var j = 0; j < S.bricks.length; j++) { var b = S.bricks[j];
+        if (S.inv <= 0 && !S.falling && mx + 16 > b.x && mx - 16 < b.x + 36 && S.y > GROUND - 32) {
+          S.inv = 1.0; S.hits++; S.combo = 0; S.cam = Math.max(0, S.cam - 110); beep(150, 0.2, "sawtooth", 0.06, 90);
+          say("Thekedar", "Tension le! Tension!", 1500); } }
+    } else if (m === "boss") {
+      if (S.inv > 0) S.inv -= dt;
+      S.bossT += dt;
+      if (keys.bhar && grounded && S.stun <= 0) {
+        S.maang = Math.min(1, S.maang + dt / 2.2); filling = true;
+        if (Math.random() < 0.3) squelch(); spray(MX + 28, S.y - 72, 2);
+      } else S.maang = Math.max(0, S.maang - dt / 5);
+      S.nextBrick -= dt;
+      if (S.nextBrick <= 0 && S.stun <= 0) { S.rolling.push({ x: 560 }); S.nextBrick = 1.6 + Math.random() * 0.8; }
+      for (var k = S.rolling.length - 1; k >= 0; k--) { var r = S.rolling[k]; r.x -= 300 * dt;
+        if (r.x < -40) { S.rolling.splice(k, 1); continue; }
+        if (S.inv <= 0 && MX + 16 > r.x && MX - 16 < r.x + 34 && S.y > GROUND - 30) {
+          S.inv = 1.0; S.maang = Math.max(0, S.maang - 0.25); beep(150, 0.2, "sawtooth", 0.06, 90); S.rolling.splice(k, 1); } }
+      if (S.maang >= 1) { S.stun = 1; S.rolling = []; win(); }
+    }
+    // vertical
+    if (m === "play" || m === "boss" || S.falling) {
+      S.vy += 1900 * dt; S.y += S.vy * dt;
+      if (!S.falling && S.y >= GROUND) {
+        var gp = (m === "play") ? overGap(S.cam + MX) : null;
+        if (gp) { S.falling = true; S.combo = 0; } else { S.y = GROUND; S.vy = 0; }
+      }
+      if (S.falling && S.y > H + 80) fail();
+    }
+    // particles
+    for (var p = S.particles.length - 1; p >= 0; p--) { var q = S.particles[p];
+      q.life -= dt; q.x += q.vx * dt; q.y += q.vy * dt; q.vy += 500 * dt; if (q.life <= 0) S.particles.splice(p, 1); }
+  }
+
+  // ---------- draw ----------
+  function drawBg(cam) {
+    ctx.fillStyle = "#cfe3ea"; ctx.fillRect(0, 0, W, GROUND);
+    ctx.strokeStyle = "#b3cdd7"; ctx.lineWidth = 2;
+    var off = -((cam * 0.5) % 60);
+    for (var x = off; x < W; x += 60) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, GROUND); ctx.stroke(); }
+    for (var y = 30; y < GROUND; y += 60) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+    // mirrors
+    var moff = -((cam * 0.5) % 600);
+    for (var k = -1; k < 3; k++) { var mx = moff + k * 600 + 240;
+      ctx.fillStyle = "#e9f6fb"; ctx.fillRect(mx, 90, 100, 130); ctx.strokeStyle = "#8aa7b3"; ctx.lineWidth = 5; ctx.strokeRect(mx, 90, 100, 130);
+      ctx.strokeStyle = "rgba(255,255,255,.8)"; ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(mx + 18, 200); ctx.lineTo(mx + 46, 108); ctx.stroke(); }
+  }
+  function drawFloor(cam) {
+    ctx.fillStyle = "#8c8f94"; ctx.fillRect(0, GROUND, W, H - GROUND);
+    ctx.fillStyle = "#a6aab0"; ctx.fillRect(0, GROUND, W, 6);
+    ctx.strokeStyle = "#7a7d82"; ctx.lineWidth = 2;
+    var off = -(cam % 80);
+    for (var x = off; x < W; x += 80) { ctx.beginPath(); ctx.moveTo(x, GROUND + 6); ctx.lineTo(x, H); ctx.stroke(); }
+    for (var i = 0; i < S.gaps.length; i++) { var g = S.gaps[i], sx = g.x - cam;
+      if (sx > W || sx + g.w < 0) continue;
+      ctx.fillStyle = "#14110f"; ctx.fillRect(sx, GROUND, g.w, H - GROUND);
+      if (g.fill > 0) { var hh = (H - GROUND) * g.fill;
+        ctx.fillStyle = "#c2570f"; ctx.fillRect(sx, H - hh, g.w, hh);
+        ctx.fillStyle = "#e07a2b"; ctx.fillRect(sx, H - hh, g.w, 4); }
+      if (g.fill < 1) { ctx.fillStyle = "#c2570f"; ctx.font = "bold 13px system-ui"; ctx.textAlign = "center"; ctx.fillText("GAP", sx + g.w / 2, GROUND - 8); }
+    }
+  }
+  function drawBrick(x, y, w, label) {
+    ctx.fillStyle = "#b5532b"; ctx.fillRect(x, y, w, w); ctx.strokeStyle = "#7a3418"; ctx.lineWidth = 2; ctx.strokeRect(x, y, w, w);
+    ctx.strokeStyle = "#8f4220"; ctx.beginPath(); ctx.moveTo(x, y + w / 2); ctx.lineTo(x + w, y + w / 2); ctx.moveTo(x + w / 2, y); ctx.lineTo(x + w / 2, y + w / 2); ctx.stroke();
+  }
+  function drawMistri() {
+    var h = 100, w = h * 200 / 320, x = MX - w / 2, y = S.y - h;
+    var run = (S.mode === "play" || S.mode === "boss") && !S.falling && S.y >= GROUND;
+    var bob = run ? Math.sin(S.t * 14) * 3 : 0;
+    var blink = S.inv > 0 && Math.floor(S.t * 12) % 2 === 0;
+    if (blink) ctx.globalAlpha = 0.35;
+    ctx.save(); ctx.translate(MX, S.y); if (S.falling) ctx.rotate(Math.min(1.2, S.vy / 900)); ctx.translate(-MX, -S.y);
+    if (imgM.complete) ctx.drawImage(imgM, x, y + bob, w, h);
+    ctx.restore(); ctx.globalAlpha = 1;
+    // grout dripping from trowel while holding
+    if (keys.bhar && S.y >= GROUND && !S.falling && (S.mode === "play" || S.mode === "boss")) {
+      ctx.fillStyle = "#c2570f"; ctx.beginPath(); ctx.arc(MX + 30, S.y - 66 + (S.t * 120) % 40, 4, 0, 6.3); ctx.fill();
+      if (S.mode === "play") { ctx.setLineDash([4, 5]); ctx.strokeStyle = "rgba(194,87,15,.6)"; ctx.lineWidth = 2;
+        ctx.strokeRect(MX, GROUND - 40, 150, 40); ctx.setLineDash([]); }
+    }
+  }
+  function drawThekedar() {
+    var h = 190, w = h * 220 / 320, x = 580, y = GROUND - h + Math.sin(S.bossT * 5) * 3;
+    if (S.stun > 0) { ctx.save(); ctx.translate(x + w / 2, GROUND); ctx.rotate(0.06); ctx.translate(-(x + w / 2), -GROUND); }
+    if (imgT.complete) ctx.drawImage(imgT, x, y, w, h);
+    // maang fill progress (hair parting at ~ (113,38) in the 220x320 art)
+    var s = h / 320, ax = x + 110 * s, ay = y + 30 * s, bx = x + 122 * s, by = y + 48 * s;
+    ctx.strokeStyle = "#ffd9a8"; ctx.lineWidth = 3; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke(); ctx.setLineDash([]);
+    ctx.strokeStyle = "#c2570f"; ctx.lineWidth = 6; ctx.lineCap = "round"; ctx.beginPath(); ctx.moveTo(ax, ay);
+    ctx.lineTo(ax + (bx - ax) * S.maang, ay + (by - ay) * S.maang); ctx.stroke(); ctx.lineCap = "butt";
+    if (S.stun > 0) ctx.restore();
+    // meter
+    ctx.fillStyle = "rgba(0,0,0,.45)"; ctx.fillRect(560, 24, 200, 12);
+    ctx.fillStyle = "#c2570f"; ctx.fillRect(560, 24, 200 * S.maang, 12);
+    ctx.fillStyle = "#fff"; ctx.font = "bold 12px system-ui"; ctx.textAlign = "left"; ctx.fillText("MAANG", 562, 20);
+  }
+  function drawHud() {
+    ctx.fillStyle = "rgba(0,0,0,.45)"; ctx.fillRect(0, 36, W, 26);
+    ctx.fillStyle = "#fff"; ctx.font = "bold 14px system-ui"; ctx.textAlign = "left";
+    ctx.fillText("Floor 1 · The Bathroom", 12, 54);
+    ctx.textAlign = "right"; ctx.fillText("Filled " + S.filled + "/" + S.gaps.length + "   Combo " + S.combo + "x", W - 12, 54);
+    // progress
+    var pr = Math.min(1, S.cam / (LEN - MX));
+    ctx.fillStyle = "rgba(255,255,255,.35)"; ctx.fillRect(0, 62, W, 4);
+    ctx.fillStyle = "#c2570f"; ctx.fillRect(0, 62, W * pr, 4);
+  }
+  function draw() {
+    var cam = S.cam;
+    drawBg(cam); drawFloor(cam);
+    for (var i = 0; i < S.bricks.length; i++) { var b = S.bricks[i], sx = b.x - cam; if (sx > -40 && sx < W) drawBrick(sx, GROUND - 36, 36); }
+    if (S.mode === "boss" || S.mode === "win") drawThekedar();
+    for (var k = 0; k < S.rolling.length; k++) drawBrick(S.rolling[k].x, GROUND - 34, 34);
+    drawMistri();
+    ctx.fillStyle = "#c2570f";
+    for (var p = 0; p < S.particles.length; p++) { var q = S.particles[p]; ctx.globalAlpha = Math.max(0, q.life * 2); ctx.fillRect(q.x, q.y, 4, 4); }
+    ctx.globalAlpha = 1;
+    drawHud();
+  }
+
+  var last = 0;
+  function frame(ts) {
+    var dt = Math.min(0.033, (ts - last) / 1000 || 0.016); last = ts;
+    if (S.mode !== "title") update(dt); else S.t += dt;
+    draw(); requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  // ---------- share card ----------
+  document.getElementById("shareBtn").onclick = function () {
+    var c = document.createElement("canvas"); c.width = 1080; c.height = 1920; var x = c.getContext("2d");
+    var g = x.createLinearGradient(0, 0, 0, 1920); g.addColorStop(0, "#f7f3ec"); g.addColorStop(1, "#ecdcc8"); x.fillStyle = g; x.fillRect(0, 0, 1080, 1920);
+    x.fillStyle = "#2a2523"; x.fillRect(60, 60, 960, 24);
+    x.textAlign = "center"; x.fillStyle = "#c2570f"; x.font = "bold 120px system-ui"; x.fillText("FLOOR 1", 540, 280);
+    x.fillStyle = "#2a2523"; x.font = "bold 70px system-ui"; x.fillText("CLEARED", 540, 370);
+    x.font = "44px system-ui"; x.fillText("Gaps filled: " + S.filled + " / " + S.gaps.length, 540, 470);
+    x.fillText("Best combo: " + S.bestCombo + "x", 540, 535);
+    x.fillText("Maang bhari: 1", 540, 600);
+    var title = S.hits === 0 && S.filled === S.gaps.length ? "Doctor of Groutology" : (S.filled >= 5 ? "Grout Guru" : "Beginner Mistri");
+    x.fillStyle = "#c2570f"; x.font = "bold 64px system-ui"; x.fillText(title, 540, 720);
+    if (imgM.complete) x.drawImage(imgM, 140, 800, 340, 544);
+    if (imgT.complete) x.drawImage(imgT, 560, 780, 380, 553);
+    x.strokeStyle = "#c2570f"; x.lineWidth = 12; x.lineCap = "round"; x.beginPath(); x.moveTo(560 + 110 * 380 / 220 * 0.69 + 4, 780 + 30 * 1.727 * 0.99); x.lineTo(560 + 122 * 1.727 + 4, 780 + 48 * 1.727); x.stroke();
+    x.fillStyle = "#2a2523"; x.font = "bold 72px system-ui"; x.fillText("When in doubt,", 540, 1560);
+    x.fillStyle = "#c2570f"; x.fillText("bhar do grout", 540, 1650);
+    x.fillStyle = "#6e645d"; x.font = "36px system-ui"; x.fillText("shoonyaorigins.com/ventures/games", 540, 1790);
+    c.toBlob(function (blob) {
+      var file = new File([blob], "grout-floor-1.png", { type: "image/png" });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({ files: [file], title: "Unlimited Grout Simulator", text: "Floor 1 cleared. When in doubt, bhar do grout." }).catch(function () {});
+      } else {
+        var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "grout-floor-1.png"; a.click();
+        setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+      }
+    }, "image/png");
+  };
+
+  // test hook (read-only view of the state, plus a way to set keys)
+  window.__grout = { state: function () { return S; }, keys: keys, jump: doJump };
+})();
+</script>
+</body>
+</html>

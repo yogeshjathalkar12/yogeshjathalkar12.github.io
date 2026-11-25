@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 320" width="200" height="320" role="img" aria-label="Mistri, a cartoon mason with a trowel and a bucket of grout">
+  <!-- shadow -->
+  <ellipse cx="100" cy="308" rx="52" ry="8" fill="#000" opacity=".18"/>
+  <!-- legs -->
+  <rect x="68" y="225" width="26" height="70" rx="8" fill="#3b3f4a"/>
+  <rect x="106" y="225" width="26" height="70" rx="8" fill="#3b3f4a"/>
+  <!-- shoes -->
+  <path d="M60 293 h38 v12 h-44 z" fill="#2a2523"/>
+  <path d="M102 293 h38 v12 h-32 z" fill="#2a2523" transform="translate(2 0)"/>
+  <!-- left arm (bucket) -->
+  <path d="M60 158 Q38 190 44 222" stroke="#b9bfc6" stroke-width="22" stroke-linecap="round" fill="none"/>
+  <circle cx="44" cy="226" r="11" fill="#b9774e"/>
+  <!-- bucket -->
+  <path d="M24 226 h40 l-5 40 h-30 z" fill="#8a9099"/>
+  <rect x="22" y="222" width="44" height="8" rx="3" fill="#a3a9b1"/>
+  <path d="M28 224 q16 -10 32 0" fill="#c2570f"/>
+  <path d="M34 230 v14 q0 6 4 0 v-14 z" fill="#c2570f"/>
+  <!-- torso (checked shirt) -->
+  <rect x="58" y="138" width="84" height="98" rx="20" fill="#b9bfc6"/>
+  <rect x="58" y="138" width="30" height="98" rx="14" fill="#9aa3ad" opacity=".55"/>
+  <path d="M112 150 h30 v34 h-34 z" fill="#35508a"/>
+  <path d="M100 138 v98" stroke="#8a9099" stroke-width="2"/>
+  <circle cx="100" cy="165" r="2.2" fill="#6b7280"/>
+  <circle cx="100" cy="190" r="2.2" fill="#6b7280"/>
+  <circle cx="100" cy="215" r="2.2" fill="#6b7280"/>
+  <!-- collar -->
+  <path d="M84 138 l16 22 l16 -22 z" fill="#d7dce2"/>
+  <!-- right arm raised with trowel -->
+  <path d="M140 158 Q170 150 168 112" stroke="#b9bfc6" stroke-width="22" stroke-linecap="round" fill="none"/>
+  <circle cx="168" cy="108" r="11" fill="#b9774e"/>
+  <!-- trowel -->
+  <rect x="163" y="64" width="9" height="46" rx="3" fill="#7a4b2a"/>
+  <path d="M148 66 L187 66 Q190 56 168 14 Q146 56 148 66 Z" fill="#d9dde2" stroke="#8a9099" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M160 60 Q158 44 167 26" stroke="#fff" stroke-width="2.5" stroke-linecap="round" fill="none" opacity=".7"/>
+  <!-- neck -->
+  <rect x="88" y="118" width="24" height="26" rx="8" fill="#a8683f"/>
+  <!-- ears -->
+  <circle cx="58" cy="88" r="9" fill="#b9774e"/>
+  <circle cx="142" cy="88" r="9" fill="#b9774e"/>
+  <!-- head -->
+  <ellipse cx="100" cy="88" rx="44" ry="48" fill="#c4825a"/>
+  <!-- hair -->
+  <path d="M56 78 Q52 36 96 34 Q146 32 146 76 Q132 56 108 60 Q90 46 70 64 Q60 66 56 78 Z" fill="#2a1b14"/>
+  <path d="M82 40 Q92 22 112 36 Q100 34 92 44 Z" fill="#2a1b14"/>
+  <!-- eyes -->
+  <ellipse cx="82" cy="88" rx="10" ry="12" fill="#fff"/>
+  <ellipse cx="118" cy="88" rx="10" ry="12" fill="#fff"/>
+  <circle cx="84" cy="90" r="5.5" fill="#2a1b14"/>
+  <circle cx="120" cy="90" r="5.5" fill="#2a1b14"/>
+  <circle cx="86" cy="87" r="1.8" fill="#fff"/>
+  <circle cx="122" cy="87" r="1.8" fill="#fff"/>
+  <!-- brows -->
+  <path d="M70 72 Q82 64 94 72" stroke="#2a1b14" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <path d="M106 72 Q118 64 130 72" stroke="#2a1b14" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <!-- nose -->
+  <path d="M100 92 q-6 12 0 16 q6 -2 4 -6" stroke="#8f5636" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <!-- moustache -->
+  <path d="M76 114 Q88 104 100 112 Q112 104 124 114 Q112 122 100 118 Q88 122 76 114 Z" fill="#2a1b14"/>
+  <!-- calm little smile -->
+  <path d="M90 126 Q100 132 110 126" stroke="#6b3a22" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <!-- grout smear on cheek -->
+  <ellipse cx="124" cy="104" rx="6" ry="3" fill="#c2570f" opacity=".85"/>
+</svg>
