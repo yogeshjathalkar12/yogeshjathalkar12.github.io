@@ -3,102 +3,61 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Unlimited Grout Simulator — Coming Live | ShoonyaOrigins Games</title>
-<meta name="description" content="Unlimited Grout Simulator is coming live. A free browser game where no gap is too big, because isme grout bhar denge. From ShoonyaOrigins Games.">
+<title>When in doubt, bhar do grout</title>
+<meta name="description" content="When in doubt, bhar do grout. Unlimited Grout Simulator is coming live.">
 <meta name="robots" content="index, follow">
 <meta name="theme-color" content="#2a2523">
 <link rel="canonical" href="https://shoonyaorigins.com/ventures/games/">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://shoonyaorigins.com/ventures/games/">
-<meta property="og:title" content="Unlimited Grout Simulator — Coming Live">
-<meta property="og:description" content="A free browser game where no gap is too big. Coming live soon from ShoonyaOrigins Games.">
-<meta property="og:site_name" content="ShoonyaOrigins Games">
+<meta property="og:title" content="When in doubt, bhar do grout">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Unlimited Grout Simulator — Coming Live">
-<meta name="twitter:description" content="A free browser game where no gap is too big. Coming live soon.">
+<meta name="twitter:title" content="When in doubt, bhar do grout">
 <style>
   :root {
     --bg: #f7f3ec;
     --ink: #2a2523;
-    --muted: #6e645d;
     --tile: #ffffff;
     --tile-edge: #e6dfd3;
     --base: #2a2523;
     --grout: #c2570f;
-    --grout-dark: #8f3f08;
-    --card: #ffffff;
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --bg: #1c1816;
       --ink: #f4eee6;
-      --muted: #b0a59b;
       --tile: #efe9df;
       --tile-edge: #cfc6b8;
       --base: #0f0d0c;
-      --card: #26211f;
     }
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; }
+  html, body { margin: 0; height: 100%; }
   body {
     background: var(--bg);
     color: var(--ink);
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    line-height: 1.55;
-    min-height: 100vh;
     display: flex;
     flex-direction: column;
-  }
-  header {
-    padding: 18px 16px;
-    max-width: 880px;
-    width: 100%;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
     align-items: center;
-    font-size: 14px;
-  }
-  header a { color: var(--ink); text-decoration: none; font-weight: 600; }
-  header span { color: var(--muted); }
-  main {
-    flex: 1;
-    max-width: 880px;
-    width: 100%;
-    margin: 0 auto;
-    padding: 8px 16px 40px;
-  }
-  .badge {
-    display: inline-block;
-    background: var(--grout);
-    color: #fff;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-    padding: 5px 12px;
-    border-radius: 999px;
+    justify-content: center;
+    gap: 32px;
+    padding: 24px 16px;
   }
   h1 {
-    font-size: clamp(2.2rem, 7vw, 4rem);
-    line-height: 1.05;
-    margin: 16px 0 12px;
+    margin: 0;
+    text-align: center;
+    font-size: clamp(2rem, 8vw, 4.5rem);
+    line-height: 1.1;
     letter-spacing: -0.02em;
+    max-width: 14em;
   }
   h1 em { font-style: normal; color: var(--grout); }
-  .lead {
-    font-size: clamp(1.05rem, 2.6vw, 1.3rem);
-    color: var(--muted);
-    max-width: 38em;
-    margin: 0 0 28px;
-  }
-  /* Tile board: the grout "fills in" on a loop */
   .board {
+    width: min(100%, 520px);
     background: var(--base);
     border-radius: 20px;
     padding: 22px;
-    margin: 8px 0 32px;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 14px;
@@ -133,69 +92,13 @@
   @media (prefers-reduced-motion: reduce) {
     .board::after { animation: none; clip-path: inset(0 0 0 0); }
   }
-  .cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 14px;
-    margin-bottom: 32px;
-  }
-  .card {
-    background: var(--card);
-    border-radius: 14px;
-    padding: 18px;
-    border: 1px solid var(--tile-edge);
-  }
-  .card h2 { font-size: 1.05rem; margin: 0 0 6px; }
-  .card p { margin: 0; color: var(--muted); font-size: .95rem; }
-  .cta {
-    display: inline-block;
-    background: var(--grout);
-    color: #fff;
-    text-decoration: none;
-    font-weight: 700;
-    padding: 13px 22px;
-    border-radius: 10px;
-  }
-  .cta:hover { background: var(--grout-dark); }
-  .note { color: var(--muted); font-size: 13px; margin-top: 28px; }
-  footer {
-    text-align: center;
-    color: var(--muted);
-    font-size: 13px;
-    padding: 20px 16px 28px;
-  }
-  footer a { color: var(--muted); }
 </style>
 </head>
 <body>
-<header>
-  <a href="/">ShoonyaOrigins</a>
-  <span>Games</span>
-</header>
-
-<main>
-  <span class="badge">Coming live</span>
-  <h1>Unlimited <em>Grout</em> Simulator</h1>
-  <p class="lead">A free browser game where no gap is too big. Crooked tiles, cracked screens, broken plans: drag, fill, smooth, repeat. We're putting the finishing touches on it now.</p>
-
-  <div class="board" role="img" aria-label="Six white tiles with orange grout filling the gaps between them">
+  <h1>When in doubt, <em>bhar do grout</em></h1>
+  <div class="board" role="img" aria-label="Tiles with grout filling the gaps">
     <div class="tile"></div><div class="tile"></div><div class="tile"></div>
     <div class="tile"></div><div class="tile"></div><div class="tile"></div>
   </div>
-
-  <div class="cards">
-    <div class="card"><h2>Play in your browser</h2><p>No download and no sign-up. Open the link on your phone or computer and start.</p></div>
-    <div class="card"><h2>Made to be shared</h2><p>Finish a level, get your score, and challenge a friend to beat it.</p></div>
-    <div class="card"><h2>Free to play</h2><p>It's a ShoonyaOrigins side project, built for fun.</p></div>
-  </div>
-
-  <a class="cta" href="/">Back to ShoonyaOrigins</a>
-
-  <p class="note">The game is inspired by the "grout bhar denge" internet meme. It is an independent fan tribute and is not affiliated with the meme's creator.</p>
-</main>
-
-<footer>
-  &copy; ShoonyaOrigins &middot; <a href="/ventures/raptor/">Raptor</a>
-</footer>
 </body>
 </html>
