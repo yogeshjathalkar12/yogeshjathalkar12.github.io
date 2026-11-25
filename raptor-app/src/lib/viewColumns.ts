@@ -5,6 +5,9 @@ import type { CustomFieldDef } from './customFields';
 
 export const customColumnId = (defId: string) => `cf:${defId}`;
 
+/** The stored values of a record's custom fields as plain text, so the search box finds them too. */
+export const customSearchText = (fields: Record<string, any> | null | undefined): string[] => Object.values(fields || {}).filter((v) => v !== null && v !== undefined && v !== '').map((v) => String(v));
+
 /** One column per custom field (numbers sort as numbers, dates by day, dropdown fields get their choices as a filter list). */
 export function customFieldColumns<R>(defs: CustomFieldDef[], getFields: (row: R) => Record<string, any> | null | undefined, rows: R[]): ColumnDef<R>[] {
   return defs.map((def) => {

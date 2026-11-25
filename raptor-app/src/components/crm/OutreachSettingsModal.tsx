@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import Modal, { fieldInputStyle, fieldLabelStyle, ghostBtnStyle, primaryBtnStyle } from './Modal';
+import { previewFill } from '../../lib/customTags';
+import { useCustomTags } from '../../hooks/useCustomTags';
 
 // Email mode and template for the pipeline. Stored per organization (crm_outreach_settings) and changed only through
 // crm_outreach_save, which lets just the owner or an admin do it. What each mode does, and the safeguards, are in
@@ -26,9 +28,6 @@ const MODES: { value: OutreachMode; title: string; text: string }[] = [
   { value: 'auto', title: 'Automatic', text: 'The email goes out as soon as a new deal with a contact email is added. Bulk imports are never emailed automatically.' },
 ];
 
-function fill(text: string): string {
-  return text.replace(/\{\{\s*(\w+)\s*\}\}/g, (_m, key: string) => SAMPLE[key] ?? '');
-}
 
 export default function OutreachSettingsModal({ open, onClose, onSaved }: Props) {
   const [mode, setMode] = useState<OutreachMode>('off');
@@ -39,6 +38,8 @@ export default function OutreachSettingsModal({ open, onClose, onSaved }: Props)
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
+  const customList = useCustomTags(open);
+  const fill = (text: string) => previewFill(text, SAMPLE, customList);
 
   useEffect(() => {
     if (!open) return;
@@ -125,6 +126,16 @@ export default function OutreachSettingsModal({ open, onClose, onSaved }: Props)
                   </button>
                 ))}
               </div>
+              {customList.length > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', alignItems: 'center', margin: '-0.5rem 0 1rem' }}>
+                  <span style={{ fontSize: '0.58rem', color: 'var(--dim)' }}>Your fields:</span>
+                  {customList.map((t) => (
+                    <button key={t.tag} type="button" title={t.label} onClick={() => insertTag(t.tag)} style={{ ...ghostBtnStyle, flex: 'none', padding: '0.2rem 0.5rem', fontSize: '0.58rem', textTransform: 'none', letterSpacing: 0 }}>
+                      {`{{${t.tag}}}`}
+                    </button>
+                  ))}
+                </div>
+              )}
 
               <div style={{ border: '1px dashed var(--border)', borderRadius: 4, padding: '0.8rem', marginBottom: '1rem' }}>
                 <div style={{ fontSize: '0.55rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--dim)', marginBottom: '0.4rem' }}>Preview</div>

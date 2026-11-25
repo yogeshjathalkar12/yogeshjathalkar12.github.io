@@ -9,7 +9,7 @@ import ImportHistoryModal from '../../components/crm/ImportHistoryModal';
 import ExportButton from '../../components/crm/ExportButton';
 import ViewTable from '../../components/crm/ViewTable';
 import type { UiColumn } from '../../components/crm/ViewTable';
-import { customFieldColumns } from '../../lib/viewColumns';
+import { customFieldColumns, customSearchText } from '../../lib/viewColumns';
 import { loadFieldDefs } from '../../lib/customFields';
 import type { CustomFieldDef } from '../../lib/customFields';
 import DuplicatesModal from '../../components/crm/DuplicatesModal';
@@ -117,7 +117,8 @@ export default function CrmContacts() {
       (c.name || '').toLowerCase().includes(q) ||
       (c.companies?.name || '').toLowerCase().includes(q) ||
       (c.email || '').toLowerCase().includes(q) ||
-      (c.phone || '').toLowerCase().includes(q)
+      (c.phone || '').toLowerCase().includes(q) ||
+      customSearchText(c.custom_fields).some((v) => v.toLowerCase().includes(q))
   );
 
   const assigneeLabels = useMemberLabels(contacts.map((c) => c.assignee_id));

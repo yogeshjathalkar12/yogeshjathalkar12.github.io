@@ -7,7 +7,7 @@ import DuplicatesModal from '../../components/crm/DuplicatesModal';
 import CustomFieldsSection, { CustomFieldsInputs } from '../../components/crm/CustomFieldsSection';
 import ViewTable from '../../components/crm/ViewTable';
 import type { UiColumn } from '../../components/crm/ViewTable';
-import { customFieldColumns } from '../../lib/viewColumns';
+import { customFieldColumns, customSearchText } from '../../lib/viewColumns';
 import { loadFieldDefs } from '../../lib/customFields';
 import type { CustomFieldDef } from '../../lib/customFields';
 import { useAuth } from '../../hooks/AuthContext';
@@ -128,7 +128,7 @@ export default function CrmCompanies() {
   }
 
   const q = search.trim().toLowerCase();
-  const filtered = companies.filter((c) => !q || [c.name, c.website_url, c.email, c.phone, c.city, c.industry, c.address].some((v) => (v || '').toLowerCase().includes(q)));
+  const filtered = companies.filter((c) => !q || [c.name, c.website_url, c.email, c.phone, c.city, c.industry, c.address, ...customSearchText(c.custom_fields)].some((v) => (v || '').toLowerCase().includes(q)));
 
   return (
     <div>

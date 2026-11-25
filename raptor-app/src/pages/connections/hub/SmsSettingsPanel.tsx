@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { SmsApi, SmsNumber, SmsSequence, SmsSettings } from './smsApi';
 import { DEFAULT_SETTINGS, TAGS, TIME_ZONES, characters } from './smsApi';
 import { Notice, buttonStyle, inputStyle, note } from './ui';
+import { useCustomTags } from '../../../hooks/useCustomTags';
 
 // The SMS settings: how the pipeline texts (Off / Semi-automatic / Automatic), the first text, the sending hours and the daily limit.
 // Used in two places: the SMS tab under Channels, and the SMS button's dialog on the CRM pipeline. Only the owner or an admin can save
@@ -18,6 +19,7 @@ const hourLabel = (h: number) => (h === 24 ? '12 midnight' : h === 0 ? '12 midni
 
 export default function SmsSettingsPanel({ api, onSaved, onCancel }: { api: SmsApi; onSaved?: () => void; onCancel?: () => void }) {
   const [settings, setSettings] = useState<SmsSettings>(DEFAULT_SETTINGS);
+  const customList = useCustomTags();
   const [numbers, setNumbers] = useState<SmsNumber[]>([]);
   const [sequences, setSequences] = useState<SmsSequence[]>([]);
   const [optIn, setOptIn] = useState(false);
@@ -94,7 +96,7 @@ export default function SmsSettingsPanel({ api, onSaved, onCancel }: { api: SmsA
         <textarea id="sms-template" rows={4} style={{ ...inputStyle, resize: 'vertical' }} value={settings.template} maxLength={480}
           placeholder="Hi {{first_name}}, this is Asha from Acme. Saw {{company}} is growing. Open to a quick chat this week?"
           onChange={(e) => set('template', e.target.value)} />
-        <div style={note}>{characters(settings.template)}. Tags filled in for each person: {TAGS.map((t) => `{{${t}}}`).join('  ')}. Start with who you are, and keep it short.</div>
+        <div style={note}>{characters(settings.template)}. Tags filled in for each person: {TAGS.map((t) => `{{${t}}}`).join('  ')}. Start with who you are, and keep it short.{customList.length > 0 && <> Your own fields: {customList.map((t) => `{{${t.tag}}}`).join('  ')}.</>}</div>
       </div>
 
       <div style={field}>
