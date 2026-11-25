@@ -16,6 +16,8 @@ import type { CompanyForm } from '../../lib/companyFields';
 import ImportWizardModal from '../../components/crm/ImportWizardModal';
 import ImportHistoryModal from '../../components/crm/ImportHistoryModal';
 import OwnerOnly from '../../components/OwnerOnly';
+import ExportButton from '../../components/crm/ExportButton';
+import { exportRecords } from '../../lib/tableView';
 import RecordHistory from '../../components/crm/RecordHistory';
 
 // Real CRM companies (Supabase `companies` table) - this app never had a
@@ -37,6 +39,7 @@ export default function CrmCompanies() {
   const [showImportHistory, setShowImportHistory] = useState(false);
   const [defs, setDefs] = useState<CustomFieldDef[]>([]);
   const [importLabels, setImportLabels] = useState<Record<string, string>>({});
+  const [viewed, setViewed] = useState<{ rows: any[]; cols: UiColumn<any>[] }>({ rows: [], cols: [] });
   const { user } = useAuth();
 
   useEffect(() => {
@@ -102,7 +105,7 @@ export default function CrmCompanies() {
     const importedOptions = [...new Set(Object.values(importLabels))];
     const built: UiColumn<any>[] = [
       { id: 'name', label: 'Name', kind: 'text', value: (c) => c.name, locked: true, bold: true },
-      { id: 'website', label: 'Website', kind: 'text', value: (c) => (c.website_url ? c.website_url.replace(/^https?:\/\//, '') : null), defaultVisible: true, dim: true },
+      { id: 'website', label: 'Website', kind: 'text', value: (c) => (c.website_url ? c.website_url.replace(/^https?:\/\//, '') : null), exportValue: (c) => c.website_url, defaultVisible: true, dim: true },
       { id: 'contacts', label: 'Contacts', kind: 'number', value: (c) => (contactsByCompany[c.id] || []).length, defaultVisible: true },
       { id: 'deals', label: 'Deals', kind: 'number', value: (c) => (dealsByCompany[c.id] || []).length, defaultVisible: true },
       { id: 'phone', label: 'Phone', kind: 'text', value: (c) => c.phone, dim: true },
@@ -116,6 +119,9 @@ export default function CrmCompanies() {
     ];
     return [...built, ...customFieldColumns(defs, (c: any) => c.custom_fields, companies)];
   }, [defs, importLabels, contactsByCompany, dealsByCompany, companies]);
+
+  // the rows exactly as the person sees them (search, filters, sort) with every column, also the hidden ones and their own fields
+  const exportFile = useMemo(() => exportRecords(viewed.rows, viewed.cols), [viewed]);
 
   if (loading) {
     return <div style={{ padding: '2rem', color: 'var(--dim)' }}>Loading companies…</div>;
@@ -134,6 +140,7 @@ export default function CrmCompanies() {
           style={{ flex: 1, maxWidth: 320, padding: '0.6rem 0.9rem', background: 'var(--surface2)', border: '1px solid var(--border)', color: 'var(--white)', fontFamily: 'var(--mono)', fontSize: '0.7rem', borderRadius: '4px' }}
         />
         <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+          <ExportButton data={exportFile.data} columns={exportFile.columns} filename="companies" label="Export CSV (all columns)" />
           <OwnerOnly permission="delete">
             <button
               onClick={() => setShowDuplicates(true)}
@@ -174,6 +181,7 @@ export default function CrmCompanies() {
         rowKey={(c) => c.id}
         onRowClick={(c) => setActiveCompany(c)}
         emptyText={companies.length === 0 ? 'No companies yet.' : 'No companies match your search.'}
+        onView={(shown, _visible, all) => setViewed({ rows: shown, cols: all })}
       />
 
       <NewCompanyModal open={showNew} onClose={() => setShowNew(false)} onCreated={fetchAll} />

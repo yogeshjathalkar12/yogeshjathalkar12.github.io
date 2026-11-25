@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { type ColumnDef, applyView, cycleSort, displayValue, EMPTY_CHOICE, hasFilters, loadPrefs, moveColumn, reconcilePrefs, savePrefs, setFilter, toggleColumn, defaultPrefs } from '../../lib/tableView';
 import type { ViewPrefs } from '../../lib/tableView';
@@ -40,7 +40,16 @@ export default function ViewTable<R>({ columns, rows, storageKey, rowKey, onRowC
   const visible = prefs.visible.map((id) => byId.get(id)).filter((c): c is UiColumn<R> => !!c);
   const shown = useMemo(() => applyView(rows, columns, prefs), [rows, columns, prefs]);
 
-  useEffect(() => { onView?.(shown, visible, columns); }, [shown]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Told only when what is shown really changed (same rows in the same order, same columns = nothing to tell). A page that builds its
+  // row list again on every render would otherwise make this effect and the page's own state feed each other without end.
+  const told = useRef<{ rows: R[]; columns: UiColumn<R>[] } | null>(null);
+  useEffect(() => {
+    if (!onView) return;
+    const last = told.current;
+    if (last && last.columns === columns && last.rows.length === shown.length && last.rows.every((r, i) => r === shown[i])) return;
+    told.current = { rows: shown, columns };
+    onView(shown, visible, columns);
+  }, [shown, columns]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const hidden = columns.filter((c) => !prefs.visible.includes(c.id));
   const filtering = hasFilters(prefs);

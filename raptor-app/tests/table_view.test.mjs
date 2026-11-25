@@ -1,7 +1,8 @@
 // Run with:  node --test tests/table_view.test.mjs      (from raptor-app/)
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { defaultPrefs, reconcilePrefs, toggleColumn, moveColumn, cycleSort, setFilter, hasFilters, displayValue, compareValues, matcher, applyView, loadPrefs, savePrefs, EMPTY_CHOICE } from '../src/lib/tableView.ts';
+import { defaultPrefs, reconcilePrefs, toggleColumn, moveColumn, cycleSort, setFilter, hasFilters, displayValue, compareValues, matcher, applyView, loadPrefs, savePrefs, EMPTY_CHOICE, exportRecords } from '../src/lib/tableView.ts';
+import { customFieldColumns } from '../src/lib/viewColumns.ts';
 
 const COLS = [
   { id: 'name', label: 'Name', kind: 'text', value: (r) => r.name, locked: true },
@@ -110,4 +111,24 @@ test('choices are remembered per person and survive a damaged or missing store',
   assert.deepEqual(loadPrefs(null, 'x', COLS), defaultPrefs(COLS));
   assert.doesNotThrow(() => savePrefs({ getItem: () => null, setItem: () => { throw new Error('quota'); } }, 'x', p));
   assert.doesNotThrow(() => savePrefs(null, 'x', p));
+});
+
+test('export: every column in definition order (hidden ones too), custom fields included, the rows as given, empty cells empty', () => {
+  const defs = [{ id: 'd1', name: 'Employees', field_type: 'number', options: null }, { id: 'd2', name: 'Cycle', field_type: 'select', options: ['Long', 'Short'] }, { id: 'd3', name: 'Renewal', field_type: 'date', options: null }];
+  const rows = [
+    { name: 'Acme', city: 'Pune', size: 5, since: '2026-01-05T10:00:00Z', stage: 'Won', custom: { d1: '120', d2: 'Long', d3: '2027-03-01' } },
+    { name: 'Beta, Inc', city: null, size: null, since: null, stage: null, custom: {} },
+  ];
+  const cols = [...COLS, ...customFieldColumns(defs, (r) => r.custom, rows)];
+  const out = exportRecords(rows, cols);
+  assert.deepEqual(out.columns.map((c) => c.label), ['Name', 'City', 'Employees', 'Since', 'Stage', 'Employees (2)', 'Cycle', 'Renewal']);   // a clash of labels keeps both columns
+  assert.deepEqual(Object.values(out.data[0]), ['Acme', 'Pune', 5, '2026-01-05', 'Won', 120, 'Long', '2027-03-01']);
+  assert.deepEqual(Object.values(out.data[1]), ['Beta, Inc', '', '', '', '', '', '', '']);
+  assert.equal(out.data.length, 2);
+  assert.deepEqual(exportRecords([], cols).data, []);
+});
+
+test('export: a column can export something other than what it shows', () => {
+  const cols = [{ id: 'site', label: 'Website', kind: 'text', value: (r) => r.url.replace(/^https?:\/\//, ''), exportValue: (r) => r.url }];
+  assert.equal(exportRecords([{ url: 'https://acme.com' }], cols).data[0].site, 'https://acme.com');
 });

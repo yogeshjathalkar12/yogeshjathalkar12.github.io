@@ -10,6 +10,8 @@ export interface ColumnDef<R> {
   kind: ColumnKind;
   /** The plain value used to sort, filter and export (dates as 'YYYY-MM-DD...' text, numbers as numbers). */
   value: (row: R) => string | number | null | undefined;
+  /** What goes into an exported file when that differs from what is shown (e.g. the full web address). */
+  exportValue?: (row: R) => string | number | null | undefined;
   /** For a select column: the choices. */
   options?: string[];
   /** The first column: it can be moved down the list but never hidden. */
@@ -85,6 +87,28 @@ function asNumber(v: unknown): number | null {
   if (typeof v !== 'string') return null;
   const n = Number(v.replace(/[,\s₹$€£]/g, ''));
   return v.trim() !== '' && Number.isFinite(n) ? n : null;
+}
+
+/** The rows as the person sees them (after search, filters and sort) with EVERY column, built-in and custom, hidden ones too,
+ *  for a CSV. Empty is an empty cell, dates are a day, and two columns with the same label get a number so no column is lost. */
+export function exportRecords<R>(rows: R[], columns: ColumnDef<R>[]): { data: Record<string, string | number>[]; columns: { key: string; label: string }[] } {
+  const seen = new Map<string, number>();
+  const cols = columns.map((c) => {
+    const n = (seen.get(c.label) || 0) + 1;
+    seen.set(c.label, n);
+    return { key: c.id, label: n === 1 ? c.label : `${c.label} (${n})` };
+  });
+  const data = rows.map((r) => {
+    const rec: Record<string, string | number> = {};
+    for (const c of columns) {
+      const raw = (c.exportValue ?? c.value)(r);
+      let v: string | number = raw === null || raw === undefined ? '' : raw;
+      if (c.kind === 'date' && typeof v === 'string' && /^\d{4}-\d{2}-\d{2}/.test(v)) v = v.slice(0, 10);
+      rec[c.id] = v;
+    }
+    return rec;
+  });
+  return { data, columns: cols };
 }
 
 /** What the table prints for a value (dates as a day, empty as a dash). */

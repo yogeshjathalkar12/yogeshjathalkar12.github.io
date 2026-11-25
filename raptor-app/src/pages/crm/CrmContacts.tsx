@@ -18,6 +18,7 @@ import AssigneeFilter, { applyAssigneeFilter, useAssigneeFilter } from '../../co
 import { useMemberLabels } from '../../hooks/useDirectory';
 import { useAuth } from '../../hooks/AuthContext';
 import { shortName } from '../../lib/team';
+import { exportRecords } from '../../lib/tableView';
 
 const STATUS_COLORS: Record<string, { bg: string; fg: string }> = {
   hot: { bg: 'rgba(239,68,68,0.1)', fg: 'var(--red)' },
@@ -41,6 +42,7 @@ export default function CrmContacts() {
   const [activeContact, setActiveContact] = useState<any | null>(null);
   const [defs, setDefs] = useState<CustomFieldDef[]>([]);
   const [importLabels, setImportLabels] = useState<Record<string, string>>({});
+  const [viewed, setViewed] = useState<{ rows: any[]; cols: UiColumn<any>[] }>({ rows: [], cols: [] });
 
   useEffect(() => {
     fetchAll();
@@ -151,6 +153,9 @@ export default function CrmContacts() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defs, importLabels, contacts, deals, assigneeLabels]);
 
+  // the rows exactly as the person sees them (search, filters, sort) with every column, also the hidden ones and their own fields
+  const exportFile = useMemo(() => exportRecords(viewed.rows, viewed.cols), [viewed]);
+
   if (loading) {
     return <div style={{ padding: '2rem', color: 'var(--dim)' }}>Loading contacts…</div>;
   }
@@ -184,16 +189,7 @@ export default function CrmContacts() {
         />
         <AssigneeFilter value={assigneeFilter} onChange={setAssigneeFilter} />
         <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
-          <ExportButton
-            data={contacts}
-            columns={[
-              { key: 'name', label: 'Name' },
-              { key: 'email', label: 'Email' },
-              { key: 'phone', label: 'Phone' },
-              { key: 'status', label: 'Status' },
-            ]}
-            filename="contacts"
-          />
+          <ExportButton data={exportFile.data} columns={exportFile.columns} filename="contacts" label="Export CSV (all columns)" />
           <OwnerOnly permission="delete"><button
             onClick={() => setShowDuplicates(true)}
             style={{
@@ -261,6 +257,7 @@ export default function CrmContacts() {
         rowKey={(c) => c.id}
         onRowClick={(c) => setActiveContact(c)}
         emptyText={contacts.length === 0 ? 'No contacts yet.' : 'No contacts match your search.'}
+        onView={(shown, _visible, all) => setViewed({ rows: shown, cols: all })}
       />
 
       <NewContactModal open={showNewContact} onClose={() => setShowNewContact(false)} onCreated={fetchAll} />
