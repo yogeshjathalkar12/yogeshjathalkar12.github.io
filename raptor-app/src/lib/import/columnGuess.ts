@@ -240,13 +240,29 @@ function candsOfKind(cands: HeaderMatch[], kind: 'email' | 'phone' | 'url'): Fie
 const kindWord = (k: string) => (k === 'url' ? 'web addresses' : k === 'phone' ? 'phone numbers' : 'email addresses');
 const pct = (x: number) => `${Math.round(x * 100)}%`;
 
-export interface ColumnSuggestion { columnIndex: number; header: string; profile: ColumnProfile; guess: Guess }
+export interface FieldTypeGuess { type: 'text' | 'number' | 'date' | 'select'; options?: string[]; why: string }
+
+/** What a column kept as a custom field should be: numbers sort as numbers, dates by day, a few repeated labels become a dropdown, anything else stays text. */
+export function suggestFieldType(profile: ColumnProfile): FieldTypeGuess {
+  const f = profile.filled;
+  if (f < 3 || profile.share.serial) return { type: 'text', why: 'Too few values to tell, so text.' };
+  if (profile.share.date >= 0.9) return { type: 'date', why: 'Every value is a date, so it can be sorted by day.' };
+  if (profile.share.phone >= 0.5 || profile.share.email >= 0.3 || profile.share.url >= 0.3) return { type: 'text', why: 'Phone numbers, emails and web addresses are kept as text.' };
+  if (profile.share.number >= 0.9) return { type: 'number', why: 'Every value is a number, so it can be sorted and compared as one.' };
+  const choices = profile.topValues.map((v) => v.value);
+  if (profile.distinct <= 12 && f >= 6 && profile.distinct * 2 <= f && choices.every((v) => v.length <= 40)) {
+    return { type: 'select', options: choices, why: `Only ${profile.distinct} different values repeat, so it can be a dropdown.` };
+  }
+  return { type: 'text', why: 'Free text.' };
+}
+
+export interface ColumnSuggestion { columnIndex: number; header: string; profile: ColumnProfile; guess: Guess; fieldType: FieldTypeGuess }
 
 /** The whole table: one suggestion per column, with a rule that two columns never claim the same single-value field. */
 export function suggestMapping(table: SheetTable): ColumnSuggestion[] {
   const out: ColumnSuggestion[] = table.columns.map((col, k) => {
     const profile = profileColumn(table.rows.map((r) => r[k]));
-    return { columnIndex: k, header: col.header, profile, guess: guessColumn(col.header, profile) };
+    return { columnIndex: k, header: col.header, profile, guess: guessColumn(col.header, profile), fieldType: suggestFieldType(profile) };
   });
   const SINGLE = new Set<FieldId>(['company.name', 'company.website_url', 'contact.name', 'contact.first_name', 'contact.last_name', 'contact.role', 'deal.title', 'deal.value', 'deal.stage', 'company.industry', 'company.description', 'company.city', 'company.address', 'company.email', 'company.phone', 'contact.email', 'contact.phone', 'contact.linkedin_url', 'contact.status', 'deal.meeting_at']);
   const rank = { high: 3, medium: 2, low: 1 };

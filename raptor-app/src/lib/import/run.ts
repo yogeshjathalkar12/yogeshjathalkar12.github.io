@@ -83,7 +83,7 @@ export async function runImport(plan: Plan, existing: Existing, opts: RunOptions
     progress('Preparing custom fields', i, plan.newCustomFields.length);
     const lower = f.name.toLowerCase();
     if (defIds[f.entity].has(lower)) continue;
-    const { data, error } = await client.from('custom_field_defs').insert({ entity_type: f.entity, name: f.name, field_type: 'text', sort_order: defIds[f.entity].size + i }).select('id').single();
+    const { data, error } = await client.from('custom_field_defs').insert({ entity_type: f.entity, name: f.name, field_type: f.type || 'text', options: f.type === 'select' ? f.options : null, sort_order: defIds[f.entity].size + i }).select('id').single();
     if (error) {
       if (error.code === '23505') {
         const again = await client.from('custom_field_defs').select('id').eq('entity_type', f.entity).ilike('name', f.name).maybeSingle();

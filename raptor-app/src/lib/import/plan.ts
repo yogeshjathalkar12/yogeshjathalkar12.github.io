@@ -22,7 +22,8 @@ import { allKeys, bookNormalizeName } from './prospects.ts';
 export type Entity = 'company' | 'contact' | 'deal';
 export type RowKind = Entity;
 
-export interface ColumnChoice { field: FieldId; customEntity?: Entity; customName?: string }
+export type FieldType = 'text' | 'number' | 'date' | 'select';
+export interface ColumnChoice { field: FieldId; customEntity?: Entity; customName?: string; customType?: FieldType; customOptions?: string[] }
 export interface TableSetup { table: SheetTable; choices: ColumnChoice[]; rowKind: RowKind }
 export interface ImportOptions {
   dateOrder: DateOrder;
@@ -50,6 +51,7 @@ export interface DealRec {
 export interface RowOutcome { sheet: string; row: number; status: 'skipped' | 'fixed'; messages: string[] }
 
 export interface Parsed {
+  customDefs: Map<string, { type: FieldType; options: string[] | null }>;   // key: entity + NUL + field name; what each custom field will be created as
   companies: Map<string, CompanyRec>;
   contacts: Map<string, ContactRec>;
   deals: DealRec[];
@@ -73,22 +75,27 @@ function nameFromEmail(email: string): string {
 // ------------------------------------------------------------------ rows -> records
 
 export function parseTables(setups: TableSetup[], opts: ImportOptions): Parsed {
-  const out: Parsed = { companies: new Map(), contacts: new Map(), deals: [], outcomes: [], rowsRead: 0, rowsUsed: 0, merged: { companies: 0, contacts: 0 }, conflicts: 0 };
+  const out: Parsed = { customDefs: new Map(), companies: new Map(), contacts: new Map(), deals: [], outcomes: [], rowsRead: 0, rowsUsed: 0, merged: { companies: 0, contacts: 0 }, conflicts: 0 };
 
   for (const setup of setups) {
     const { table, choices, rowKind } = setup;
+    choices.forEach((ch, c) => {
+      if (ch.field !== 'custom') return;
+      const key = (ch.customEntity || rowKind) + String.fromCharCode(0) + (ch.customName || table.columns[c].header).trim();
+      if (!out.customDefs.has(key)) out.customDefs.set(key, { type: ch.customType || 'text', options: ch.customType === 'select' ? ch.customOptions || [] : null });
+    });
     table.rows.forEach((cells, ri) => {
       out.rowsRead++;
       const ref: SourceRef = { sheet: table.name, row: table.rowNumbers[ri] };
       const msgs: string[] = [];
       const f: Partial<Record<FieldId, string>> = {};
-      const customs: { entity: Entity; name: string; value: string }[] = [];
+      const customs: { entity: Entity; name: string; value: string; type: FieldType }[] = [];
       choices.forEach((ch, c) => {
         if (ch.field === 'ignore') return;
         const v = cleanText(cells[c], opts.extraPlaceholders);
         if (!v) return;
         if (ch.field === 'custom') {
-          customs.push({ entity: ch.customEntity || rowKind, name: (ch.customName || table.columns[c].header).trim(), value: v });
+          customs.push({ entity: ch.customEntity || rowKind, name: (ch.customName || table.columns[c].header).trim(), value: v, type: ch.customType || 'text' });
         } else if (!f[ch.field]) f[ch.field] = v;
       });
 
@@ -165,7 +172,11 @@ export function parseTables(setups: TableSetup[], opts: ImportOptions): Parsed {
       // --- custom field columns go to the entity they were assigned to
       for (const c of customs) {
         const target = c.entity === 'company' ? company : c.entity === 'contact' ? contacts[0] : deal;
-        if (target) (target.custom[c.name] = target.custom[c.name] ?? c.value);
+        if (target) {
+          const conv = convertCustom(c.type, c.value, opts.dateOrder, c.name);
+          if (conv.message) msgs.push(conv.message);
+          if (conv.value !== undefined && target.custom[c.name] === undefined) target.custom[c.name] = conv.value;
+        }
         else msgs.push(`"${c.name}" kept nowhere: this row has no ${c.entity}.`);
       }
 
@@ -185,6 +196,20 @@ export function parseTables(setups: TableSetup[], opts: ImportOptions): Parsed {
   for (const c of out.companies.values()) overflow(c);
   for (const c of out.contacts.values()) overflow(c);
   return out;
+}
+
+/** A custom column's cell as the field's type wants it: numbers as plain numbers, dates as a day, a value that does not fit is left out and said so (never turned into text). */
+export function convertCustom(type: FieldType, raw: string, order: DateOrder, name: string): { value?: string; message?: string } {
+  if (type === 'number') {
+    const n = parseNumber(raw);
+    return n.value === null ? { message: `"${name}" left out: ${n.problem || `"${raw}" is not a number`}` } : { value: String(n.value) };
+  }
+  if (type === 'date') {
+    const d = parseDate(raw, order);
+    if (!d.value) return { message: `"${name}" left out: ${d.problem || `"${raw}" is not a date`}` };
+    return d.ambiguous ? { value: d.value, message: `"${name}": the date "${raw}" could be day-first or month-first.` } : { value: d.value };
+  }
+  return { value: raw };
 }
 
 function overflow(r: { custom: Record<string, string>; otherEmails: string[]; otherPhones: string[]; email?: string; phone?: string }) {
@@ -329,7 +354,7 @@ export interface Plan {
   contacts: { create: ContactCreate[]; update: UpdatePlan[]; unchanged: number };
   deals: { create: DealCreate[]; skipped: number };
   prospects: { create: ProspectCreate[]; alreadyThere: number; sharedSite: number };
-  newCustomFields: { entity: Entity; name: string }[];
+  newCustomFields: { entity: Entity; name: string; type: FieldType; options: string[] | null }[];
   outcomes: RowOutcome[];
   counts: { rowsRead: number; rowsUsed: number; skipped: number; fixed: number; mergedInFile: number; conflicts: number };
 }
@@ -444,7 +469,11 @@ export function planImport(parsed: Parsed, existing: Existing, links: Links = {}
     }
   }
 
-  plan.newCustomFields = [...wanted].map((w) => { const [entity, name] = w.split('\u0000'); return { entity: entity as Entity, name }; });
+  plan.newCustomFields = [...wanted].map((w) => {
+    const [entity, name] = w.split('\u0000');
+    const def = parsed.customDefs.get(w);                                  // what the person chose for that column; fields the import adds itself (Other emails ...) are text
+    return { entity: entity as Entity, name, type: def?.type ?? 'text', options: def?.type === 'select' ? def.options : null };
+  });
   return plan;
 }
 

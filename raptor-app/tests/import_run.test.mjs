@@ -102,7 +102,7 @@ test('custom fields are created first and the values are stored under their ids'
   const db = fakeDb();
   const rows = [['Company', 'Sales Cycle'], ...Array.from({ length: 5 }, (_, i) => [`Co ${i}`, '3-6 months'])];
   const plan = planFrom(rows);
-  assert.deepEqual(plan.newCustomFields, [{ entity: 'company', name: 'Sales Cycle' }]);
+  assert.deepEqual(plan.newCustomFields, [{ entity: 'company', name: 'Sales Cycle', type: 'text', options: null }]);
   const res = await runImport(plan, emptyExisting(), { source: 's', fileName: 'f' }, db);
   assert.equal(res.customFieldsCreated, 1);
   const defId = db.tables.custom_field_defs[0].id;

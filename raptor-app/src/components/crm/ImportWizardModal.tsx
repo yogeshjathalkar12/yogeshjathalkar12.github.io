@@ -7,7 +7,7 @@ import type { SheetTable } from '../../lib/import/sheetShape';
 import { FIELDS, FIELD_BY_ID, suggestSetup, retargetField } from '../../lib/import/columnGuess';
 import type { ColumnSuggestion, FieldId } from '../../lib/import/columnGuess';
 import { applyFileLinks, distinctValues, findSuggestions, parseTables, planImport, suggestStage } from '../../lib/import/plan';
-import type { ColumnChoice, Existing, Links, RowKind, StageInfo, Suggestion, TableSetup } from '../../lib/import/plan';
+import type { ColumnChoice, Existing, FieldType, Links, RowKind, StageInfo, Suggestion, TableSetup } from '../../lib/import/plan';
 import { inferDateOrder } from '../../lib/import/values';
 import type { DateOrder } from '../../lib/import/values';
 import { loadExisting, runImport } from '../../lib/import/run';
@@ -120,7 +120,7 @@ export default function ImportWizardModal({ open, onClose, onImported, client, l
         sheets.forEach((s, i) => {
           const table = analyseSheet(s.name, s.hidden, s.rows);
           const { suggestions, rowKind } = suggestSetup(table);
-          const guessedChoices: ColumnChoice[] = suggestions.map((x) => ({ field: x.guess.field, customName: x.header }));
+          const guessedChoices: ColumnChoice[] = suggestions.map((x) => ({ field: x.guess.field, customName: x.header, customType: x.fieldType.type, customOptions: x.fieldType.options }));
           let choices = guessedChoices, kind = rowKind, savedNote: string | null = null;
           const found = table.verdict === 'list' ? findSaved(loadAll(storage), table.columns.map((c) => c.header)) : null;
           if (found) {
@@ -147,10 +147,23 @@ export default function ImportWizardModal({ open, onClose, onImported, client, l
 
   const selected = tabs.filter((t) => t.selected);
   const updateTab = (id: string, fn: (t: Tab) => Tab) => setTabs((all) => all.map((t) => (t.id === id ? fn(t) : t)));
+  /** Changing a field's type; a dropdown gets its choices from the distinct values in that column (up to 30, else it stays text). */
+  function setCustomType(tabId: string, col: number, type: FieldType) {
+    updateTab(tabId, (x) => {
+      let options: string[] | undefined;
+      let t: FieldType = type;
+      if (type === 'select') {
+        const seen = new Set<string>();
+        for (const r of x.table.rows) { const v = (r[col] || '').trim(); if (v) seen.add(v); if (seen.size > 30) break; }
+        if (seen.size === 0 || seen.size > 30) t = 'text'; else options = [...seen];
+      }
+      return { ...x, choices: x.choices.map((c, k) => (k === col ? { ...c, customType: t, customOptions: options } : c)) };
+    });
+  }
 
   // ---------------------------------------------------------------- step 2 derived: dates and stages
   const setups: TableSetup[] = useMemo(() => selected.map((t) => ({ table: t.table, choices: t.choices, rowKind: t.rowKind })), [tabs]); // eslint-disable-line react-hooks/exhaustive-deps
-  const dateValues = useMemo(() => setups.flatMap((s) => { const i = s.choices.findIndex((c) => c.field === 'deal.meeting_at'); return i < 0 ? [] : s.table.rows.map((r) => r[i]).filter(Boolean); }), [setups]);
+  const dateValues = useMemo(() => setups.flatMap((s) => s.choices.flatMap((c, i) => (c.field === 'deal.meeting_at' || (c.field === 'custom' && c.customType === 'date') ? s.table.rows.map((r) => r[i]).filter(Boolean) : []))), [setups]);
   const inferred: DateOrder = useMemo(() => inferDateOrder(dateValues), [dateValues]);
   const needsDateOrder = dateValues.length > 0 && inferred === 'ambiguous' && dateValues.some((v) => /^\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4}/.test(v));
   const effectiveDateOrder: DateOrder = inferred !== 'ambiguous' ? inferred : (dateOrder || 'ambiguous');
@@ -173,7 +186,7 @@ export default function ImportWizardModal({ open, onClose, onImported, client, l
   const mapProblem = useMemo(() => {
     if (!selected.length) return 'Tick at least one sheet.';
     for (const t of selected) { const p = mandatory(t); if (p) return `${t.table.name}: ${p}`; }
-    if (needsDateOrder && !dateOrder) return 'Choose how the meeting dates are written (day first or month first).';
+    if (needsDateOrder && !dateOrder) return 'Choose how the dates are written (day first or month first).';
     return null;
   }, [tabs, needsDateOrder, dateOrder]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -323,6 +336,17 @@ export default function ImportWizardModal({ open, onClose, onImported, client, l
                             <input style={{ ...selectStyle, width: '62%' }} value={ch.customName ?? col.header} onChange={(e) => updateTab(tab.id, (x) => ({ ...x, choices: x.choices.map((c, k) => (k === i ? { ...c, customName: e.target.value } : c)) }))} />
                           </div>
                         )}
+                        {ch.field === 'custom' && (
+                          <div style={{ marginTop: 6 }}>
+                            <select style={selectStyle} aria-label="Field type" value={ch.customType || 'text'} onChange={(e) => setCustomType(tab.id, i, e.target.value as FieldType)}>
+                              <option value="text">Type: text</option><option value="number">Type: number</option><option value="date">Type: date</option><option value="select">Type: dropdown</option>
+                            </select>
+                            <div style={{ ...small, marginTop: 4 }}>
+                              {(ch.customType || 'text') === s.fieldType.type ? s.fieldType.why : `You chose ${ch.customType === 'select' ? 'a dropdown' : ch.customType}. Raptor would have suggested ${s.fieldType.type === 'select' ? 'a dropdown' : s.fieldType.type}.`}
+                              {ch.customType === 'select' && ch.customOptions && ` Choices: ${ch.customOptions.slice(0, 8).join(', ')}${ch.customOptions.length > 8 ? ` and ${ch.customOptions.length - 8} more` : ''}.`}
+                            </div>
+                          </div>
+                        )}
                         <div style={{ ...small, color: ch.field === s.guess.field ? CONF_COLOR[s.guess.confidence] : 'var(--dim)', marginTop: 4 }}>
                           {ch.field === s.guess.field ? s.guess.reason : `You chose ${FIELD_BY_ID.get(ch.field)?.label.toLowerCase()}.`}
                         </div>
@@ -339,7 +363,7 @@ export default function ImportWizardModal({ open, onClose, onImported, client, l
 
           {needsDateOrder && (
             <div style={{ marginBottom: '1rem' }}>
-              <label style={fieldLabelStyle}>Meeting dates like 03/04/2026 can be read two ways. Yours are</label>
+              <label style={fieldLabelStyle}>Dates like 03/04/2026 can be read two ways. Yours are</label>
               <select style={selectStyle} value={dateOrder} onChange={(e) => setDateOrder(e.target.value as DateOrder)}>
                 <option value="">Choose…</option><option value="dmy">day first (31/12/2026)</option><option value="mdy">month first (12/31/2026)</option>
               </select>
@@ -403,7 +427,7 @@ export default function ImportWizardModal({ open, onClose, onImported, client, l
 
           {plan.newCustomFields.length > 0 && (
             <div style={{ ...small, marginBottom: '1rem' }}>
-              <strong style={{ color: 'var(--white)' }}>New custom fields that will be created:</strong> {plan.newCustomFields.map((f) => `${f.name} (${f.entity})`).join(', ')}.
+              <strong style={{ color: 'var(--white)' }}>New custom fields that will be created:</strong> {plan.newCustomFields.map((f) => `${f.name} (${f.entity}${f.type !== 'text' ? `, ${f.type === 'select' ? 'dropdown' : f.type}` : ''})`).join(', ')}.
               <span> They stay if you undo (they hold no data of their own); you can delete them in the CRM settings.</span>
             </div>
           )}

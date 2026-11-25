@@ -10,7 +10,7 @@ import { FIELD_BY_ID } from './columnGuess.ts';
 import type { FieldId } from './columnGuess.ts';
 import type { ColumnChoice, RowKind } from './plan.ts';
 
-export interface SavedColumn { field: FieldId; customEntity?: RowKind; customName?: string }
+export interface SavedColumn { field: FieldId; customEntity?: RowKind; customName?: string; customType?: 'text' | 'number' | 'date' | 'select'; customOptions?: string[] }
 export interface SavedMapping {
   v: 1;
   signature: string;
@@ -37,7 +37,7 @@ export function buildSaved(headers: string[], choices: ColumnChoice[], rowKind: 
     const c = choices[i];
     const key = headerKey(h);
     if (!c || !key) return;
-    columns[key] = { field: c.field, ...(c.field === 'custom' ? { customEntity: c.customEntity, customName: c.customName } : {}) };
+    columns[key] = { field: c.field, ...(c.field === 'custom' ? { customEntity: c.customEntity, customName: c.customName, customType: c.customType, customOptions: c.customOptions } : {}) };
   });
   return { v: 1, signature: signatureOf(headers), headers: [...headers], rowKind, columns, stageMap: { ...stageMap }, emptyWords, savedAt: nowIso, uses };
 }
@@ -68,7 +68,7 @@ export function applySaved(found: Found, headers: string[]): (ColumnChoice | nul
   return headers.map((h) => {
     const s = found.mapping.columns[headerKey(h)];
     if (!s || !FIELD_BY_ID.has(s.field)) return null;
-    return s.field === 'custom' ? { field: 'custom', customEntity: s.customEntity, customName: s.customName ?? h } : { field: s.field };
+    return s.field === 'custom' ? { field: 'custom', customEntity: s.customEntity, customName: s.customName ?? h, customType: s.customType, customOptions: s.customOptions } : { field: s.field };
   });
 }
 
