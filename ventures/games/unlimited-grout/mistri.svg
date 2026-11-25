@@ -13,8 +13,8 @@
   <!-- bucket -->
   <path d="M24 226 h40 l-5 40 h-30 z" fill="#8a9099"/>
   <rect x="22" y="222" width="44" height="8" rx="3" fill="#a3a9b1"/>
-  <path d="M28 224 q16 -10 32 0" fill="#c2570f"/>
-  <path d="M34 230 v14 q0 6 4 0 v-14 z" fill="#c2570f"/>
+  <path d="M28 224 q16 -10 32 0" fill="#f6f4ee"/>
+  <path d="M34 230 v14 q0 6 4 0 v-14 z" fill="#f6f4ee"/>
   <!-- torso (checked shirt) -->
   <rect x="58" y="138" width="84" height="98" rx="20" fill="#b9bfc6"/>
   <rect x="58" y="138" width="30" height="98" rx="14" fill="#9aa3ad" opacity=".55"/>
@@ -59,5 +59,5 @@
   <!-- calm little smile -->
   <path d="M90 126 Q100 132 110 126" stroke="#6b3a22" stroke-width="3" stroke-linecap="round" fill="none"/>
   <!-- grout smear on cheek -->
-  <ellipse cx="124" cy="104" rx="6" ry="3" fill="#c2570f" opacity=".85"/>
+  <ellipse cx="124" cy="104" rx="6" ry="3" fill="#f6f4ee" opacity=".9"/>
 </svg>

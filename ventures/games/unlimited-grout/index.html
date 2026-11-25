@@ -83,6 +83,7 @@
   var cv = document.getElementById("c"), ctx = cv.getContext("2d");
   var cap = document.getElementById("caption"), supBtn = document.getElementById("sup"), supReady = false;
   var stageEl = document.getElementById("stage");
+  var GROUT = "#f6f4ee", GROUT_EDGE = "#6f7c87";   // grout is white
 
   // ---------- assets ----------
   // Vector art is drawn once into small canvases, because re-drawing an SVG image every frame is slow.
@@ -438,10 +439,15 @@
       if (sx > W || sx + g.w < 0) continue;
       ctx.fillStyle = "#14110f"; ctx.fillRect(sx, GROUND, g.w, H - GROUND);
       if (g.fill > 0) { var hh = (H - GROUND) * g.fill;
-        ctx.fillStyle = "#c2570f"; ctx.fillRect(sx, H - hh, g.w, hh);
-        ctx.fillStyle = "#e07a2b"; ctx.fillRect(sx, H - hh, g.w, 4); }
+        ctx.fillStyle = GROUT; ctx.fillRect(sx, H - hh, g.w, hh);
+        ctx.fillStyle = "#ffffff"; ctx.fillRect(sx, H - hh, g.w, 4); }
       if (g.fill < 1) { ctx.fillStyle = "#c2570f"; ctx.font = "bold 13px system-ui"; ctx.textAlign = "center"; ctx.fillText("GAP", sx + g.w / 2, GROUND - 8); }
     }
+  }
+  function drawParticles() {      // white grout splashes, with a thin edge so they show on the light wall
+    ctx.fillStyle = GROUT; ctx.strokeStyle = GROUT_EDGE; ctx.lineWidth = 1;
+    for (var p = 0; p < S.particles.length; p++) { var q = S.particles[p]; ctx.globalAlpha = Math.max(0, Math.min(1, q.life * 2)); ctx.fillRect(q.x, q.y, 5, 5); ctx.strokeRect(q.x, q.y, 5, 5); }
+    ctx.globalAlpha = 1;
   }
   function drawBrick(x, y, w) {
     ctx.fillStyle = "#b5532b"; ctx.fillRect(x, y, w, w); ctx.strokeStyle = "#7a3418"; ctx.lineWidth = 2; ctx.strokeRect(x, y, w, w);
@@ -472,8 +478,8 @@
     ctx.drawImage(baked.t || imgT, x, y, w, h);
     ctx.globalAlpha = 1;
     var s = h / 320, ax = x + 110 * s, ay = y + 30 * s, bx = x + 122 * s, by = y + 48 * s;
-    ctx.strokeStyle = "#ffd9a8"; ctx.lineWidth = 3; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke(); ctx.setLineDash([]);
-    if (maangFill > 0) { ctx.strokeStyle = "#c2570f"; ctx.lineWidth = 6; ctx.lineCap = "round"; ctx.beginPath(); ctx.moveTo(ax, ay);
+    ctx.strokeStyle = "#8a9099"; ctx.lineWidth = 3; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke(); ctx.setLineDash([]);
+    if (maangFill > 0) { ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 6; ctx.lineCap = "round"; ctx.beginPath(); ctx.moveTo(ax, ay);
       ctx.lineTo(ax + (bx - ax) * maangFill, ay + (by - ay) * maangFill); ctx.stroke(); ctx.lineCap = "butt"; }
     if (warnMark) { ctx.fillStyle = "#e0301e"; ctx.font = "bold 40px system-ui"; ctx.textAlign = "center"; ctx.fillText("!", x + w / 2, y - 6); }
     ctx.restore();
@@ -498,12 +504,12 @@
     ctx.strokeStyle = "rgba(60,40,30,.28)";
     for (var hx = cut - ((cut - px) % 11.5) + 11.5; hx <= px + pw; hx += 11.5) { ctx.beginPath(); ctx.moveTo(hx, py); ctx.lineTo(hx, py + ph); ctx.stroke(); }
     for (var hy = py; hy <= py + ph; hy += 11.5) { ctx.beginPath(); ctx.moveTo(cut, hy); ctx.lineTo(px + pw, hy); ctx.stroke(); }
-    ctx.strokeStyle = "#c2570f"; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(cut, py); ctx.lineTo(cut, py + ph); ctx.stroke();
+    ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(cut, py); ctx.lineTo(cut, py + ph); ctx.stroke();
     // Mistri working: a little rock as the trowel moves
     var work = Math.sin(S.t * 5);
     drawMistriAt(285, GROUND, { rot: work * 0.03, bob: Math.abs(work) * -2 });
     // grout bucket
-    ctx.fillStyle = "#8a9099"; ctx.fillRect(215, GROUND - 22, 30, 22); ctx.fillStyle = "#c2570f"; ctx.fillRect(217, GROUND - 24, 26, 5);
+    ctx.fillStyle = "#8a9099"; ctx.fillRect(215, GROUND - 22, 30, 22); ctx.fillStyle = GROUT; ctx.fillRect(217, GROUND - 24, 26, 5);
   }
 
   function drawHud() {
@@ -526,7 +532,7 @@
   function drawFightHud() {
     bar(14, 26, 300, 18, S.hp / 100, "#3ba55d", "MISTRI", "l");
     var full = S.meter >= 100;
-    bar(14, 62, 220, 12, S.meter / 100, full && Math.floor(S.t * 8) % 2 ? "#ffd34d" : "#c2570f", full ? "GROUT METER: SUPER READY!" : "GROUT METER", "l");
+    bar(14, 62, 220, 12, S.meter / 100, full && Math.floor(S.t * 8) % 2 ? "#ffd34d" : GROUT, full ? "GROUT METER: SUPER READY!" : "GROUT METER", "l");
     bar(W - 314, 26, 300, 18, S.thp / 100, "#d64541", "THEKEDAR", "r");
   }
 
@@ -539,8 +545,7 @@
       drawBg(0); drawFloor(0, false);
       drawThekedarAt(S.thX, 0, false, 0, S.maangShown);
       drawMistriAt(S.cx, S.cy);
-      ctx.fillStyle = "#c2570f"; for (var a = 0; a < S.particles.length; a++) { var qa = S.particles[a]; ctx.globalAlpha = Math.max(0, qa.life * 2); ctx.fillRect(qa.x, qa.y, 4, 4); }
-      ctx.globalAlpha = 1; ctx.restore(); return;
+      drawParticles(); ctx.restore(); return;
     }
     var cam = S.cam, fighting = (m === "fightIntro" || m === "boss" || m === "win" || (m === "fail" && S.failBoss));
     drawBg(cam); drawFloor(cam, !fighting);
@@ -554,16 +559,14 @@
         if (pr.type === "low") drawBrick(pr.x, GROUND - 34, 34);
         else { ctx.fillStyle = "#f4f1e8"; ctx.fillRect(pr.x, GROUND - 100, 34, 32); ctx.strokeStyle = "#9aa3ad"; ctx.lineWidth = 2; ctx.strokeRect(pr.x, GROUND - 100, 34, 32);
           ctx.beginPath(); ctx.moveTo(pr.x + 6, GROUND - 90); ctx.lineTo(pr.x + 28, GROUND - 90); ctx.moveTo(pr.x + 6, GROUND - 82); ctx.lineTo(pr.x + 28, GROUND - 82); ctx.stroke(); } }
-      ctx.fillStyle = "#c2570f";
-      for (var bl = 0; bl < S.blobs.length; bl++) { ctx.beginPath(); ctx.arc(S.blobs[bl].x, S.blobs[bl].y, 7, 0, 6.3); ctx.fill(); }
-      if (S.wave) { ctx.fillStyle = "rgba(194,87,15,.85)"; ctx.fillRect(S.wave.x - 40, GROUND - 120, 44, 120); ctx.fillStyle = "#ffb067"; ctx.fillRect(S.wave.x - 12, GROUND - 120, 16, 120); }
+      ctx.fillStyle = GROUT; ctx.strokeStyle = GROUT_EDGE; ctx.lineWidth = 2;
+      for (var bl = 0; bl < S.blobs.length; bl++) { ctx.beginPath(); ctx.arc(S.blobs[bl].x, S.blobs[bl].y, 7, 0, 6.3); ctx.fill(); ctx.stroke(); }
+      if (S.wave) { ctx.fillStyle = GROUT; ctx.fillRect(S.wave.x - 40, GROUND - 120, 44, 120); ctx.strokeRect(S.wave.x - 40, GROUND - 120, 44, 120); ctx.fillStyle = "#ffffff"; ctx.fillRect(S.wave.x - 12, GROUND - 120, 16, 120); }
     }
     var inv = S.inv > 0 && Math.floor(S.t * 12) % 2 === 0;
     drawMistriAt(MX, S.y, { crouch: S.crouch, alpha: inv ? 0.35 : 1, rot: S.falling ? Math.min(1.2, S.vy / 900) : 0, bob: (!S.falling && S.y >= GROUND && m !== "win" && !S.crouch) ? Math.sin(S.t * 14) * 3 : 0 });
-    if (m === "play") { ctx.setLineDash([4, 6]); ctx.strokeStyle = "rgba(194,87,15,.45)"; ctx.lineWidth = 2; ctx.strokeRect(MX, GROUND - 40, RANGE, 40); ctx.setLineDash([]); }
-    ctx.fillStyle = "#c2570f";
-    for (var p = 0; p < S.particles.length; p++) { var q = S.particles[p]; ctx.globalAlpha = Math.max(0, q.life * 2); ctx.fillRect(q.x, q.y, 4, 4); }
-    ctx.globalAlpha = 1;
+    if (m === "play") { ctx.setLineDash([4, 6]); ctx.strokeStyle = "rgba(60,70,80,.45)"; ctx.lineWidth = 2; ctx.strokeRect(MX, GROUND - 40, RANGE, 40); ctx.setLineDash([]); }
+    drawParticles();
     if (fighting) drawFightHud(); else drawHud();
     ctx.restore();
     var ready = m === "boss" && S.meter >= 100;
@@ -593,7 +596,7 @@
     if (imgM.complete) x.drawImage(imgM, 140, 800, 340, 544);
     if (imgT.complete) { x.drawImage(imgT, 560, 780, 380, 553);
       var sc = 380 / 220;
-      x.strokeStyle = "#c2570f"; x.lineWidth = 12; x.lineCap = "round"; x.beginPath(); x.moveTo(560 + 110 * sc, 780 + 30 * sc); x.lineTo(560 + 122 * sc, 780 + 48 * sc); x.stroke(); }
+      x.strokeStyle = "#ffffff"; x.lineWidth = 12; x.lineCap = "round"; x.beginPath(); x.moveTo(560 + 110 * sc, 780 + 30 * sc); x.lineTo(560 + 122 * sc, 780 + 48 * sc); x.stroke(); }
     x.fillStyle = "#2a2523"; x.font = "bold 72px system-ui"; x.fillText("When in doubt,", 540, 1560);
     x.fillStyle = "#c2570f"; x.fillText("bhar do grout", 540, 1650);
     x.fillStyle = "#6e645d"; x.font = "36px system-ui"; x.fillText("shoonyaorigins.com/ventures/games", 540, 1790);
