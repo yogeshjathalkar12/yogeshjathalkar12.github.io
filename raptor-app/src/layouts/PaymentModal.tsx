@@ -59,7 +59,11 @@ const TOPUP_PACKS = [
 ] as const;
 
 type PackId = (typeof TOPUP_PACKS)[number]['id'];
-type LoadingKey = PackId | 'pro' | null;
+type LoadingKey = PackId | null;
+
+// The online Pro upgrade is closed while the plans change (the server refuses it too, billing_router.py).
+const PRICING_URL = 'https://shoonyaorigins.com/ventures/raptor/pricing/';
+const CONTACT_URL = 'mailto:contact@shoonyaorigins.com?subject=Raptor plans';
 
 function loadRazorpayScript(): Promise<boolean> {
   return new Promise((resolve) => {
@@ -88,17 +92,14 @@ export function PaymentModal({ plan, onClose }: PaymentModalProps) {
 
   const isPro = plan.toLowerCase() === 'pro';
 
-  /**
-   * Shared checkout runner. `createBody` is optional since /create-order
-   * (Pro upgrade) takes no body, while /create-topup-order needs { pack }.
-   */
+  /** Checkout runner for credit top-ups. */
   const runCheckout = async (opts: {
     createUrl: string;
     verifyUrl: string;
     createBody?: Record<string, unknown>;
     description: string;
     successMessage: (result: VerifyResponse) => string;
-    loadingKey: PackId | 'pro';
+    loadingKey: PackId;
   }) => {
     setLoading(opts.loadingKey);
     try {
@@ -165,15 +166,6 @@ export function PaymentModal({ plan, onClose }: PaymentModalProps) {
     }
   };
 
-  const handlePayPro = () =>
-    runCheckout({
-      createUrl: `${RAPTOR_API_URL}/api/billing/create-order`,
-      verifyUrl: `${RAPTOR_API_URL}/api/billing/verify-payment`,
-      description: 'Pro Plan Upgrade',
-      successMessage: (r) => r.message || 'Upgraded to Pro!',
-      loadingKey: 'pro',
-    });
-
   const handleBuyPack = (packId: PackId) =>
     runCheckout({
       createUrl: `${RAPTOR_API_URL}/api/billing/create-topup-order`,
@@ -219,18 +211,17 @@ export function PaymentModal({ plan, onClose }: PaymentModalProps) {
           </>
         ) : (
           <>
-            <div className="billing-modal-badge">Upgrade</div>
-            <h2 className="billing-modal-title">Go Pro</h2>
+            <div className="billing-modal-badge">Plans</div>
+            <h2 className="billing-modal-title">Choose a plan</h2>
             <p className="billing-modal-desc">
-              Unlock 500 credits and priority access to every Raptor tool.
+              Online upgrade is closed while we move to new plans. See the plans, or email us and we will set you up.
             </p>
-            <div className="billing-modal-price">
-              ₹4,999 <span>/ one-time</span>
-            </div>
-            <button className="billing-modal-pay-btn" onClick={handlePayPro} disabled={loading !== null}>
-              {loading === 'pro' ? 'Opening checkout…' : 'Pay with Razorpay'}
-            </button>
-            <div className="billing-modal-secure">🔒 Secured by Razorpay</div>
+            <a className="billing-modal-pay-btn" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }} href={PRICING_URL} target="_blank" rel="noopener noreferrer">
+              See plans
+            </a>
+            <p className="billing-modal-desc" style={{ marginTop: '1rem', marginBottom: 0 }}>
+              <a href={CONTACT_URL} style={{ color: 'var(--purple)' }}>contact@shoonyaorigins.com</a>
+            </p>
           </>
         )}
       </div>

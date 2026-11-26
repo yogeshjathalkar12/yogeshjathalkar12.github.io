@@ -6,7 +6,7 @@ import { SECTION_NAME } from '../pages/connections/hub/channels';
 interface ProGateProps {
   /** Short name of the feature, e.g. "Email automation". */
   feature: string;
-  /** Finishes the sentence "Upgrade to Pro for ...". */
+  /** Finishes the sentence "A paid plan unlocks ...". */
   headline: string;
   /** What the person gets, in plain words. */
   points: string[];
@@ -35,10 +35,10 @@ export default function ProGate({ feature, headline, points, children }: ProGate
   return (
     <div style={{ padding: '2rem' }}>
       <div style={{ maxWidth: 560, border: '1px solid var(--border)', borderRadius: 8, padding: '1.8rem', background: 'var(--surface)' }}>
-        <div style={{ fontSize: '0.6rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--purple)', fontFamily: 'var(--mono)' }}>Pro feature</div>
-        <h2 style={{ margin: '0.5rem 0 0.4rem', color: 'var(--white)' }}>Upgrade to Pro for {headline}</h2>
+        <div style={{ fontSize: '0.6rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--purple)', fontFamily: 'var(--mono)' }}>Paid feature</div>
+        <h2 style={{ margin: '0.5rem 0 0.4rem', color: 'var(--white)' }}>A paid plan unlocks {headline}</h2>
         <p style={{ color: 'var(--dim)', fontSize: '0.78rem', lineHeight: 1.6, margin: '0 0 1rem' }}>
-          {feature} is part of the Pro plan. Here&rsquo;s what you get:
+          {feature} is part of the paid plans. Here&rsquo;s what you get:
         </p>
         <ul style={{ margin: '0 0 1.4rem', paddingLeft: '1.1rem', color: 'var(--white)', fontSize: '0.78rem', lineHeight: 1.9 }}>
           {points.map((p) => <li key={p}>{p}</li>)}
@@ -49,7 +49,7 @@ export default function ProGate({ feature, headline, points, children }: ProGate
             onClick={() => window.dispatchEvent(new Event('raptor:open-payment'))}
             style={{ background: 'var(--grad)', color: '#fff', border: 'none', padding: '0.75rem 1.5rem', borderRadius: 4, cursor: 'pointer', fontSize: '0.7rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}
           >
-            Upgrade to Pro
+            See plans
           </button>
         ) : (
           <div style={{ color: 'var(--dim)', fontSize: '0.72rem', lineHeight: 1.6 }}>

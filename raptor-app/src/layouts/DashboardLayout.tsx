@@ -102,7 +102,7 @@ export function DashboardLayout() {
             className={`dash-billing-btn${isPro ? '' : ' dash-billing-btn-primary'}`}
             onClick={() => setShowPayment(true)}
           >
-            {isPro ? 'Buy More Credits' : 'Upgrade to Pro'}
+            {isPro ? 'Buy More Credits' : 'See plans'}
           </button>
 
           <NotificationBell />
@@ -240,7 +240,7 @@ export function DashboardLayout() {
                 style={{ width: '100%' }}
                 onClick={() => setShowPayment(true)}
               >
-                Upgrade to Pro →
+                See plans →
               </button>
             )}
           </div>
