@@ -1,41 +1,77 @@
-/* Extras for the pricing page only. Everything else (nav, type, buttons, tables, cards, footer, light/dark) comes from the shared
-   /ventures/raptor/site.css, so this page matches the rest of the public site. Colours use the shared tokens. */
+/* Pricing page. The look comes from the home page's stylesheet (/ventures/raptor/styles.css), loaded before this file. This file holds
+   the home page's own top-bar rules (kept in step with the <style> block in /ventures/raptor/index.html) and what is particular to pricing. */
 
-body { --ok: #15803d; }
+body { --ok: #15803d; --card: var(--black); --text2: var(--dim); }
 body.dark-mode { --ok: #4ade80; }
 
-/* ── founding banner (top strip) ── */
-.founding-banner {
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.4rem 1.6rem;
-  padding: 0.7rem 1.25rem; text-align: center;
-  background: var(--surface2); border-bottom: 1px solid var(--border);
-  font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text2);
+/* ── copied from the home page ── */
+/* theme lamp: smaller and tucked into the right edge */
+.lamp-container{right:1.6rem;transform:scale(.62);transform-origin:top center}
+/* nav: one clean dark bar, one Download button */
+nav{background:rgba(12,10,18,.78);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);padding:1rem 7rem 1rem 4rem;border-bottom:1px solid rgba(255,255,255,.08)}
+nav::after{display:none}
+nav .nav-logo{display:flex;align-items:center;gap:.7rem;text-decoration:none;background:none;-webkit-text-fill-color:initial;font-size:2.7rem;line-height:1}
+nav .nav-logo img{width:44px;height:44px;border-radius:11px;display:block;box-shadow:0 0 18px rgba(168,85,247,.35)}
+nav .nav-logo-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-family:'Bebas Neue',sans-serif;letter-spacing:.1em}
+nav .nav-logo-ai{align-self:flex-start;margin-top:.35rem;margin-left:-.35rem;font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.14em;color:#e9d5ff;border:1px solid rgba(192,132,252,.7);border-radius:999px;padding:.12rem .45rem;-webkit-text-fill-color:#e9d5ff}
+@media(max-width:700px){nav .nav-logo{font-size:2rem}nav .nav-logo img{width:34px;height:34px}}
+nav .nav-links a{color:#e9e6f2;font-size:.68rem;opacity:.85;transition:opacity .2s,color .2s}
+nav .nav-links a:hover{opacity:1;color:#fff}
+.nav-download{display:inline-flex;align-items:center;gap:.6rem;padding:.8rem 1.7rem;border:0;border-radius:999px;cursor:pointer;background:var(--grad);color:#fff;font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;box-shadow:0 6px 24px rgba(168,85,247,.35);transition:transform .2s,box-shadow .2s}
+.nav-download:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(168,85,247,.5)}
+.nav-download:focus-visible{outline:2px solid #fff;outline-offset:3px}
+nav .nav-auth{gap:1rem}
+nav .nav-login-btn{padding:.78rem 1.4rem;border-radius:999px;color:#e9e6f2;border:1px solid rgba(255,255,255,.28);background:transparent;font-size:.65rem;white-space:nowrap}
+nav .nav-login-btn:hover{color:#fff;border-color:#c084fc;background:rgba(168,85,247,.14)}
+@media(max-width:700px){nav .nav-login-btn{padding:.6rem .9rem;font-size:.58rem}}
+@media(max-width:900px){nav{padding:.9rem 4.5rem .9rem 1.2rem}.nav-download{padding:.7rem 1.1rem}}
+/* DEMO:START */
+nav .nav-demo{padding:.78rem 1.3rem;border-radius:999px;border:1px solid rgba(192,132,252,.7);background:rgba(168,85,247,.12);color:#f3e8ff;font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;white-space:nowrap;cursor:pointer;transition:background .2s,border-color .2s,transform .2s}
+nav .nav-demo:hover{background:rgba(168,85,247,.28);border-color:#c084fc;transform:translateY(-1px)}
+nav .nav-demo:focus-visible{outline:2px solid #fff;outline-offset:3px}
+nav .nav-auth{gap:.8rem}
+@media(max-width:1180px){nav .nav-links{gap:1.1rem}nav .nav-demo,nav .nav-login-btn{padding:.7rem 1rem;letter-spacing:.14em}}
+@media(max-width:900px){nav .nav-demo{display:none}}
+@media(max-width:560px){
+nav{padding:.7rem 3.4rem .7rem .8rem}
+nav .nav-logo-ai,nav .nav-login-btn .nl-more,.nav-download svg{display:none}
+nav .nav-auth{gap:.45rem}
+nav .nav-login-btn{padding:.55rem .8rem;font-size:.56rem;letter-spacing:.1em}
+.nav-download{padding:.6rem .85rem;font-size:.56rem}
+.trust-item{white-space:normal;text-align:center}
 }
-.founding-banner strong { font-weight: 500; color: var(--white); }
-.founding-count { color: var(--purple); }
+.nav-demo, .nav-login-btn, .nav-download { text-decoration: none; line-height: 1.2; }
+nav .nav-links a[aria-current="page"] { color: #fff; opacity: 1; }
 
-.lede strong { color: var(--white); font-weight: 400; }
-.lede-2 { margin-top: 0.8rem; }
-.jump { margin-top: 2.2rem; }
+/* ── page frame ── */
+.skip-link { position: absolute; left: 1rem; top: -4rem; z-index: 300; background: var(--purple); color: #fff; padding: 0.6rem 1rem; text-decoration: none; font-size: 0.8rem; }
+.skip-link:focus { top: 1rem; }
+.who-section { position: relative; z-index: 2; scroll-margin-top: 5rem; }
+.who-section.alt { background: var(--black); }
+.who-section > .who-inner > .big-title { margin-bottom: 3rem; }
+.btn-main, .btn-ghost { display: inline-block; text-align: center; cursor: pointer; }
 
-.sub-title {
-  font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 1.7rem; letter-spacing: 0.03em;
-  margin: 3.2rem 0 1rem;
-}
+.plans-two { margin-top: 1.2rem; }
+#plans .plan-name { margin-bottom: 1.1rem; }
+.cta-section { padding-top: 6rem; padding-bottom: 6rem; }
+
+/* ── tables ── */
+.tbl-wrap { overflow-x: auto; border: 1px solid var(--border); background: var(--black); }
+table.tbl { width: 100%; border-collapse: collapse; min-width: 640px; }
+.tbl th, .tbl td { text-align: left; padding: 1rem 1.2rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+.tbl th { font-size: 0.66rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--purple); font-weight: 500; }
+.tbl td { font-family: 'Instrument Serif', Georgia, serif; font-size: 1.12rem; line-height: 1.5; color: var(--text2); }
+.tbl tr:last-child td, .tbl tr:last-child th { border-bottom: none; }
 
 /* ── plans ── */
-.plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.2rem; align-items: stretch; }
+.plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.2rem; align-items: stretch; }
+.plans-two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .plan {
   position: relative; display: flex; flex-direction: column;
   background: var(--card); border: 1px solid var(--border); padding: 1.7rem 1.5rem;
 }
 .plan.featured { border-color: var(--purple); box-shadow: 0 0 0 1px var(--purple); background: var(--surface); }
-.plan-badge { font-size: 0.62rem; letter-spacing: 0.24em; text-transform: uppercase; color: var(--purple); margin-bottom: 0.8rem; }
 .plan-name { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 0.04em; line-height: 1; }
-.plan-target {
-  font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-size: 1.08rem; line-height: 1.4;
-  color: var(--text2); margin: 0.5rem 0 1.3rem; min-height: 3em;
-}
 .plan-price { padding: 1.1rem 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin-bottom: 1.2rem; }
 .price-amount {
   font-family: 'Bebas Neue', sans-serif; font-size: 3.1rem; line-height: 1; letter-spacing: 0.02em; color: var(--purple);
@@ -56,91 +92,53 @@ body.dark-mode { --ok: #4ade80; }
 .plan-features li.locked::before { content: '–'; color: var(--dim); }
 .plan-cta { text-align: center; width: 100%; padding-left: 1rem; padding-right: 1rem; }
 
-/* annual billing table */
-.annual td.saving { color: var(--ok); }
-.annual td.hl { color: var(--white); }
-.annual td:last-child { color: var(--dim); }
+.price-from { font-size: 0.62rem; letter-spacing: 0.24em; text-transform: uppercase; color: var(--dim); margin-bottom: 0.2rem; }
+.plan-limits { margin: 0 0 1.2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.8rem; }
+.plan-limits > div { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding: 0.3rem 0; }
+.plan-limits dt { font-size: 0.64rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); }
+.plan-limits dd { margin: 0; font-size: 0.82rem; color: var(--white); text-align: right; }
+.plan-service { border: 1px solid var(--border); padding: 0.9rem 1rem; margin-bottom: 1.2rem; }
+.plan-service-title { font-size: 0.62rem; letter-spacing: 0.24em; text-transform: uppercase; color: var(--purple); margin-bottom: 0.4rem; }
+.plan-service ul { list-style: none; margin: 0; padding: 0; }
+.plan-service li { font-family: 'Instrument Serif', Georgia, serif; font-size: 1.05rem; line-height: 1.5; color: var(--text2); }
+.plan-note { font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-size: 1rem; line-height: 1.45; color: var(--text2); margin: 0 0 1.2rem; }
+.plans-more { margin-top: 1.6rem; font-family: 'Instrument Serif', Georgia, serif; font-size: 1.15rem; color: var(--text2); }
+.plans-more a { color: var(--purple); }
 
-/* ── add-ons ── */
-.addon-price { margin-top: 1rem; font-family: 'Bebas Neue', sans-serif; font-size: 1.9rem; letter-spacing: 0.03em; color: var(--purple); }
-.addon-price span { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim); }
+/* ── plan by plan table ── */
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.plan-table { min-width: 860px; }
+.plan-table th:not(:first-child), .plan-table td { text-align: center; vertical-align: middle; }
+.plan-table tbody th[scope="row"] { vertical-align: middle; text-align: left; font-weight: 400; font-size: 0.8rem; letter-spacing: 0.02em; text-transform: none; color: var(--white); }
+.plan-table tbody .group-row th { text-align: left; font-size: 0.62rem; letter-spacing: 0.24em; text-transform: uppercase; font-weight: 400; color: var(--purple); background: var(--surface2); }
+.plan-table .check { color: var(--ok); font-size: 1.05rem; }
+@media (max-width: 700px) {
+  .plan-table thead th:first-child, .plan-table tbody th[scope="row"] { position: sticky; left: 0; z-index: 1; background: var(--black); min-width: 130px; max-width: 150px; padding-left: 0.8rem; padding-right: 0.8rem; border-right: 1px solid var(--border); }
+}
+.plan-table .cross { color: var(--dim); }
 
-/* ── founding ── */
-.founding-grid {
-  display: grid; grid-template-columns: 1.3fr 1fr; gap: 2.5rem;
-  background: var(--surface); border: 1px solid var(--border); padding: 2.4rem;
-}
-.founding-left h2 { margin-bottom: 1.4rem; }
-.founding-left h2 em { font-style: normal; color: var(--purple); }
-@supports (-webkit-background-clip: text) {
-  .founding-left h2 em { background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-}
-.founding-left p { font-family: 'Instrument Serif', Georgia, serif; font-size: 1.2rem; line-height: 1.6; color: var(--text2); margin-bottom: 1rem; }
-.founding-left strong { color: var(--white); font-weight: 400; }
-.founding-benefits { list-style: none; margin-top: 1.4rem; }
-.founding-benefits li {
-  position: relative; padding: 0.5rem 0 0.5rem 1.5rem; border-top: 1px solid var(--border);
-  font-family: 'Instrument Serif', Georgia, serif; font-size: 1.1rem; line-height: 1.45; color: var(--text2);
-}
-.founding-benefits li::before { content: '✓'; position: absolute; left: 0; top: 0.5rem; color: var(--ok); font-size: 0.85rem; }
-.founding-benefits strong { color: var(--white); font-weight: 400; }
-.founding-right { display: flex; flex-direction: column; justify-content: center; }
-.slots-counter { text-align: center; }
-.slots-number {
-  font-family: 'Bebas Neue', sans-serif; font-size: 6rem; line-height: 0.9; color: var(--purple);
-}
-@supports (-webkit-background-clip: text) {
-  .slots-number { background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-}
-.slots-label { font-size: 0.7rem; letter-spacing: 0.24em; text-transform: uppercase; color: var(--dim); margin-top: 0.4rem; }
-.slots-bar { height: 8px; margin: 1.4rem 0 0.6rem; background: var(--border); border-radius: 99px; overflow: hidden; position: relative; }
-.slots-bar::after { content: ''; position: absolute; inset: 0 auto 0 0; width: 35%; background: var(--grad); border-radius: 99px; }
-.slots-taken { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text2); }
-.slots-taken .claimed { color: var(--purple); }
-.founding-price-display { margin: 1.8rem 0; text-align: center; padding: 1.2rem; border: 1px solid var(--border); background: var(--card); }
-.founding-price-old { color: var(--dim); text-decoration: line-through; font-size: 0.9rem; }
-.founding-price-new { font-family: 'Bebas Neue', sans-serif; font-size: 3.4rem; line-height: 1; color: var(--white); }
-.founding-price-note { margin-top: 0.4rem; font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--purple); }
-.founding-cta { text-align: center; }
-.founding-cta-note { margin-top: 0.7rem; text-align: center; font-size: 0.66rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); }
+/* ── pilot ── */
+.pilot-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 2.5rem; background: var(--surface); border: 1px solid var(--border); padding: 2.4rem; }
+.pilot-left h2 { margin-bottom: 1.4rem; }
+.pilot-left p { font-family: 'Instrument Serif', Georgia, serif; font-size: 1.2rem; line-height: 1.6; color: var(--text2); margin-bottom: 1rem; }
+.pilot-left strong { color: var(--white); font-weight: 400; }
+.pilot-points { list-style: none; margin-top: 1.4rem; }
+.pilot-points li { position: relative; padding: 0.5rem 0 0.5rem 1.5rem; border-top: 1px solid var(--border); font-family: 'Instrument Serif', Georgia, serif; font-size: 1.1rem; line-height: 1.45; color: var(--text2); }
+.pilot-points li::before { content: '✓'; position: absolute; left: 0; top: 0.5rem; color: var(--ok); font-size: 0.85rem; }
+.pilot-right { display: flex; flex-direction: column; justify-content: center; }
+.pilot-price { margin-bottom: 1.4rem; text-align: center; padding: 1.4rem 1rem; border: 1px solid var(--border); background: var(--card); }
+.pilot-price-amount { font-family: 'Bebas Neue', sans-serif; font-size: 3.4rem; line-height: 1; color: var(--white); }
+.pilot-price-note { margin-top: 0.4rem; font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--purple); }
+.pilot-cta { text-align: center; }
 
-/* ── ROI calculator ── */
-.roi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
-.roi-inputs, .roi-outputs { background: var(--card); border: 1px solid var(--border); padding: 1.8rem 1.6rem; }
-.roi-outputs { background: var(--surface); }
-.roi-title { font-size: 0.68rem; letter-spacing: 0.26em; text-transform: uppercase; color: var(--purple); margin-bottom: 1.3rem; }
-.roi-field { margin-bottom: 1.1rem; }
-.roi-field label { display: block; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); margin-bottom: 0.4rem; }
-.roi-field input, .roi-field select {
-  width: 100%; padding: 0.8rem 0.9rem; font-family: 'DM Mono', monospace; font-size: 0.95rem;
-  color: var(--white); background: var(--black); border: 1px solid var(--border); border-radius: 10px;
-}
-.roi-field input:focus, .roi-field select:focus { outline: 2px solid var(--purple); outline-offset: 1px; border-color: var(--purple); }
-.roi-metric { padding: 0.9rem 0; border-bottom: 1px solid var(--border); }
-.roi-metric:last-child { border-bottom: none; }
-.roi-metric-label { font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); }
-.roi-metric-value { font-family: 'Bebas Neue', sans-serif; font-size: 2.4rem; line-height: 1.1; color: var(--white); overflow-wrap: anywhere; }
-.roi-metric-value.positive { color: var(--ok); }
-.roi-metric-value.highlight { color: var(--purple); }
-@supports (-webkit-background-clip: text) {
-  .roi-metric-value.highlight { background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-}
-.roi-metric-sub { font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-size: 1rem; color: var(--text2); }
-
-.cta-band h2 em { font-style: normal; color: var(--purple); }
-@supports (-webkit-background-clip: text) {
-  .cta-band h2 em { background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-}
-.cta-band p strong { color: var(--white); font-weight: 400; }
+.plan.who-card.in:hover { transform: translateY(-4px); }
+.plan.who-card.featured:hover { border-color: var(--purple); }
+.plan .plan-note { font-family: 'Instrument Serif', Georgia, serif; font-size: 1rem; line-height: 1.45; color: var(--text2); }
 
 /* ── responsive ── */
 @media (max-width: 900px) {
-  .founding-grid { grid-template-columns: 1fr; padding: 1.6rem 1.25rem; gap: 2rem; }
-  .roi-grid { grid-template-columns: 1fr; }
-  .plan-target { min-height: 0; }
+  .plans-two { grid-template-columns: 1fr; }
+  .pilot-grid { grid-template-columns: 1fr; padding: 1.6rem 1.25rem; gap: 2rem; }
 }
-@media (max-width: 700px) {
-  .founding-banner { font-size: 0.6rem; letter-spacing: 0.1em; }
-  .slots-number { font-size: 4.6rem; }
-  .jump { margin-top: 1.6rem; }
-}
+@media (max-width: 768px) {
+  }
