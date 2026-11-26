@@ -313,10 +313,6 @@ nav .nav-login-btn{padding:.55rem .8rem;font-size:.56rem;letter-spacing:.1em}
 .moat-compound .compound-inner{max-width:none}
 .moat-compound .timeline{margin-top:3rem}
 @media(max-width:900px){.moat-compound{grid-template-columns:1fr}.moat-compound .brain-section,.moat-compound .compound-section{padding:5rem 1.5rem}}
-/* comparison table: first 6 rows, rest behind View more */
-.compare-extra[hidden]{display:none}
-.compare-more-wrap{text-align:center;margin-top:1.5rem}
-.compare-more{cursor:pointer;padding:.9rem 2rem;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;font-family:'DM Mono',monospace}
 </style>
 <link rel="stylesheet" href="/ventures/raptor/download.css?v=1">
 <script src="/ventures/raptor/release.js?v=1"></script>
@@ -713,106 +709,6 @@ if (el) {
 }
 </script>
 <!-- SIGNAL-BRAIN:END -->
-
-<!-- COMPARISON STRIP: named competitors, marks checked against public vendor pages (Oct 2026) -->
-<div class="compare-section" id="compare">
-  <div class="compare-inner">
-    <div class="label reveal">Raptor vs The Rest</div>
-    <h2 class="big-title1 reveal">One Unified Brain.<br><em>Beats Five Disconnected Tools.</em></h2>
-    <table class="compare-table reveal" aria-label="Raptor compared with Apollo.io, Salesforce and Outreach">
-      <thead>
-        <tr>
-          <th style="text-align: left;">Capability</th>
-          <th class="raptor-col">Raptor</th>
-          <th>Apollo.io</th>
-          <th>Salesforce</th>
-          <th>Outreach</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Your data and AI run on your own machine</td>
-          <td class="check raptor-col">✓</td>
-          <td class="cross">—</td>
-          <td class="cross">—</td>
-          <td class="cross">—</td>
-        </tr>
-        <tr>
-          <td>No per-credit or per-task AI charges</td>
-          <td class="check raptor-col">✓</td>
-          <td class="cross">—</td>
-          <td class="cross">—</td>
-          <td class="cross">—</td>
-        </tr>
-        <tr>
-          <td>Finds new prospects for you</td>
-          <td class="check raptor-col">✓</td>
-          <td class="check">✓</td>
-          <td class="cross">—</td>
-          <td class="cross">—</td>
-        </tr>
-        <tr>
-          <td>Owns a licensed contact database</td>
-          <td class="cross raptor-col">—</td>
-          <td class="check">✓</td>
-          <td class="cross">—</td>
-          <td class="cross">—</td>
-        </tr>
-        <tr>
-          <td>AI-written, per-prospect pitches</td>
-          <td class="check raptor-col">✓</td>
-          <td class="check">✓</td>
-          <td class="check">✓</td>
-          <td class="check">✓</td>
-        </tr>
-        <tr>
-          <td>Live call guidance</td>
-          <td class="check raptor-col">✓</td>
-          <td class="" style="color:#f59e0b;font-size:1rem">◐</td>
-          <td class="" style="color:#f59e0b;font-size:1rem">◐</td>
-          <td class="check">✓</td>
-        </tr>
-        <tr class="compare-extra" hidden>
-          <td>Draft claims checked against your company facts before sending</td>
-          <td class="check raptor-col">✓</td>
-          <td class="cross">—</td>
-          <td class="cross">—</td>
-          <td class="cross">—</td>
-        </tr>
-        <tr class="compare-extra" hidden>
-          <td>Learns from your own outcomes</td>
-          <td class="check raptor-col">✓</td>
-          <td class="" style="color:#f59e0b;font-size:1rem">◐</td>
-          <td class="" style="color:#f59e0b;font-size:1rem">◐</td>
-          <td class="" style="color:#f59e0b;font-size:1rem">◐</td>
-        </tr>
-        <tr class="compare-extra" hidden>
-          <td>Fit score with the reasons listed</td>
-          <td class="check raptor-col">✓</td>
-          <td class="" style="color:#f59e0b;font-size:1rem">◐</td>
-          <td class="" style="color:#f59e0b;font-size:1rem">◐</td>
-          <td class="" style="color:#f59e0b;font-size:1rem">◐</td>
-        </tr>
-        <tr class="compare-extra" hidden>
-          <td>Free CRM to start</td>
-          <td class="check raptor-col">✓</td>
-          <td class="check">✓</td>
-          <td class="cross">—</td>
-          <td class="cross">—</td>
-        </tr>
-        <tr class="compare-extra" hidden>
-          <td>Mature integrations and ecosystem</td>
-          <td class="raptor-col" style="color:#f59e0b;font-size:1rem">◐</td>
-          <td class="check">✓</td>
-          <td class="check">✓</td>
-          <td class="check">✓</td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="compare-more-wrap"><button type="button" class="compare-more btn-ghost" id="compare-more" aria-expanded="false" aria-controls="compare">View more</button></div>
-    <p class="prose reveal" style="margin-top:1.2rem;font-size:.8rem">✓ offered &nbsp;·&nbsp; ◐ partial, add-on or usage-based &nbsp;·&nbsp; — not offered that we could find. Checked October 2026 against each vendor's public pages and independent reviews; their products change, so verify before you decide. Where a competitor is ahead, the table says so.</p>
-  </div>
-</div>
 
 <!-- THE LOOP -->
 <div class="loop-section" id="loop">
@@ -1427,11 +1323,6 @@ if (el) {
 <script type="module" src="/ventures/raptor/assets/signal-bg.js?v=8"></script>
 <!-- SB-BG-SCRIPT:END -->
 <script>
-(function(){var b=document.getElementById('compare-more');if(!b)return;
-b.addEventListener('click',function(){var rows=document.querySelectorAll('#compare .compare-extra');var open=b.getAttribute('aria-expanded')==='true';
-rows.forEach(function(r){r.hidden=open});b.setAttribute('aria-expanded',open?'false':'true');b.textContent=open?'View more':'View less';});})();
-</script>
-<script>
 document.querySelectorAll('.arch-more').forEach(function(b){b.addEventListener('click',function(){var t=b.parentNode.querySelector('.arch-text');var open=b.getAttribute('aria-expanded')==='true';t.hidden=open;b.setAttribute('aria-expanded',open?'false':'true');b.textContent=open?'View more':'View less';});});
 </script>
 <!-- DEMO:START -->
@@ -1544,7 +1435,6 @@ function ctaRun(i){
   },true);
 }
 var cameos=[
-  {sel:"#compare",fire:edgeRun([[-0.06,0.2,0.55,0,0],[0.02,0.26,0.7,1,0.15],[0.1,0.42,0.9,1,0.7],[0.16,0.52,0.95,0,1]],false)},
   {sel:"#loop",fire:edgeRun([[1.06,0.3,0.55,0,0],[0.98,0.36,0.7,1,0.15],[0.9,0.52,0.9,1,0.7],[0.84,0.62,0.95,0,1]],true)},
   {sel:".moat-compound",fire:edgeRun([[-0.06,0.5,0.55,0,0],[0.02,0.58,0.7,1,0.15],[0.1,0.72,0.9,1,0.7],[0.16,0.82,0.95,0,1]],false)},
   {sel:"#faq",fire:edgeRun([[1.06,0.45,0.55,0,0],[0.98,0.52,0.7,1,0.15],[0.9,0.68,0.9,1,0.7],[0.84,0.78,0.95,0,1]],true)},

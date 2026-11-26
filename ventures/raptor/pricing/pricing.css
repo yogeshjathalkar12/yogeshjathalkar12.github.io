@@ -1,10 +1,8 @@
 /* Extras for the pricing page only. Everything else (nav, type, buttons, tables, cards, footer, light/dark) comes from the shared
    /ventures/raptor/site.css, so this page matches the rest of the public site. Colours use the shared tokens. */
 
-body { --ok: #15803d; --warn: #b45309; }
-body.dark-mode { --ok: #4ade80; --warn: #fbbf24; }
-
-.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+body { --ok: #15803d; }
+body.dark-mode { --ok: #4ade80; }
 
 /* ── founding banner (top strip) ── */
 .founding-banner {
@@ -58,7 +56,7 @@ body.dark-mode { --ok: #4ade80; --warn: #fbbf24; }
 .plan-features li.locked::before { content: '–'; color: var(--dim); }
 .plan-cta { text-align: center; width: 100%; padding-left: 1rem; padding-right: 1rem; }
 
-/* annual + comparison tables */
+/* annual billing table */
 .annual td.saving { color: var(--ok); }
 .annual td.hl { color: var(--white); }
 .annual td:last-child { color: var(--dim); }
@@ -128,19 +126,6 @@ body.dark-mode { --ok: #4ade80; --warn: #fbbf24; }
   .roi-metric-value.highlight { background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
 }
 .roi-metric-sub { font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-size: 1rem; color: var(--text2); }
-
-/* ── comparison table ── */
-.cmp { min-width: 760px; }
-.cmp th:not(:first-child), .cmp td:not(:first-child) { text-align: center; }
-.cmp td { vertical-align: middle; }
-.cmp .raptor-col { background: var(--card); color: var(--white); }
-.cmp th.raptor-col { color: var(--purple); }
-.cmp .check { color: var(--ok); font-size: 1.15rem; }
-.cmp .cross { color: var(--dim); font-size: 1rem; }
-.cmp .partial { color: var(--warn); font-family: 'DM Mono', monospace; font-size: 0.78rem; letter-spacing: 0.04em; }
-.cmp .cost-row td { border-top: 1px solid var(--border); font-family: 'DM Mono', monospace; font-size: 0.85rem; color: var(--text2); }
-.cmp .cost-row td:first-child { color: var(--white); }
-.cmp .cost-raptor { font-family: 'Bebas Neue', sans-serif !important; font-size: 1.7rem !important; letter-spacing: 0.04em; color: var(--purple) !important; }
 
 .cta-band h2 em { font-style: normal; color: var(--purple); }
 @supports (-webkit-background-clip: text) {
