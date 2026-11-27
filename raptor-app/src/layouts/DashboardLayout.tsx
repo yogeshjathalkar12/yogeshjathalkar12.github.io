@@ -10,6 +10,7 @@ import GlobalSearch from '../components/GlobalSearch';
 import { WhatsAppDispatcher } from '../components/crm/WhatsAppDispatcher';
 import { SmsDispatcher } from '../components/crm/SmsDispatcher';
 import { SECTION_NAME } from '../pages/connections/hub/channels';
+import { isPaid } from '../lib/plans';
 
 // Profile photo from the sign-in provider (Google sends `picture`/`avatar_url`).
 // Password-only accounts have none, so they keep the initial-letter circle.
@@ -70,7 +71,7 @@ export function DashboardLayout() {
   const fullName = user?.user_metadata?.full_name || displayName;
   const photoUrl = photoUrlOf(user);
   const initial = displayName[0]?.toUpperCase() ?? '';
-  const isPro = plan.toLowerCase() === 'pro';
+  const isPro = isPaid(plan);
   // A small "PRO" tag on the locked sections for Free accounts (hidden until the plan is known).
   const proTag = !isPro && planLoaded ? <span style={{ marginLeft: 'auto', fontSize: '0.5rem', letterSpacing: '0.1em', padding: '0.1rem 0.35rem', borderRadius: 3, border: '1px solid var(--purple)', color: 'var(--purple)' }}>PRO</span> : null;
 

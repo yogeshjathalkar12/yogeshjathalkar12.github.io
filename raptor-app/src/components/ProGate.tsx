@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { useCredits } from '../hooks/CreditsContext';
 import { useOrg } from '../hooks/OrgContext';
 import { SECTION_NAME } from '../pages/connections/hub/channels';
+import { hasFeature } from '../lib/plans';
 
 interface ProGateProps {
   /** Short name of the feature, e.g. "Email automation". */
@@ -13,10 +14,10 @@ interface ProGateProps {
   children: ReactNode;
 }
 
-/** True when the organization is on the Pro plan. */
+/** True when the organization's plan includes the web app's paid features (Reach and up, and the earlier Pro plans). */
 export function useIsPro() {
   const { plan, planLoaded } = useCredits();
-  return { isPro: plan.toLowerCase() === 'pro', planLoaded };
+  return { isPro: hasFeature(plan, 'automation'), planLoaded };
 }
 
 // Wraps a Pro-only area. Pro: shows the area. Free: shows what Pro unlocks

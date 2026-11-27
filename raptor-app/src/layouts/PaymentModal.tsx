@@ -4,6 +4,7 @@ import { useCredits } from '../hooks/CreditsContext';
 import { useToast } from '../hooks/ToastContext';
 import { RAPTOR_API_URL } from '../lib/config';
 import './PaymentModal.css';
+import { isPaid } from '../lib/plans';
 
 declare global {
   interface Window {
@@ -90,7 +91,7 @@ export function PaymentModal({ plan, onClose }: PaymentModalProps) {
   const { showToast } = useToast();
   const [loading, setLoading] = useState<LoadingKey>(null);
 
-  const isPro = plan.toLowerCase() === 'pro';
+  const isPro = isPaid(plan);
 
   /** Checkout runner for credit top-ups. */
   const runCheckout = async (opts: {
@@ -185,10 +186,10 @@ export function PaymentModal({ plan, onClose }: PaymentModalProps) {
 
         {isPro ? (
           <>
-            <div className="billing-modal-badge">Pro Plan</div>
+            <div className="billing-modal-badge">{plan} Plan</div>
             <h2 className="billing-modal-title">Buy More Credits</h2>
             <p className="billing-modal-desc">
-              Loyalty pricing for Pro members — cheaper per credit the more you buy.
+              Cheaper per credit the more you buy.
             </p>
             <div className="billing-pack-list">
               {TOPUP_PACKS.map((pack) => (

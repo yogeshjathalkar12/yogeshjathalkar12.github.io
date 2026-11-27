@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabaseClient';
 import { COUNTRIES } from '../lib/currency';
 import TeamSection from '../components/team/TeamSection';
 import SecurityCard from '../components/team/SecurityCard';
+import PlanCard from '../components/PlanCard';
 
 const cardStyle: React.CSSProperties = {
   background: 'var(--surface)',
@@ -78,6 +79,8 @@ export default function Settings() {
       <div style={{ gridColumn: '1 / -1', fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.5rem', letterSpacing: '0.05em' }}>
         Settings
       </div>
+
+      <div style={{ gridColumn: '1 / -1' }}><PlanCard /></div>
 
       <div style={cardStyle}>
         <div style={{ fontSize: '0.7rem', color: 'var(--white)', fontWeight: 'bold', marginBottom: '0.4rem' }}>
