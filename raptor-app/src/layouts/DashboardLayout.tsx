@@ -194,6 +194,12 @@ export function DashboardLayout() {
             <NavLink to="/crm" className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
               <span className="dash-sidebar-icon">◫</span><span>Automated CRM</span>
             </NavLink>
+            <NavLink to="/calls" className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
+              <span className="dash-sidebar-icon">◉</span><span>Calls</span>
+            </NavLink>
+            <NavLink to="/competitors" className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
+              <span className="dash-sidebar-icon">◎</span><span>Competitors</span>
+            </NavLink>
             <NavLink to="/sync" className={({ isActive }) => `dash-sidebar-item${isActive ? ' active' : ''}`}>
               <span className="dash-sidebar-icon">⇄</span><span>Desktop Sync</span>
             </NavLink>

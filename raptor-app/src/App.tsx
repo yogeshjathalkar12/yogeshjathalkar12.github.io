@@ -47,6 +47,18 @@ import SyncDna from './pages/sync/SyncDna';
 import SyncDossiers from './pages/sync/SyncDossiers';
 import SyncPitches from './pages/sync/SyncPitches';
 import SyncCompetitors from './pages/sync/SyncCompetitors';
+import TabsLayout, { CALL_TABS, COMPETITOR_TABS } from './layouts/TabsLayout';
+import CompetitorList from './pages/competitors/CompetitorList';
+import CompetitorDetail from './pages/competitors/CompetitorDetail';
+import CompetitorFeed from './pages/competitors/CompetitorFeed';
+import CompetitorWinLoss from './pages/competitors/CompetitorWinLoss';
+import CompetitorSettings from './pages/competitors/CompetitorSettings';
+import CallsList from './pages/calls/CallsList';
+import CallDetail from './pages/calls/CallDetail';
+import CallsTeam from './pages/calls/CallsTeam';
+import CallsLibrary from './pages/calls/CallsLibrary';
+import CallsScorecards from './pages/calls/CallsScorecards';
+import CallsWatchWords from './pages/calls/CallsWatchWords';
 
 /* email files */
 import EmailLayout from './layouts/EmailLayout';
@@ -99,6 +111,23 @@ export default function App() {
                 <Routes>
                   <Route element={<RequireAuth><MfaGate><OrgGate><DashboardLayout /></OrgGate></MfaGate></RequireAuth>}>
                     <Route path="/dashboard" element={<DashboardHome />} />
+
+                    <Route path="/competitors" element={<ProGate {...PRO_COPY.competitors}><TabsLayout tabs={COMPETITOR_TABS} /></ProGate>}>
+                      <Route index element={<CompetitorList />} />
+                      <Route path="updates" element={<CompetitorFeed />} />
+                      <Route path="win-loss" element={<CompetitorWinLoss />} />
+                      <Route path="settings" element={<CompetitorSettings />} />
+                      <Route path=":id" element={<CompetitorDetail />} />
+                    </Route>
+
+                    <Route path="/calls" element={<ProGate {...PRO_COPY.calls}><TabsLayout tabs={CALL_TABS} /></ProGate>}>
+                      <Route index element={<CallsList />} />
+                      <Route path="team" element={<CallsTeam />} />
+                      <Route path="library" element={<CallsLibrary />} />
+                      <Route path="scorecards" element={<CallsScorecards />} />
+                      <Route path="watch-words" element={<CallsWatchWords />} />
+                      <Route path=":id" element={<CallDetail />} />
+                    </Route>
                     <Route path="/settings" element={<Settings />} />
 
                     <Route path="/crm" element={<CrmLayout />}>

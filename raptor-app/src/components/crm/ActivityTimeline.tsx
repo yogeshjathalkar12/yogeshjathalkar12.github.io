@@ -12,6 +12,8 @@ import { fieldInputStyle, fieldLabelStyle, toolPrimaryStyle } from './Modal';
 
 const TYPES: [string, string][] = [['note', 'Note'], ['call', 'Call'], ['meeting', 'Meeting'], ['email', 'Email']];
 const SHOW_AT_FIRST = 20;
+/** The call a history line was written for (2026-11-30_d_call_history.sql), or ''. */
+const callOf = (line: any): string => (typeof line.source_ref === 'string' && line.source_ref.startsWith('call:') ? line.source_ref.slice(5) : '');
 
 type Props = { dealId?: string; contactId?: string | null; companyId?: string };
 
@@ -99,7 +101,8 @@ export default function ActivityTimeline({ dealId, contactId, companyId }: Props
           <div key={line.id} style={{ display: 'flex', gap: 10, padding: '0.5rem 0', borderTop: '1px solid var(--border)', fontSize: '0.66rem' }}>
             <span aria-hidden="true">{TYPE_ICON[line.type] || '•'}</span>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{line.content}</div>
+              <div style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }} dir="auto">{line.content}</div>
+              {callOf(line) && <a href={`#/calls/${callOf(line)}`} style={{ color: 'var(--purple)', fontSize: '0.58rem' }}>Open the call</a>}
               <div style={{ color: 'var(--dim2)', fontSize: '0.56rem' }}>{line.type}{from ? ` · ${from}` : ''} · {relativeTime(line.created_at)}</div>
             </div>
           </div>

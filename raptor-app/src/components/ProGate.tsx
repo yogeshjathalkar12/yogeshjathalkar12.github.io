@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { useCredits } from '../hooks/CreditsContext';
 import { useOrg } from '../hooks/OrgContext';
 import { SECTION_NAME } from '../pages/connections/hub/channels';
-import { hasFeature } from '../lib/plans';
+import { hasFeature, type Feature } from '../lib/plans';
 
 interface ProGateProps {
   /** Short name of the feature, e.g. "Email automation". */
@@ -11,6 +11,8 @@ interface ProGateProps {
   headline: string;
   /** What the person gets, in plain words. */
   points: string[];
+  /** The part of a plan this needs; the web's paid features (Reach and up) unless said otherwise. */
+  needs?: Feature;
   children: ReactNode;
 }
 
@@ -24,8 +26,9 @@ export function useIsPro() {
 // here and an Upgrade button (or, for a team member, who to ask - only the
 // owner can change the plan). The server refuses these actions on the Free
 // plan too (raptor_auth.require_pro), so this is the friendly half of the lock.
-export default function ProGate({ feature, headline, points, children }: ProGateProps) {
-  const { isPro, planLoaded } = useIsPro();
+export default function ProGate({ feature, headline, points, needs = 'automation', children }: ProGateProps) {
+  const { plan, planLoaded } = useCredits();
+  const isPro = hasFeature(plan, needs);
   const { isOwner } = useOrg();
 
   if (!planLoaded) {
@@ -39,7 +42,7 @@ export default function ProGate({ feature, headline, points, children }: ProGate
         <div style={{ fontSize: '0.6rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--purple)', fontFamily: 'var(--mono)' }}>Paid feature</div>
         <h2 style={{ margin: '0.5rem 0 0.4rem', color: 'var(--white)' }}>A paid plan unlocks {headline}</h2>
         <p style={{ color: 'var(--dim)', fontSize: '0.78rem', lineHeight: 1.6, margin: '0 0 1rem' }}>
-          {feature} is part of the paid plans. Here&rsquo;s what you get:
+          {feature} is part of {needs === 'desktop_engine' ? 'the Core plan and up' : 'the paid plans'}. Here&rsquo;s what you get:
         </p>
         <ul style={{ margin: '0 0 1.4rem', paddingLeft: '1.1rem', color: 'var(--white)', fontSize: '0.78rem', lineHeight: 1.9 }}>
           {points.map((p) => <li key={p}>{p}</li>)}
@@ -54,7 +57,7 @@ export default function ProGate({ feature, headline, points, children }: ProGate
           </button>
         ) : (
           <div style={{ color: 'var(--dim)', fontSize: '0.72rem', lineHeight: 1.6 }}>
-            Your organization is on the Free plan. Ask your organization&rsquo;s owner to upgrade, and this will unlock for everyone on the team.
+            Your organization&rsquo;s plan does not include this. Ask your organization&rsquo;s owner to upgrade, and it will unlock for everyone on the team.
           </div>
         )}
       </div>
@@ -63,6 +66,27 @@ export default function ProGate({ feature, headline, points, children }: ProGate
 }
 
 export const PRO_COPY = {
+  calls: {
+    needs: 'desktop_engine' as Feature,
+    feature: 'Call analytics',
+    headline: 'seeing and coaching your team’s calls',
+    points: [
+      'Every call from the PC app with who said what, and when',
+      'Talk share, questions, concerns and next steps, counted for every call',
+      'Your own watch words, scorecards, comments and a library of good calls',
+      'Team figures by person and by week',
+    ],
+  },
+  competitors: {
+    needs: 'desktop_engine' as Feature,
+    feature: 'Competitor tracking',
+    headline: 'keeping an eye on your competitors as a team',
+    points: [
+      'One list of competitors and one feed of their price and page changes',
+      'Battle cards you can correct, with the source of every statement',
+      'Wins and losses against each competitor, and what your calls say about them',
+    ],
+  },
   email: {
     feature: 'Email automation',
     headline: 'email campaigns that run on their own',

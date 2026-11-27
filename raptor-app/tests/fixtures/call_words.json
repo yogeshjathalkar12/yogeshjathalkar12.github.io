@@ -1,0 +1,344 @@
+{
+ "tokens": [
+  {
+   "text": "",
+   "tokens": []
+  },
+  {
+   "text": "... ?! ",
+   "tokens": []
+  },
+  {
+   "text": "Hello, World!",
+   "tokens": [
+    "hello",
+    "world"
+   ]
+  },
+  {
+   "text": "We can't pay ₹5,000 — too much!",
+   "tokens": [
+    "we",
+    "can't",
+    "pay",
+    "5",
+    "000",
+    "too",
+    "much"
+   ]
+  },
+  {
+   "text": "I can’t afford it",
+   "tokens": [
+    "i",
+    "can't",
+    "afford",
+    "it"
+   ]
+  },
+  {
+   "text": "C’est TROP CHER",
+   "tokens": [
+    "c'est",
+    "trop",
+    "cher"
+   ]
+  },
+  {
+   "text": "Está muy caro, señor",
+   "tokens": [
+    "esta",
+    "muy",
+    "caro",
+    "senor"
+   ]
+  },
+  {
+   "text": "Zu teuer für die Straße",
+   "tokens": [
+    "zu",
+    "teuer",
+    "fur",
+    "die",
+    "strasse"
+   ]
+  },
+  {
+   "text": "नमस्ते, आप कैसे हैं?",
+   "tokens": [
+    "नमस्ते",
+    "आप",
+    "कैसे",
+    "हैं"
+   ]
+  },
+  {
+   "text": "ये बहुत महँगा है",
+   "tokens": [
+    "ये",
+    "बहुत",
+    "महंगा",
+    "है"
+   ]
+  },
+  {
+   "text": "बिज़ी हूँ अभी",
+   "tokens": [
+    "बिजी",
+    "हूं",
+    "अभी"
+   ]
+  },
+  {
+   "text": "क्योंकि यह अच्छा है।",
+   "tokens": [
+    "क्योंकि",
+    "यह",
+    "अच्छा",
+    "है"
+   ]
+  },
+  {
+   "text": "वह 25 लोग।",
+   "tokens": [
+    "वह",
+    "25",
+    "लोग"
+   ]
+  },
+  {
+   "text": "هذا غالي جدا",
+   "tokens": [
+    "هذا",
+    "غالي",
+    "جدا"
+   ]
+  },
+  {
+   "text": "ماذا؟",
+   "tokens": [
+    "ماذا"
+   ]
+  },
+  {
+   "text": "我们没有预算",
+   "tokens": [
+    "我",
+    "们",
+    "没",
+    "有",
+    "预",
+    "算"
+   ]
+  },
+  {
+   "text": "これは高いです",
+   "tokens": [
+    "こ",
+    "れ",
+    "は",
+    "高",
+    "い",
+    "で",
+    "す"
+   ]
+  },
+  {
+   "text": "வணக்கம் எப்படி இருக்கிறீர்கள்",
+   "tokens": [
+    "வணக்கம்",
+    "எப்படி",
+    "இருக்கிறீர்கள்"
+   ]
+  },
+  {
+   "text": "আমাদের বাজেট নেই",
+   "tokens": [
+    "আমাদের",
+    "বাজেট",
+    "নেই"
+   ]
+  },
+  {
+   "text": "ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ",
+   "tokens": [
+    "ਸਤਿ",
+    "ਸ੍ਰੀ",
+    "ਅਕਾਲ"
+   ]
+  },
+  {
+   "text": "Это слишком дорого",
+   "tokens": [
+    "это",
+    "слишком",
+    "дорого"
+   ]
+  },
+  {
+   "text": "ÅNGSTRÖM café naïve",
+   "tokens": [
+    "angstrom",
+    "cafe",
+    "naive"
+   ]
+  },
+  {
+   "text": "‘quoted’ words' end",
+   "tokens": [
+    "quoted",
+    "words",
+    "end"
+   ]
+  },
+  {
+   "text": "e-mail me@x.test now",
+   "tokens": [
+    "e",
+    "mail",
+    "me",
+    "x",
+    "test",
+    "now"
+   ]
+  },
+  {
+   "text": "123 456.78 ₹ 9",
+   "tokens": [
+    "123",
+    "456",
+    "78",
+    "9"
+   ]
+  },
+  {
+   "text": "ﬁne ½ price",
+   "tokens": [
+    "fine",
+    "1",
+    "2",
+    "price"
+   ]
+  },
+  {
+   "text": "Zero‌width‍joiners",
+   "tokens": [
+    "zerowidthjoiners"
+   ]
+  },
+  {
+   "text": "ΣΟΦΟΣ λόγος",
+   "tokens": [
+    "σοφοσ",
+    "λόγοσ"
+   ]
+  }
+ ],
+ "find": [
+  {
+   "text": "he wore a costume",
+   "phrases": [
+    "cost"
+   ],
+   "first": null,
+   "count": 0
+  },
+  {
+   "text": "our budgets are fixed",
+   "phrases": [
+    "budget"
+   ],
+   "first": "budget",
+   "count": 1
+  },
+  {
+   "text": "nobody knows",
+   "phrases": [
+    "no"
+   ],
+   "first": null,
+   "count": 0
+  },
+  {
+   "text": "ये बहुत महँगा है",
+   "phrases": [
+    "महंगा"
+   ],
+   "first": "महंगा",
+   "count": 1
+  },
+  {
+   "text": "बिज़ी हूँ अभी",
+   "phrases": [
+    "बिजी हूं"
+   ],
+   "first": "बिजी हूं",
+   "count": 1
+  },
+  {
+   "text": "no budget, really no budget",
+   "phrases": [
+    "no budget",
+    "budget"
+   ],
+   "first": "no budget",
+   "count": 2
+  },
+  {
+   "text": "I can’t afford it",
+   "phrases": [
+    "can't afford"
+   ],
+   "first": "can't afford",
+   "count": 1
+  },
+  {
+   "text": "Esta muy caro",
+   "phrases": [
+    "está muy caro"
+   ],
+   "first": "está muy caro",
+   "count": 1
+  },
+  {
+   "text": "我们没有预算",
+   "phrases": [
+    "没有预算"
+   ],
+   "first": "没有预算",
+   "count": 1
+  },
+  {
+   "text": "the costs and the fees",
+   "phrases": [
+    "fee",
+    "cost"
+   ],
+   "first": "cost",
+   "count": 1
+  },
+  {
+   "text": "price price price",
+   "phrases": [
+    "price",
+    "the price"
+   ],
+   "first": "price",
+   "count": 3
+  },
+  {
+   "text": "nothing here",
+   "phrases": [],
+   "first": null,
+   "count": 0
+  },
+  {
+   "text": "short",
+   "phrases": [
+    "a much longer phrase than this"
+   ],
+   "first": null,
+   "count": 0
+  }
+ ]
+}

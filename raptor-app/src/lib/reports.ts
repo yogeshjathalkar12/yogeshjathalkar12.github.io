@@ -2,7 +2,9 @@
 // (db/migrations/2026-11-28_o_reports.sql keeps only that description). The numbers are worked out here from the records the person
 // looking may see, so two people can get different totals from the same report.
 
-export type Source = 'deals' | 'contacts' | 'companies' | 'tasks' | 'activities';
+import { OBJECTION_NAMES } from './calls/measuresView.ts';
+
+export type Source = 'deals' | 'contacts' | 'companies' | 'tasks' | 'activities' | 'calls';
 export type FieldKind = 'choice' | 'text' | 'tags' | 'number' | 'date';
 export type Measure = 'count' | 'sum' | 'average';
 export type Chart = 'bar' | 'line' | 'pie' | 'table' | 'number';
@@ -40,8 +42,10 @@ export interface ReportContext {
   now?: Date;
 }
 
-export const SOURCE_NAMES: Record<Source, string> = { deals: 'Deals', contacts: 'Contacts', companies: 'Companies', tasks: 'Tasks', activities: 'Activity' };
-export const SOURCE_TABLES: Record<Source, string> = { deals: 'deals', contacts: 'contacts', companies: 'companies', tasks: 'tasks', activities: 'interactions' };
+export const SOURCE_NAMES: Record<Source, string> = { deals: 'Deals', contacts: 'Contacts', companies: 'Companies', tasks: 'Tasks', activities: 'Activity', calls: 'Calls' };
+export const SOURCE_TABLES: Record<Source, string> = { deals: 'deals', contacts: 'contacts', companies: 'companies', tasks: 'tasks', activities: 'interactions', calls: 'calls' };
+// the columns read for a source: calls leave their transcripts behind
+export const SOURCE_COLUMNS: Partial<Record<Source, string>> = { calls: 'id, company_name, started_at, duration_seconds, sentiment, created_by, metrics' };
 export const PERIODS: [string, string][] = [
   ['all', 'All time'], ['this_month', 'This month'], ['last_month', 'Last month'], ['this_quarter', 'This quarter'], ['this_year', 'This year'],
   ['last_90_days', 'Last 90 days'], ['last_12_months', 'Last 12 months'], ['next_90_days', 'Next 90 days'],
@@ -91,13 +95,27 @@ export function fieldsOf(source: Source, ctx: ReportContext = {}): Field[] {
     return [choice('state', 'State', (r) => (r.done_at ? 'Done' : r.due_at && new Date(r.due_at).getTime() < now ? 'Overdue' : 'To do'), ['To do', 'Overdue', 'Done']),
       owner, date('created_at', 'Added'), date('due_at', 'Due'), date('done_at', 'Finished')];
   }
+  if (source === 'calls') {
+    const share = (r: any) => (r.metrics?.talk?.rep_share == null ? null : Math.round(r.metrics.talk.rep_share * 100));
+    return [
+      choice('person', 'Who called', (r) => person(r.created_by)),
+      choice('sentiment', 'Mood', (r) => capital(r.sentiment), ['Positive', 'Neutral', 'Negative']),
+      choice('next_step', 'Next step mentioned', (r) => (r.metrics?.next_step ? (r.metrics.next_step.mentioned ? 'Yes' : 'No') : ''), ['Yes', 'No']),
+      { id: 'concerns', label: 'Concern raised', kind: 'tags', get: (r) => [...new Set((r.metrics?.objections || []).map((o: any) => OBJECTION_NAMES[o.kind] || o.kind))] as string[] },
+      text('company_name', 'Company'),
+      { id: 'minutes', label: 'Minutes', kind: 'number', get: (r) => (r.duration_seconds == null ? null : Math.round(r.duration_seconds / 6) / 10) },
+      { id: 'talk', label: 'Our share of the talking (%)', kind: 'number', get: share },
+      { id: 'questions', label: 'Questions asked', kind: 'number', get: (r) => r.metrics?.questions?.count ?? null },
+      date('started_at', 'Date'),
+    ];
+  }
   return [choice('type', 'Kind', (r) => capital(r.type)), choice('direction', 'Direction', (r) => (r.direction === 'inbound' ? 'Received' : r.direction === 'outbound' ? 'Sent' : '')),
     choice('person', 'Added by', (r) => person(r.created_by)), date('created_at', 'Date')];
 }
 
 export const blankConfig = (source: Source = 'deals'): ReportConfig => ({
-  source, measure: 'count', value: '', group: source === 'deals' ? 'stage' : source === 'contacts' ? 'status' : source === 'companies' ? 'industry' : source === 'tasks' ? 'state' : 'type',
-  period: 'all', periodField: 'created_at', filters: [], chart: 'bar',
+  source, measure: 'count', value: '', group: source === 'deals' ? 'stage' : source === 'contacts' ? 'status' : source === 'companies' ? 'industry' : source === 'tasks' ? 'state' : source === 'calls' ? 'person' : 'type',
+  period: 'all', periodField: source === 'calls' ? 'started_at' : 'created_at', filters: [], chart: 'bar',
 });
 
 export const STARTERS: { name: string; config: ReportConfig }[] = [
@@ -122,7 +140,7 @@ export function readConfig(raw: any, ctx: ReportContext = {}): ReportConfig {
     group: raw?.group === '' || has(raw?.group) ? raw.group : base.group,
     ...(raw?.split && raw.split !== raw?.group && has(raw.split, ['choice', 'text', 'tags']) ? { split: raw.split } : {}),
     period: PERIODS.some(([k]) => k === raw?.period) ? raw.period : 'all',
-    periodField: has(raw?.periodField, ['date']) ? raw.periodField : 'created_at',
+    periodField: has(raw?.periodField, ['date']) ? raw.periodField : base.periodField,
     filters: (Array.isArray(raw?.filters) ? raw.filters : []).filter((f: any) => f && has(f.field) && f.op in OP_NAMES).slice(0, 8)
       .map((f: any) => ({ field: f.field, op: f.op, value: String(f.value ?? '') })),
     chart: ['bar', 'line', 'pie', 'table', 'number'].includes(raw?.chart) ? raw.chart : 'bar',

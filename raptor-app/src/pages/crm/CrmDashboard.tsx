@@ -10,7 +10,7 @@ import { shortName } from '../../lib/team';
 import { loadPipelineStages, type PipelineStage } from '../../lib/pipelineStages';
 import { loadPipelines } from '../../lib/pipelines';
 import { dealProbability } from '../../lib/forecast';
-import { type ReportConfig, type ReportContext, type Source, SOURCE_TABLES, STARTERS, blankConfig, fieldsOf, readConfig, runReport } from '../../lib/reports';
+import { type ReportConfig, type ReportContext, type Source, SOURCE_TABLES, SOURCE_COLUMNS, STARTERS, blankConfig, fieldsOf, readConfig, runReport } from '../../lib/reports';
 import Modal, { fieldInputStyle, fieldLabelStyle, ghostBtnStyle, primaryBtnStyle, toolBtnStyle, toolPrimaryStyle } from '../../components/crm/Modal';
 import ReportBuilder from '../../components/crm/ReportBuilder';
 import ReportView from '../../components/crm/ReportView';
@@ -76,7 +76,7 @@ export default function CrmDashboard() {
     for (const source of wanted) {
       if (asked.current.has(source)) continue;
       asked.current.add(source);
-      selectAll(() => supabase.from(SOURCE_TABLES[source]).select('*')).then(({ data: rows, error }) => {
+      selectAll(() => supabase.from(SOURCE_TABLES[source]).select(SOURCE_COLUMNS[source] || '*')).then(({ data: rows, error }) => {
         if (error) { asked.current.delete(source); setFailed((f) => ({ ...f, [source]: error.message })); return; }
         setData((d) => ({ ...d, [source]: rows || [] }));
       });

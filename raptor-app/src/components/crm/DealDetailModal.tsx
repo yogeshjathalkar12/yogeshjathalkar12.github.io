@@ -20,6 +20,7 @@ import StageOptions from './StageOptions';
 import TagsEditor from './TagsEditor';
 import DealMoneyFields from './DealMoneyFields';
 import { dealMoneyRow, moneyOf, moneyProblem, ownMoney } from '../../lib/fx';
+import DealCompetitionFields, { competitionOf, competitionRow } from './DealCompetitionFields';
 import { Link } from 'react-router-dom';
 
 interface DealDetailModalProps {
@@ -40,6 +41,8 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
   const quotes = useColumn('quotes', 'id');
   const currencies = useColumn('deals', 'currency');
   const [money, setMoney] = useState(ownMoney);
+  const competitionColumns = useColumn('deals', 'competitors');
+  const [competition, setCompetition] = useState(() => competitionOf({}));
   const [campaigns, setCampaigns] = useState<any[]>([]);
   const [contacts, setContacts] = useState<any[]>([]);
   const [contactId, setContactId] = useState('');
@@ -53,6 +56,7 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
     if (deal) {
       setValue(String(deal.value ?? 0));
       setMoney(moneyOf(deal));
+      setCompetition(competitionOf(deal));
       setStage(deal.stage);
       setCampaignId(deal.campaign_id || '');
       setCloseDate(deal.expected_close || '');
@@ -120,6 +124,7 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
         ...(forecast ? forecastValues(closeDate, probability) : {}),
       };
       const stageType = stageByKey(stages, stage)?.type;
+      if (competitionColumns) Object.assign(payload, competitionRow(competition, stageType));
       if (stageType === 'won' || stageType === 'lost') payload.closed_at = new Date().toISOString();
       const { error: updateErr } = await supabase.from('deals').update(payload).eq('id', deal.id);
       if (updateErr) throw updateErr;
@@ -169,6 +174,7 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
         <StageOptions stages={stages} />
       </select>
 
+      {competitionColumns && <DealCompetitionFields value={competition} onChange={setCompetition} stageType={stageByKey(stages, stage)?.type} />}
       {forecast && <ForecastFields closeDate={closeDate} probability={probability} stageChance={stageProbability(stages.find((s) => s.key === stage), stages)} onCloseDate={setCloseDate} onProbability={setProbability} />}
 
 
