@@ -60,3 +60,14 @@ test('only conditions that fit are saved, and a saved rule opens as it was', () 
   assert.equal(words.when, 'A deal has been in Meeting for 2 days (only if worth at least 500 and tagged “big”)');
   assert.equal(words.then, 'assign it to ben@x.in');
 });
+
+test('a rule can start from the lead score', () => {
+  const draft = { ...emptyDraft(), trigger: 'contact_score', score: ' 40 ', action: 'notify', message: 'Warm' };
+  assert.equal(problemWith(draft), null);
+  assert.match(problemWith({ ...draft, score: '4.5' }), /whole number/);
+  const row = ruleRow(draft, true);
+  assert.deepEqual([row.trigger_value, row.trigger_days], ['40', 0]);
+  assert.equal(describeRule(row).when, 'A contact’s score reaches 40');
+  assert.deepEqual(ruleRow(draftOf(row), true), row);
+  assert.ok(actionsFor('contact_score', true).includes('create_reminder'));
+});

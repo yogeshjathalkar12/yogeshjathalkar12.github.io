@@ -3,7 +3,7 @@ import { toolBtnStyle } from '../../components/crm/Modal';
 import ScoringRulesModal from '../../components/crm/ScoringRulesModal';
 import { type ScoreRule, scoreContact } from '../../lib/scoring';
 import { useColumn } from '../../hooks/useColumn';
-import { useEffect, useMemo, useState, useCallback } from 'react';
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { relativeTime } from '../../lib/crmHelpers';
@@ -25,6 +25,8 @@ import { useAuth } from '../../hooks/AuthContext';
 import { shortName } from '../../lib/team';
 import { exportRecords } from '../../lib/tableView';
 import { selectAll } from '../../lib/selectAll';
+import { coalesce } from '../../lib/coalesce';
+import LoadingMore from '../../components/crm/LoadingMore';
 import { useOrg } from '../../hooks/OrgContext';
 import BulkBar from '../../components/crm/BulkBar';
 
@@ -65,17 +67,21 @@ export default function CrmContacts() {
   const [defs, setDefs] = useState<CustomFieldDef[]>([]);
   const [importLabels, setImportLabels] = useState<Record<string, string>>({});
   const [viewed, setViewed] = useState<{ rows: any[]; cols: UiColumn<any>[] }>({ rows: [], cols: [] });
+  const [partial, setPartial] = useState(0);            // how many are shown while the rest of a long list is still coming
+  const loadedOnce = useRef(false);
 
   useEffect(() => {
     fetchAll();
+    const reload = coalesce(fetchAll);
 
     const channel = supabase
       .channel('crm-contacts-page')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'contacts' }, fetchAll)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'interactions' }, fetchAll)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'contacts' }, reload)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'interactions' }, reload)
       .subscribe();
 
     return () => {
+      reload.cancel();
       supabase.removeChannel(channel);
     };
   }, []);
@@ -86,7 +92,13 @@ export default function CrmContacts() {
         selectAll(() => supabase
           .from('contacts')
           .select('*, companies(id, name)')
-          .order('last_interaction_at', { ascending: false, nullsFirst: false })),
+          .order('last_interaction_at', { ascending: false, nullsFirst: false }), 'id', (first: any[]) => {
+            // the first time only: a later reload keeps the full list on screen until the new one is complete
+            if (loadedOnce.current) return;
+            setContacts(first);
+            setPartial(first.length);
+            setLoading(false);
+          }),
         selectAll(() => supabase.from('deals').select('id, contact_id, stage')),
         supabase
           .from('interactions')
@@ -106,6 +118,8 @@ export default function CrmContacts() {
       for (const i of (importsRes as any).data || []) labels[i.id] = `${i.source_name || i.file_name || 'Import'} · ${String(i.started_at || '').slice(0, 10)}`;
       setImportLabels(labels);
       setContacts(contactsRes.data || []);
+      loadedOnce.current = true;
+      setPartial(0);
       setDeals(dealsRes.data || []);
       setInteractions(interactionsRes.data || []);
 
@@ -123,14 +137,14 @@ export default function CrmContacts() {
   // resolves, open that contact and drop the param.
   useEffect(() => {
     const openId = searchParams.get('open');
-    if (!openId || contacts.length === 0) return;
+    if (!openId || contacts.length === 0 || partial) return;      // the wanted one may be in the part still coming
     const match = contacts.find((c) => c.id === openId);
     if (match) setActiveContact(match);
     const next = new URLSearchParams(searchParams);
     next.delete('open');
     setSearchParams(next, { replace: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contacts]);
+  }, [contacts, partial]);
 
   const q = search.trim().toLowerCase();
   const filtered = contacts.filter(
@@ -148,9 +162,13 @@ export default function CrmContacts() {
   const assigneeLabels = useMemberLabels(contacts.map((c) => c.assignee_id));
   const rows = applyAssigneeFilter(filtered, assigneeFilter, user?.id);
 
-  function activeDealCount(contactId: string) {
-    return deals.filter((d) => d.contact_id === contactId && d.stage !== 'won' && d.stage !== 'lost').length;
-  }
+  // counted once for everyone: searching the deals again for each of thousands of contacts would stall the page
+  const activeDeals = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const d of deals) if (d.contact_id && d.stage !== 'won' && d.stage !== 'lost') counts.set(d.contact_id, (counts.get(d.contact_id) || 0) + 1);
+    return counts;
+  }, [deals]);
+  const activeDealCount = (contactId: string) => activeDeals.get(contactId) || 0;
 
   const columns: UiColumn<any>[] = useMemo(() => {
     const importedOptions = [...new Set(Object.values(importLabels))];
@@ -218,7 +236,7 @@ export default function CrmContacts() {
         />
         <AssigneeFilter value={assigneeFilter} onChange={setAssigneeFilter} />
         <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
-          <ExportButton data={exportFile.data} columns={exportFile.columns} filename="contacts" label="Export CSV (all columns)" />
+          <ExportButton data={partial ? [] : exportFile.data} columns={exportFile.columns} filename="contacts" label="Export CSV (all columns)" />
           {hasAssignment && (isOwner || isAdmin) && <button type="button" style={toolBtnStyle} onClick={() => setShowAssignment(true)}>Assignment rules</button>}
           {hasScoring && can('manage_pipeline') && <button type="button" style={toolBtnStyle} onClick={() => setShowScoring(true)}>Scoring rules</button>}
           <OwnerOnly permission="delete"><button
@@ -282,6 +300,7 @@ export default function CrmContacts() {
       </div>
 
       {bulkNote && <div role="status" style={{ fontSize: '0.65rem', color: 'var(--green)', marginBottom: 8 }}>{bulkNote}</div>}
+      <LoadingMore count={partial} />
       <ViewTable
         columns={columns}
         rows={rows}

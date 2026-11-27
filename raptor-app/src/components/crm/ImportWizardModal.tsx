@@ -99,6 +99,8 @@ export default function ImportWizardModal({ open, onClose, onImported, client, l
   const [alsoProspects, setAlsoProspects] = useState(true);
   const [sourceTag, setSourceTag] = useState('');
   const [ownerId, setOwnerId] = useState('');
+  const [hasRules, setHasRules] = useState(false);        // there are assignment rules the new contacts could be shared out by
+  const [byRules, setByRules] = useState(false);
   const [country, setCountry] = useState('');
   const [overwrite, setOverwrite] = useState(false);
   const [showChanges, setShowChanges] = useState(false);
@@ -111,9 +113,16 @@ export default function ImportWizardModal({ open, onClose, onImported, client, l
 
   function reset() {
     setStep('file'); setTabs([]); setActiveTab(''); setError(null); setReading(false); setEmptyWords(''); setDateOrder(''); setStageMap({});
-    setExisting(null); setDecisions({}); setProgress(null); setResult(null); setUndoing(false); setUndoNote(null); setUndone(false); setShowLeftOut(false); setSourceTag(''); setOwnerId(''); setCountry(''); setOverwrite(false); setShowChanges(false); setTeamSaved(null); setTeamNote(null); stopRef.current = false;
+    setExisting(null); setDecisions({}); setProgress(null); setResult(null); setUndoing(false); setUndoNote(null); setUndone(false); setShowLeftOut(false); setSourceTag(''); setOwnerId(''); setByRules(false); setCountry(''); setOverwrite(false); setShowChanges(false); setTeamSaved(null); setTeamNote(null); stopRef.current = false;
   }
   useEffect(() => { if (!open) reset(); }, [open]);
+  useEffect(() => {
+    if (!open || !(isOwner || isAdmin)) return;
+    Promise.resolve(client ?? import('../../lib/supabaseClient').then((m) => m.supabase))
+      .then((db: any) => db.from('assignment_rules').select('id').limit(1))
+      .then(({ data, error }: any) => setHasRules(!error && !!data?.length))
+      .catch(() => setHasRules(false));
+  }, [open, isOwner, isAdmin]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!open) return;
@@ -253,7 +262,7 @@ export default function ImportWizardModal({ open, onClose, onImported, client, l
     setStep('running'); setError(null); stopRef.current = false; setProgress({ phase: 'Starting', done: 0, total: 1 });
     try {
       const names = [...new Set(selected.map((t) => t.fileName))];
-      const res = await runImport(plan, existing, { source: (sourceTag.trim() || names.join(', ')).slice(0, 180), fileName: names.join(', ').slice(0, 280), assigneeId: ownerId || null, overwrite, onProgress: setProgress, shouldStop: () => stopRef.current }, client);
+      const res = await runImport(plan, existing, { source: (sourceTag.trim() || names.join(', ')).slice(0, 180), fileName: names.join(', ').slice(0, 280), assigneeId: ownerId || null, overwrite, shareByRules: byRules && hasRules && !ownerId, onProgress: setProgress, shouldStop: () => stopRef.current }, client);
       setResult(res); setStep('done'); onImported();
       if (res.created.companies + res.created.contacts + res.created.deals + res.updated.companies + res.updated.contacts > 0) {
         let list = loadAll(storage);
@@ -514,6 +523,12 @@ export default function ImportWizardModal({ open, onClose, onImported, client, l
                   {assignable.map((o) => <option key={o.user_id} value={o.user_id}>{shortName(o.email)}{o.is_me ? ' (me)' : ''}{o.is_owner ? ' — owner' : ''}</option>)}
                 </select>
                 {ownerId && <div style={{ ...small, marginBottom: '0.7rem' }}>The owner gets a notification for each record assigned to them. Companies have no owner.</div>}
+                {hasRules && !ownerId && !!plan?.contacts.create.length && (
+                  <label style={{ ...small, display: 'flex', gap: 8, alignItems: 'center', marginBottom: '0.7rem', cursor: 'pointer' }}>
+                    <input type="checkbox" checked={byRules} onChange={(e) => setByRules(e.target.checked)} />
+                    Share the new contacts out by the assignment rules (each person gets one summary notice)
+                  </label>
+                )}
               </>
             )}
             {phoneStats.without > 0 && (
@@ -607,6 +622,7 @@ export default function ImportWizardModal({ open, onClose, onImported, client, l
             <>
               <div style={{ fontSize: '0.8rem', color: result.failed.length ? 'var(--white)' : 'var(--green)', marginBottom: '0.8rem' }}>
                 {result.stopped ? 'Stopped. ' : ''}Added {result.created.companies} companies, {result.created.contacts} contacts, {result.created.deals} deals{result.created.prospects ? ` and ${result.created.prospects} prospects` : ''}.
+                {!!result.handedOut && <> {result.handedOut} contact{result.handedOut === 1 ? ' was' : 's were'} shared out by your rules.</>}
                 {(result.updated.companies + result.updated.contacts) > 0 && <> {overwrite ? 'Changed' : 'Filled'} {result.fieldsFilled} {overwrite ? 'values' : 'empty fields'} on {result.updated.companies + result.updated.contacts} existing records.</>}
               </div>
               {undoNote && <div style={{ ...small, color: 'var(--green)', marginBottom: '0.8rem' }}>{undoNote}</div>}

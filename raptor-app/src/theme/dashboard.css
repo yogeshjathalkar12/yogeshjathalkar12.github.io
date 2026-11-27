@@ -123,3 +123,15 @@
   input:not([type="checkbox"]):not([type="radio"]), select, textarea { font-size: 16px !important; }   /* smaller text makes iPhones zoom in */
 }
 
+/* Printing (the CRM dashboard and quotes): only the page itself, dark text on white. */
+@media print {
+  :root, body.light-mode { --black: #fff; --surface: #fff; --surface2: #fff; --border: #ccc; --white: #111; --dim: #444; --dim2: #777; }
+  body { background: #fff; }
+  .dash-topbar, .dash-sidebar, .dash-sidebar-restore-tab, .crm-tabs, .no-print { display: none !important; }
+  .dash-layout { padding-top: 0; }
+  .dash-main { margin: 0 !important; padding: 0 !important; }
+  .crm-shell { padding: 0; height: auto; display: block; }
+  .crm-outlet, .crm-outlet > div { overflow: visible !important; height: auto !important; display: block; }
+  section { break-inside: avoid; margin-bottom: 12px; }
+}
+

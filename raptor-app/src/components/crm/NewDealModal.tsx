@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
+import DealMoneyFields from './DealMoneyFields';
+import { dealMoneyRow, moneyProblem, ownMoney } from '../../lib/fx';
 import Modal, { fieldLabelStyle, fieldInputStyle, primaryBtnStyle, ghostBtnStyle } from './Modal';
 import { findOrCreateCompany, findOrCreateContact } from '../../lib/crmContacts';
 import { type PipelineStage, loadPipelineStages } from '../../lib/pipelineStages';
@@ -21,6 +23,8 @@ interface NewDealModalProps {
 export default function NewDealModal({ open, onClose, onCreated, pipelineId }: NewDealModalProps) {
   const [title, setTitle] = useState('');
   const [value, setValue] = useState('');
+  const currencies = useColumn('deals', 'currency');
+  const [money, setMoney] = useState(ownMoney);
   const [stage, setStage] = useState('');
   const [stages, setStages] = useState<PipelineStage[]>([]);
   const [companyName, setCompanyName] = useState('');
@@ -56,14 +60,16 @@ export default function NewDealModal({ open, onClose, onCreated, pipelineId }: N
   }
 
   function reset() {
-    setTitle(''); setValue(''); setStage(stages[0]?.key || '');
+    setTitle(''); setValue(''); setMoney(ownMoney); setStage(stages[0]?.key || '');
     setCompanyName(''); setContactName(''); setContactEmail(''); setCampaignId(''); setCloseDate(''); setProbability('');
     setError(null);
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
+    const wrong = currencies ? moneyProblem(money) : null;
+    setError(wrong);
+    if (wrong) return;
     setSaving(true);
     try {
       // Both of these now go through the same identity resolution NewContactModal
@@ -83,7 +89,7 @@ export default function NewDealModal({ open, onClose, onCreated, pipelineId }: N
 
       const { error: dealErr } = await supabase.from('deals').insert({
         title: title.trim(),
-        value: Number(value) || 0,
+        ...(currencies ? dealMoneyRow(money, value) : { value: Number(value) || 0 }),
         stage,
         company_id: companyId,
         contact_id: contactId,
@@ -109,8 +115,12 @@ export default function NewDealModal({ open, onClose, onCreated, pipelineId }: N
         <label style={fieldLabelStyle}>Deal Title</label>
         <input style={fieldInputStyle} value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="e.g. Website revamp" />
 
-        <label style={fieldLabelStyle}>Value ({activeCurrencyCode()})</label>
-        <input style={fieldInputStyle} type="number" min="0" value={value} onChange={(e) => setValue(e.target.value)} required placeholder="0" />
+        {currencies ? <DealMoneyFields money={money} onMoney={setMoney} value={value} onValue={setValue} required /> : (
+          <>
+            <label style={fieldLabelStyle}>Value ({activeCurrencyCode()})</label>
+            <input style={fieldInputStyle} type="number" min="0" value={value} onChange={(e) => setValue(e.target.value)} required placeholder="0" />
+          </>
+        )}
 
         <label style={fieldLabelStyle}>Stage</label>
         <select style={fieldInputStyle} value={stage} onChange={(e) => setStage(e.target.value)}>

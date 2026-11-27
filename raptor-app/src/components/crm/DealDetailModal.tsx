@@ -18,6 +18,9 @@ import { forecastValues, stageProbability } from '../../lib/forecast';
 import { moveToBin } from '../../lib/bulk';
 import StageOptions from './StageOptions';
 import TagsEditor from './TagsEditor';
+import DealMoneyFields from './DealMoneyFields';
+import { dealMoneyRow, moneyOf, moneyProblem, ownMoney } from '../../lib/fx';
+import { Link } from 'react-router-dom';
 
 interface DealDetailModalProps {
   deal: any | null;
@@ -34,6 +37,9 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
   const [closeDate, setCloseDate] = useState('');
   const [probability, setProbability] = useState('');
   const forecast = useColumn('deals', 'expected_close');
+  const quotes = useColumn('quotes', 'id');
+  const currencies = useColumn('deals', 'currency');
+  const [money, setMoney] = useState(ownMoney);
   const [campaigns, setCampaigns] = useState<any[]>([]);
   const [contacts, setContacts] = useState<any[]>([]);
   const [contactId, setContactId] = useState('');
@@ -46,6 +52,7 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
   useEffect(() => {
     if (deal) {
       setValue(String(deal.value ?? 0));
+      setMoney(moneyOf(deal));
       setStage(deal.stage);
       setCampaignId(deal.campaign_id || '');
       setCloseDate(deal.expected_close || '');
@@ -84,6 +91,8 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
   if (!deal) return null;
 
   async function handleSave() {
+    const wrong = currencies ? moneyProblem(money) : null;
+    if (wrong) { setError(wrong); return; }
     setSaving(true);
     setError(null);
     try {
@@ -103,7 +112,7 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
       }
 
       const payload: any = {
-        value: Number(value) || 0,
+        ...(currencies ? dealMoneyRow(money, value) : { value: Number(value) || 0 }),
         stage,
         campaign_id: campaignId || null,
         contact_id: finalContactId,
@@ -148,8 +157,12 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
         {deal.companies?.name || '—'} · {deal.contacts?.name || 'No contact yet'}
       </div>
 
-      <label style={fieldLabelStyle}>Value ({activeCurrencyCode()})</label>
-      <input style={fieldInputStyle} type="number" min="0" value={value} onChange={(e) => setValue(e.target.value)} />
+      {currencies ? <DealMoneyFields money={money} onMoney={setMoney} value={value} onValue={setValue} /> : (
+        <>
+          <label style={fieldLabelStyle}>Value ({activeCurrencyCode()})</label>
+          <input style={fieldInputStyle} type="number" min="0" value={value} onChange={(e) => setValue(e.target.value)} />
+        </>
+      )}
 
       <label style={fieldLabelStyle}>Stage</label>
       <select style={fieldInputStyle} value={stage} onChange={(e) => setStage(e.target.value)}>
@@ -202,6 +215,9 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
       <CustomFieldsSection entityType="deal" entity={deal} onChanged={onSaved} />
       <TasksSection dealId={deal.id} />
 
+      {quotes && (
+        <Link to={`/crm/quotes?deal=${deal.id}`} onClick={onClose} style={{ display: 'inline-block', marginBottom: 12, fontSize: '0.65rem', color: 'var(--purple)' }}>Make a quote for this deal</Link>
+      )}
       <ActivityTimeline dealId={deal.id} contactId={deal.contact_id} />
 
       <AttachmentsSection entityType="deal" entityId={deal.id} />

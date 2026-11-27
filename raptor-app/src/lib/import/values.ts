@@ -168,7 +168,7 @@ export function normalizeCompanyName(raw: string): string {
 
 const HONORIFICS = new Set(['mr', 'mrs', 'ms', 'miss', 'mx', 'dr', 'prof', 'professor', 'sir', 'madam', 'shri', 'shree', 'smt', 'sri', 'er', 'ca', 'cs', 'adv', 'capt', 'col', 'maj', 'rev']);
 
-export interface PersonName { name: string; first: string; last: string; role: string | null; honorific: string | null }
+export interface PersonName { name: string; first: string; last: string; role: string | null; honorific: string | null; email?: string }
 
 /** "Mr. Anil Kumar (Head – HR)" -> name "Anil Kumar", role "Head – HR". One cell may hold several people. */
 export function parsePeople(raw: string): { people: PersonName[]; problems: string[] } {
@@ -180,7 +180,12 @@ export function parsePeople(raw: string): { people: PersonName[]; problems: stri
     let s = part;
     let role: string | null = null;
     const paren = s.match(/\(([^)]*)\)/);
-    if (paren) { role = paren[1].trim() || null; s = s.replace(paren[0], ' ').replace(/\s+/g, ' ').trim(); }
+    let email: string | undefined;
+    if (paren) {
+      // "Asha Rao (asha@acme.com)", as other CRMs write an associated person: the address is not a job title
+      if (paren[1].includes('@')) email = parseEmails(paren[1]).primary ?? undefined; else role = paren[1].trim() || null;
+      s = s.replace(paren[0], ' ').replace(/\s+/g, ' ').trim();
+    }
     const dash = s.match(/^(.*?)\s+[-–—]\s+(.+)$/);
     if (dash && !role && dash[1].split(' ').length >= 2 && dash[2].split(' ').length <= 6 && /[A-Za-z]/.test(dash[2]) && !/\d/.test(dash[2])) { s = dash[1]; role = dash[2].trim(); }
     let honorific: string | null = null;
@@ -189,7 +194,7 @@ export function parsePeople(raw: string): { people: PersonName[]; problems: stri
     s = words.join(' ').replace(/^[\s,.-]+|[\s,.-]+$/g, '');
     if (!s || isPlaceholder(s) || !/\p{L}/u.test(s) || HONORIFICS.has(s.replace(/\.$/, '').toLowerCase())) continue;
     const w = s.split(' ');
-    people.push({ name: s, first: w.length > 1 ? w.slice(0, -1).join(' ') : w[0], last: w.length > 1 ? w[w.length - 1] : '', role, honorific });
+    people.push({ name: s, first: w.length > 1 ? w.slice(0, -1).join(' ') : w[0], last: w.length > 1 ? w[w.length - 1] : '', role, honorific, ...(email ? { email } : {}) });
   }
   return { people, problems: [] };
 }

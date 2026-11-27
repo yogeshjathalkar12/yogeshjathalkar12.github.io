@@ -36,6 +36,7 @@ import CrmForms from './pages/crm/CrmForms';
 import CrmBooking from './pages/crm/CrmBooking';
 import CrmApi from './pages/crm/CrmApi';
 import CrmDashboard from './pages/crm/CrmDashboard';
+import CrmQuotes from './pages/crm/CrmQuotes';
 import CrmForecast from './pages/crm/CrmForecast';
 import CrmTrash from './pages/crm/CrmTrash';
 
@@ -112,6 +113,7 @@ export default function App() {
                       <Route path="booking" element={<CrmBooking />} />
                       <Route path="api" element={<CrmApi />} />
                       <Route path="dashboard" element={<CrmDashboard />} />
+                      <Route path="quotes" element={<CrmQuotes />} />
                       <Route path="forecast" element={<CrmForecast />} />
                       <Route path="trash" element={<CrmTrash />} />
                       <Route path="activity" element={<CrmActivity />} />

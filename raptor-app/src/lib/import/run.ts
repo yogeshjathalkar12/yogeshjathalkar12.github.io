@@ -24,6 +24,7 @@ export interface RunResult {
   customFieldsCreated: number;
   failed: RunFailure[];
   stopped: boolean;
+  handedOut?: number;       // new contacts given to someone by the assignment rules
 }
 
 export interface RunOptions {
@@ -31,6 +32,8 @@ export interface RunOptions {
   fileName: string;
   /** who the new contacts and deals belong to (a team member's user id); unset = the database's own default */
   assigneeId?: string | null;
+  /** true: the new contacts are then handed out by the organization's assignment rules */
+  shareByRules?: boolean;
   /** true: existing records also get their DIFFERENT values replaced (never blanked); false (default): only empty fields are filled */
   overwrite?: boolean;
   onProgress?: (p: RunProgress) => void;
@@ -60,15 +63,18 @@ async function pageAll(client: DbClient, table: string, columns: string): Promis
 
 export async function loadExisting(db?: DbClient): Promise<Existing> {
   const client = db ?? await appClient();
+  let jobTitle = true;
+  const contactColumns = 'id,name,email,phone,company_id,first_name,last_name,linkedin_url,custom_fields';
   const [companies, contacts, deals, defs, dossiers] = await Promise.all([
     pageAll(client, 'companies', 'id,name,website_url,phone,email,address,city,industry,description,custom_fields,created_at'),
-    pageAll(client, 'contacts', 'id,name,email,phone,company_id,first_name,last_name,linkedin_url,custom_fields'),
+    // the job title field is newer: a database without it is read without it
+    pageAll(client, 'contacts', `${contactColumns},job_title`).catch(() => { jobTitle = false; return pageAll(client, 'contacts', contactColumns); }),
     pageAll(client, 'deals', 'id,title,company_id'),
     pageAll(client, 'custom_field_defs', 'id,entity_type,name'),
     pageAll(client, 'prospect_dossiers', 'id,entity_name,company_key,company_id').catch(() => [] as any[]),   // unreadable: a duplicate is then refused by the database, never created
   ]);
   const map = (e: Entity) => new Map<string, string>(defs.filter((d) => d.entity_type === e).map((d) => [String(d.name).toLowerCase(), d.id as string]));
-  return { companies, contacts, deals, dossiers, defs: { company: map('company'), contact: map('contact'), deal: map('deal') } };
+  return { companies, contacts, deals, dossiers, jobTitle, defs: { company: map('company'), contact: map('contact'), deal: map('deal') } };
 }
 
 // ------------------------------------------------------------------ running
@@ -77,6 +83,7 @@ export async function runImport(plan: Plan, existing: Existing, opts: RunOptions
   const client = db ?? await appClient();
   const chunk = opts.chunkSize ?? 200;
   const conc = Math.max(1, opts.concurrency ?? 6);
+  let handedOut = 0;
   const progress = (phase: string, done: number, total: number) => opts.onProgress?.({ phase, done, total });
   const failed: RunFailure[] = [];
 
@@ -152,13 +159,13 @@ export async function runImport(plan: Plan, existing: Existing, opts: RunOptions
     if (!stopped) {
       created.contacts = await insertAll('contacts', 'Adding contacts', plan.contacts.create.map((c) => ({
         id: c.id, name: c.rec.name,
-        row: clean({ id: c.id, name: c.rec.name, first_name: c.rec.first_name, last_name: c.rec.last_name, email: c.rec.email, phone: c.rec.phone, linkedin_url: c.rec.linkedin_url, status: c.rec.status || 'cold', company_id: c.companyId && !badCompanies.has(c.companyId) ? c.companyId : undefined, custom_fields: customJson('contact', c.rec.custom), assignee_id: opts.assigneeId || undefined, import_batch_id: batchId }),
+        row: clean({ id: c.id, name: c.rec.name, first_name: c.rec.first_name, last_name: c.rec.last_name, email: c.rec.email, phone: c.rec.phone, linkedin_url: c.rec.linkedin_url, job_title: c.rec.job_title, status: c.rec.status || 'cold', company_id: c.companyId && !badCompanies.has(c.companyId) ? c.companyId : undefined, custom_fields: customJson('contact', c.rec.custom), assignee_id: opts.assigneeId || undefined, import_batch_id: batchId }),
       })), (id) => badContacts.add(id));
     }
     if (!stopped) {
       created.deals = await insertAll('deals', 'Adding deals', plan.deals.create.map((d) => ({
         id: d.id, name: d.rec.title,
-        row: clean({ id: d.id, title: d.rec.title, value: d.rec.value, stage: d.rec.stage, meeting_at: d.rec.meeting_at, company_id: d.companyId && !badCompanies.has(d.companyId) ? d.companyId : undefined, contact_id: d.contactId && !badContacts.has(d.contactId) ? d.contactId : undefined, custom_fields: customJson('deal', d.rec.custom), assignee_id: opts.assigneeId || undefined, import_batch_id: batchId }),
+        row: clean({ id: d.id, title: d.rec.title, value: d.rec.value, stage: d.rec.stage, meeting_at: d.rec.meeting_at, expected_close: d.rec.expected_close, company_id: d.companyId && !badCompanies.has(d.companyId) ? d.companyId : undefined, contact_id: d.contactId && !badContacts.has(d.contactId) ? d.contactId : undefined, custom_fields: customJson('deal', d.rec.custom), assignee_id: opts.assigneeId || undefined, import_batch_id: batchId }),
       })), () => undefined);
     }
 
@@ -200,6 +207,17 @@ export async function runImport(plan: Plan, existing: Existing, opts: RunOptions
       };
       await Promise.all(Array.from({ length: Math.min(conc, todo.length) }, worker));
     }
+    // 4b. hand the new contacts out by the rules while the import is still open: a change made after it is closed would count as
+    //     somebody working on the record, and Undo would keep it
+    if (opts.shareByRules && !opts.shouldStop?.()) {
+      const ids = plan.contacts.create.map((c) => c.id).filter((id) => !badContacts.has(id));
+      for (let from = 0; from < ids.length; from += 500) {
+        progress('Sharing contacts out by your rules', from, ids.length);
+        const { data, error } = await client.rpc('crm_assign_by_rules', { p_ids: ids.slice(from, from + 500) });
+        if (error) { failed.push({ table: 'contacts', name: '', message: `The assignment rules were not applied: ${msg(error)}` }); break; }
+        handedOut += Number(data) || 0;
+      }
+    }
   } catch (e) {
     failed.push({ table: 'import', name: '', message: msg(e) });
     stopped = true;
@@ -209,7 +227,7 @@ export async function runImport(plan: Plan, existing: Existing, opts: RunOptions
     const fin = await client.rpc('crm_import_finish', { p_batch: batchId, p_counts: counts });
     if (fin.error) failed.push({ table: 'import', name: '', message: `The import could not be closed: ${msg(fin.error)} (it is still listed and can be undone)` });
   }
-  return { batchId, created, updated, fieldsFilled, customFieldsCreated: customCreated, failed, stopped };
+  return { batchId, created, updated, fieldsFilled, customFieldsCreated: customCreated, failed, stopped, handedOut };
 }
 
 // ------------------------------------------------------------------ history and undo

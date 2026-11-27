@@ -118,6 +118,9 @@ export function displayValue(kind: ColumnKind, v: unknown): string {
   return String(v);
 }
 
+// made once: making it again for every comparison makes sorting a long list many times slower
+const WORDS = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
+
 export function compareValues(kind: ColumnKind, a: unknown, b: unknown): number {
   if (isEmpty(a) && isEmpty(b)) return 0;
   if (isEmpty(a)) return 1;                                  // empty values go last, whichever way it is sorted (the caller keeps them there)
@@ -129,7 +132,7 @@ export function compareValues(kind: ColumnKind, a: unknown, b: unknown): number 
     if (y !== null) return 1;
   }
   if (kind === 'date') return String(a).slice(0, 19) < String(b).slice(0, 19) ? -1 : String(a).slice(0, 19) > String(b).slice(0, 19) ? 1 : 0;
-  return String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' });
+  return WORDS.compare(String(a), String(b));
 }
 
 const OPERATOR = /^\s*(>=|<=|!=|>|<|=)\s*(.*)$/;

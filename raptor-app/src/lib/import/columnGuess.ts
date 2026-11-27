@@ -13,7 +13,7 @@ export type FieldId =
   | 'company.industry' | 'company.description'
   | 'contact.name' | 'contact.first_name' | 'contact.last_name' | 'contact.role' | 'contact.email' | 'contact.phone' | 'contact.linkedin_url'
   | 'contact.status'
-  | 'deal.title' | 'deal.value' | 'deal.stage' | 'deal.meeting_at'
+  | 'deal.title' | 'deal.value' | 'deal.stage' | 'deal.meeting_at' | 'deal.expected_close'
   | 'custom' | 'ignore';
 
 export interface FieldDef {
@@ -44,6 +44,7 @@ export const FIELDS: FieldDef[] = [
   { id: 'deal.value', entity: 'deal', label: 'Deal value', kind: 'number' },
   { id: 'deal.stage', entity: 'deal', label: 'Deal stage', kind: 'label' },
   { id: 'deal.meeting_at', entity: 'deal', label: 'Meeting date', kind: 'date' },
+  { id: 'deal.expected_close', entity: 'deal', label: 'Expected close date', kind: 'text' },
   { id: 'custom', entity: 'other', label: 'Keep as a custom field', kind: 'text' },
   { id: 'ignore', entity: 'other', label: "Don't import", kind: 'none' },
 ];
@@ -61,7 +62,7 @@ const HEADER_RULES: HeaderRule[] = [
   { field: 'company.email', weight: 8, any: [W('email'), W('e-mail'), W('emails'), W('email id'), W('email address'), W('mail'), W('mail id'), W('general email'), W('company email')] },
   { field: 'contact.phone', weight: 10, any: [W('contact phone'), W('mobile'), W('cell'), W('cell phone'), W('contact mobile'), W('direct phone'), W('direct dial')] },
   { field: 'company.phone', weight: 8, any: [W('phone'), W('telephone'), W('tel'), W('phone number'), W('contact number'), W('contact no'), W('number'), W('landline'), W('office phone'), W('phone no'), W('whatsapp')], not: ['fax', 'id', 'employees', 'sales', 'cycle'] },
-  { field: 'contact.name', weight: 9, any: [W('contact name'), W('contact person'), W('contact'), W('person'), W('full name'), W('name of contact'), W('hr name'), W('owner name'), W('founder'), W('ceo'), W('decision maker'), W('point of contact'), W('poc'), W('lead name'), W('representative'), W('spoc')], not: ['email', 'phone', 'number', 'address', 'linkedin', 'status', 'details', 'info'] },
+  { field: 'contact.name', weight: 9, any: [W('contact name'), W('contact person'), W('contact'), W('person'), W('full name'), W('name of contact'), W('hr name'), W('owner name'), W('founder'), W('ceo'), W('decision maker'), W('point of contact'), W('poc'), W('lead name'), W('representative'), W('spoc'), W('associated contact'), W('primary contact')], not: ['email', 'phone', 'number', 'address', 'linkedin', 'status', 'details', 'info'] },
   { field: 'contact.first_name', weight: 9, any: [W('first name'), W('firstname'), W('given name'), W('forename')] },
   { field: 'contact.last_name', weight: 9, any: [W('last name'), W('lastname'), W('surname'), W('family name')] },
   { field: 'contact.role', weight: 9, any: [W('job title'), W('title'), W('designation'), W('role'), W('position'), W('job role'), W('job')], not: ['deal', 'company', 'startup'] },
@@ -73,6 +74,7 @@ const HEADER_RULES: HeaderRule[] = [
   { field: 'deal.value', weight: 9, any: [W('value'), W('deal value'), W('amount'), W('revenue'), W('price'), W('deal size'), W('worth'), W('budget'), W('arr'), W('mrr'), W('contract value')], not: ['employees'] },
   { field: 'deal.stage', weight: 9, any: [W('stage'), W('pipeline stage'), W('deal stage'), W('pipeline'), W('lead status'), W('funnel stage'), W('sales stage')] },
   { field: 'deal.meeting_at', weight: 8, any: [W('meeting'), W('meeting date'), W('meeting time'), W('appointment')] },
+  { field: 'deal.expected_close', weight: 10, any: [W('close date'), W('closing date'), W('expected close'), W('expected close date'), W('expected closing date')] },
   { field: 'contact.status', weight: 6, any: [W('status'), W('temperature'), W('lead temperature'), W('lead status')], not: ['address', 'verified', 'verification'] },
 ];
 
@@ -84,9 +86,13 @@ const containsPhrase = (toks: string[], phrase: string[]) => {
 
 interface HeaderMatch { field: FieldId; score: number }
 
+// In another CRM's export, "Contact owner" or "Deal Owner" is the colleague looking after the record, not a person to import.
+const CRM_RECORDS = ['contact', 'deal', 'account', 'company', 'record', 'lead'];
+
 export function headerCandidates(header: string): HeaderMatch[] {
   const toks = tokens(header);
   if (!toks.length) return [];
+  if (toks.includes('owner') && !toks.includes('name') && toks.some((t) => CRM_RECORDS.includes(t))) return [];
   const out: HeaderMatch[] = [];
   for (const rule of HEADER_RULES) {
     if (rule.not && toks.some((t) => rule.not!.includes(t))) continue;
@@ -130,9 +136,11 @@ export function profileColumn(values: string[]): ColumnProfile {
   const sn = sample.length || 1;
   for (const v of sample) {
     const e = parseEmails(v);
-    if (e.primary) { email++; if (e.others.length) multi++; } else if (/@/.test(v)) emailProblems++;
+    const named = /^[^()@]*\p{L}[^()@]*\([^()]*@[^()]*\)\s*$/u.test(v);      // "Asha Rao (asha@acme.com)" is a person, not an email column
+    if (named) { /* counted as a person below */ } else if (e.primary) { email++; if (e.others.length) multi++; } else if (/@/.test(v)) emailProblems++;
     const p = parsePhones(v);
-    if (p.primary && /^[\d\s()+./-]+$/.test(v.replace(/\.0+$/, ''))) { phone++; if (p.others.length) multi++; } else if (/^[\d\s()+./\-eE.]+$/.test(v) && v.replace(/\D/g, '').length >= 6) phoneProblems++;
+    // (a date is not a phone number)
+    if (p.primary && /^[\d\s()+./-]+$/.test(v.replace(/\.0+$/, '')) && !/^\s*\d{4}-\d{1,2}-\d{1,2}/.test(v)) { phone++; if (p.others.length) multi++; } else if (/^[\d\s()+./\-eE.]+$/.test(v) && v.replace(/\D/g, '').length >= 6) phoneProblems++;
     if (parseUrl(v).url && !e.primary) url++;
     if (parseNumber(v).value !== null && /^[\s\d.,₹$€£()+-]+[kKmMbB]?$/.test(v)) num++;
     if (parseDate(v).value) date++;
@@ -264,7 +272,7 @@ export function suggestMapping(table: SheetTable): ColumnSuggestion[] {
     const profile = profileColumn(table.rows.map((r) => r[k]));
     return { columnIndex: k, header: col.header, profile, guess: guessColumn(col.header, profile), fieldType: suggestFieldType(profile) };
   });
-  const SINGLE = new Set<FieldId>(['company.name', 'company.website_url', 'contact.name', 'contact.first_name', 'contact.last_name', 'contact.role', 'deal.title', 'deal.value', 'deal.stage', 'company.industry', 'company.description', 'company.city', 'company.address', 'company.email', 'company.phone', 'contact.email', 'contact.phone', 'contact.linkedin_url', 'contact.status', 'deal.meeting_at']);
+  const SINGLE = new Set<FieldId>(['company.name', 'company.website_url', 'contact.name', 'contact.first_name', 'contact.last_name', 'contact.role', 'deal.title', 'deal.value', 'deal.stage', 'company.industry', 'company.description', 'company.city', 'company.address', 'company.email', 'company.phone', 'contact.email', 'contact.phone', 'contact.linkedin_url', 'contact.status', 'deal.meeting_at', 'deal.expected_close']);
   const rank = { high: 3, medium: 2, low: 1 };
   const winners = new Map<FieldId, number>();
   out.forEach((s, i) => {
@@ -277,6 +285,12 @@ export function suggestMapping(table: SheetTable): ColumnSuggestion[] {
       s.guess = { field: 'custom', confidence: 'low', reason: `Another column fits "${FIELD_BY_ID.get(s.guess.field)!.label}" better; this one is kept as a custom field.`, alternatives: [s.guess.field, 'ignore'] };
     }
   });
+  // without a column naming the deals, a value or stage would be dropped by the import: keep it as an extra field instead
+  if (!out.some((s) => s.guess.field === 'deal.title')) {
+    out.forEach((s) => {
+      if (s.guess.field.startsWith('deal.')) s.guess = { field: 'custom', confidence: 'low', reason: 'No column holds a deal name, so this is kept as an extra field.', alternatives: [s.guess.field, 'ignore'] };
+    });
+  }
   return out;
 }
 

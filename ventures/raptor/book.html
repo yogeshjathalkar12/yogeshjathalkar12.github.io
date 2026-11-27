@@ -43,6 +43,12 @@
   var params = new URLSearchParams(location.search), token = (params.get('p') || '').slice(0, 64), cancelKey = (params.get('c') || '').slice(0, 64);
   var card = document.getElementById('card');
   var zone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+  var MAIL_SERVER = 'https://websites-api-5wmu.onrender.com/api/raptor/booking-mail';
+  // Asks the server to send this meeting's email now (pages that send from Raptor's address). Nothing depends on the answer.
+  function sendMail(key) {
+    fetch(MAIL_SERVER + '/flush', { method: 'POST', credentials: 'omit', keepalive: true, headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: key }) }).catch(function () {});
+  }
 
   // Called directly, never with a visitor's own sign-in.
   function rpc(name, body) {
@@ -74,13 +80,15 @@
     return URL.createObjectURL(new Blob([lines.join('\r\n') + '\r\n'], { type: 'text/calendar' }));
   }
 
-  function booked(done) {
+  function booked(done, sendsEmail) {
     var link = location.origin + location.pathname + '?c=' + encodeURIComponent(done.cancel);
     var box = el('div', '', { 'class': 'row', role: 'status' });
     box.appendChild(el('h1', 'You are booked'));
     box.appendChild(el('p', done.title + '\n' + longOf(done.starts_at) + ' (' + zone + ')' + (done.location ? '\n' + done.location : '')));
     var save = el('a', 'Add to your calendar', { href: calendarFile(done), download: 'meeting.ics' }); box.appendChild(save);
-    box.appendChild(el('p', 'No email is sent. Keep this page or save the link below in case you need to cancel.', { 'class': 'note' }));
+    box.appendChild(el('p', sendsEmail ? 'A confirmation email is on its way. You can also cancel with the link below.'
+      : 'No email is sent. Keep this page or save the link below in case you need to cancel.', { 'class': 'note' }));
+    if (sendsEmail) sendMail(done.cancel);
     box.appendChild(el('a', 'Cancel this meeting', { href: link }));
     card.replaceChildren(box);
   }
@@ -144,7 +152,7 @@
       if (empty) { complain('Please enter your ' + empty + '.'); inputs[empty].focus(); return; }
       button.disabled = true; bad.hidden = true;
       rpc('booking_make', { p_token: token, p_start: chosen, p_data: data }).then(function (out) {
-        if (out && out.ok) booked(out);
+        if (out && out.ok) booked(out, page.sends_email === true);
         else if (out && out.taken) load(out.error, data);
         else complain((out && out.error) || 'The meeting could not be booked. Please try again.');
       }).catch(function () { complain('The meeting could not be booked. Check your connection and try again.'); });
@@ -166,14 +174,16 @@
       if (!meeting) { only('This meeting was not found.'); return; }
       if (meeting.status === 'cancelled') { only('This meeting is cancelled.'); return; }
       var box = el('div', '', { 'class': 'row' });
-      box.appendChild(el('h1', 'Cancel your meeting?'));
-      box.appendChild(el('p', meeting.title + '\n' + longOf(meeting.starts_at) + ' (' + zone + ')'));
+      box.appendChild(el('h1', 'Your meeting'));
+      box.appendChild(el('p', meeting.title + '\n' + longOf(meeting.starts_at) + ' (' + zone + ')' + (meeting.location ? '\n' + meeting.location : '')));
+      meeting.cancel = cancelKey;
+      box.appendChild(el('a', 'Add to your calendar', { href: calendarFile(meeting), download: 'meeting.ics' }));
       var button = el('button', 'Cancel the meeting', { type: 'button' }); box.appendChild(button);
       var bad = el('p', '', { 'class': 'bad', role: 'alert' }); bad.hidden = true; box.appendChild(bad);
       button.addEventListener('click', function () {
         button.disabled = true; bad.hidden = true;
         rpc('booking_cancel', { p_cancel: cancelKey }).then(function (out) {
-          if (out && out.ok) only('The meeting is cancelled.');
+          if (out && out.ok) { if (meeting.sends_email) sendMail(cancelKey); only('The meeting is cancelled.'); }
           else { bad.textContent = (out && out.error) || 'It could not be cancelled.'; bad.hidden = false; button.disabled = false; }
         }).catch(function () { bad.textContent = 'It could not be cancelled. Please try again.'; bad.hidden = false; button.disabled = false; });
       });

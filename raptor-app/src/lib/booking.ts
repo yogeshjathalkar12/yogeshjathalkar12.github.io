@@ -23,9 +23,34 @@ export interface BookingPage {
   ask_phone: boolean;
   ask_message: boolean;
   enabled: boolean;
+  // only once 2026-11-29_a_booking_emails.sql has been run
+  email_mode?: EmailMode;
+  reminder_hours?: number;
+}
+
+export type EmailMode = 'off' | 'raptor' | 'mine';
+
+export const EMAIL_MODES: [EmailMode, string][] = [['off', 'No email'], ['raptor', 'From Raptor’s address'], ['mine', 'From my own mailbox (PC app)']];
+export const REMINDERS: [number, string][] = [[0, 'No reminder'], [1, '1 hour before'], [2, '2 hours before'], [24, '1 day before'], [48, '2 days before']];
+
+export interface BookingMail { booking_id: string; kind: 'confirm' | 'reminder' | 'cancel'; channel: 'raptor' | 'mine'; status: string; error: string | null; send_after: string; sent_at: string | null }
+
+const MAIL_NAMES = { confirm: 'Confirmation', reminder: 'Reminder', cancel: 'Cancellation' } as const;
+
+/** One line per email of a meeting: "Confirmation sent", "Reminder due 28 Nov, 10:00", "Cancellation failed: ...". */
+export function mailLines(mails: BookingMail[], when: (iso: string) => string, now: Date = new Date()): { text: string; bad: boolean }[] {
+  const order = { confirm: 0, reminder: 1, cancel: 2 };
+  return [...mails].sort((a, b) => order[a.kind] - order[b.kind]).filter((m) => m.status !== 'cancelled').map((m) => {
+    const name = MAIL_NAMES[m.kind];
+    if (m.status === 'sent') return { text: `${name} sent`, bad: false };
+    if (m.status === 'failed') return { text: `${name} not sent${m.error ? `: ${m.error}` : ''}`, bad: true };
+    if (new Date(m.send_after).getTime() > now.getTime()) return { text: `${name} due ${when(m.send_after)}`, bad: false };
+    return { text: `${name} waiting${m.channel === 'mine' ? ' for the PC app' : ''}`, bad: false };
+  });
 }
 
 export interface Booking {
+  cancel_token?: string;
   id: string;
   page_id: string | null;
   host_id: string;
@@ -59,12 +84,14 @@ export interface BookingDraft {
   ask_phone: boolean;
   ask_message: boolean;
   enabled: boolean;
+  email_mode: EmailMode;
+  reminder_hours: number;
 }
 
 export const newDraft = (hostId: string, timezone: string): BookingDraft => ({
   host_id: hostId, name: 'Intro call', title: 'Book a meeting', intro: '', location: '', minutes: '30', buffer_minutes: '0',
   days: [1, 2, 3, 4, 5], start_time: '10:00', end_time: '17:00', timezone, notice_hours: '12', days_ahead: '14',
-  ask_phone: false, ask_message: true, enabled: true,
+  ask_phone: false, ask_message: true, enabled: true, email_mode: 'off', reminder_hours: 24,
 });
 
 export const draftOfPage = (page: BookingPage): BookingDraft => ({
@@ -73,6 +100,7 @@ export const draftOfPage = (page: BookingPage): BookingDraft => ({
   start_time: page.start_time.slice(0, 5), end_time: page.end_time.slice(0, 5), timezone: page.timezone,
   notice_hours: String(page.notice_hours), days_ahead: String(page.days_ahead),
   ask_phone: page.ask_phone, ask_message: page.ask_message, enabled: page.enabled,
+  email_mode: page.email_mode || 'off', reminder_hours: page.reminder_hours ?? 24,
 });
 
 const minutesOfDay = (time: string) => { const [h, m] = time.split(':').map(Number); return h * 60 + m; };
@@ -95,7 +123,9 @@ export function bookingProblem(d: BookingDraft): string | null {
   return null;
 }
 
-export const bookingRow = (d: BookingDraft) => ({
+/** The row to save; the email choices only when the database has them. */
+export const bookingRow = (d: BookingDraft, emails = false) => ({
+  ...(emails ? { email_mode: d.email_mode, reminder_hours: Number(d.reminder_hours) } : {}),
   host_id: d.host_id, name: d.name.trim(), title: d.title.trim(), intro: d.intro.trim(), location: d.location.trim(),
   minutes: Number(d.minutes), buffer_minutes: Number(d.buffer_minutes), days: [...d.days].sort((a, b) => a - b),
   start_time: d.start_time, end_time: d.end_time, timezone: d.timezone, notice_hours: Number(d.notice_hours),

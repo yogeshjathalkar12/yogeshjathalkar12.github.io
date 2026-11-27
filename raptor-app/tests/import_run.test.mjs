@@ -37,6 +37,7 @@ function fakeDb({ failNames = new Set(), failDefs = null, updateError = false, t
     rpc: async (fn, args) => {
       log.push(['rpc', fn]);
       if (fn === 'crm_import_begin') return { data: 'batch-1', error: null };
+      if (fn === 'crm_assign_by_rules') { log.push(['assign', args.p_ids]); return { data: args.p_ids.length, error: null }; }
       if (fn === 'crm_import_finish') { log.push(['finish', args.p_counts]); return { data: null, error: null }; }
       if (fn === 'crm_import_apply_update') { log.push(['update', args]); return updateError ? { data: null, error: { message: 'cannot change' } } : { data: { applied: Object.keys(args.p_patch), skipped: [] }, error: null }; }
       if (fn === 'crm_import_undo') { log.push(['undo']); const k = log.filter((l) => l[0] === 'undo').length; return { data: k < 3 ? { done: false } : { done: true, status: 'undone' }, error: null }; }
@@ -188,3 +189,41 @@ test('loading what exists reads every page, not just the first 1000', async () =
   assert.equal(ex.contacts.length, 5);
   assert.equal(ex.defs.deal.get('f'), 'custom_field_defs0');
 });
+
+test('a job title goes to its own field where there is one, and is kept as an extra field where there is not', async () => {
+  const rows = [['Contact', 'Job title', 'Email'], ['Ravi Kumar', 'Head of IT', 'ravi@alpha.com'], ['Asha Rao', 'CFO', 'asha@alpha.com']];
+  const map = { Contact: 'contact.name', 'Job title': 'contact.role', Email: 'contact.email' };
+  const plain = planFrom(rows, emptyExisting(), map);
+  assert.deepEqual(plain.contacts.create.map((c) => [c.rec.job_title, c.rec.custom['Job title']]), [[undefined, 'Head of IT'], [undefined, 'CFO']]);
+  const withColumn = { ...emptyExisting(), jobTitle: true, contacts: [{ id: 'old', name: 'Asha Rao', email: 'asha@alpha.com', job_title: null, custom_fields: {} }] };
+  const plan = planFrom(rows, withColumn, map);
+  assert.deepEqual([plan.contacts.create[0].rec.job_title, plan.contacts.create[0].rec.custom], ['Head of IT', {}]);
+  assert.equal(plan.contacts.update[0].patch.job_title, 'CFO');
+  assert.ok(!plan.newCustomFields.some((f) => f.name === 'Job title'));
+  const db = fakeDb();
+  await runImport(plan, withColumn, { source: 's', fileName: 'f' }, db);
+  assert.equal(db.tables.contacts[0].job_title, 'Head of IT');
+});
+
+test('the job title field is read when the database has it', async () => {
+  const asked = [];
+  const db = (has) => ({ from: (table) => ({ select: (columns) => ({ order: () => ({ range: async () => {
+    asked.push(columns);
+    return !has && columns.includes('job_title') ? { data: null, error: { message: 'column contacts.job_title does not exist' } } : { data: [], error: null };
+  } }) }) }) });
+  assert.equal((await loadExisting(db(true))).jobTitle, true);
+  assert.equal((await loadExisting(db(false))).jobTitle, false);
+});
+
+test('new contacts are shared out by the rules before the import is closed', async () => {
+  const db = fakeDb({ failNames: new Set() });
+  const plan = planFrom(COMPANIES, emptyExisting(), { Contact: 'contact.name', Email: 'contact.email' });
+  const res = await runImport(plan, emptyExisting(), { source: 's', fileName: 'f', shareByRules: true }, db);
+  assert.equal(res.handedOut, 1);
+  const steps = db.log.map((l) => (l[0] === 'rpc' ? l[1] : l[0]));
+  assert.ok(steps.indexOf('assign') < steps.indexOf('crm_import_finish'));
+  const without = fakeDb();
+  assert.equal((await runImport(planFrom(COMPANIES), emptyExisting(), { source: 's', fileName: 'f' }, without)).handedOut, 0);
+  assert.ok(!without.log.some((l) => l[0] === 'assign'));
+});
+

@@ -44,7 +44,7 @@ jobs:
               "https://websites-api-5wmu.onrender.com/api/automations/run$query" || true)
             echo "attempt $attempt: HTTP $code"
             if [ "$code" = "200" ]; then
-              jq '{dry_run, rules_checked, rules_with_matches: .rules_fired, matches: .actions_taken, rules_with_errors: (.errors | length), task_reminders, emptied_from_bin}' response.json
+              jq '{dry_run, rules_checked, rules_with_matches: .rules_fired, matches: .actions_taken, rules_with_errors: (.errors | length), task_reminders, emptied_from_bin, booking_emails, task_summaries}' response.json
               test "$(jq '.errors | length' response.json)" = "0"
               exit
             fi

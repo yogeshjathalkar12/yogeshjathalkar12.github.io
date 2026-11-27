@@ -93,3 +93,28 @@ test('tasks and activity', () => {
   const acts = [{ type: 'call', created_by: 'u1' }, { type: 'call', created_by: 'u2' }, { type: 'note', created_by: 'u1' }];
   assert.deepEqual(pairs(runReport(blankConfig('activities'), acts, ctx)), [['Call', 2], ['Note', 1]]);
 });
+
+test('a second grouping divides each group, keeping every record', () => {
+  const r = run({ split: 'owner', measure: 'sum', value: 'value' });
+  assert.deepEqual(r.series, ['asha', 'ben', '(none)']);
+  assert.deepEqual(r.points.find((p) => p.label === 'Meeting').parts, { asha: 100, ben: 0, '(none)': 0 });
+  assert.equal(r.points.reduce((a, p) => a + Object.values(p.parts).reduce((x, y) => x + y, 0), 0), r.total);
+  const months = run({ group: 'created_at', split: 'status' });
+  assert.deepEqual(months.series, ['Open', 'Won']);
+  assert.deepEqual(months.points.at(-1).parts, { Open: 1, Won: 1 });
+  assert.equal(run({}).series, undefined);
+});
+
+test('many divisions are folded into Other', () => {
+  const rows = Array.from({ length: 24 }, (_, i) => ({ id: i, industry: 'x', city: `c${i % 12}`, created_at: '2026-11-01' }));
+  const r = runReport({ ...blankConfig('companies'), split: 'city' }, rows, ctx);
+  assert.equal(r.series.length, 8);
+  assert.equal(r.series.at(-1), 'Other (5)');
+  assert.equal(Object.values(r.points[0].parts).reduce((a, b) => a + b, 0), 24);
+});
+
+test('a split that makes no sense is dropped', () => {
+  assert.equal(readConfig({ source: 'deals', group: 'stage', split: 'stage' }, ctx).split, undefined);
+  assert.equal(readConfig({ source: 'deals', group: 'stage', split: 'value' }, ctx).split, undefined);
+  assert.equal(readConfig({ source: 'deals', group: 'stage', split: 'owner' }, ctx).split, 'owner');
+});

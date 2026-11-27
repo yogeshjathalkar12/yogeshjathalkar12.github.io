@@ -21,8 +21,12 @@ import { startCall } from '../../lib/calls';
 import { useAuth } from '../../hooks/AuthContext';
 import { type PipelineStage, loadPipelineStages, stageByKey } from '../../lib/pipelineStages';
 import { formatCurrency } from '../../lib/crmHelpers';
+import { money as moneyIn } from '../../lib/quotes';
 import { checkTeamOverlap, noteTeamContact, reachedOut } from '../../lib/teamContactGuard';
 import { selectAll } from '../../lib/selectAll';
+import { coalesce } from '../../lib/coalesce';
+import LoadingMore from '../../components/crm/LoadingMore';
+import CurrencyRatesModal from '../../components/crm/CurrencyRatesModal';
 import { COLUMN_STEP } from '../../lib/paging';
 import BulkBar from '../../components/crm/BulkBar';
 import { toolBtnStyle } from '../../components/crm/Modal';
@@ -86,6 +90,9 @@ export default function CrmPipeline() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [assigneeFilter, setAssigneeFilter] = useAssigneeFilter('pipeline');
   const [columnLimit, setColumnLimit] = useState<Record<string, number>>({});     // cards drawn in a column, once "show more" was used
+  const [partial, setPartial] = useState(0);            // deals shown while the rest of a long list is still coming
+  const [showRates, setShowRates] = useState(false);
+  const loadedOnce = useRef(false);
   const [deals, setDeals] = useState<any[]>([]);
   const [stages, setStages] = useState<PipelineStage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -98,10 +105,11 @@ export default function CrmPipeline() {
   const [chosenPipeline, setChosenPipeline] = useState<string>(() => { try { return localStorage.getItem('crm-pipeline') || MAIN; } catch { return MAIN; } });
   const [showPipelines, setShowPipelines] = useState(false);
   const hasPipelines = useColumn('pipeline_stages', 'pipeline_id');
+  const hasCurrencies = useColumn('deals', 'currency');
   const choosePipeline = (id: string) => { setChosenPipeline(id); setPicked(new Set()); try { localStorage.setItem('crm-pipeline', id); } catch { /* not remembered */ } };
   const [picked, setPicked] = useState<Set<string>>(() => new Set());
   const [bulkNote, setBulkNote] = useState('');
-  const { can } = useOrg();
+  const { can, isOwner, isAdmin } = useOrg();
   const [activeDeal, setActiveDeal] = useState<any | null>(null);
   const [activeCall, setActiveCall] = useState<{
     prospectCompany: string; contactPhone: string | null; contactEmail: string | null;
@@ -283,9 +291,10 @@ export default function CrmPipeline() {
     fetchSms();
 
     // Replicate the realtime listener from crm.html
+    const reloadDeals = coalesce(fetchDeals);
     const channel = supabase.channel('crm-deals')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'deals' }, () => {
-        fetchDeals();
+        reloadDeals();
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'pipeline_stages' }, () => {
         fetchStages();
@@ -302,6 +311,7 @@ export default function CrmPipeline() {
       .subscribe();
 
     return () => {
+      reloadDeals.cancel();
       supabase.removeChannel(channel);
     };
   }, []);
@@ -321,10 +331,17 @@ export default function CrmPipeline() {
       const { data, error } = await selectAll(() => supabase
         .from('deals')
         .select('*, contacts(id, name, email, phone), companies(id, name)')
-        .order('created_at', { ascending: false }));
+        .order('created_at', { ascending: false }), 'id', (first: any[]) => {
+          if (loadedOnce.current) return;
+          setDeals(first);
+          setPartial(first.length);
+          setLoading(false);
+        });
 
       if (error) throw error;
       setDeals(data || []);
+      loadedOnce.current = true;
+      setPartial(0);
       // keep an open deal's detail view in step with what was just saved/assigned
       setActiveDeal((prev: any) => (prev ? (data || []).find((d: any) => d.id === prev.id) ?? prev : prev));
     } catch (error) {
@@ -338,14 +355,14 @@ export default function CrmPipeline() {
   // resolves, open that deal and drop the param.
   useEffect(() => {
     const openId = searchParams.get('open');
-    if (!openId || deals.length === 0) return;
+    if (!openId || deals.length === 0 || partial) return;
     const match = deals.find((d) => d.id === openId);
     if (match) setActiveDeal(match);
     const next = new URLSearchParams(searchParams);
     next.delete('open');
     setSearchParams(next, { replace: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deals]);
+  }, [deals, partial]);
 
   const assigneeLabels = useMemberLabels(deals.map((d) => d.assignee_id));
 
@@ -420,6 +437,7 @@ export default function CrmPipeline() {
             {pipelines.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
           </select>
         )}
+        {hasCurrencies && (isOwner || isAdmin) && <button type="button" style={toolBtnStyle} onClick={() => setShowRates(true)}>Currencies</button>}
         {hasPipelines && can('manage_pipeline') && <button type="button" style={toolBtnStyle} onClick={() => setShowPipelines(true)}>Pipelines</button>}
         <AssigneeFilter value={assigneeFilter} onChange={setAssigneeFilter} />
         {(can('edit') || can('delete')) && (
@@ -429,7 +447,7 @@ export default function CrmPipeline() {
           </button>
         )}
         <ExportButton
-          data={exportRows}
+          data={partial ? [] : exportRows}
           columns={[
             { key: 'title', label: 'Title' },
             { key: 'value', label: 'Value' },
@@ -513,6 +531,7 @@ export default function CrmPipeline() {
         </button></OwnerOnly>
       </div>
 
+      <LoadingMore count={partial} />
       {bulkNote && <div role="status" style={{ fontSize: '0.65rem', color: 'var(--green)', marginBottom: 8 }}>{bulkNote}</div>}
       {picking && picked.size === 0 && <div style={{ fontSize: '0.65rem', color: 'var(--dim)', marginBottom: 8 }}>Click deals to select them.</div>}
       {picked.size > 0 && (
@@ -590,6 +609,7 @@ export default function CrmPipeline() {
                       <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.5rem', color: stage.type === 'won' ? 'var(--green)' : 'inherit' }}>
                         {formatCurrency(deal.value)}
                       </div>
+                      {deal.currency && <div style={{ fontSize: '0.55rem', color: 'var(--dim2)' }}>{moneyIn(deal.amount, deal.currency)}</div>}
                       <div style={{ fontSize: '0.7rem', color: 'var(--white)', margin: '0.3rem 0' }}>{deal.title}</div>
                       {deal.expected_close && stage.type === 'open' && (
                         <div style={{ fontSize: '0.55rem', marginBottom: '0.35rem', color: deal.expected_close < new Date().toISOString().slice(0, 10) ? 'var(--red)' : 'var(--dim2)' }}>
@@ -714,6 +734,7 @@ export default function CrmPipeline() {
       <ImportWizardModal open={showImport} onClose={() => setShowImport(false)} onImported={fetchDeals} />
       <ImportHistoryModal open={showImportHistory} onClose={() => setShowImportHistory(false)} onChanged={fetchDeals} />
 
+      <CurrencyRatesModal open={showRates} onClose={() => setShowRates(false)} onChanged={fetchDeals} />
       <PipelineStagesModal
         open={showStageManager}
         onClose={() => setShowStageManager(false)}

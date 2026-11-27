@@ -24,6 +24,7 @@ import { exportRecords } from '../../lib/tableView';
 import RecordHistory from '../../components/crm/RecordHistory';
 import ActivityTimeline from '../../components/crm/ActivityTimeline';
 import { selectAll } from '../../lib/selectAll';
+import { coalesce } from '../../lib/coalesce';
 import { moveToBin } from '../../lib/bulk';
 import { useColumn } from '../../hooks/useColumn';
 import BulkBar from '../../components/crm/BulkBar';
@@ -58,13 +59,14 @@ export default function CrmCompanies() {
 
   useEffect(() => {
     fetchAll();
+    const reload = coalesce(fetchAll);
     const channel = supabase
       .channel('crm-companies-page')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'companies' }, fetchAll)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'contacts' }, fetchAll)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'deals' }, fetchAll)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'companies' }, reload)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'contacts' }, reload)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'deals' }, reload)
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    return () => { reload.cancel(); supabase.removeChannel(channel); };
   }, []);
 
   async function fetchAll() {

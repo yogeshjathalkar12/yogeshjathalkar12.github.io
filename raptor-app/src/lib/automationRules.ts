@@ -5,6 +5,7 @@ export type Target = 'contact' | 'deal' | 'task';
 
 export const OLD_TRIGGERS = ['contact_no_reply', 'deal_stalled', 'deal_won'];
 export const NEW_TRIGGERS = ['contact_created', 'deal_created', 'deal_in_stage', 'task_overdue'];
+export const SCORE_TRIGGER = 'contact_score';          // needs 2026-11-29_c_score_trigger.sql
 export const OLD_ACTIONS = ['log_note', 'create_reminder', 'webhook'];
 export const NEW_ACTIONS = ['assign', 'set_status', 'add_tag', 'notify'];
 
@@ -16,6 +17,7 @@ export const TRIGGER_NAMES: Record<string, string> = {
   deal_created: 'A deal is added',
   deal_in_stage: 'A deal reaches a stage',
   task_overdue: 'A task is overdue',
+  contact_score: 'A contact’s score reaches a number',
 };
 
 export const ACTION_NAMES: Record<string, string> = {
@@ -33,8 +35,8 @@ export const ACTIONS_WITH_MESSAGE = ['log_note', 'create_reminder', 'notify'];
 export const ACTIONS_WITH_VALUE = ['assign', 'set_status', 'add_tag'];
 
 export const targetOf = (trigger: string): Target =>
-  (trigger === 'contact_no_reply' || trigger === 'contact_created' ? 'contact' : trigger === 'task_overdue' ? 'task' : 'deal');
-export const showsDays = (trigger: string): boolean => trigger !== 'deal_won';
+  (['contact_no_reply', 'contact_created', SCORE_TRIGGER].includes(trigger) ? 'contact' : trigger === 'task_overdue' ? 'task' : 'deal');
+export const showsDays = (trigger: string): boolean => trigger !== 'deal_won' && trigger !== SCORE_TRIGGER;
 export const leastDays = (trigger: string): number => (NEW_TRIGGERS.includes(trigger) ? 0 : 1);
 
 export function actionsFor(trigger: string, installed: boolean): string[] {
@@ -52,6 +54,7 @@ export interface RuleDraft {
   trigger: string;
   days: string;
   stage: string;
+  score: string;
   action: string;
   value: string;          // who to assign to, the status, or the tag
   message: string;
@@ -63,7 +66,7 @@ export interface RuleDraft {
 }
 
 export const emptyDraft = (): RuleDraft => ({
-  trigger: 'contact_no_reply', days: '3', stage: '', action: 'log_note', value: '', message: '', webhook: '',
+  trigger: 'contact_no_reply', days: '3', stage: '', score: '', action: 'log_note', value: '', message: '', webhook: '',
   minValue: '', status: '', tag: '', enabled: true,
 });
 
@@ -72,7 +75,8 @@ export function draftOf(rule: any): RuleDraft {
   return {
     trigger: rule.trigger_type || 'contact_no_reply',
     days: String(rule.trigger_days ?? 3),
-    stage: rule.trigger_value || '',
+    stage: rule.trigger_type === SCORE_TRIGGER ? '' : rule.trigger_value || '',
+    score: rule.trigger_type === SCORE_TRIGGER ? rule.trigger_value || '' : '',
     action: rule.action_type || 'log_note',
     value: rule.action_value || '',
     message: rule.action_message || '',
@@ -102,6 +106,7 @@ export function problemWith(draft: RuleDraft): string | null {
     }
   }
   if (draft.trigger === 'deal_in_stage' && !draft.stage) return 'Choose the stage.';
+  if (draft.trigger === SCORE_TRIGGER && !/^-?\d{1,6}$/.test(draft.score.trim())) return 'Type the score as a whole number.';
   if (ACTIONS_WITH_MESSAGE.includes(draft.action) && !draft.message.trim()) return 'Add a message for this action.';
   if (draft.action === 'webhook' && !/^https?:\/\/\S+$/i.test(draft.webhook.trim())) return 'Add a webhook address starting with https://';
   if (draft.action === 'assign' && !draft.value) return 'Choose the person.';
@@ -129,7 +134,7 @@ export function ruleRow(draft: RuleDraft, installed: boolean): Record<string, un
   if (fits.includes('min_value') && draft.minValue.trim() !== '') conditions.min_value = Number(draft.minValue);
   if (fits.includes('status') && draft.status) conditions.status = draft.status;
   if (fits.includes('tag') && draft.tag.trim()) conditions.tag = draft.tag.trim();
-  row.trigger_value = draft.trigger === 'deal_in_stage' ? draft.stage : null;
+  row.trigger_value = draft.trigger === 'deal_in_stage' ? draft.stage : draft.trigger === SCORE_TRIGGER ? draft.score.trim() : null;
   row.action_value = ACTIONS_WITH_VALUE.includes(draft.action) ? draft.value.trim() : null;
   row.conditions = conditions;
   return row;
@@ -151,6 +156,7 @@ export function describeRule(rule: any, names: RuleNames = {}): { when: string; 
     deal_created: days ? `A deal was added ${plural(days)} ago` : 'A deal is added',
     deal_in_stage: days ? `A deal has been in ${stage} for ${plural(days)}` : `A deal reaches ${stage}`,
     task_overdue: days ? `A task is ${plural(days)} overdue` : 'A task becomes overdue',
+    contact_score: `A contact’s score reaches ${rule.trigger_value || '…'}`,
   };
   const c = rule.conditions || {};
   const only: string[] = [];

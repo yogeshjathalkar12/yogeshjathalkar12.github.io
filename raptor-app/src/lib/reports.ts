@@ -14,6 +14,7 @@ export interface ReportConfig {
   measure: Measure;
   value: string;          // the number field added up or averaged
   group: string;          // '' = one total
+  split?: string;         // a second grouping: each bar, point or row is divided by it
   period: string;
   periodField: string;
   filters: Filter[];
@@ -119,6 +120,7 @@ export function readConfig(raw: any, ctx: ReportContext = {}): ReportConfig {
     measure: value ? measure : 'count',
     value,
     group: raw?.group === '' || has(raw?.group) ? raw.group : base.group,
+    ...(raw?.split && raw.split !== raw?.group && has(raw.split, ['choice', 'text', 'tags']) ? { split: raw.split } : {}),
     period: PERIODS.some(([k]) => k === raw?.period) ? raw.period : 'all',
     periodField: has(raw?.periodField, ['date']) ? raw.periodField : 'created_at',
     filters: (Array.isArray(raw?.filters) ? raw.filters : []).filter((f: any) => f && has(f.field) && f.op in OP_NAMES).slice(0, 8)
@@ -186,8 +188,10 @@ export function passes(field: Field, row: any, filter: Filter): boolean {
   return filter.op === 'is_not' ? !same : same;
 }
 
-export interface Point { label: string; value: number; count: number }
-export interface ReportResult { points: Point[]; total: number; count: number; money: boolean; measureName: string }
+export interface Point { label: string; value: number; count: number; parts?: Record<string, number> }
+export interface ReportResult { points: Point[]; total: number; count: number; money: boolean; measureName: string; series?: string[] }
+
+const MAX_SERIES = 8;
 
 const MAX_GROUPS = 25;
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -245,7 +249,32 @@ export function runReport(config: ReportConfig, rows: any[], ctx: ReportContext 
     else if (group.kind === 'tags') (raw.length ? raw : [NONE]).forEach((t: string) => put(t, row));
     else put(isBlank(raw) ? NONE : String(raw), row);
   }
-  const point = (label: string, list: any[]): Point => ({ label, value: measureOf(list), count: list.length });
+  // the second grouping: which divisions there are (the biggest ones, the rest together), and each group's value for each
+  const splitField = config.split ? field(config.split) : undefined;
+  let divide: ((list: any[]) => Record<string, number>) | null = null;
+  if (splitField) {
+    const keysOf = (row: any): string[] => {
+      const raw = splitField.get(row);
+      if (splitField.kind === 'tags') return raw.length ? raw : [NONE];
+      return [isBlank(raw) ? NONE : String(raw)];
+    };
+    const sizes = new Map<string, number>();
+    kept.forEach((row) => keysOf(row).forEach((k) => sizes.set(k, (sizes.get(k) || 0) + 1)));
+    let names = [...sizes.keys()];
+    const order = splitField.order;
+    names.sort((a, b) => (order ? (order.indexOf(a) + 1 || 999) - (order.indexOf(b) + 1 || 999)
+      : Number(a === NONE) - Number(b === NONE) || (sizes.get(b) as number) - (sizes.get(a) as number) || a.localeCompare(b)));
+    const folded = names.length > MAX_SERIES ? new Set(names.slice(MAX_SERIES - 1)) : new Set<string>();
+    const rest = `Other (${folded.size})`;
+    if (folded.size) names = [...names.slice(0, MAX_SERIES - 1), rest];
+    result.series = names;
+    divide = (list) => {
+      const bins = new Map<string, any[]>(names.map((n) => [n, []]));
+      list.forEach((row) => new Set(keysOf(row).map((k) => (folded.has(k) ? rest : k))).forEach((k) => bins.get(k)?.push(row)));
+      return Object.fromEntries(names.map((n) => [n, measureOf(bins.get(n) as any[])]));
+    };
+  }
+  const point = (label: string, list: any[]): Point => ({ label, value: measureOf(list), count: list.length, ...(divide ? { parts: divide(list) } : {}) });
 
   if (group.kind === 'date') {
     const present = [...buckets.keys()].filter(Boolean).sort();
@@ -266,7 +295,7 @@ export function runReport(config: ReportConfig, rows: any[], ctx: ReportContext 
     all.sort((a, b) => b.value - a.value || a.label.localeCompare(b.label));
   }
   const shown = all.length > MAX_GROUPS ? all.slice(0, MAX_GROUPS - 1) : all;
-  result.points = shown.map(({ label, value, count }) => ({ label, value, count }));
+  result.points = shown.map(({ label, value, count, parts }) => ({ label, value, count, ...(parts ? { parts } : {}) }));
   if (all.length > shown.length) result.points.push(point(`Other (${all.length - shown.length})`, all.slice(shown.length).flatMap((p) => p.list)));
   return result;
 }

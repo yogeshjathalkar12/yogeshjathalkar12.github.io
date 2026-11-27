@@ -8,6 +8,7 @@ import { shortName } from '../../lib/team';
 import { type Task, formatDue, isDueToday, isOverdue, loadTasks, setTaskDone } from '../../lib/tasks';
 import TaskModal from '../../components/crm/TaskModal';
 import CalendarFeedButton from '../../components/crm/CalendarFeedButton';
+import TaskDigestToggle from '../../components/crm/TaskDigestToggle';
 import AssigneeFilter, { applyAssigneeFilter, useAssigneeFilter } from '../../components/crm/AssigneeFilter';
 import { selectAll } from '../../lib/selectAll';
 import { TABLE_PAGE } from '../../lib/paging';
@@ -118,6 +119,7 @@ export default function CrmTasks() {
           <button style={pill(view === 'calendar')} onClick={() => setView('calendar')}>Calendar</button>
           <AssigneeFilter value={filter} onChange={setFilter} />
           <CalendarFeedButton />
+          <TaskDigestToggle />
         </div>
         {can('create') && (
           <button onClick={() => setShowNew(true)} style={{ background: 'var(--grad)', color: '#fff', border: 'none', padding: '0.6rem 1.1rem', borderRadius: 4, cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: '0.65rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}>

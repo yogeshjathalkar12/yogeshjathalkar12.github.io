@@ -10,6 +10,7 @@ export default function CrmLayout() {
           { name: 'Dashboard', path: '/crm/dashboard' },
           { name: 'Pipeline', path: '/crm/pipeline' },
           { name: 'Forecast', path: '/crm/forecast' },
+          { name: 'Quotes', path: '/crm/quotes' },
           { name: 'Contacts', path: '/crm/contacts' },
           { name: 'Companies', path: '/crm/companies' },
           { name: 'Tasks', path: '/crm/tasks' },

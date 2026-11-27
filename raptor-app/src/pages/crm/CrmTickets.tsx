@@ -7,6 +7,14 @@ import ExportButton from '../../components/crm/ExportButton';
 import OwnerOnly from '../../components/OwnerOnly';
 import { TICKETS_IMPORT_SCHEMA } from '../../lib/ticketImportSchema';
 import { selectAll } from '../../lib/selectAll';
+import { useSearchParams } from 'react-router-dom';
+import TicketPanel from '../../components/crm/TicketPanel';
+import { useColumn } from '../../hooks/useColumn';
+import { useAuth } from '../../hooks/AuthContext';
+import { useMemberLabels } from '../../hooks/useDirectory';
+import { shortName } from '../../lib/team';
+import { TABLE_PAGE } from '../../lib/paging';
+import { type TicketView, dueLabel, inView, isOverdueTicket } from '../../lib/tickets';
 
 const PRIORITY_BADGES: Record<string, { bg: string; fg: string }> = {
   low: { bg: 'rgba(113,113,122,0.1)', fg: 'var(--dim)' },
@@ -30,6 +38,21 @@ export default function CrmTickets() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [showNewModal, setShowNewModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
+  const helpdesk = useColumn('tickets', 'due_at') === true;          // 2026-11-29_h_helpdesk.sql
+  const { user } = useAuth();
+  const [view, setView] = useState<TicketView>('all');
+  const [openId, setOpenId] = useState<string | null>(null);
+  const [limit, setLimit] = useState(TABLE_PAGE);
+  const [params, setParams] = useSearchParams();
+  const names = useMemberLabels(tickets.map((t) => t.assignee_id));
+
+  // a notification links here with ?open=<ticket id>
+  useEffect(() => {
+    const wanted = params.get('open');
+    if (!wanted || tickets.length === 0) return;
+    if (tickets.some((t) => t.id === wanted)) setOpenId(wanted);
+    setParams({}, { replace: true });
+  }, [tickets, params, setParams]);
 
   useEffect(() => {
     fetchAll();
@@ -83,6 +106,7 @@ export default function CrmTickets() {
   const q = search.trim().toLowerCase();
   const filtered = tickets.filter((t) => {
     if (statusFilter !== 'all' && t.status !== statusFilter) return false;
+    if (helpdesk && !inView(t, view, user?.id)) return false;
     if (!q) return true;
     return (
       (t.title || '').toLowerCase().includes(q) ||
@@ -134,6 +158,11 @@ export default function CrmTickets() {
             <option value="closed">Closed</option>
           </select>
 
+          {helpdesk && ([['all', 'All'], ['mine', 'Mine'], ['overdue', `Overdue (${tickets.filter((t) => isOverdueTicket(t)).length})`]] as [TicketView, string][]).map(([key, label]) => (
+            <button key={key} type="button" aria-pressed={view === key} onClick={() => setView(key)}
+              style={{ background: 'transparent', color: view === key ? 'var(--white)' : 'var(--dim)', border: `1px solid ${view === key ? 'var(--purple)' : 'var(--border)'}`, padding: '0.55rem 0.8rem', borderRadius: 4, cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: '0.65rem' }}>{label}</button>
+          ))}
+
           <ExportButton
             data={exportRows}
             columns={[
@@ -171,7 +200,7 @@ export default function CrmTickets() {
       </div>
 
       {/* Tickets Table */}
-      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', overflow: 'hidden' }}>
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', overflow: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontFamily: 'var(--mono)', fontSize: '0.75rem' }}>
           <thead>
             <tr style={{ background: 'var(--surface2)', color: 'var(--dim)', borderBottom: '1px solid var(--border)' }}>
@@ -180,23 +209,27 @@ export default function CrmTickets() {
               <th style={{ padding: '0.9rem 1rem' }}>Priority</th>
               <th style={{ padding: '0.9rem 1rem' }}>Category</th>
               <th style={{ padding: '0.9rem 1rem' }}>Status</th>
+              {helpdesk && <th style={{ padding: '0.9rem 1rem' }}>Handled by</th>}
+              {helpdesk && <th style={{ padding: '0.9rem 1rem' }}>Due</th>}
               <th style={{ padding: '0.9rem 1rem' }}>Created</th>
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={6} style={{ padding: '2rem', textAlign: 'center', color: 'var(--dim)' }}>
+                <td colSpan={helpdesk ? 8 : 6} style={{ padding: '2rem', textAlign: 'center', color: 'var(--dim)' }}>
                   {tickets.length === 0 ? 'No support tickets logged yet.' : 'No tickets match your filter.'}
                 </td>
               </tr>
             ) : (
-              filtered.map((t) => {
+              filtered.slice(0, limit).map((t) => {
                 const priorityBadge = PRIORITY_BADGES[t.priority] || PRIORITY_BADGES.low;
                 return (
                   <tr key={t.id} style={{ borderBottom: '1px solid var(--border)' }}>
                     <td style={{ padding: '1rem' }}>
-                      <div style={{ fontWeight: 'bold', color: 'var(--white)' }}>{t.title}</div>
+                      {helpdesk ? (
+                        <button type="button" onClick={() => setOpenId(t.id)} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', font: 'inherit', fontWeight: 'bold', color: 'var(--white)', textAlign: 'left' }}>{t.title}</button>
+                      ) : <div style={{ fontWeight: 'bold', color: 'var(--white)' }}>{t.title}</div>}
                       {t.description && <div style={{ fontSize: '0.65rem', color: 'var(--dim)', marginTop: '0.2rem' }}>{t.description}</div>}
                     </td>
                     <td style={{ padding: '1rem', color: 'var(--dim)' }}>
@@ -229,6 +262,8 @@ export default function CrmTickets() {
                         <option value="closed">Closed</option>
                       </select>
                     </td>
+                    {helpdesk && <td style={{ padding: '1rem', color: 'var(--dim)' }}>{t.assignee_id ? shortName(names[t.assignee_id]) : '—'}</td>}
+                    {helpdesk && <td style={{ padding: '1rem', whiteSpace: 'nowrap', color: isOverdueTicket(t) ? 'var(--red)' : 'var(--dim)' }}>{dueLabel(t)}</td>}
                     <td style={{ padding: '1rem', color: 'var(--dim2)' }}>{relativeTime(t.created_at)}</td>
                   </tr>
                 );
@@ -238,7 +273,12 @@ export default function CrmTickets() {
         </table>
       </div>
 
+      {filtered.length > limit && (
+        <button type="button" onClick={() => setLimit(limit + TABLE_PAGE)} style={{ marginTop: 10, background: 'transparent', color: 'var(--dim)', border: '1px solid var(--border)', padding: '0.5rem 1rem', borderRadius: 4, cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: '0.65rem' }}>Show more ({filtered.length - limit} more)</button>
+      )}
+
       {/* Modals */}
+      <TicketPanel ticket={tickets.find((t) => t.id === openId) || null} onClose={() => setOpenId(null)} onChanged={fetchAll} />
       <NewTicketModal open={showNewModal} contacts={contacts} onClose={() => setShowNewModal(false)} onCreated={fetchAll} />
       <BulkImportModal
         open={showImportModal}

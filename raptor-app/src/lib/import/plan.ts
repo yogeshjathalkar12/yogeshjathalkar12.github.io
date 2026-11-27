@@ -44,10 +44,12 @@ export interface CompanyRec {
 }
 export interface ContactRec {
   key: string; name: string; first_name?: string; last_name?: string; email?: string; phone?: string; linkedin_url?: string; status?: string;
+  role?: string;               // the job title read from the file
+  job_title?: string;          // set when the database has a job title field of its own
   custom: Record<string, string>; otherEmails: string[]; otherPhones: string[]; companyKey: string | null; rows: SourceRef[];
 }
 export interface DealRec {
-  title: string; value: number; stage: string; meeting_at?: string; custom: Record<string, string>;
+  title: string; value: number; stage: string; meeting_at?: string; expected_close?: string; custom: Record<string, string>;
   companyKey: string | null; contactKey: string | null; rows: SourceRef[];
 }
 
@@ -101,6 +103,7 @@ export function parseTables(setups: TableSetup[], opts: ImportOptions): Parsed {
         if (ch.field === 'custom') {
           customs.push({ entity: ch.customEntity || rowKind, name: (ch.customName || table.columns[c].header).trim(), value: v, type: ch.customType || 'text' });
         } else if (!f[ch.field]) f[ch.field] = v;
+        else if (/\.(email|phone)$/.test(ch.field)) f[ch.field] += `; ${v}`;            // a second phone or email column is kept
       });
 
       // --- company
@@ -133,6 +136,7 @@ export function parseTables(setups: TableSetup[], opts: ImportOptions): Parsed {
         people = [{ name, first, last, role: null, honorific: null }];
       }
       if (!people.length && emails.length) people = [{ name: nameFromEmail(emails[0]), first: '', last: '', role: null, honorific: null }];
+      if (!emails.length && people.length === 1 && people[0].email) emails.push(people[0].email);
       const pairEmails = people.length > 1 && emails.length === people.length;
       const pairPhones = people.length > 1 && phones.length === people.length;
       if (people.length > 1 && (emails.length > 1 && !pairEmails || phones.length > 1 && !pairPhones)) msgs.push('Several people and a different number of emails/phones: all were given to the first person.');
@@ -144,7 +148,7 @@ export function parseTables(setups: TableSetup[], opts: ImportOptions): Parsed {
           linkedin_url: undefined, custom: {}, otherEmails: em.slice(1), otherPhones: ph.slice(1), companyKey: company ? company.key : null, rows: [ref],
         };
         const role = f['contact.role'] || p.role;
-        if (role) rec.custom['Job title'] = role;
+        if (role) { rec.custom['Job title'] = role; rec.role = role; }
         if (i === 0 && f['contact.linkedin_url']) { const u = parseUrl(f['contact.linkedin_url']); if (u.url) rec.linkedin_url = u.url; else u.problems.forEach((x) => msgs.push(`LinkedIn left out: ${x}`)); }
         if (i === 0 && f['contact.status']) {
           const s = f['contact.status'].toLowerCase();
@@ -171,7 +175,12 @@ export function parseTables(setups: TableSetup[], opts: ImportOptions): Parsed {
           const d = parseDate(f['deal.meeting_at'], opts.dateOrder);
           if (d.value) { meeting = d.value; if (d.ambiguous) msgs.push(`Date "${f['deal.meeting_at']}" could be day-first or month-first.`); } else if (d.problem) msgs.push(`Meeting date left out: ${d.problem}`);
         }
-        deal = { title: f['deal.title'], value: v?.value ?? 0, stage, meeting_at: meeting, custom: {}, companyKey: company ? company.key : null, contactKey: contacts[0]?.key ?? null, rows: [ref] };
+        let closes: string | undefined;
+        if (f['deal.expected_close']) {
+          const d = parseDate(f['deal.expected_close'], opts.dateOrder);
+          if (d.value) { closes = d.value.slice(0, 10); if (d.ambiguous) msgs.push(`Date "${f['deal.expected_close']}" could be day-first or month-first.`); } else if (d.problem) msgs.push(`Expected close date left out: ${d.problem}`);
+        }
+        deal = { title: f['deal.title'], value: v?.value ?? 0, stage, meeting_at: meeting, expected_close: closes, custom: {}, companyKey: company ? company.key : null, contactKey: contacts[0]?.key ?? null, rows: [ref] };
       }
 
       // --- custom field columns go to the entity they were assigned to
@@ -261,7 +270,8 @@ function addContact(out: Parsed, c: ContactRec) {
 
 export interface Existing {
   companies: { id: string; name: string; website_url: string | null; phone: string | null; email: string | null; address: string | null; city: string | null; industry: string | null; description: string | null; custom_fields: Record<string, any> | null; created_at?: string }[];
-  contacts: { id: string; name: string; email: string | null; phone: string | null; company_id: string | null; first_name: string | null; last_name: string | null; linkedin_url: string | null; custom_fields: Record<string, any> | null }[];
+  contacts: { id: string; name: string; email: string | null; phone: string | null; company_id: string | null; first_name: string | null; last_name: string | null; linkedin_url: string | null; job_title?: string | null; custom_fields: Record<string, any> | null }[];
+  jobTitle?: boolean;          // the database has a job title field on contacts
   deals: { id: string; title: string; company_id: string | null }[];
   dossiers?: { id: string; entity_name: string; company_key: string | null; company_id: string | null }[];   // the prospect book (prospect_dossiers)
   defs: Record<Entity, Map<string, string>>;   // lower-cased custom field name -> def id
@@ -453,7 +463,14 @@ export function planImport(parsed: Parsed, existing: Existing, links: Links = {}
     exByName.set(`${personKey(c.name)}|${c.company_id ?? ''}`, c);
   }
   const contactId = new Map<string, string>();
-  for (const c of parsed.contacts.values()) {
+  for (const read of parsed.contacts.values()) {
+    // a job title goes to the contact's own field where there is one, and is kept as an extra field where there is not
+    let c = read;
+    if (existing.jobTitle && read.role) {
+      const custom = { ...read.custom };
+      if (custom['Job title'] === read.role) delete custom['Job title'];
+      c = { ...read, job_title: read.role, custom };
+    }
     const cid = c.companyKey ? companyId.get(c.companyKey) ?? null : null;
     const match = (c.email && exByEmail.get(c.email)) || exByName.get(`${personKey(c.name)}|${cid ?? ''}`);
     if (match) {
@@ -465,6 +482,7 @@ export function planImport(parsed: Parsed, existing: Existing, links: Links = {}
       decide(mode, 'email', COLUMN_LABEL.email, match.email, c.email, changes, patch);
       decide(mode, 'phone', COLUMN_LABEL.phone, match.phone, c.phone, changes, patch);
       decide(mode, 'linkedin_url', COLUMN_LABEL.linkedin_url, match.linkedin_url, c.linkedin_url, changes, patch);
+      decide(mode, 'job_title', 'Job title', match.job_title, c.job_title, changes, patch);
       if (cid && isEmptyVal(match.company_id)) { patch.company_id = cid; changes.push({ key: 'company_id', label: 'Company', before: null, after: c.companyKey ? (parsed.companies.get(c.companyKey)?.name || 'a company') : 'a company', kind: 'fill' }); }   // an existing or a just-created company; never moved to another one, even in overwrite mode
       Object.assign(patch, customPatch('contact', c.custom, match.custom_fields, existing.defs.contact, wanted, mode, changes));
       if (Object.keys(patch).length) plan.contacts.update.push({ table: 'contacts', id: match.id, name: match.name, patch, changes }); else plan.contacts.unchanged++;

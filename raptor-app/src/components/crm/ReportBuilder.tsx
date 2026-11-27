@@ -60,11 +60,20 @@ export default function ReportBuilder({ config, onChange, rows, context, loading
         )}
         <div>
           <label style={fieldLabelStyle} htmlFor="r-group">Grouped by</label>
-          <select id="r-group" style={fieldInputStyle} value={config.group} onChange={(e) => set({ group: e.target.value })}>
+          <select id="r-group" style={fieldInputStyle} value={config.group} onChange={(e) => set({ group: e.target.value, split: e.target.value && config.split !== e.target.value ? config.split : undefined })}>
             <option value="">Nothing (one number)</option>
             {fields.filter((f) => f.kind !== 'number').map((f) => <option key={f.id} value={f.id}>{f.kind === 'date' ? `Month: ${f.label}` : f.label}</option>)}
           </select>
         </div>
+        {config.group !== '' && (
+          <div>
+            <label style={fieldLabelStyle} htmlFor="r-split">Then split by</label>
+            <select id="r-split" style={fieldInputStyle} value={config.split || ''} onChange={(e) => set({ split: e.target.value || undefined })}>
+              <option value="">Nothing</option>
+              {fields.filter((f) => (f.kind === 'choice' || f.kind === 'text' || f.kind === 'tags') && f.id !== config.group).map((f) => <option key={f.id} value={f.id}>{f.label}</option>)}
+            </select>
+          </div>
+        )}
         <div>
           <label style={fieldLabelStyle} htmlFor="r-period">Period</label>
           <select id="r-period" style={fieldInputStyle} value={config.period} onChange={(e) => set({ period: e.target.value })}>

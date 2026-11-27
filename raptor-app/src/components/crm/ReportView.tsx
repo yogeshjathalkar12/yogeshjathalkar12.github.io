@@ -1,4 +1,4 @@
-import { Bar, BarChart, CartesianGrid, Cell, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { formatCurrency } from '../../lib/crmHelpers';
 import type { Chart, ReportResult } from '../../lib/reports';
 
@@ -26,12 +26,17 @@ export default function ReportView({ result, chart }: { result: ReportResult; ch
       <div style={{ maxHeight: 260, overflow: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.68rem' }}>
           <thead>
-            <tr style={{ color: 'var(--dim)', textAlign: 'left' }}><th style={{ padding: '0.3rem' }}>Group</th><th style={{ padding: '0.3rem', textAlign: 'right' }}>{result.measureName}</th><th style={{ padding: '0.3rem', textAlign: 'right' }}>Records</th></tr>
+            <tr style={{ color: 'var(--dim)', textAlign: 'left' }}>
+              <th style={{ padding: '0.3rem' }}>Group</th>
+              {(result.series || []).map((s) => <th key={s} style={{ padding: '0.3rem', textAlign: 'right' }}>{s}</th>)}
+              <th style={{ padding: '0.3rem', textAlign: 'right' }}>{result.series ? 'All' : result.measureName}</th><th style={{ padding: '0.3rem', textAlign: 'right' }}>Records</th>
+            </tr>
           </thead>
           <tbody>
             {result.points.map((p) => (
               <tr key={p.label} style={{ borderTop: '1px solid var(--border)' }}>
                 <td style={{ padding: '0.35rem', overflowWrap: 'anywhere' }}>{p.label}</td>
+                {(result.series || []).map((s) => <td key={s} style={{ padding: '0.35rem', textAlign: 'right', color: 'var(--dim)' }}>{shownValue(result, p.parts?.[s] || 0)}</td>)}
                 <td style={{ padding: '0.35rem', textAlign: 'right' }}>{shownValue(result, p.value)}</td>
                 <td style={{ padding: '0.35rem', textAlign: 'right', color: 'var(--dim)' }}>{p.count}</td>
               </tr>
@@ -42,6 +47,10 @@ export default function ReportView({ result, chart }: { result: ReportResult; ch
     );
   }
   const pie = chart === 'pie' && result.points.every((p) => p.value >= 0);
+  const series = pie ? undefined : result.series;                                            // a pie shows the first grouping only
+  const flat = series ? result.points.map((p) => ({ ...p.parts, label: p.label })) : result.points;
+  const stack = result.measureName.startsWith('Average') ? undefined : 'all';               // averages stand side by side, they do not add up
+  const seriesFormat = (v: any, name: any) => [shownValue(result, Number(v)), name] as [string, string];
   const format = (v: any) => [shownValue(result, Number(v)), result.measureName] as [string, string];
   const axis = { stroke: '#777', fontSize: 11, tickLine: false };
   const compact = (v: number) => Intl.NumberFormat(undefined, { notation: 'compact' }).format(v);
@@ -56,20 +65,24 @@ export default function ReportView({ result, chart }: { result: ReportResult; ch
             <Tooltip contentStyle={tip} formatter={(v: any, n: any) => [shownValue(result, Number(v)), n]} />
           </PieChart>
         ) : chart === 'line' ? (
-          <LineChart data={result.points} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
+          <LineChart data={flat} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
             <CartesianGrid stroke="#2a2a2a" vertical={false} />
             <XAxis dataKey="label" {...axis} />
             <YAxis {...axis} width={48} tickFormatter={compact} />
-            <Tooltip contentStyle={tip} formatter={format} />
-            <Line type="linear" dataKey="value" stroke={COLORS[0]} strokeWidth={2} dot={{ r: 3 }} isAnimationActive={false} />
+            <Tooltip contentStyle={tip} formatter={series ? seriesFormat : format} />
+            {series ? series.map((s, i) => <Line key={s} type="linear" dataKey={(p: any) => p[s]} name={s} stroke={COLORS[i % COLORS.length]} strokeWidth={2} dot={{ r: 2 }} isAnimationActive={false} />)
+              : <Line type="linear" dataKey="value" stroke={COLORS[0]} strokeWidth={2} dot={{ r: 3 }} isAnimationActive={false} />}
+            {series && <Legend wrapperStyle={{ fontSize: 11 }} />}
           </LineChart>
         ) : (
-          <BarChart data={result.points} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
+          <BarChart data={flat} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
             <CartesianGrid stroke="#2a2a2a" vertical={false} />
             <XAxis dataKey="label" {...axis} />
             <YAxis {...axis} width={48} tickFormatter={compact} />
-            <Tooltip contentStyle={tip} formatter={format} cursor={{ fill: 'rgba(255,255,255,0.05)' }} />
-            <Bar dataKey="value" fill={COLORS[0]} radius={[3, 3, 0, 0]} isAnimationActive={false} />
+            <Tooltip contentStyle={tip} formatter={series ? seriesFormat : format} cursor={{ fill: 'rgba(255,255,255,0.05)' }} />
+            {series ? series.map((s, i) => <Bar key={s} dataKey={(p: any) => p[s]} name={s} stackId={stack} fill={COLORS[i % COLORS.length]} isAnimationActive={false} />)
+              : <Bar dataKey="value" fill={COLORS[0]} radius={[3, 3, 0, 0]} isAnimationActive={false} />}
+            {series && <Legend wrapperStyle={{ fontSize: 11 }} />}
           </BarChart>
         )}
       </ResponsiveContainer>

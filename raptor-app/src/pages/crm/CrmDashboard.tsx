@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { selectAll } from '../../lib/selectAll';
 import { isNotInstalled } from '../../lib/dbMissing';
+import { useColumn } from '../../hooks/useColumn';
 import { useAuth } from '../../hooks/AuthContext';
 import { useOrg } from '../../hooks/OrgContext';
 import { useDirectory } from '../../hooks/useDirectory';
@@ -17,7 +18,9 @@ import ExportButton from '../../components/crm/ExportButton';
 
 // CRM > Dashboard: the organization's own reports (db/migrations/2026-11-28_o_reports.sql).
 
-interface Saved { id: string; name: string; config: any; created_by: string | null }
+interface Saved { id: string; name: string; config: any; created_by: string | null; dashboard?: string }
+
+const MAIN_DASHBOARD = 'Main';
 
 const card: React.CSSProperties = { background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 6, padding: '1rem 1.1rem', minWidth: 0 };
 const small: React.CSSProperties = { fontSize: '0.65rem', color: 'var(--dim)', lineHeight: 1.6 };
@@ -32,13 +35,15 @@ export default function CrmDashboard() {
   const [data, setData] = useState<Partial<Record<Source, any[]>>>({});
   const [failed, setFailed] = useState<Partial<Record<Source, string>>>({});
   const [lookups, setLookups] = useState<{ stages: PipelineStage[]; pipelines: Record<string, string>; companies: Record<string, string>; custom: any[] } | null>(null);
-  const [editing, setEditing] = useState<{ id: string | null; name: string; config: ReportConfig } | null>(null);
+  const [editing, setEditing] = useState<{ id: string | null; name: string; dashboard: string; config: ReportConfig } | null>(null);
+  const boards = useColumn('saved_reports', 'dashboard') === true;      // several dashboards: 2026-11-29_e_dashboards.sql
+  const [board, setBoard] = useState('');
   const [saving, setSaving] = useState(false);
   const [problem, setProblem] = useState('');
   const asked = useRef(new Set<Source>());
 
   const load = useCallback(async () => {
-    const { data: rows, error } = await supabase.from('saved_reports').select('id, name, config, created_by').order('created_at', { ascending: true });
+    const { data: rows, error } = await supabase.from('saved_reports').select('*').order('created_at', { ascending: true });
     if (error) { setState(isNotInstalled(error) ? 'missing' : 'error'); setMessage(error.message); return; }
     setReports((rows || []) as Saved[]);
     setState('ready');
@@ -88,6 +93,10 @@ export default function CrmDashboard() {
   }), [lookups, entries]);
 
   const mine = (r: Saved) => r.created_by === user?.id || isOwner || isAdmin;
+  // the dashboards there are, "Main" first; a dashboard exists as long as a report is on it
+  const names = useMemo(() => [...new Set([MAIN_DASHBOARD, ...reports.map((r) => r.dashboard || MAIN_DASHBOARD)])], [reports]);
+  const current = names.includes(board) ? board : names.find((n) => reports.some((r) => (r.dashboard || MAIN_DASHBOARD) === n)) || MAIN_DASHBOARD;
+  const onBoard = boards ? reports.filter((r) => (r.dashboard || MAIN_DASHBOARD) === current) : reports;
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
@@ -95,12 +104,14 @@ export default function CrmDashboard() {
     if (!editing.name.trim()) { setProblem('Give the report a name.'); return; }
     setSaving(true);
     setProblem('');
-    const row = { name: editing.name.trim(), config: editing.config };
+    const dashboard = editing.dashboard.trim() === MAIN_DASHBOARD ? '' : editing.dashboard.trim();
+    const row = { name: editing.name.trim(), config: editing.config, ...(boards ? { dashboard } : {}) };
     const { error } = editing.id
       ? await supabase.from('saved_reports').update(row).eq('id', editing.id)
       : await supabase.from('saved_reports').insert(row);
     setSaving(false);
     if (error) { setProblem(error.message); return; }
+    if (boards) setBoard(dashboard || MAIN_DASHBOARD);
     setEditing(null);
     load();
   }
@@ -124,7 +135,8 @@ export default function CrmDashboard() {
 
   const open = (r: Saved | null) => {
     setProblem('');
-    setEditing(r ? { id: r.id, name: r.name, config: readConfig(r.config, context) } : { id: null, name: '', config: blankConfig() });
+    setEditing(r ? { id: r.id, name: r.name, dashboard: r.dashboard || MAIN_DASHBOARD, config: readConfig(r.config, context) }
+      : { id: null, name: '', dashboard: current, config: blankConfig() });
   };
 
   if (state === 'loading') return <div style={small}>Loading your dashboard…</div>;
@@ -135,8 +147,19 @@ export default function CrmDashboard() {
     <div style={{ overflowY: 'auto', height: '100%' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap', marginBottom: '1.2rem' }}>
         <div style={{ ...small, maxWidth: 600 }}>Reports your team builds. Everyone sees the same list; the numbers cover the records each person is allowed to see.</div>
-        <button type="button" style={{ ...toolPrimaryStyle, alignSelf: 'flex-start' }} onClick={() => open(null)}>+ New report</button>
+        <div className="no-print" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignSelf: 'flex-start' }}>
+          {reports.length > 0 && <button type="button" style={toolBtnStyle} onClick={() => window.print()}>Print or save as PDF</button>}
+          <button type="button" style={toolPrimaryStyle} onClick={() => open(null)}>+ New report</button>
+        </div>
       </div>
+      {boards && names.length > 1 && (
+        <div className="no-print" role="tablist" aria-label="Dashboards" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: '1rem' }}>
+          {names.map((n) => (
+            <button key={n} type="button" role="tab" aria-selected={n === current} onClick={() => setBoard(n)}
+              style={{ ...toolBtnStyle, color: n === current ? 'var(--white)' : 'var(--dim)', borderColor: n === current ? 'var(--purple)' : 'var(--border)' }}>{n}</button>
+          ))}
+        </div>
+      )}
       {problem && !editing && <div role="alert" style={{ ...small, color: 'var(--red)', marginBottom: 10 }}>{problem}</div>}
 
       {reports.length === 0 && (
@@ -147,7 +170,7 @@ export default function CrmDashboard() {
       )}
 
       <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 380px), 1fr))' }}>
-        {reports.map((r) => {
+        {onBoard.map((r) => {
           const config = readConfig(r.config, context);
           const rows = data[config.source];
           const result = rows && lookups ? runReport(config, rows, context) : null;
@@ -156,10 +179,10 @@ export default function CrmDashboard() {
             <section key={r.id} style={card} aria-label={r.name}>
               <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'flex-start', flexWrap: 'wrap', marginBottom: 6 }}>
                 <div style={{ fontSize: '0.82rem', color: 'var(--white)', overflowWrap: 'anywhere' }}>{r.name}</div>
-                <div style={{ display: 'flex', gap: 6 }}>
+                <div className="no-print" style={{ display: 'flex', gap: 6 }}>
                   {result && result.points.length > 0 && (
-                    <ExportButton data={result.points.map((p) => ({ group: p.label, value: p.value, records: p.count }))}
-                      columns={[{ key: 'group', label: groupLabel }, { key: 'value', label: result.measureName }, { key: 'records', label: 'Records' }]}
+                    <ExportButton data={result.points.map((p) => ({ group: p.label, ...Object.fromEntries((result.series || []).map((s, i) => [`s${i}`, p.parts?.[s] ?? 0])), value: p.value, records: p.count }))}
+                      columns={[{ key: 'group', label: groupLabel }, ...(result.series || []).map((s, i) => ({ key: `s${i}`, label: s })), { key: 'value', label: result.measureName }, { key: 'records', label: 'Records' }]}
                       filename={`${r.name.replace(/[^\w -]+/g, '').trim() || 'report'}.csv`} label="CSV" />
                   )}
                   {mine(r) && <button type="button" style={toolBtnStyle} onClick={() => open(r)}>Edit</button>}
@@ -183,6 +206,13 @@ export default function CrmDashboard() {
           <form onSubmit={save} noValidate>
             <label style={fieldLabelStyle} htmlFor="r-name">Name</label>
             <input id="r-name" style={fieldInputStyle} value={editing.name} maxLength={80} placeholder="e.g. Won this quarter by person" onChange={(e) => setEditing({ ...editing, name: e.target.value })} />
+            {boards && (
+              <>
+                <label style={fieldLabelStyle} htmlFor="r-board">Dashboard (type a new name to make another)</label>
+                <input id="r-board" style={fieldInputStyle} list="r-boards" value={editing.dashboard} maxLength={40} onChange={(e) => setEditing({ ...editing, dashboard: e.target.value })} />
+                <datalist id="r-boards">{names.map((n) => <option key={n} value={n} />)}</datalist>
+              </>
+            )}
             <ReportBuilder config={editing.config} onChange={(config) => setEditing({ ...editing, config })} rows={data[editing.config.source] || []} context={context}
               loading={!data[editing.config.source] || !lookups} />
             {problem && <div role="alert" style={{ ...small, color: 'var(--red)', marginBottom: 10 }}>{problem}</div>}

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import Modal, { fieldLabelStyle, fieldInputStyle, primaryBtnStyle, ghostBtnStyle } from './Modal';
 import {
-  ACTION_NAMES, ACTIONS_WITH_MESSAGE, NEW_TRIGGERS, OLD_TRIGGERS, STATUSES, TRIGGER_NAMES,
+  ACTION_NAMES, ACTIONS_WITH_MESSAGE, NEW_TRIGGERS, OLD_TRIGGERS, SCORE_TRIGGER, STATUSES, TRIGGER_NAMES,
   actionsFor, conditionsFor, describeRule, draftOf, emptyDraft, leastDays, problemWith, ruleRow, showsDays, withTrigger,
   type RuleDraft,
 } from '../../lib/automationRules';
@@ -11,6 +11,7 @@ interface AutomationModalProps {
   open: boolean;
   automation: any | null; // null = creating a new automation, otherwise editing
   installed: boolean;     // 2026-11-28_k_automations.sql has been run: the newer choices can be saved
+  scoring: boolean;       // 2026-11-29_c_score_trigger.sql has been run: a rule can start from the lead score
   stages: [string, string][];
   people: [string, string][];
   onClose: () => void;
@@ -19,7 +20,7 @@ interface AutomationModalProps {
 
 const noteStyle: React.CSSProperties = { fontSize: '0.6rem', color: 'var(--dim)', margin: '-0.5rem 0 0.9rem' };
 
-export default function AutomationModal({ open, automation, installed, stages, people, onClose, onSaved }: AutomationModalProps) {
+export default function AutomationModal({ open, automation, installed, scoring, stages, people, onClose, onSaved }: AutomationModalProps) {
   const [draft, setDraft] = useState<RuleDraft>(emptyDraft);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +33,7 @@ export default function AutomationModal({ open, automation, installed, stages, p
   }, [open, automation]);
 
   const set = (change: Partial<RuleDraft>) => setDraft((d) => ({ ...d, ...change }));
-  const triggers = installed ? [...OLD_TRIGGERS, ...NEW_TRIGGERS] : OLD_TRIGGERS;
+  const triggers = installed ? [...OLD_TRIGGERS, ...NEW_TRIGGERS, ...(scoring ? [SCORE_TRIGGER] : [])] : OLD_TRIGGERS;
   const actions = actionsFor(draft.trigger, installed);
   const conditions = installed ? conditionsFor(draft.trigger) : [];
 
@@ -96,6 +97,14 @@ export default function AutomationModal({ open, automation, installed, stages, p
               {draft.stage && !stages.some(([k]) => k === draft.stage) && <option value={draft.stage}>A stage that no longer exists</option>}
               {stages.map(([key, label]) => <option key={key} value={key}>{label}</option>)}
             </select>
+          </>
+        )}
+
+        {draft.trigger === SCORE_TRIGGER && (
+          <>
+            <label style={fieldLabelStyle} htmlFor="rule-score">Score</label>
+            <input id="rule-score" style={fieldInputStyle} type="number" value={draft.score} placeholder="e.g. 50" onChange={(e) => set({ score: e.target.value })} />
+            <div style={noteStyle}>Your scoring rules (Contacts → Scoring rules) work out the score. It acts once for each contact that newly reaches it; those already there when the rule starts are left alone.</div>
           </>
         )}
 

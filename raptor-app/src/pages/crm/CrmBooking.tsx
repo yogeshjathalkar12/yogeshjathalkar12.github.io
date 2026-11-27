@@ -7,8 +7,11 @@ import CalendarFeedButton from '../../components/crm/CalendarFeedButton';
 import { shortName } from '../../lib/team';
 import { isNotInstalled } from '../../lib/dbMissing';
 import {
-  type Booking, type BookingDraft, type BookingPage, DAY_NAMES, bookingLink, bookingProblem, bookingRow, draftOfPage, newDraft, splitBookings, summaryOf,
+  type Booking, type BookingDraft, type BookingMail, type BookingPage, type EmailMode, DAY_NAMES, EMAIL_MODES, REMINDERS, bookingLink, bookingProblem,
+  bookingRow, draftOfPage, mailLines, newDraft, splitBookings, summaryOf,
 } from '../../lib/booking';
+import { useColumn } from '../../hooks/useColumn';
+import { RAPTOR_API_URL } from '../../lib/config';
 
 // CRM > Booking: links where people pick a free time with someone on the team (db/migrations/2026-11-28_l_booking.sql).
 
@@ -37,6 +40,20 @@ export default function CrmBooking() {
   const [problem, setProblem] = useState<string | null>(null);
   const [copied, setCopied] = useState('');
   const [showPast, setShowPast] = useState(false);
+  const emails = useColumn('booking_pages', 'email_mode') === true;
+  const [mails, setMails] = useState<BookingMail[]>([]);
+  const [serverSends, setServerSends] = useState<boolean | null>(null);     // can the server send from Raptor's address?
+  const mailServer = `${RAPTOR_API_URL}/api/raptor/booking-mail`;
+
+  async function loadMails() {
+    const { data, error } = await supabase.from('booking_mail').select('booking_id, kind, channel, status, error, send_after, sent_at').order('created_at', { ascending: false }).limit(600);
+    if (!error) setMails((data || []) as BookingMail[]);
+  }
+  useEffect(() => {
+    if (!emails) return;
+    loadMails();
+    fetch(`${mailServer}/status`).then((r) => (r.ok ? r.json() : null)).then((out) => setServerSends(out ? !!out.configured : null)).catch(() => setServerSends(null));
+  }, [emails]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function load() {
     const [p, b] = await Promise.all([
@@ -67,7 +84,7 @@ export default function CrmBooking() {
     if (wrong) { setProblem(wrong); return; }
     setSaving(true);
     setProblem(null);
-    const row = bookingRow(draft);
+    const row = bookingRow(draft, emails);
     const { error } = editing.id
       ? await supabase.from('booking_pages').update(row).eq('id', editing.id)
       : await supabase.from('booking_pages').insert(row);
@@ -86,10 +103,17 @@ export default function CrmBooking() {
   }
 
   async function cancel(b: Booking) {
-    if (!confirm(`Cancel the meeting with ${b.name}? Raptor does not email them: tell them yourself (${b.email}).`)) return;
+    const mode = pages.find((p) => p.id === b.page_id)?.email_mode || 'off';
+    const told = mode === 'off' ? `Raptor does not email them: tell them yourself (${b.email}).` : `A cancellation email goes to ${b.email}.`;
+    if (!confirm(`Cancel the meeting with ${b.name}? ${told}`)) return;
     const { error } = await supabase.rpc('booking_team_cancel', { p_id: b.id });
     if (error) { alert(error.message); return; }
+    if (mode === 'raptor' && b.cancel_token) {
+      // asks the server to send the cancellation now; if this fails the hourly run sends it
+      await fetch(`${mailServer}/flush`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: b.cancel_token }) }).catch(() => undefined);
+    }
     load();
+    if (emails) loadMails();
   }
 
   async function copy(key: string, text: string) {
@@ -115,6 +139,8 @@ export default function CrmBooking() {
         {b.contact_id ? <a style={{ color: 'var(--purple)' }} href={`#/crm/contacts?open=${b.contact_id}`}>{b.name}</a> : b.name}
         <div style={{ color: 'var(--dim)' }}>{b.email}{b.phone ? ` · ${b.phone}` : ''}</div>
         {b.message && <div style={{ color: 'var(--dim)', maxWidth: 360 }}>{b.message}</div>}
+        {mailLines(mails.filter((m) => m.booking_id === b.id), (iso) => new Date(iso).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }))
+          .map((line) => <div key={line.text} style={{ fontSize: '0.58rem', color: line.bad ? 'var(--red)' : 'var(--dim2)' }}>✉ {line.text}</div>)}
       </td>
       <td style={{ padding: '0.5rem 0.4rem', color: 'var(--dim)' }}>{b.title}<div>with {person(b.host_id)}</div></td>
       <td style={{ padding: '0.5rem 0.4rem', textAlign: 'right' }}>
@@ -130,7 +156,7 @@ export default function CrmBooking() {
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap', marginBottom: '1.2rem' }}>
         <div style={{ ...small, maxWidth: 600 }}>
           Share a link and people pick a free time. A booking adds the contact, a task and a notification. Free times come from your hours here,
-          other bookings and deal meetings: your Google or Outlook calendar is not checked, and no email is sent to the visitor.
+          other bookings and deal meetings: your Google or Outlook calendar is not checked.{emails ? '' : ' No email is sent to the visitor.'}
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignSelf: 'flex-start' }}>
           <CalendarFeedButton />
@@ -208,6 +234,33 @@ export default function CrmBooking() {
             <div style={{ ...fieldLabelStyle, marginBottom: 8 }}>Name and email are always asked. Also ask for:</div>
             <label style={check}><input type="checkbox" checked={d.ask_phone} onChange={(e) => set({ ask_phone: e.target.checked })} /> Phone</label>
             <label style={check}><input type="checkbox" checked={d.ask_message} onChange={(e) => set({ ask_message: e.target.checked })} /> A note</label>
+            {emails && (
+              <>
+                <label style={fieldLabelStyle} htmlFor="bk-mail">Emails to the visitor (confirmation, reminder, cancellation)</label>
+                <select id="bk-mail" style={fieldInputStyle} value={d.email_mode} onChange={(e) => set({ email_mode: e.target.value as EmailMode })}>
+                  {EMAIL_MODES.map(([k, label]) => <option key={k} value={k}>{label}</option>)}
+                </select>
+                {d.email_mode === 'raptor' && (
+                  <div style={{ ...small, marginTop: -6, marginBottom: 12 }}>
+                    Sent from bookings@shoonyaorigins.com within moments; replies go to the person the meeting is with. Up to 100 a day. Reminders go out on the hourly run.
+                    {serverSends === false && <div style={{ color: 'var(--red)' }}>The Raptor server cannot send email yet (no sending key is set).</div>}
+                  </div>
+                )}
+                {d.email_mode === 'mine' && (
+                  <div style={{ ...small, marginTop: -6, marginBottom: 12 }}>
+                    Sent by the PC app of the person the meeting is with: needs a paid plan, their mailbox connected there and the app open. It follows that mailbox’s sending hours and daily limit, so an email can arrive later.
+                  </div>
+                )}
+                {d.email_mode !== 'off' && (
+                  <>
+                    <label style={fieldLabelStyle} htmlFor="bk-remind">Reminder</label>
+                    <select id="bk-remind" style={fieldInputStyle} value={d.reminder_hours} onChange={(e) => set({ reminder_hours: Number(e.target.value) })}>
+                      {REMINDERS.map(([hours, label]) => <option key={hours} value={hours}>{label}</option>)}
+                    </select>
+                  </>
+                )}
+              </>
+            )}
             <label style={check}><input type="checkbox" checked={d.enabled} onChange={(e) => set({ enabled: e.target.checked })} /> The page is on</label>
             {problem && <div role="alert" style={{ ...small, color: 'var(--red)', marginBottom: 10 }}>{problem}</div>}
             <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', flexWrap: 'wrap' }}>

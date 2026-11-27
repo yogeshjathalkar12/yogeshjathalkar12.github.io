@@ -8,7 +8,7 @@ import { fieldLabelStyle } from './Modal';
 const FIELD_LABELS: Record<string, string> = {
   name: 'Name', email: 'Email', phone: 'Phone', status: 'Status', lead_score: 'Lead score', title: 'Title',
   value: 'Value', stage: 'Stage', assignee_id: 'Assigned to', linkedin_url: 'LinkedIn', website_url: 'Website',
-  closed_at: 'Closed', meeting_at: 'Meeting', deleted_at: 'Deleted', deleted_by: 'Deleted by', expected_close: 'Expected close date', probability: 'Chance of closing', first_name: 'First name', last_name: 'Last name',
+  closed_at: 'Closed', meeting_at: 'Meeting', deleted_at: 'Deleted', deleted_by: 'Deleted by', expected_close: 'Expected close date', currency: 'Currency', amount: 'Amount in that currency', fx_rate: 'Exchange rate', probability: 'Chance of closing', first_name: 'First name', last_name: 'Last name',
   company_id: 'Company', contact_id: 'Contact', campaign_id: 'Campaign', custom_fields: 'Custom fields', assigned_to: 'Assigned to (note)',
 };
 const ID_FIELDS = new Set(['company_id', 'contact_id', 'campaign_id']);

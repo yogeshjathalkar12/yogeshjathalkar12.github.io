@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<title>Quote</title>
+<style>
+  :root { --ink:#18181b; --soft:#52525b; --line:#d4d4d8; --paper:#ffffff; --accent:#742469; --bad:#b91c1c; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color:var(--ink); background:#f4f4f5; }
+  body.embed { background:transparent; }
+  main { max-width:720px; margin:32px auto; background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:24px; }
+  body.embed main { margin:0 auto; border:0; padding:8px; }
+  h1 { font-size:20px; margin:0 0 6px; }
+  p { margin:0 0 16px; color:var(--soft); white-space:pre-line; }
+  label { display:block; font-size:13px; font-weight:600; margin:0 0 4px; }
+  input, textarea { width:100%; font:inherit; color:inherit; background:#fff; border:1px solid var(--line); border-radius:6px; padding:9px 11px; margin:0 0 14px; }
+  textarea { min-height:110px; resize:vertical; }
+  button { width:100%; font:inherit; font-weight:600; color:#fff; background:var(--accent); border:0; border-radius:6px; padding:11px; cursor:pointer; }
+  button:disabled { opacity:.6; cursor:default; }
+  .bad { color:var(--bad); margin:0 0 12px; }
+  .away { position:absolute; left:-10000px; width:1px; height:1px; overflow:hidden; }
+  .by { text-align:center; font-size:11px; color:#a1a1aa; margin:14px 0 0; }
+  .by a { color:inherit; }
+  .top { display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; margin:0 0 18px; }
+  .top div { white-space:pre-line; font-size:13px; color:var(--soft); }
+  .top strong { color:var(--ink); font-size:15px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; margin:0 0 12px; }
+  th, td { text-align:right; padding:7px 6px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th:first-child, td:first-child { text-align:left; }
+  td small { display:block; color:var(--soft); white-space:pre-line; }
+  .scroll { overflow-x:auto; }
+  .sum { text-align:right; font-size:13px; margin:0 0 18px; }
+  .sum b { font-size:18px; display:block; margin-top:4px; }
+  .row { display:flex; gap:10px; flex-wrap:wrap; }
+  .row button { flex:1 1 160px; }
+  button.plain { color:var(--accent); background:#fff; border:1px solid var(--accent); }
+  .state { font-weight:600; margin:0 0 14px; color:var(--ink); }
+  @media print { body { background:#fff; } main { border:0; margin:0; max-width:none; padding:0; } .noprint, .by { display:none; } }
+</style>
+</head>
+<body>
+<main id="card"><p id="status">Loading…</p></main>
+<script>
+(function () {
+  'use strict';
+  // The website's public (anonymous) key: it can do nothing here but read one quote and send the customer's answer.
+  var URL_BASE = 'https://pcdbtcpctlnvdtbrrqoo.supabase.co', KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjZGJ0Y3BjdGxudmR0YnJycW9vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI2MjIxMjQsImV4cCI6MjA5ODE5ODEyNH0._y59k8mmSqvkCL9gPBWp5hfp2LwpP_IBvr5h7y3nP7Q';
+  var token = (new URLSearchParams(location.search).get('q') || '').slice(0, 80);
+  var card = document.getElementById('card');
+
+  // Called directly, never with a visitor's own sign-in.
+  function rpc(name, body) {
+    return fetch(URL_BASE + '/rest/v1/rpc/' + name, {
+      method: 'POST', credentials: 'omit',
+      headers: { apikey: KEY, Authorization: 'Bearer ' + KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+  }
+  // Everything from the quote is put on the page as plain text, never as HTML.
+  function el(tag, text, attrs) {
+    var node = document.createElement(tag);
+    if (text !== undefined && text !== null && text !== '') node.textContent = text;
+    for (var k in attrs || {}) node.setAttribute(k, attrs[k]);
+    return node;
+  }
+  function only(message) { card.replaceChildren(el('p', message, { role: 'status' })); }
+  function day(text) { return text ? new Date(text.slice(0, 10) + 'T00:00:00').toLocaleDateString([], { day: 'numeric', month: 'long', year: 'numeric' }) : ''; }
+
+  function show(q) {
+    if (q.status === 'cancelled') { only('Quote ' + q.number + ' has been cancelled.'); return; }
+    function money(value) {
+      try { return new Intl.NumberFormat(q.currency === 'INR' ? 'en-IN' : undefined, { style: 'currency', currency: q.currency }).format(value); }
+      catch (e) { return q.currency + ' ' + Number(value).toFixed(2); }
+    }
+    var seller = q.seller || {};
+    var box = el('div');
+    box.appendChild(el('h1', 'Quote ' + q.number + (q.title ? ': ' + q.title : '')));
+    document.title = 'Quote ' + q.number;
+    var top = el('div', '', { 'class': 'top' });
+    var from = el('div'); from.appendChild(el('strong', seller.name || '')); from.appendChild(el('div', seller.details || '')); top.appendChild(from);
+    var to = el('div'); to.appendChild(el('div', 'For')); to.appendChild(el('strong', q.buyer_name || '')); to.appendChild(el('div', q.buyer_details || '')); top.appendChild(to);
+    top.appendChild(el('div', 'Date: ' + day(q.issue_date) + (q.valid_until ? '\nValid until: ' + day(q.valid_until) : '')));
+    box.appendChild(top);
+    var hasDiscount = q.items.some(function (i) { return Number(i.discount_percent) > 0; });
+    var hasTax = q.items.some(function (i) { return Number(i.tax_percent) > 0; });
+    var table = el('table'), head = el('tr');
+    ['Item', 'Quantity', 'Price'].concat(hasDiscount ? ['Discount'] : [], hasTax ? ['Tax'] : [], ['Amount']).forEach(function (h) { head.appendChild(el('th', h)); });
+    table.appendChild(head);
+    q.items.forEach(function (i) {
+      var tr = el('tr'), name = el('td', i.name);
+      if (i.description) name.appendChild(el('small', i.description));
+      tr.appendChild(name);
+      tr.appendChild(el('td', String(Number(i.quantity))));
+      tr.appendChild(el('td', money(i.unit_price)));
+      if (hasDiscount) tr.appendChild(el('td', Number(i.discount_percent) + '%'));
+      if (hasTax) tr.appendChild(el('td', Number(i.tax_percent) + '%'));
+      tr.appendChild(el('td', money(i.amount)));
+      table.appendChild(tr);
+    });
+    var scroll = el('div', '', { 'class': 'scroll' }); scroll.appendChild(table); box.appendChild(scroll);
+    var sum = el('div', '', { 'class': 'sum' });
+    sum.appendChild(el('div', 'Subtotal ' + money(q.subtotal)));
+    if (Number(q.discount_total) > 0) sum.appendChild(el('div', 'Discount −' + money(q.discount_total)));
+    if (Number(q.tax_total) > 0) sum.appendChild(el('div', 'Tax ' + money(q.tax_total)));
+    sum.appendChild(el('b', 'Total ' + money(q.total)));
+    box.appendChild(sum);
+    if (q.notes) box.appendChild(el('p', q.notes));
+    if (seller.terms) { box.appendChild(el('h2', 'Terms')); box.appendChild(el('p', seller.terms)); }
+
+    if (q.status === 'accepted' || q.status === 'declined') {
+      box.appendChild(el('p', (q.status === 'accepted' ? 'Accepted' : 'Declined') + (q.answered_by ? ' by ' + q.answered_by : '') + (q.answered_at ? ' on ' + day(q.answered_at) : '') + '.', { 'class': 'state', role: 'status' }));
+    } else if (q.expired) {
+      box.appendChild(el('p', 'This quote is out of date. Please ask for a new one.', { 'class': 'state', role: 'status' }));
+    } else {
+      var form = el('form', '', { 'class': 'noprint', novalidate: 'novalidate' });
+      form.appendChild(el('label', 'Your name', { 'for': 'name' }));
+      var name = el('input', '', { type: 'text', id: 'name', autocomplete: 'name', maxlength: '120' }); form.appendChild(name);
+      form.appendChild(el('label', 'A note (optional)', { 'for': 'note' }));
+      var note = el('textarea', '', { id: 'note', maxlength: '1000' }); form.appendChild(note);
+      var bad = el('p', '', { 'class': 'bad', role: 'alert' }); bad.hidden = true; form.appendChild(bad);
+      var row = el('div', '', { 'class': 'row' });
+      var yes = el('button', 'Accept this quote', { type: 'submit' }), no = el('button', 'Decline', { type: 'button', 'class': 'plain' });
+      row.appendChild(yes); row.appendChild(no); form.appendChild(row);
+      function answer(accept) {
+        if (yes.disabled) return;
+        if (name.value.trim().length < 2) { bad.textContent = 'Please type your name.'; bad.hidden = false; name.focus(); return; }
+        if (!window.confirm((accept ? 'Accept' : 'Decline') + ' quote ' + q.number + ' for ' + money(q.total) + '?')) return;
+        yes.disabled = no.disabled = true; bad.hidden = true;
+        rpc('quote_respond', { p_token: token, p_accept: accept, p_name: name.value.trim(), p_note: note.value.trim() }).then(function (out) {
+          if (out && out.ok) load();
+          else { bad.textContent = (out && out.error) || 'Your answer could not be sent.'; bad.hidden = false; yes.disabled = no.disabled = false; }
+        }).catch(function () { bad.textContent = 'Your answer could not be sent. Check your connection and try again.'; bad.hidden = false; yes.disabled = no.disabled = false; });
+      }
+      form.addEventListener('submit', function (event) { event.preventDefault(); answer(true); });
+      no.addEventListener('click', function () { answer(false); });
+      box.appendChild(form);
+    }
+    var print = el('button', 'Print or save as PDF', { type: 'button', 'class': 'plain noprint', style: 'margin-top:12px' });
+    print.addEventListener('click', function () { window.print(); });
+    box.appendChild(print);
+    var by = el('div', '', { 'class': 'by' });
+    by.appendChild(el('a', 'Quote by Raptor', { href: 'https://shoonyaorigins.com/ventures/raptor/', target: '_blank', rel: 'noopener' }));
+    card.replaceChildren(box, by);
+  }
+
+  function load() {
+    rpc('quote_public', { p_token: token }).then(function (q) { if (q) show(q); else only('This quote is not available.'); })
+      .catch(function () { only('This quote could not be loaded. Please try again later.'); });
+  }
+  if (!token) { only('This quote is not available.'); return; }
+  load();
+})();
+</script>
+</body>
+</html>

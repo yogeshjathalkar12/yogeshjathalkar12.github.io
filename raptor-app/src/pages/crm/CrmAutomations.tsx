@@ -14,6 +14,7 @@ export default function CrmAutomations() {
   const [editing, setEditing] = useState<any | null>(null);
   const [stages, setStages] = useState<[string, string][]>([]);
   const installed = useColumn('automations', 'trigger_value') === true;
+  const scoring = useColumn('automations', 'baseline_at') === true;
   const { entries } = useDirectory();
   const people = entries.map((p) => [p.user_id, p.email] as [string, string]);
   const names = { stages: Object.fromEntries(stages), people: Object.fromEntries(people) };
@@ -165,6 +166,7 @@ export default function CrmAutomations() {
         open={modalOpen}
         automation={editing}
         installed={installed}
+        scoring={scoring}
         stages={stages}
         people={people}
         onClose={() => setModalOpen(false)}
