@@ -47,7 +47,7 @@ export const TRIGGER_LABELS: Record<string, (days: number) => string> = {
 
 export const ACTION_LABELS: Record<string, (a: any) => string> = {
   log_note: (a) => `log a note: "${a.action_message || ''}"`,
-  create_reminder: (a) => `create a reminder: "${a.action_message || ''}"`,
+  create_reminder: (a) => `create a task: "${a.action_message || ''}"`,
   webhook: (a) => `call the webhook ${a.action_webhook_url || '(no URL set)'}`,
 };
 

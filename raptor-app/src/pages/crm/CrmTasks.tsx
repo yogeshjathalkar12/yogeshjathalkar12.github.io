@@ -8,6 +8,7 @@ import { shortName } from '../../lib/team';
 import { type Task, formatDue, isDueToday, isOverdue, loadTasks, setTaskDone } from '../../lib/tasks';
 import TaskModal from '../../components/crm/TaskModal';
 import AssigneeFilter, { applyAssigneeFilter, useAssigneeFilter } from '../../components/crm/AssigneeFilter';
+import { selectAll } from '../../lib/selectAll';
 
 type Tab = 'open' | 'today' | 'overdue' | 'done';
 type View = 'list' | 'calendar';
@@ -44,7 +45,7 @@ export default function CrmTasks() {
       setError(e.message || 'Could not load tasks.');
     }
     // Deal meetings show on the calendar too. A missing column just means none.
-    const { data } = await supabase.from('deals').select('id, title, meeting_at').not('meeting_at', 'is', null);
+    const { data } = await selectAll(() => supabase.from('deals').select('id, title, meeting_at').not('meeting_at', 'is', null));
     setMeetings((data || []) as Meeting[]);
     setLoading(false);
   }, []);

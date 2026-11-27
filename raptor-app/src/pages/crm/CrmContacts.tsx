@@ -19,6 +19,7 @@ import { useMemberLabels } from '../../hooks/useDirectory';
 import { useAuth } from '../../hooks/AuthContext';
 import { shortName } from '../../lib/team';
 import { exportRecords } from '../../lib/tableView';
+import { selectAll } from '../../lib/selectAll';
 
 const STATUS_COLORS: Record<string, { bg: string; fg: string }> = {
   hot: { bg: 'rgba(239,68,68,0.1)', fg: 'var(--red)' },
@@ -61,11 +62,11 @@ export default function CrmContacts() {
   async function fetchAll() {
     try {
       const [contactsRes, dealsRes, interactionsRes, fieldDefs, importsRes] = await Promise.all([
-        supabase
+        selectAll(() => supabase
           .from('contacts')
           .select('*, companies(id, name)')
-          .order('last_interaction_at', { ascending: false, nullsFirst: false }),
-        supabase.from('deals').select('id, contact_id, stage'),
+          .order('last_interaction_at', { ascending: false, nullsFirst: false })),
+        selectAll(() => supabase.from('deals').select('id, contact_id, stage')),
         supabase
           .from('interactions')
           .select('*, contacts(id, name)')

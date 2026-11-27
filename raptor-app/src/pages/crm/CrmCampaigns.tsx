@@ -4,6 +4,7 @@ import { formatCurrency } from '../../lib/crmHelpers';
 import CampaignModal from '../../components/crm/CampaignModal';
 import RowMenu from '../../components/crm/RowMenu';
 import { type PipelineStage, loadPipelineStages, wonStageKeys } from '../../lib/pipelineStages';
+import { selectAll } from '../../lib/selectAll';
 
 export default function CrmCampaigns() {
   const [campaigns, setCampaigns] = useState<any[]>([]);
@@ -32,7 +33,7 @@ export default function CrmCampaigns() {
     try {
       const [campaignsRes, dealsRes, stageRows] = await Promise.all([
         supabase.from('campaigns').select('*').order('created_at', { ascending: false }),
-        supabase.from('deals').select('id, campaign_id, stage, value'),
+        selectAll(() => supabase.from('deals').select('id, campaign_id, stage, value')),
         loadPipelineStages(),
       ]);
       if (campaignsRes.error) throw campaignsRes.error;

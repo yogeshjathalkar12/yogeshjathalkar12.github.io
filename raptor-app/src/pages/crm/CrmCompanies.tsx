@@ -19,6 +19,7 @@ import OwnerOnly from '../../components/OwnerOnly';
 import ExportButton from '../../components/crm/ExportButton';
 import { exportRecords } from '../../lib/tableView';
 import RecordHistory from '../../components/crm/RecordHistory';
+import { selectAll } from '../../lib/selectAll';
 
 // Real CRM companies (Supabase `companies` table) - this app never had a
 // dedicated page for them before (they only ever showed up as a name-join
@@ -56,9 +57,9 @@ export default function CrmCompanies() {
   async function fetchAll() {
     try {
       const [companiesRes, contactsRes, dealsRes, fieldDefs, importsRes] = await Promise.all([
-        supabase.from('companies').select('*').order('created_at', { ascending: false }),
-        supabase.from('contacts').select('id, name, company_id'),
-        supabase.from('deals').select('id, title, value, company_id'),
+        selectAll(() => supabase.from('companies').select('*').order('created_at', { ascending: false })),
+        selectAll(() => supabase.from('contacts').select('id, name, company_id')),
+        selectAll(() => supabase.from('deals').select('id, title, value, company_id')),
         loadFieldDefs('company').catch(() => [] as CustomFieldDef[]),
         Promise.resolve(supabase.from('crm_imports').select('id, source_name, file_name, started_at')).catch(() => ({ data: [] as any[] })),   // the import log may not exist yet
       ]);

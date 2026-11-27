@@ -6,6 +6,7 @@ import BulkImportModal from '../../components/crm/BulkImportModal';
 import ExportButton from '../../components/crm/ExportButton';
 import OwnerOnly from '../../components/OwnerOnly';
 import { TICKETS_IMPORT_SCHEMA } from '../../lib/ticketImportSchema';
+import { selectAll } from '../../lib/selectAll';
 
 const PRIORITY_BADGES: Record<string, { bg: string; fg: string }> = {
   low: { bg: 'rgba(113,113,122,0.1)', fg: 'var(--dim)' },
@@ -46,11 +47,11 @@ export default function CrmTickets() {
   async function fetchAll() {
     try {
       const [ticketsRes, contactsRes] = await Promise.all([
-        supabase
+        selectAll(() => supabase
           .from('tickets')
           .select('*, contacts(id, name, companies(id, name))')
-          .order('created_at', { ascending: false }),
-        supabase.from('contacts').select('id, name, companies(id, name)').order('name', { ascending: true }),
+          .order('created_at', { ascending: false })),
+        selectAll(() => supabase.from('contacts').select('id, name, companies(id, name)').order('name', { ascending: true })),
       ]);
 
       if (ticketsRes.error) throw ticketsRes.error;

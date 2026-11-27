@@ -22,6 +22,7 @@ import { useAuth } from '../../hooks/AuthContext';
 import { type PipelineStage, loadPipelineStages, stageByKey } from '../../lib/pipelineStages';
 import { formatCurrency } from '../../lib/crmHelpers';
 import { checkTeamOverlap, noteTeamContact, reachedOut } from '../../lib/teamContactGuard';
+import { selectAll } from '../../lib/selectAll';
 
 // What the email on a deal card is doing. Statuses come from deal_outreach (see db/migrations/2026-10-14_crm_outreach.sql).
 interface DealEmail { status: string; error: string | null; }
@@ -156,7 +157,7 @@ export default function CrmPipeline() {
     try {
       const [settings, rows] = await Promise.all([
         supabase.from('crm_outreach_settings').select('mode').maybeSingle(),
-        supabase.from('deal_outreach').select('deal_id, status, error'),
+        selectAll(() => supabase.from('deal_outreach').select('deal_id, status, error'), 'deal_id'),
       ]);
       if (settings.error || rows.error) return; // the database part is not installed yet: the board works as before
       setOutreachMode((settings.data?.mode as OutreachMode) || 'off');
@@ -170,7 +171,7 @@ export default function CrmPipeline() {
     try {
       const [settings, rows] = await Promise.all([
         supabase.from('crm_whatsapp_settings').select('mode').maybeSingle(),
-        supabase.from('deal_whatsapp').select('deal_id, status, error'),
+        selectAll(() => supabase.from('deal_whatsapp').select('deal_id, status, error'), 'deal_id'),
       ]);
       if (settings.error || rows.error) return; // the database part is not installed yet: the board works as before
       setWaMode((settings.data?.mode as WhatsAppMode) || 'off');
@@ -206,7 +207,7 @@ export default function CrmPipeline() {
     try {
       const [settings, rows] = await Promise.all([
         supabase.from('sms_settings').select('mode').maybeSingle(),
-        supabase.from('deal_sms').select('deal_id, status, error'),
+        selectAll(() => supabase.from('deal_sms').select('deal_id, status, error'), 'deal_id'),
       ]);
       if (settings.error || rows.error) return; // the database part is not installed yet: the board works as before
       setSmsMode((settings.data?.mode as SmsMode) || 'off');
@@ -297,10 +298,10 @@ export default function CrmPipeline() {
 
   async function fetchDeals() {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await selectAll(() => supabase
         .from('deals')
         .select('*, contacts(id, name, email, phone), companies(id, name)')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false }));
 
       if (error) throw error;
       setDeals(data || []);

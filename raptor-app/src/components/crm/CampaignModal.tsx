@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import Modal, { fieldLabelStyle, fieldInputStyle, primaryBtnStyle, ghostBtnStyle } from './Modal';
+import { activeCurrencyCode } from '../../lib/currency';
 
 interface CampaignModalProps {
   open: boolean;
@@ -96,7 +97,7 @@ export default function CampaignModal({ open, campaign, onClose, onSaved }: Camp
           placeholder="e.g. Product A"
         />
 
-        <label style={fieldLabelStyle}>Price (USD)</label>
+        <label style={fieldLabelStyle}>Price ({activeCurrencyCode()})</label>
         <input
           style={fieldInputStyle}
           type="number"

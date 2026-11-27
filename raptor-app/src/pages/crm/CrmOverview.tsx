@@ -5,6 +5,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { formatCurrency, relativeTime, TYPE_ICON } from '../../lib/crmHelpers';
 import NewDealModal from '../../components/crm/NewDealModal';
 import { type PipelineStage, loadPipelineStages } from '../../lib/pipelineStages';
+import { selectAll } from '../../lib/selectAll';
 
 export default function CrmOverview() {
   const [deals, setDeals] = useState<any[]>([]);
@@ -33,7 +34,7 @@ export default function CrmOverview() {
   async function fetchAll() {
     try {
       const [dealsRes, contactsRes, interactionsRes, stageRows] = await Promise.all([
-        supabase.from('deals').select('*, contacts(id, name), companies(id, name)').order('created_at', { ascending: false }),
+        selectAll(() => supabase.from('deals').select('*, contacts(id, name), companies(id, name)').order('created_at', { ascending: false })),
         supabase.from('contacts').select('id', { count: 'exact', head: true }),
         supabase.from('interactions').select('*, contacts(id, name)').order('created_at', { ascending: false }).limit(5),
         loadPipelineStages(),

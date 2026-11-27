@@ -1,0 +1,54 @@
+name: CRM automations
+
+# The CRM's automation rules (CRM > Automations) run on the server, and the server has no clock of its own (free hosting), so this
+# knocks once an hour.
+#
+# It stays quiet until you switch it on, in this repository's Settings > Secrets and variables > Actions:
+#   1. Secret   AUTOMATION_CRON_SECRET     the same value as the AUTOMATION_CRON_SECRET variable on Render
+#   2. Variable CRM_AUTOMATIONS = on       turns the hourly run on
+# Before turning it on, press "Run workflow" with "Only count what would happen" ticked: nothing is changed and the log shows how many
+# matches there are. This repository's logs can be read by others, so only counts are printed, never names or deal titles.
+on:
+  schedule:
+    - cron: '47 * * * *' # every hour at :47 (GitHub may start it a few minutes late)
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Only count what would happen (nothing is changed)
+        type: boolean
+        default: true
+
+jobs:
+  run:
+    if: github.event_name == 'workflow_dispatch' || vars.CRM_AUTOMATIONS == 'on'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions: {}
+    steps:
+      - name: Ask the server to check the rules
+        env:
+          AUTOMATION_CRON_SECRET: ${{ secrets.AUTOMATION_CRON_SECRET }}
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+        run: |
+          if [ -z "$AUTOMATION_CRON_SECRET" ]; then
+            echo "The AUTOMATION_CRON_SECRET repository secret is not set, so the server cannot be asked." >&2
+            exit 1
+          fi
+          query=""
+          if [ "$DRY_RUN" = "true" ]; then query="?dry_run=true"; fi
+          # The free server sleeps when idle and takes up to a minute to wake, so wait generously. Only a request that never reached the
+          # server is tried again: repeating one that did could act twice.
+          for attempt in 1 2 3; do
+            code=$(curl -sS -o response.json -w '%{http_code}' --max-time 300 -X POST \
+              -H "X-Automation-Secret: $AUTOMATION_CRON_SECRET" \
+              "https://websites-api-5wmu.onrender.com/api/automations/run$query" || true)
+            echo "attempt $attempt: HTTP $code"
+            if [ "$code" = "200" ]; then
+              jq '{dry_run, rules_checked, rules_with_matches: .rules_fired, matches: .actions_taken, rules_with_errors: (.errors | length)}' response.json
+              test "$(jq '.errors | length' response.json)" = "0"
+              exit
+            fi
+            if [ "$code" != "502" ] && [ "$code" != "503" ]; then exit 1; fi
+            sleep 30
+          done
+          exit 1

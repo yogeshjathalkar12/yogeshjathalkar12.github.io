@@ -11,6 +11,7 @@ import AssigneeSelect from './AssigneeSelect';
 import RecordHistory from './RecordHistory';
 import TasksSection from './TasksSection';
 import PrivacySection from './PrivacySection';
+import { selectAll } from '../../lib/selectAll';
 
 const WHATSAPP_API = toolApiBase('whatsapp');
 
@@ -25,6 +26,15 @@ export default function ContactPanel({ contact, interactions, onClose, onChanged
   const [status, setStatus] = useState(contact?.status || 'cold');
   const [activityType, setActivityType] = useState('note');
   const [content, setContent] = useState('');
+  const [history, setHistory] = useState<{ id: string | null; rows: any[] }>({ id: null, rows: [] });
+  useEffect(() => {
+    const id = contact?.id;
+    if (!id) return undefined;
+    let current = true;
+    selectAll(() => supabase.from('interactions').select('*').eq('contact_id', id).order('created_at', { ascending: false }))
+      .then(({ data }) => { if (current && data) setHistory({ id, rows: data }); });
+    return () => { current = false; };
+  }, [contact?.id, interactions]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -227,7 +237,8 @@ export default function ContactPanel({ contact, interactions, onClose, onChanged
 
   if (!contact) return null;
 
-  const contactActivity = interactions.filter((i) => i.contact_id === contact.id);
+  // `interactions` (the newest activity of everyone) changing is the sign to read this contact's own history again
+  const contactActivity = history.id === contact.id ? history.rows : interactions.filter((i) => i.contact_id === contact.id);
   const waMessages = waEvents.filter((e) => e.event_type === 'sent' || e.event_type === 'received');
 
   async function handleStatusChange(newStatus: string) {

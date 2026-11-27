@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient';
+import { selectAll } from './selectAll';
 
 // Follow-up tasks (db/migrations/2026-10-05_*.sql). A task can be tied to a
 // contact and/or a deal, has an optional due date and an assignee; who can
@@ -37,10 +38,12 @@ function isMissingTable(err: { code?: string; message?: string } | null): boolea
 
 /** Empty (not an error) when the tasks table hasn't been created yet. */
 export async function loadTasks(filter?: { contactId?: string; dealId?: string }): Promise<Task[]> {
-  let q = supabase.from('tasks').select(SELECT).order('due_at', { ascending: true, nullsFirst: false }).order('created_at', { ascending: false });
-  if (filter?.contactId) q = q.eq('contact_id', filter.contactId);
-  if (filter?.dealId) q = q.eq('deal_id', filter.dealId);
-  const { data, error } = await q;
+  const { data, error } = await selectAll(() => {
+    let q = supabase.from('tasks').select(SELECT).order('due_at', { ascending: true, nullsFirst: false }).order('created_at', { ascending: false });
+    if (filter?.contactId) q = q.eq('contact_id', filter.contactId);
+    if (filter?.dealId) q = q.eq('deal_id', filter.dealId);
+    return q;
+  });
   if (error) {
     if (isMissingTable(error)) return [];
     throw error;

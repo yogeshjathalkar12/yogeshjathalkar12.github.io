@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient';
+import { selectAll } from './selectAll';
 
 // Exact-match duplicate detection + merge for contacts and companies.
 // v1 deliberately only groups by an exact normalized match (case/
@@ -14,7 +15,7 @@ export interface DuplicateContact { id: string; name: string; email: string | nu
 export interface DuplicateCompany { id: string; name: string; website_url: string | null; created_at: string; }
 
 export async function findDuplicateContacts(): Promise<DuplicateContact[][]> {
-  const { data, error } = await supabase.from('contacts').select('id, name, email, phone, company_id, created_at');
+  const { data, error } = await selectAll(() => supabase.from('contacts').select('id, name, email, phone, company_id, created_at'));
   if (error) throw error;
   const groups: Record<string, DuplicateContact[]> = {};
   for (const c of (data || []) as DuplicateContact[]) {
@@ -28,7 +29,7 @@ export async function findDuplicateContacts(): Promise<DuplicateContact[][]> {
 }
 
 export async function findDuplicateCompanies(): Promise<DuplicateCompany[][]> {
-  const { data, error } = await supabase.from('companies').select('id, name, website_url, created_at');
+  const { data, error } = await selectAll(() => supabase.from('companies').select('id, name, website_url, created_at'));
   if (error) throw error;
   const groups: Record<string, DuplicateCompany[]> = {};
   for (const c of (data || []) as DuplicateCompany[]) {

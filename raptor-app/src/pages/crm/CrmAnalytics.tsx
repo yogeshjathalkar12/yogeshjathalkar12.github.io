@@ -15,6 +15,9 @@ import {
   Cell,
   CartesianGrid,
 } from 'recharts';
+import { selectAll } from '../../lib/selectAll';
+import { averageDaysToClose, salesVelocity as velocityOf } from '../../lib/salesVelocity';
+import { activeCurrencyCode } from '../../lib/currency';
 
 const COLORS = ['#3b82f6', '#eab308', '#f97316', '#22c55e', '#ef4444'];
 
@@ -63,8 +66,8 @@ export default function CrmAnalytics() {
 
       // Query deals and contacts with graceful fallback on missing tables
       const [dealsRes, contactsRes, stageRows] = await Promise.all([
-        supabase.from('deals').select('*'),
-        supabase.from('contacts').select('*'),
+        selectAll(() => supabase.from('deals').select('*')),
+        selectAll(() => supabase.from('contacts').select('*')),
         loadPipelineStages(),
       ]);
 
@@ -107,12 +110,9 @@ export default function CrmAnalytics() {
   const totalWonValue = wonDeals.reduce((sum, d) => sum + (Number(d?.value) || 0), 0);
   const avgDealSize = wonDeals.length > 0 ? totalWonValue / wonDeals.length : 0;
 
-  const avgDaysToClose = 14;
+  const avgDaysToClose = averageDaysToClose(wonDeals);      // from the won deals' own dates; null when none has both
   const activeDealsCount = safeDeals.filter((d) => d && typeByKey[d.stage] === 'open').length;
-  const salesVelocity =
-    avgDaysToClose > 0
-      ? Math.round((activeDealsCount * avgDealSize * (conversionRate / 100)) / avgDaysToClose)
-      : 0;
+  const salesVelocity = velocityOf(activeDealsCount, avgDealSize, conversionRate, avgDaysToClose);
 
   const stageDataMap: Record<string, { name: string; count: number; value: number }> = Object.fromEntries(
     stages.map((s) => [s.key, { name: s.label, count: 0, value: 0 }])
@@ -141,7 +141,8 @@ export default function CrmAnalytics() {
   const exportSummary = [
     { Metric: 'Conversion Rate', Value: `${conversionRate}%` },
     { Metric: 'Average Deal Size', Value: formatCurrency(avgDealSize) },
-    { Metric: 'Sales Velocity ($/Day)', Value: formatCurrency(salesVelocity) },
+    { Metric: 'Sales Velocity (per day)', Value: salesVelocity === null ? 'Not enough data' : formatCurrency(salesVelocity) },
+    { Metric: 'Average Days to Win', Value: avgDaysToClose === null ? 'Not enough data' : Math.round(avgDaysToClose) },
     { Metric: 'Total Won Revenue', Value: formatCurrency(totalWonValue) },
     { Metric: 'Total Active Deals', Value: activeDealsCount },
     { Metric: 'Total Contacts', Value: safeContacts.length },
@@ -214,10 +215,12 @@ export default function CrmAnalytics() {
             Sales Velocity
           </div>
           <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '2.2rem', color: 'var(--purple)', marginTop: '0.4rem' }}>
-            {formatCurrency(salesVelocity)}/day
+            {salesVelocity === null ? '—' : `${formatCurrency(salesVelocity)}/day`}
           </div>
           <div style={{ fontSize: '0.6rem', color: 'var(--dim2)', marginTop: '0.2rem' }}>
-            Expected daily pipeline output
+            {avgDaysToClose === null
+              ? 'Shows once a won deal has a close date'
+              : `Expected daily pipeline output · deals take ${Math.round(avgDaysToClose)} day${Math.round(avgDaysToClose) === 1 ? '' : 's'} to win`}
           </div>
         </div>
 
@@ -238,7 +241,7 @@ export default function CrmAnalytics() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.4rem' }}>
         <div style={cardStyle}>
           <div style={{ fontSize: '0.7rem', color: 'var(--white)', fontWeight: 'bold', marginBottom: '1rem' }}>
-            Pipeline Value by Stage ($)
+            Pipeline Value by Stage ({activeCurrencyCode()})
           </div>
           <div style={{ width: '100%', height: 260 }}>
             <ChartErrorBoundary>

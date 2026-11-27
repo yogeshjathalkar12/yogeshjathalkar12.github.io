@@ -9,6 +9,8 @@ import OwnerOnly from '../OwnerOnly';
 import AssigneeSelect from './AssigneeSelect';
 import RecordHistory from './RecordHistory';
 import TasksSection from './TasksSection';
+import { selectAll } from '../../lib/selectAll';
+import { activeCurrencyCode } from '../../lib/currency';
 
 interface DealDetailModalProps {
   deal: any | null;
@@ -58,7 +60,7 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
 
   async function fetchContacts() {
     try {
-      const { data, error } = await supabase.from('contacts').select('id, name').order('name', { ascending: true });
+      const { data, error } = await selectAll(() => supabase.from('contacts').select('id, name').order('name', { ascending: true }));
       if (error) throw error;
       setContacts(data || []);
     } catch (error) {
@@ -131,7 +133,7 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
         {deal.companies?.name || '—'} · {deal.contacts?.name || 'No contact yet'}
       </div>
 
-      <label style={fieldLabelStyle}>Value (USD)</label>
+      <label style={fieldLabelStyle}>Value ({activeCurrencyCode()})</label>
       <input style={fieldInputStyle} type="number" min="0" value={value} onChange={(e) => setValue(e.target.value)} />
 
       <label style={fieldLabelStyle}>Stage</label>

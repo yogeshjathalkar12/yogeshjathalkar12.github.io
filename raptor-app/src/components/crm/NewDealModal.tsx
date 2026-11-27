@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabaseClient';
 import Modal, { fieldLabelStyle, fieldInputStyle, primaryBtnStyle, ghostBtnStyle } from './Modal';
 import { findOrCreateCompany, findOrCreateContact } from '../../lib/crmContacts';
 import { type PipelineStage, loadPipelineStages } from '../../lib/pipelineStages';
+import { activeCurrencyCode } from '../../lib/currency';
 
 interface NewDealModalProps {
   open: boolean;
@@ -96,7 +97,7 @@ export default function NewDealModal({ open, onClose, onCreated }: NewDealModalP
         <label style={fieldLabelStyle}>Deal Title</label>
         <input style={fieldInputStyle} value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="e.g. Website revamp" />
 
-        <label style={fieldLabelStyle}>Value (USD)</label>
+        <label style={fieldLabelStyle}>Value ({activeCurrencyCode()})</label>
         <input style={fieldInputStyle} type="number" min="0" value={value} onChange={(e) => setValue(e.target.value)} required placeholder="0" />
 
         <label style={fieldLabelStyle}>Stage</label>

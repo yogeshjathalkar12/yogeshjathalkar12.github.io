@@ -56,6 +56,11 @@ export function setGlobalCurrency(currencyCode: string, locale: string): void {
   _locale = locale;
 }
 
+/** The code of the currency amounts are shown in ("INR"), for the labels of the boxes where amounts are typed. */
+export function activeCurrencyCode(): string {
+  return _currencyCode;
+}
+
 export function formatCurrency(value: number | string | null | undefined): string {
   const n = Number(value) || 0;
   try {

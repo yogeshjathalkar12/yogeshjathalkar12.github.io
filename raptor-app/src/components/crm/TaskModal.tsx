@@ -5,6 +5,7 @@ import { useDirectory } from '../../hooks/useDirectory';
 import { useOrg } from '../../hooks/OrgContext';
 import { shortName } from '../../lib/team';
 import { type Task, createTask, deleteTask, fromLocalInput, toLocalInput, updateTask } from '../../lib/tasks';
+import { selectAll } from '../../lib/selectAll';
 
 interface TaskModalProps {
   open: boolean;
@@ -42,8 +43,8 @@ export default function TaskModal({ open, task, defaults, onClose, onSaved }: Ta
     setDealId(task?.deal_id || defaults?.deal_id || '');
     setError(null);
     Promise.all([
-      supabase.from('contacts').select('id, name').order('name').limit(500),
-      supabase.from('deals').select('id, title').order('title').limit(500),
+      selectAll(() => supabase.from('contacts').select('id, name').order('name')),
+      selectAll(() => supabase.from('deals').select('id, title').order('title')),
     ]).then(([c, d]) => { setContacts(c.data || []); setDeals(d.data || []); });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, task]);

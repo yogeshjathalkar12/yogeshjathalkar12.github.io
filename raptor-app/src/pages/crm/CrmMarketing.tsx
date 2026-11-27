@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import AudienceSegmentModal from '../../components/crm/AudienceSegmentModal';
+import { selectAll } from '../../lib/selectAll';
 
 export default function CrmMarketing() {
   const [segments, setSegments] = useState<any[]>([]);
@@ -23,7 +24,7 @@ export default function CrmMarketing() {
     try {
       const [segRes, conRes] = await Promise.all([
         supabase.from('audience_lists').select('*').order('created_at', { ascending: false }),
-        supabase.from('contacts').select('*'),
+        selectAll(() => supabase.from('contacts').select('*')),
       ]);
 
       if (segRes.error) throw segRes.error;
