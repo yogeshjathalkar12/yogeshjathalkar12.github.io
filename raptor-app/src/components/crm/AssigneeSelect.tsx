@@ -6,7 +6,7 @@ import { shortName } from '../../lib/team';
 import { fieldLabelStyle, fieldInputStyle } from './Modal';
 
 interface AssigneeSelectProps {
-  table: 'contacts' | 'deals';
+  table: 'contacts' | 'deals' | 'companies';
   recordId: string;
   value: string | null;
   onChanged: () => void;

@@ -1,4 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import AssignmentRulesModal from '../../components/crm/AssignmentRulesModal';
+import { toolBtnStyle } from '../../components/crm/Modal';
+import ScoringRulesModal from '../../components/crm/ScoringRulesModal';
+import { type ScoreRule, scoreContact } from '../../lib/scoring';
+import { useColumn } from '../../hooks/useColumn';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { relativeTime } from '../../lib/crmHelpers';
@@ -20,6 +25,8 @@ import { useAuth } from '../../hooks/AuthContext';
 import { shortName } from '../../lib/team';
 import { exportRecords } from '../../lib/tableView';
 import { selectAll } from '../../lib/selectAll';
+import { useOrg } from '../../hooks/OrgContext';
+import BulkBar from '../../components/crm/BulkBar';
 
 const STATUS_COLORS: Record<string, { bg: string; fg: string }> = {
   hot: { bg: 'rgba(239,68,68,0.1)', fg: 'var(--red)' },
@@ -28,6 +35,20 @@ const STATUS_COLORS: Record<string, { bg: string; fg: string }> = {
 };
 
 export default function CrmContacts() {
+  const hasAssignment = useColumn('assignment_rules', 'id');
+  const [showAssignment, setShowAssignment] = useState(false);
+  const hasScoring = useColumn('lead_score_rules', 'id');
+  const [scoreRules, setScoreRules] = useState<ScoreRule[]>([]);
+  const [showScoring, setShowScoring] = useState(false);
+  const loadScoring = useCallback(async () => {
+    const { data, error } = await supabase.from('lead_score_rules').select('*').order('created_at', { ascending: true });
+    if (!error) setScoreRules((data || []) as ScoreRule[]);
+  }, []);
+  useEffect(() => { if (hasScoring) loadScoring(); }, [hasScoring, loadScoring]);
+  const tagColumn = useColumn('contacts', 'tags');
+  const hasJobTitle = useColumn('contacts', 'job_title');
+  const [bulkNote, setBulkNote] = useState('');
+  const { can, isOwner, isAdmin } = useOrg();
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
   const [assigneeFilter, setAssigneeFilter] = useAssigneeFilter('contacts');
@@ -118,6 +139,8 @@ export default function CrmContacts() {
       (c.name || '').toLowerCase().includes(q) ||
       (c.companies?.name || '').toLowerCase().includes(q) ||
       (c.email || '').toLowerCase().includes(q) ||
+      (c.job_title || '').toLowerCase().includes(q) ||
+      (c.tags || []).some((t: string) => t.toLowerCase().includes(q)) ||
       (c.phone || '').toLowerCase().includes(q) ||
       customSearchText(c.custom_fields).some((v) => v.toLowerCase().includes(q))
   );
@@ -144,16 +167,20 @@ export default function CrmContacts() {
       },
       { id: 'assigned', label: 'Assigned', kind: 'text', value: (c) => (c.assignee_id ? shortName(assigneeLabels[c.assignee_id]) : null), defaultVisible: true, dim: true },
       { id: 'active_deals', label: 'Active Deals', kind: 'number', value: (c) => activeDealCount(c.id), defaultVisible: true },
+      ...(hasJobTitle ? [{ id: 'job_title', label: 'Job title', kind: 'text' as const, value: (c: any) => c.job_title, dim: true }] : []),
+      ...(tagColumn ? [{ id: 'tags', label: 'Tags', kind: 'text' as const, value: (c: any) => (c.tags || []).join(', ') }] : []),
       { id: 'email', label: 'Email', kind: 'text', value: (c) => c.email, dim: true },
       { id: 'phone', label: 'Phone', kind: 'text', value: (c) => c.phone, dim: true },
       { id: 'linkedin', label: 'LinkedIn', kind: 'text', value: (c) => c.linkedin_url, dim: true },
-      { id: 'lead_score', label: 'Lead score', kind: 'number', value: (c) => c.lead_score },
+      ...(scoreRules.length
+        ? [{ id: 'score', label: 'Score', kind: 'number' as const, value: (c: any) => scoreContact(c, scoreRules), defaultVisible: true }]
+        : [{ id: 'lead_score', label: 'Lead score', kind: 'number' as const, value: (c: any) => c.lead_score }]),
       { id: 'imported', label: 'Imported from', kind: 'select', value: (c) => (c.import_batch_id ? importLabels[c.import_batch_id] || 'an import' : null), options: importedOptions, dim: true },
       { id: 'created', label: 'Added', kind: 'date', value: (c) => c.created_at, dim: true },
     ];
     return [...built, ...customFieldColumns(defs, (c: any) => c.custom_fields, contacts)];
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [defs, importLabels, contacts, deals, assigneeLabels]);
+  }, [defs, importLabels, contacts, deals, assigneeLabels, hasJobTitle, tagColumn, scoreRules]);
 
   // the rows exactly as the person sees them (search, filters, sort) with every column, also the hidden ones and their own fields
   const exportFile = useMemo(() => exportRecords(viewed.rows, viewed.cols), [viewed]);
@@ -192,6 +219,8 @@ export default function CrmContacts() {
         <AssigneeFilter value={assigneeFilter} onChange={setAssigneeFilter} />
         <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
           <ExportButton data={exportFile.data} columns={exportFile.columns} filename="contacts" label="Export CSV (all columns)" />
+          {hasAssignment && (isOwner || isAdmin) && <button type="button" style={toolBtnStyle} onClick={() => setShowAssignment(true)}>Assignment rules</button>}
+          {hasScoring && can('manage_pipeline') && <button type="button" style={toolBtnStyle} onClick={() => setShowScoring(true)}>Scoring rules</button>}
           <OwnerOnly permission="delete"><button
             onClick={() => setShowDuplicates(true)}
             style={{
@@ -252,6 +281,7 @@ export default function CrmContacts() {
         </div>
       </div>
 
+      {bulkNote && <div role="status" style={{ fontSize: '0.65rem', color: 'var(--green)', marginBottom: 8 }}>{bulkNote}</div>}
       <ViewTable
         columns={columns}
         rows={rows}
@@ -260,8 +290,15 @@ export default function CrmContacts() {
         onRowClick={(c) => setActiveContact(c)}
         emptyText={contacts.length === 0 ? 'No contacts yet.' : 'No contacts match your search.'}
         onView={(shown, _visible, all) => setViewed({ rows: shown, cols: all })}
+        bulk={can('edit') || can('delete') ? (picked, clear) => (
+          <BulkBar table="contacts" ids={picked.map((c) => c.id)} assign byRules={!!hasAssignment && (isOwner || isAdmin)}
+            choices={[{ label: 'Set status', options: [['hot', 'Hot'], ['active', 'Active'], ['cold', 'Cold']], patch: (status) => ({ status }) }]}
+            onDone={(message) => { setBulkNote(message); clear(); fetchAll(); }} />
+        ) : undefined}
       />
 
+      <AssignmentRulesModal open={showAssignment} onClose={() => setShowAssignment(false)} />
+      <ScoringRulesModal open={showScoring} rules={scoreRules} defs={defs} onClose={() => setShowScoring(false)} onChanged={loadScoring} />
       <NewContactModal open={showNewContact} onClose={() => setShowNewContact(false)} onCreated={fetchAll} />
       <ImportWizardModal open={showImport} onClose={() => setShowImport(false)} onImported={fetchAll} />
       <ImportHistoryModal open={showImportHistory} onClose={() => setShowImportHistory(false)} onChanged={fetchAll} />

@@ -7,8 +7,10 @@ import { useDirectory } from '../../hooks/useDirectory';
 import { shortName } from '../../lib/team';
 import { type Task, formatDue, isDueToday, isOverdue, loadTasks, setTaskDone } from '../../lib/tasks';
 import TaskModal from '../../components/crm/TaskModal';
+import CalendarFeedButton from '../../components/crm/CalendarFeedButton';
 import AssigneeFilter, { applyAssigneeFilter, useAssigneeFilter } from '../../components/crm/AssigneeFilter';
 import { selectAll } from '../../lib/selectAll';
+import { TABLE_PAGE } from '../../lib/paging';
 
 type Tab = 'open' | 'today' | 'overdue' | 'done';
 type View = 'list' | 'calendar';
@@ -36,6 +38,8 @@ export default function CrmTasks() {
   const [showNew, setShowNew] = useState(false);
   const [month, setMonth] = useState(() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); });
   const [pickedDay, setPickedDay] = useState<string | null>(null);
+  const [limit, setLimit] = useState(TABLE_PAGE);
+  useEffect(() => { setLimit(TABLE_PAGE); }, [tab, filter]);
 
   const load = useCallback(async () => {
     try {
@@ -113,6 +117,7 @@ export default function CrmTasks() {
           <button style={pill(view === 'list')} onClick={() => setView('list')}>List</button>
           <button style={pill(view === 'calendar')} onClick={() => setView('calendar')}>Calendar</button>
           <AssigneeFilter value={filter} onChange={setFilter} />
+          <CalendarFeedButton />
         </div>
         {can('create') && (
           <button onClick={() => setShowNew(true)} style={{ background: 'var(--grad)', color: '#fff', border: 'none', padding: '0.6rem 1.1rem', borderRadius: 4, cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: '0.65rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
@@ -136,7 +141,7 @@ export default function CrmTasks() {
               <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--dim)', fontSize: '0.75rem' }}>
                 {tasks.length === 0 ? 'No tasks yet. Add a follow-up so nothing slips.' : tab === 'done' ? 'Nothing completed yet.' : 'Nothing here — you’re clear.'}
               </div>
-            ) : shown.map((t) => (
+            ) : shown.slice(0, limit).map((t) => (
               <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: '0.9rem', padding: '0.85rem 1rem', borderBottom: '1px solid var(--border)' }}>
                 <input type="checkbox" checked={!!t.done_at} onChange={() => toggle(t)} disabled={!can('edit')} style={{ cursor: 'pointer' }} />
                 <div style={{ flex: 1, minWidth: 0, cursor: 'pointer' }} onClick={() => setEditing(t)}>
@@ -150,6 +155,11 @@ export default function CrmTasks() {
                 <div style={{ fontSize: '0.62rem', color: isOverdue(t) ? 'var(--red)' : 'var(--dim)', whiteSpace: 'nowrap' }}>{isOverdue(t) ? 'Overdue · ' : ''}{formatDue(t.due_at)}</div>
               </div>
             ))}
+            {shown.length > limit && (
+              <div style={{ padding: '0.8rem', textAlign: 'center' }}>
+                <button style={pill(false)} onClick={() => setLimit(limit + TABLE_PAGE)}>Show more ({shown.length - limit} more)</button>
+              </div>
+            )}
           </div>
         </>
       ) : (
@@ -162,7 +172,7 @@ export default function CrmTasks() {
             <button style={pill(false)} onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1))}>→</button>
             <button style={pill(false)} onClick={() => { const d = new Date(); setMonth(new Date(d.getFullYear(), d.getMonth(), 1)); }}>Today</button>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 1, background: 'var(--border)', border: '1px solid var(--border)', borderRadius: 6, overflow: 'hidden' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, minmax(0, 1fr))', gap: 1, background: 'var(--border)', border: '1px solid var(--border)', borderRadius: 6, overflow: 'hidden' }}>
             {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d) => (
               <div key={d} style={{ background: 'var(--surface2)', padding: '0.5rem', fontSize: '0.55rem', color: 'var(--dim)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{d}</div>
             ))}

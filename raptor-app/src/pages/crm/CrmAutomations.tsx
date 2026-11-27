@@ -1,13 +1,28 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
-import { describeAutomation } from '../../lib/crmHelpers';
+import { describeRule } from '../../lib/automationRules';
 import AutomationModal from '../../components/crm/AutomationModal';
+import { useColumn } from '../../hooks/useColumn';
+import { useDirectory } from '../../hooks/useDirectory';
+import { loadPipelineStages } from '../../lib/pipelineStages';
+import { loadPipelines, stageChoices } from '../../lib/pipelines';
 
 export default function CrmAutomations() {
   const [automations, setAutomations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
+  const [stages, setStages] = useState<[string, string][]>([]);
+  const installed = useColumn('automations', 'trigger_value') === true;
+  const { entries } = useDirectory();
+  const people = entries.map((p) => [p.user_id, p.email] as [string, string]);
+  const names = { stages: Object.fromEntries(stages), people: Object.fromEntries(people) };
+
+  useEffect(() => {
+    Promise.all([loadPipelineStages(), loadPipelines(supabase)])
+      .then(([all, pipelines]) => setStages(stageChoices(all, pipelines)))
+      .catch((error) => console.error('Failed to load pipeline stages:', error));
+  }, []);
 
   useEffect(() => {
     fetchAll();
@@ -89,7 +104,7 @@ export default function CrmAutomations() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
           {automations.map((a) => {
-            const { when, then } = describeAutomation(a);
+            const { when, then } = describeRule(a, names);
             return (
               <div
                 key={a.id}
@@ -149,6 +164,9 @@ export default function CrmAutomations() {
       <AutomationModal
         open={modalOpen}
         automation={editing}
+        installed={installed}
+        stages={stages}
+        people={people}
         onClose={() => setModalOpen(false)}
         onSaved={fetchAll}
       />

@@ -104,7 +104,7 @@ export default function CrmMarketing() {
         </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.4rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '1.4rem' }}>
         {/* Audience Segments Card */}
         <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.2rem' }}>
           <div style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--white)', marginBottom: '1rem' }}>

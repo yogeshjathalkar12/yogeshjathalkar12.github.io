@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import { type ColumnDef, applyView, cycleSort, displayValue, EMPTY_CHOICE, hasFilters, loadPrefs, moveColumn, reconcilePrefs, savePrefs, setFilter, toggleColumn, defaultPrefs } from '../../lib/tableView';
+import { type ColumnDef, applyView, cycleSort, displayValue, EMPTY_CHOICE, hasFilters, savedChoice, moveColumn, reconcilePrefs, savePrefs, setFilter, toggleColumn, defaultPrefs } from '../../lib/tableView';
 import type { ViewPrefs } from '../../lib/tableView';
+import { pageOf } from '../../lib/paging';
 
 export interface UiColumn<R> extends ColumnDef<R> {
   /** How the cell looks; without it the plain value is printed (a dash when empty). */
@@ -20,6 +21,8 @@ interface Props<R> {
   /** Told whenever the rows the person sees change (for Export): the rows as shown, the visible columns, and every column. */
   onView?: (rows: R[], visible: UiColumn<R>[], all: UiColumn<R>[]) => void;
   toolbarExtra?: ReactNode;
+  /** With this, each row gets a tick box; the bar it returns shows while rows are ticked (only rows still shown count). */
+  bulk?: (picked: R[], clear: () => void) => ReactNode;
 }
 
 const small = { fontSize: '0.6rem', color: 'var(--dim)' } as const;
@@ -27,10 +30,11 @@ const barBtn = { background: 'transparent', color: 'var(--dim)', border: '1px so
 const filterBox = { width: '100%', padding: '0.35rem 0.5rem', background: 'var(--surface2)', border: '1px solid var(--border)', color: 'var(--white)', fontFamily: 'var(--mono)', fontSize: '0.65rem', borderRadius: 4 } as const;
 const HINT: Record<string, string> = { text: 'contains…', number: '>=100  or  5..20', date: '>=2026-01-01', select: '' };
 
-export default function ViewTable<R>({ columns, rows, storageKey, rowKey, onRowClick, emptyText, onView, toolbarExtra }: Props<R>) {
+export default function ViewTable<R>({ columns, rows, storageKey, rowKey, onRowClick, emptyText, onView, toolbarExtra, bulk }: Props<R>) {
+  const [ticked, setTicked] = useState<Set<string>>(() => new Set());
   const store = useMemo(() => { try { return window.localStorage; } catch { return null; } }, []);
   // what was chosen on an earlier visit, kept as it was written; what is used is that choice made to fit today's columns (a deleted field vanishes from the view)
-  const [stored, setStored] = useState<Partial<ViewPrefs> | null>(() => loadPrefs(store, storageKey, columns));
+  const [stored, setStored] = useState<Partial<ViewPrefs> | null>(() => savedChoice(store, storageKey));
   const prefs = useMemo(() => reconcilePrefs(stored, columns), [stored, columns]);
   const [menu, setMenu] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -51,6 +55,16 @@ export default function ViewTable<R>({ columns, rows, storageKey, rowKey, onRowC
     onView(shown, visible, columns);
   }, [shown, columns]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // only one page is drawn; a new sort or filter starts again at the first page
+  const [pageNumber, setPageNumber] = useState(0);
+  const arrangement = JSON.stringify([prefs.sort, prefs.filters]);
+  useEffect(() => { setPageNumber(0); }, [arrangement]);
+  const page = pageOf(shown, pageNumber);
+
+  const picked = bulk ? shown.filter((r) => ticked.has(rowKey(r))) : [];
+  const allTicked = page.rows.length > 0 && page.rows.every((r) => ticked.has(rowKey(r)));      // the box at the top is about this page
+  const tick = (key: string) => setTicked((old) => { const next = new Set(old); if (next.has(key)) next.delete(key); else next.add(key); return next; });
+  const tickPage = () => setTicked((old) => { const next = new Set(old); page.rows.forEach((r) => { if (allTicked) next.delete(rowKey(r)); else next.add(rowKey(r)); }); return next; });
   const hidden = columns.filter((c) => !prefs.visible.includes(c.id));
   const filtering = hasFilters(prefs);
 
@@ -92,10 +106,23 @@ export default function ViewTable<R>({ columns, rows, storageKey, rowKey, onRowC
         )}
       </div>
 
+      {bulk && picked.length > 0 && bulk(picked, () => setTicked(new Set()))}
+      {bulk && allTicked && page.pages > 1 && picked.length < shown.length && (
+        <div style={{ ...small, marginBottom: 8 }}>
+          The {page.rows.length} on this page are ticked.{' '}
+          <button type="button" style={{ ...barBtn, padding: '0.2rem 0.6rem' }} onClick={() => setTicked(new Set(shown.map(rowKey)))}>Select all {shown.length}</button>
+        </div>
+      )}
+
       <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 6, overflow: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontFamily: 'var(--mono)', fontSize: '0.75rem' }}>
           <thead>
             <tr style={{ background: 'var(--surface2)', color: 'var(--dim)', borderBottom: '1px solid var(--border)' }}>
+              {bulk && (
+                <th style={{ padding: '0.9rem 0 0.9rem 1rem', width: 28 }}>
+                  <input type="checkbox" aria-label="Select all shown" checked={allTicked} onChange={tickPage} />
+                </th>
+              )}
               {visible.map((c) => (
                 <th key={c.id} onClick={() => change(cycleSort(prefs, c.id))} title="Click to sort" style={{ padding: '0.9rem 1rem', cursor: 'pointer', whiteSpace: 'nowrap', userSelect: 'none' }}>
                   {c.label}{prefs.sort?.id === c.id ? (prefs.sort.dir === 'asc' ? ' ▲' : ' ▼') : ''}
@@ -104,6 +131,7 @@ export default function ViewTable<R>({ columns, rows, storageKey, rowKey, onRowC
             </tr>
             {(filtersOpen || filtering) && (
               <tr style={{ background: 'var(--surface2)', borderBottom: '1px solid var(--border)' }}>
+                {bulk && <th />}
                 {visible.map((c) => (
                   <th key={c.id} style={{ padding: '0.4rem 0.6rem', fontWeight: 'normal' }}>
                     {c.kind === 'select' ? (
@@ -122,9 +150,14 @@ export default function ViewTable<R>({ columns, rows, storageKey, rowKey, onRowC
           </thead>
           <tbody>
             {shown.length === 0 ? (
-              <tr><td colSpan={Math.max(visible.length, 1)} style={{ padding: '2rem', textAlign: 'center', color: 'var(--dim)' }}>{rows.length === 0 ? emptyText : 'Nothing matches the filters.'}</td></tr>
-            ) : shown.map((row) => (
+              <tr><td colSpan={Math.max(visible.length, 1) + (bulk ? 1 : 0)} style={{ padding: '2rem', textAlign: 'center', color: 'var(--dim)' }}>{rows.length === 0 ? emptyText : 'Nothing matches the filters.'}</td></tr>
+            ) : page.rows.map((row) => (
               <tr key={rowKey(row)} onClick={() => onRowClick(row)} style={{ borderBottom: '1px solid var(--border)', cursor: 'pointer' }}>
+                {bulk && (
+                  <td style={{ padding: '1rem 0 1rem 1rem' }} onClick={(e) => e.stopPropagation()}>
+                    <input type="checkbox" aria-label="Select this row" checked={ticked.has(rowKey(row))} onChange={() => tick(rowKey(row))} />
+                  </td>
+                )}
                 {visible.map((c) => (
                   <td key={c.id} style={{ padding: '1rem', fontWeight: c.bold ? 'bold' : undefined, color: c.dim ? 'var(--dim)' : undefined, maxWidth: 320, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {c.render ? c.render(row) : displayValue(c.kind, c.value(row))}
@@ -135,6 +168,14 @@ export default function ViewTable<R>({ columns, rows, storageKey, rowKey, onRowC
           </tbody>
         </table>
       </div>
+      {page.pages > 1 && (
+        <nav aria-label="Pages" style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', justifyContent: 'flex-end', marginTop: '0.7rem', flexWrap: 'wrap' }}>
+          <span style={small}>{page.from}–{page.to} of {shown.length}</span>
+          <button type="button" style={barBtn} disabled={page.page === 0} onClick={() => setPageNumber(page.page - 1)}>Previous</button>
+          <span style={small}>Page {page.page + 1} of {page.pages}</span>
+          <button type="button" style={barBtn} disabled={page.page === page.pages - 1} onClick={() => setPageNumber(page.page + 1)}>Next</button>
+        </nav>
+      )}
     </div>
   );
 }

@@ -4,14 +4,21 @@ import Modal, { fieldLabelStyle, fieldInputStyle, primaryBtnStyle, ghostBtnStyle
 import { findOrCreateCompany, findOrCreateContact } from '../../lib/crmContacts';
 import { type PipelineStage, loadPipelineStages } from '../../lib/pipelineStages';
 import { activeCurrencyCode } from '../../lib/currency';
+import ForecastFields from './ForecastFields';
+import { useColumn } from '../../hooks/useColumn';
+import { forecastValues, stageProbability } from '../../lib/forecast';
+import StageOptions from './StageOptions';
+import { MAIN, pipelineOf, stagesOf } from '../../lib/pipelines';
 
 interface NewDealModalProps {
+  /** start in this pipeline's first stage; empty = the main one */
+  pipelineId?: string;
   open: boolean;
   onClose: () => void;
   onCreated: () => void;
 }
 
-export default function NewDealModal({ open, onClose, onCreated }: NewDealModalProps) {
+export default function NewDealModal({ open, onClose, onCreated, pipelineId }: NewDealModalProps) {
   const [title, setTitle] = useState('');
   const [value, setValue] = useState('');
   const [stage, setStage] = useState('');
@@ -20,6 +27,9 @@ export default function NewDealModal({ open, onClose, onCreated }: NewDealModalP
   const [contactName, setContactName] = useState('');
   const [contactEmail, setContactEmail] = useState('');
   const [campaignId, setCampaignId] = useState('');
+  const [closeDate, setCloseDate] = useState('');
+  const [probability, setProbability] = useState('');
+  const forecast = useColumn('deals', 'expected_close');
   const [campaigns, setCampaigns] = useState<any[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +39,8 @@ export default function NewDealModal({ open, onClose, onCreated }: NewDealModalP
       fetchCampaigns();
       loadPipelineStages().then((rows) => {
         setStages(rows);
-        setStage((prev) => prev || rows[0]?.key || '');
+        const first = (stagesOf(rows, pipelineId || MAIN)[0] || rows[0])?.key || '';
+        setStage((prev) => (prev && rows.some((r) => r.key === prev && pipelineOf(r) === (pipelineId || MAIN)) ? prev : first));
       }).catch((err) => console.error('Failed to load pipeline stages:', err));
     }
   }, [open]);
@@ -46,7 +57,7 @@ export default function NewDealModal({ open, onClose, onCreated }: NewDealModalP
 
   function reset() {
     setTitle(''); setValue(''); setStage(stages[0]?.key || '');
-    setCompanyName(''); setContactName(''); setContactEmail(''); setCampaignId('');
+    setCompanyName(''); setContactName(''); setContactEmail(''); setCampaignId(''); setCloseDate(''); setProbability('');
     setError(null);
   }
 
@@ -77,6 +88,7 @@ export default function NewDealModal({ open, onClose, onCreated }: NewDealModalP
         company_id: companyId,
         contact_id: contactId,
         campaign_id: campaignId || null,
+        ...(forecast ? forecastValues(closeDate, probability) : {}),
       });
       if (dealErr) throw dealErr;
 
@@ -102,10 +114,11 @@ export default function NewDealModal({ open, onClose, onCreated }: NewDealModalP
 
         <label style={fieldLabelStyle}>Stage</label>
         <select style={fieldInputStyle} value={stage} onChange={(e) => setStage(e.target.value)}>
-          {stages.map((s) => (
-            <option key={s.id} value={s.key}>{s.label}</option>
-          ))}
+          <StageOptions stages={stages} />
         </select>
+
+        {forecast && <ForecastFields closeDate={closeDate} probability={probability} stageChance={stageProbability(stages.find((s) => s.key === stage), stages)} onCloseDate={setCloseDate} onProbability={setProbability} />}
+
 
         <label style={fieldLabelStyle}>Campaign</label>
         <select style={fieldInputStyle} value={campaignId} onChange={(e) => setCampaignId(e.target.value)}>

@@ -16,6 +16,10 @@ export interface PipelineStage {
   type: StageType;
   sort_order: number;
   created_at: string;
+  /** chance of closing for deals in this stage; empty = worked out from its place (lib/forecast.ts) */
+  probability?: number | null;
+  /** the pipeline it belongs to; empty = the main one (lib/pipelines.ts) */
+  pipeline_id?: string | null;
 }
 
 export const DEFAULT_STAGES: Array<Pick<PipelineStage, 'key' | 'label' | 'type' | 'sort_order'>> = [
@@ -32,7 +36,8 @@ export const DEFAULT_STAGES: Array<Pick<PipelineStage, 'key' | 'label' | 'type' 
 export const RESERVED_KEYS = new Set(['lead', 'meeting', 'won', 'lost']);
 
 function sortStages(rows: PipelineStage[]): PipelineStage[] {
-  return [...rows].sort((a, b) => a.sort_order - b.sort_order);
+  // the main pipeline's stages come first, then each other pipeline's, each in its own order
+  return [...rows].sort((a, b) => (a.pipeline_id || '').localeCompare(b.pipeline_id || '') || a.sort_order - b.sort_order);
 }
 
 export async function loadPipelineStages(): Promise<PipelineStage[]> {
@@ -55,6 +60,11 @@ export async function loadPipelineStages(): Promise<PipelineStage[]> {
   return sortStages((reloaded || []) as PipelineStage[]);
 }
 
+export async function setStageProbability(stage: PipelineStage, probability: number | null): Promise<void> {
+  const { error } = await supabase.from('pipeline_stages').update({ probability }).eq('id', stage.id);
+  if (error) throw error;
+}
+
 export function stageByKey(stages: PipelineStage[], key: string): PipelineStage | null {
   return stages.find((s) => s.key === key) || null;
 }
@@ -67,7 +77,7 @@ export function wonStageKeys(stages: PipelineStage[]): string[] {
   return stages.filter((s) => s.type === 'won').map((s) => s.key);
 }
 
-export async function createStage(label: string, type: StageType): Promise<void> {
+export async function createStage(label: string, type: StageType, pipelineId?: string): Promise<void> {
   const key =
     typeof crypto !== 'undefined' && crypto.randomUUID
       ? crypto.randomUUID()
@@ -81,7 +91,7 @@ export async function createStage(label: string, type: StageType): Promise<void>
   const nextOrder = (data && data[0] ? data[0].sort_order : -1) + 1;
   const { error: insertError } = await supabase
     .from('pipeline_stages')
-    .insert({ key, label: label.trim(), type, sort_order: nextOrder });
+    .insert({ key, label: label.trim(), type, sort_order: nextOrder, ...(pipelineId ? { pipeline_id: pipelineId } : {}) });
   if (insertError) throw insertError;
 }
 

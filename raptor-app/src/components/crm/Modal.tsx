@@ -29,6 +29,7 @@ export default function Modal({ open, onClose, title, children, width = 440 }: M
       }}
     >
       <div
+        className="crm-modal-box"
         style={{
           background: 'var(--surface)',
           border: '1px solid var(--border)',
@@ -125,3 +126,7 @@ export const ghostBtnStyle: React.CSSProperties = {
   borderRadius: '4px',
   flex: 1,
 };
+
+// the same buttons at their natural size, for toolbars and rows (the two above stretch to share a dialog's bottom bar)
+export const toolBtnStyle: React.CSSProperties = { ...ghostBtnStyle, flex: 'none', padding: '0.45rem 0.75rem', textDecoration: 'none', whiteSpace: 'nowrap' };
+export const toolPrimaryStyle: React.CSSProperties = { ...primaryBtnStyle, flex: 'none', padding: '0.55rem 1rem', whiteSpace: 'nowrap' };

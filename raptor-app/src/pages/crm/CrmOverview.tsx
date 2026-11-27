@@ -99,7 +99,7 @@ export default function CrmOverview() {
         </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.4rem', marginBottom: '2rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '1.4rem', marginBottom: '2rem' }}>
         <div style={kpiCardStyle}>
           <div style={kpiLabelStyle}>Pipeline Value</div>
           <div style={{ ...kpiValueStyle, background: 'var(--grad)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>

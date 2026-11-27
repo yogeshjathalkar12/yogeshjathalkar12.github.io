@@ -12,6 +12,9 @@ import RecordHistory from './RecordHistory';
 import TasksSection from './TasksSection';
 import PrivacySection from './PrivacySection';
 import { selectAll } from '../../lib/selectAll';
+import { moveToBin } from '../../lib/bulk';
+import { useColumn } from '../../hooks/useColumn';
+import TagsEditor from './TagsEditor';
 
 const WHATSAPP_API = toolApiBase('whatsapp');
 
@@ -26,6 +29,7 @@ export default function ContactPanel({ contact, interactions, onClose, onChanged
   const [status, setStatus] = useState(contact?.status || 'cold');
   const [activityType, setActivityType] = useState('note');
   const [content, setContent] = useState('');
+  const hasBin = useColumn('contacts', 'deleted_at');
   const [history, setHistory] = useState<{ id: string | null; rows: any[] }>({ id: null, rows: [] });
   useEffect(() => {
     const id = contact?.id;
@@ -43,6 +47,8 @@ export default function ContactPanel({ contact, interactions, onClose, onChanged
   // weren't added, like mail or a number" was the explicit ask. ---
   const [editing, setEditing] = useState(false);
   const [editName, setEditName] = useState('');
+  const [editJobTitle, setEditJobTitle] = useState('');
+  const hasJobTitle = useColumn('contacts', 'job_title');
   const [editEmail, setEditEmail] = useState('');
   const [editPhone, setEditPhone] = useState('');
   const [editCompanyName, setEditCompanyName] = useState('');
@@ -74,6 +80,7 @@ export default function ContactPanel({ contact, interactions, onClose, onChanged
 
   function startEditing() {
     setEditName(contact?.name || '');
+    setEditJobTitle(contact.job_title || '');
     setEditEmail(contact?.email || '');
     setEditPhone(contact?.phone || '');
     setEditCompanyName(contact?.companies?.name || '');
@@ -82,8 +89,9 @@ export default function ContactPanel({ contact, interactions, onClose, onChanged
   }
 
   async function handleDelete() {
-    if (!confirm(`Delete ${contact.name}? This cannot be undone.`)) return;
+    if (!confirm(hasBin ? `Delete ${contact.name}? It stays in the recycle bin for 30 days.` : `Delete ${contact.name}? This cannot be undone.`)) return;
     try {
+      if (await moveToBin(supabase, 'contacts', [contact.id])) { onChanged(); onClose(); return; }
       // THE FIX (2026-10-01): deleting a contact used to surface a raw
       // Postgres foreign-key-violation error (e.g. "...violates foreign
       // key constraint calls_contact_id_fkey on table calls") the moment
@@ -134,6 +142,7 @@ export default function ContactPanel({ contact, interactions, onClose, onChanged
           email: editEmail.trim() || null,
           phone: editPhone.trim() || null,
           company_id: companyId,
+          ...(hasJobTitle ? { job_title: editJobTitle.trim() || null } : {}),
         })
         .eq('id', contact.id);
       if (updateErr) throw updateErr;
@@ -291,6 +300,18 @@ export default function ContactPanel({ contact, interactions, onClose, onChanged
           <label style={fieldLabelStyle}>Phone</label>
           <input style={fieldInputStyle} value={editPhone} onChange={(e) => setEditPhone(e.target.value)} placeholder="+1 555 000 0000" />
 
+          {hasJobTitle && (
+
+            <>
+
+              <label style={fieldLabelStyle}>Job title</label>
+
+              <input style={fieldInputStyle} value={editJobTitle} maxLength={160} onChange={(e) => setEditJobTitle(e.target.value)} />
+
+            </>
+
+          )}
+
           <label style={fieldLabelStyle}>Company</label>
           <input style={fieldInputStyle} value={editCompanyName} onChange={(e) => setEditCompanyName(e.target.value)} placeholder="e.g. Acme Corp" />
 
@@ -323,7 +344,7 @@ export default function ContactPanel({ contact, interactions, onClose, onChanged
             </div>
             <div style={{ flex: 1 }}>
               <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.3rem' }}>{contact.name}</div>
-              <div style={{ fontSize: '0.65rem', color: 'var(--dim)' }}>{contact.companies?.name || 'No company on file'}</div>
+              <div style={{ fontSize: '0.65rem', color: 'var(--dim)' }}>{contact.job_title ? `${contact.job_title} · ` : ''}{contact.companies?.name || 'No company on file'}</div>
             </div>
             <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
               <OwnerOnly permission="edit"><button
@@ -389,6 +410,7 @@ export default function ContactPanel({ contact, interactions, onClose, onChanged
       </select>
 
       <AssigneeSelect table="contacts" recordId={contact.id} value={contact.assignee_id ?? null} onChanged={onChanged} />
+      <TagsEditor table="contacts" recordId={contact.id} tags={contact.tags} onChanged={onChanged} />
       <CustomFieldsSection entityType="contact" entity={contact} onChanged={onChanged} />
       <TasksSection contactId={contact.id} />
 

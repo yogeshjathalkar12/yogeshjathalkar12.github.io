@@ -209,6 +209,15 @@ export function loadPrefs<R>(store: KeyValueStore | null | undefined, key: strin
   } catch { return defaultPrefs(columns); }
 }
 
+/** The choice as it was saved, or null when the person never changed anything: the standard columns then follow the columns there are,
+ *  including ones that appear a moment after the table does. */
+export function savedChoice(store: KeyValueStore | null | undefined, key: string): Partial<ViewPrefs> | null {
+  try {
+    const raw = store?.getItem(PREFIX + key);
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+
 export function savePrefs(store: KeyValueStore | null | undefined, key: string, prefs: ViewPrefs): void {
   try { store?.setItem(PREFIX + key, JSON.stringify(prefs)); } catch { /* storage unavailable: the choice just is not remembered */ }
 }

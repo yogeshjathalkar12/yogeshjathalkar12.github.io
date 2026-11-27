@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import { useColumn } from '../../hooks/useColumn';
 import Modal, { fieldLabelStyle, fieldInputStyle, primaryBtnStyle, ghostBtnStyle } from './Modal';
+import { supabase } from '../../lib/supabaseClient';
 import { findOrCreateCompany, findOrCreateContact } from '../../lib/crmContacts';
 
 const STATUS_OPTIONS = ['cold', 'active', 'hot'];
@@ -15,13 +17,15 @@ export default function NewContactModal({ open, onClose, onCreated }: NewContact
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [companyName, setCompanyName] = useState('');
+  const [jobTitle, setJobTitle] = useState('');
+  const hasJobTitle = useColumn('contacts', 'job_title');
   const [status, setStatus] = useState('cold');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [matchedExisting, setMatchedExisting] = useState<any | null>(null);
 
   function reset() {
-    setName(''); setEmail(''); setPhone(''); setCompanyName(''); setStatus('cold');
+    setName(''); setEmail(''); setPhone(''); setCompanyName(''); setJobTitle(''); setStatus('cold');
     setError(null); setMatchedExisting(null);
   }
 
@@ -37,6 +41,11 @@ export default function NewContactModal({ open, onClose, onCreated }: NewContact
     try {
       const companyId = await findOrCreateCompany(companyName);
       const { contact, created } = await findOrCreateContact({ name, email, phone, companyId, status });
+      // a new contact takes the title typed; one already on file only gets it if it had none
+      if (hasJobTitle && jobTitle.trim() && (created || !contact.job_title)) {
+        const { error: titleErr } = await supabase.from('contacts').update({ job_title: jobTitle.trim() }).eq('id', contact.id);
+        if (titleErr) throw titleErr;
+      }
 
       onCreated();
 
@@ -76,6 +85,18 @@ export default function NewContactModal({ open, onClose, onCreated }: NewContact
 
           <label style={fieldLabelStyle}>Phone</label>
           <input style={fieldInputStyle} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+1 555 000 0000" />
+
+          {hasJobTitle && (
+
+            <>
+
+              <label style={fieldLabelStyle}>Job title</label>
+
+              <input style={fieldInputStyle} value={jobTitle} maxLength={160} onChange={(e) => setJobTitle(e.target.value)} placeholder="e.g. Head of Purchasing" />
+
+            </>
+
+          )}
 
           <label style={fieldLabelStyle}>Company</label>
           <input style={fieldInputStyle} value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="e.g. Acme Corp" />

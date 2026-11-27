@@ -2,22 +2,28 @@ import { NavLink, Outlet } from 'react-router-dom';
 
 export default function CrmLayout() {
   return (
-    <div style={{ padding: '2rem', height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <div className="crm-shell">
       {/* CRM Sub-Navigation Tabs */}
-      <nav style={{ display: 'flex', gap: '2rem', borderBottom: '1px solid var(--border)', marginBottom: '2rem' }}>
+      <nav className="crm-tabs">
         {[
           { name: 'Overview', path: '/crm/overview' },
+          { name: 'Dashboard', path: '/crm/dashboard' },
           { name: 'Pipeline', path: '/crm/pipeline' },
+          { name: 'Forecast', path: '/crm/forecast' },
           { name: 'Contacts', path: '/crm/contacts' },
           { name: 'Companies', path: '/crm/companies' },
           { name: 'Tasks', path: '/crm/tasks' },
           { name: 'Activity', path: '/crm/activity' },
           { name: 'Automations', path: '/crm/automations' },
+          { name: 'Web forms', path: '/crm/forms' },
+          { name: 'Booking', path: '/crm/booking' },
           { name: 'Campaigns', path: '/crm/campaigns' },
           { name: 'Tickets', path: '/crm/tickets' },
           { name: 'Analytics', path: '/crm/analytics' },
           { name: 'Reports', path: '/crm/reports' },
           { name: 'Marketing', path: '/crm/marketing' },
+          { name: 'API', path: '/crm/api' },
+          { name: 'Recycle bin', path: '/crm/trash' },
           { name: 'Guide', path: '/crm/guide' },
         ].map((tab) => (
           <NavLink
@@ -41,7 +47,7 @@ export default function CrmLayout() {
       </nav>
 
       {/* The specific CRM page (Pipeline, Contacts, etc.) renders here */}
-      <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <div className="crm-outlet">
         <Outlet />
       </div>
     </div>

@@ -1,3 +1,6 @@
+import AssigneeSelect from '../../components/crm/AssigneeSelect';
+import { useMemberLabels } from '../../hooks/useDirectory';
+import { shortName } from '../../lib/team';
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
@@ -19,7 +22,13 @@ import OwnerOnly from '../../components/OwnerOnly';
 import ExportButton from '../../components/crm/ExportButton';
 import { exportRecords } from '../../lib/tableView';
 import RecordHistory from '../../components/crm/RecordHistory';
+import ActivityTimeline from '../../components/crm/ActivityTimeline';
 import { selectAll } from '../../lib/selectAll';
+import { moveToBin } from '../../lib/bulk';
+import { useColumn } from '../../hooks/useColumn';
+import BulkBar from '../../components/crm/BulkBar';
+import { useOrg } from '../../hooks/OrgContext';
+import TagsEditor from '../../components/crm/TagsEditor';
 
 // Real CRM companies (Supabase `companies` table) - this app never had a
 // dedicated page for them before (they only ever showed up as a name-join
@@ -27,6 +36,10 @@ import { selectAll } from '../../lib/selectAll';
 // adapted to this app's table+modal convention (see CrmContacts.tsx)
 // instead of desktop's inline two-column grid.
 export default function CrmCompanies() {
+  const tagColumn = useColumn('companies', 'tags');
+  const ownerColumn = useColumn('companies', 'assignee_id');
+  const { can } = useOrg();
+  const [bulkNote, setBulkNote] = useState('');
   const [searchParams, setSearchParams] = useSearchParams();
   const [companies, setCompanies] = useState<any[]>([]);
   const [contactsByCompany, setContactsByCompany] = useState<Record<string, any[]>>({});
@@ -102,6 +115,8 @@ export default function CrmCompanies() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [companies]);
 
+  const ownerNames = useMemberLabels(companies.map((c) => c.assignee_id));
+
   const columns: UiColumn<any>[] = useMemo(() => {
     const importedOptions = [...new Set(Object.values(importLabels))];
     const built: UiColumn<any>[] = [
@@ -109,6 +124,8 @@ export default function CrmCompanies() {
       { id: 'website', label: 'Website', kind: 'text', value: (c) => (c.website_url ? c.website_url.replace(/^https?:\/\//, '') : null), exportValue: (c) => c.website_url, defaultVisible: true, dim: true },
       { id: 'contacts', label: 'Contacts', kind: 'number', value: (c) => (contactsByCompany[c.id] || []).length, defaultVisible: true },
       { id: 'deals', label: 'Deals', kind: 'number', value: (c) => (dealsByCompany[c.id] || []).length, defaultVisible: true },
+      ...(ownerColumn ? [{ id: 'owner', label: 'Owner', kind: 'text' as const, value: (c: any) => (c.assignee_id ? shortName(ownerNames[c.assignee_id]) : ''), dim: true }] : []),
+      ...(tagColumn ? [{ id: 'tags', label: 'Tags', kind: 'text' as const, value: (c: any) => (c.tags || []).join(', ') }] : []),
       { id: 'phone', label: 'Phone', kind: 'text', value: (c) => c.phone, dim: true },
       { id: 'email', label: 'Email', kind: 'text', value: (c) => c.email, dim: true },
       { id: 'city', label: 'City / region', kind: 'text', value: (c) => c.city, dim: true },
@@ -119,7 +136,7 @@ export default function CrmCompanies() {
       { id: 'created', label: 'Added', kind: 'date', value: (c) => c.created_at, dim: true },
     ];
     return [...built, ...customFieldColumns(defs, (c: any) => c.custom_fields, companies)];
-  }, [defs, importLabels, contactsByCompany, dealsByCompany, companies]);
+  }, [defs, importLabels, contactsByCompany, dealsByCompany, companies, ownerColumn, ownerNames, tagColumn]);
 
   // the rows exactly as the person sees them (search, filters, sort) with every column, also the hidden ones and their own fields
   const exportFile = useMemo(() => exportRecords(viewed.rows, viewed.cols), [viewed]);
@@ -175,6 +192,7 @@ export default function CrmCompanies() {
         </div>
       </div>
 
+      {bulkNote && <div role="status" style={{ fontSize: '0.65rem', color: 'var(--green)', marginBottom: 8 }}>{bulkNote}</div>}
       <ViewTable
         columns={columns}
         rows={filtered}
@@ -183,6 +201,9 @@ export default function CrmCompanies() {
         onRowClick={(c) => setActiveCompany(c)}
         emptyText={companies.length === 0 ? 'No companies yet.' : 'No companies match your search.'}
         onView={(shown, _visible, all) => setViewed({ rows: shown, cols: all })}
+        bulk={can('edit') || can('delete') ? (picked, clear) => (
+          <BulkBar table="companies" ids={picked.map((c) => c.id)} assign={!!ownerColumn} onDone={(message) => { setBulkNote(message); clear(); fetchAll(); }} />
+        ) : undefined}
       />
 
       <NewCompanyModal open={showNew} onClose={() => setShowNew(false)} onCreated={fetchAll} />
@@ -266,6 +287,8 @@ function CompanyDetailModal({ company, contacts, deals, importLabel, onClose, on
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState<CompanyForm>(blankCompanyForm());
   const [saving, setSaving] = useState(false);
+  const hasBin = useColumn('companies', 'deleted_at');
+  const hasOwner = useColumn('companies', 'assignee_id');
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -297,10 +320,11 @@ function CompanyDetailModal({ company, contacts, deals, importLabel, onClose, on
     const msg = linked > 0
       ? `${company.name} has ${linked} linked contact(s)/deal(s). Delete anyway? They'll keep existing but lose their company link.`
       : `Delete ${company.name}?`;
-    if (!confirm(msg)) return;
+    if (!confirm(hasBin ? `Delete ${company.name}? It stays in the recycle bin for 30 days; its contacts and deals stay.` : msg)) return;
     setSaving(true);
     setError(null);
     try {
+      if (await moveToBin(supabase, 'companies', [company.id])) { onChanged(); onClose(); return; }
       const { error: deleteErr } = await supabase.from('companies').delete().eq('id', company.id);
       if (deleteErr) throw deleteErr;
       onChanged();
@@ -336,6 +360,10 @@ function CompanyDetailModal({ company, contacts, deals, importLabel, onClose, on
             </div>
           ))}
 
+          {hasOwner && <AssigneeSelect table="companies" recordId={company.id} value={company.assignee_id ?? null} onChanged={onChanged} />}
+
+          <TagsEditor table="companies" recordId={company.id} tags={company.tags} onChanged={onChanged} />
+
           <CustomFieldsSection entityType="company" entity={company} onChanged={onChanged} />
 
           <div style={{ fontSize: '0.55rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--dim)', margin: '1rem 0 0.5rem' }}>Contacts ({contacts.length})</div>
@@ -353,6 +381,8 @@ function CompanyDetailModal({ company, contacts, deals, importLabel, onClose, on
               <span>{d.title}</span><span style={{ color: 'var(--purple)' }}>{formatCurrency(d.value)}</span>
             </div>
           ))}
+
+          <ActivityTimeline companyId={company.id} />
 
           <RecordHistory table="companies" recordId={company.id} refreshKey={[company.name, company.website_url, company.phone, company.email, company.address, company.city, company.industry, company.description].join('|')} />
 

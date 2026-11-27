@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/AuthContext';
 import { useCredits } from '../hooks/CreditsContext';
 import { useTheme } from '../hooks/ThemeContext';
@@ -9,6 +9,7 @@ import { PaymentModal } from './PaymentModal';
 import GlobalSearch from '../components/GlobalSearch';
 import { WhatsAppDispatcher } from '../components/crm/WhatsAppDispatcher';
 import { SmsDispatcher } from '../components/crm/SmsDispatcher';
+import TaskReminders from '../components/crm/TaskReminders';
 import { SECTION_NAME } from '../pages/connections/hub/channels';
 import { isPaid } from '../lib/plans';
 
@@ -36,6 +37,8 @@ function UserAvatar({ photoUrl, letter, size }: { photoUrl: string | null; lette
   );
 }
 
+const isPhone = () => typeof window !== 'undefined' && !!window.matchMedia?.('(max-width: 700px)').matches;
+
 export function DashboardLayout() {
   const { user, signOut } = useAuth();
   const { credits, totalCredits, plan, planLoaded } = useCredits();
@@ -45,13 +48,17 @@ export function DashboardLayout() {
   // Same behaviour as the desktop app: hide the sidebar, bring it back with the
   // "Menu" tab, and remember the choice.
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    if (isPhone()) return true;                 // on a phone the menu lies over the page, so it starts closed
     try {
       return localStorage.getItem('raptor_sidebar_collapsed') === 'true';
     } catch {
       return false;
     }
   });
+  const { pathname } = useLocation();
+  useEffect(() => { if (isPhone()) setSidebarCollapsed(true); }, [pathname]);
   useEffect(() => {
+    if (isPhone()) return;                      // opening and closing on a phone does not change what the computer remembers
     try {
       localStorage.setItem('raptor_sidebar_collapsed', String(sidebarCollapsed));
     } catch {
@@ -256,6 +263,7 @@ export function DashboardLayout() {
         <main className="dash-main">
           <WhatsAppDispatcher />
           <SmsDispatcher />
+          <TaskReminders />
           <Outlet />
         </main>
       </div>

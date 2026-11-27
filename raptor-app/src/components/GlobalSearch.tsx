@@ -41,7 +41,7 @@ export default function GlobalSearch() {
   const hasResults = results && (results.contacts.length || results.companies.length || results.deals.length || results.calls.length);
 
   return (
-    <div ref={boxRef} style={{ position: 'relative', width: 200 }}>
+    <div ref={boxRef} className="global-search">
       <input
         placeholder="Search CRM…"
         value={query}

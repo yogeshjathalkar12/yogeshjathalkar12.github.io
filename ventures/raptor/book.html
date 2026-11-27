@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<title>Book a meeting</title>
+<style>
+  :root { --ink:#18181b; --soft:#52525b; --line:#d4d4d8; --paper:#ffffff; --accent:#742469; --bad:#b91c1c; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color:var(--ink); background:#f4f4f5; }
+  body.embed { background:transparent; }
+  main { max-width:480px; margin:32px auto; background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:24px; }
+  body.embed main { margin:0 auto; border:0; padding:8px; }
+  h1 { font-size:20px; margin:0 0 6px; }
+  p { margin:0 0 16px; color:var(--soft); white-space:pre-line; }
+  label { display:block; font-size:13px; font-weight:600; margin:0 0 4px; }
+  input, textarea { width:100%; font:inherit; color:inherit; background:#fff; border:1px solid var(--line); border-radius:6px; padding:9px 11px; margin:0 0 14px; }
+  textarea { min-height:110px; resize:vertical; }
+  button { width:100%; font:inherit; font-weight:600; color:#fff; background:var(--accent); border:0; border-radius:6px; padding:11px; cursor:pointer; }
+  button:disabled { opacity:.6; cursor:default; }
+  .bad { color:var(--bad); margin:0 0 12px; }
+  .away { position:absolute; left:-10000px; width:1px; height:1px; overflow:hidden; }
+  .by { text-align:center; font-size:11px; color:#a1a1aa; margin:14px 0 0; }
+  .by a { color:inherit; }
+  .days, .times { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 16px; }
+  .days button, .times button { width:auto; color:var(--ink); background:#fff; border:1px solid var(--line); padding:8px 12px; font-weight:500; }
+  .days button[aria-pressed="true"], .times button[aria-pressed="true"] { color:#fff; background:var(--accent); border-color:var(--accent); }
+  button.plain { color:var(--accent); background:#fff; border:1px solid var(--accent); }
+  .row { display:grid; gap:8px; }
+  .note { font-size:13px; margin:0 0 14px; }
+  h2 { font-size:14px; margin:0 0 8px; }
+</style>
+</head>
+<body>
+<main id="card"><p id="status">Loading…</p></main>
+<script>
+(function () {
+  'use strict';
+  // The website's public (anonymous) key: it can do nothing here but read one booking page, book a free time and cancel with the link.
+  var URL_BASE = 'https://pcdbtcpctlnvdtbrrqoo.supabase.co', KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjZGJ0Y3BjdGxudmR0YnJycW9vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI2MjIxMjQsImV4cCI6MjA5ODE5ODEyNH0._y59k8mmSqvkCL9gPBWp5hfp2LwpP_IBvr5h7y3nP7Q';
+  var params = new URLSearchParams(location.search), token = (params.get('p') || '').slice(0, 64), cancelKey = (params.get('c') || '').slice(0, 64);
+  var card = document.getElementById('card');
+  var zone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+
+  // Called directly, never with a visitor's own sign-in.
+  function rpc(name, body) {
+    return fetch(URL_BASE + '/rest/v1/rpc/' + name, {
+      method: 'POST', credentials: 'omit',
+      headers: { apikey: KEY, Authorization: 'Bearer ' + KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+  }
+  // Everything from the page's owner is put on the page as plain text, never as HTML.
+  function el(tag, text, attrs) {
+    var node = document.createElement(tag);
+    if (text) node.textContent = text;
+    for (var k in attrs || {}) node.setAttribute(k, attrs[k]);
+    return node;
+  }
+  function only(message) { card.replaceChildren(el('p', message, { role: 'status' })); }
+  function dayOf(iso) { return new Date(iso).toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' }); }
+  function timeOf(iso) { return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); }
+  function longOf(iso) { return new Date(iso).toLocaleString([], { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+
+  // A calendar file the visitor can open in any calendar.
+  function calendarFile(done) {
+    function stamp(iso) { return new Date(iso).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, ''); }
+    function safe(text) { return String(text || '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n'); }
+    var lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Raptor//Booking//EN', 'BEGIN:VEVENT',
+      'UID:' + done.cancel + '@raptor', 'DTSTAMP:' + stamp(new Date().toISOString()), 'DTSTART:' + stamp(done.starts_at), 'DTEND:' + stamp(done.ends_at),
+      'SUMMARY:' + safe(done.title), 'LOCATION:' + safe(done.location), 'END:VEVENT', 'END:VCALENDAR'];
+    return URL.createObjectURL(new Blob([lines.join('\r\n') + '\r\n'], { type: 'text/calendar' }));
+  }
+
+  function booked(done) {
+    var link = location.origin + location.pathname + '?c=' + encodeURIComponent(done.cancel);
+    var box = el('div', '', { 'class': 'row', role: 'status' });
+    box.appendChild(el('h1', 'You are booked'));
+    box.appendChild(el('p', done.title + '\n' + longOf(done.starts_at) + ' (' + zone + ')' + (done.location ? '\n' + done.location : '')));
+    var save = el('a', 'Add to your calendar', { href: calendarFile(done), download: 'meeting.ics' }); box.appendChild(save);
+    box.appendChild(el('p', 'No email is sent. Keep this page or save the link below in case you need to cancel.', { 'class': 'note' }));
+    box.appendChild(el('a', 'Cancel this meeting', { href: link }));
+    card.replaceChildren(box);
+  }
+
+  function show(page, notice, typed) {
+    var box = el('form', '', { novalidate: 'novalidate' });
+    box.appendChild(el('h1', page.title || 'Book a meeting')); document.title = page.title || 'Book a meeting';
+    if (page.intro) box.appendChild(el('p', page.intro));
+    box.appendChild(el('p', page.minutes + ' minutes. Times are shown in your time zone (' + zone + ').', { 'class': 'note' }));
+    if (notice) box.appendChild(el('p', notice, { 'class': 'bad', role: 'alert' }));
+    var times = page.times || [];
+    if (!times.length) { box.appendChild(el('p', 'There are no free times at the moment.')); card.replaceChildren(box); return; }
+    var byDay = new Map();
+    times.forEach(function (t) { var d = dayOf(t); if (!byDay.has(d)) byDay.set(d, []); byDay.get(d).push(t); });
+    var chosen = null;
+    box.appendChild(el('h2', 'Choose a day'));
+    var days = el('div', '', { 'class': 'days' }); box.appendChild(days);
+    box.appendChild(el('h2', 'Choose a time'));
+    var slots = el('div', '', { 'class': 'times' }); box.appendChild(slots);
+    function pick(buttons, one) { Array.prototype.forEach.call(buttons.children, function (b) { b.setAttribute('aria-pressed', String(b === one)); }); }
+    function openDay(name, button) {
+      pick(days, button); chosen = null; slots.replaceChildren();
+      byDay.get(name).forEach(function (t) {
+        var b = el('button', timeOf(t), { type: 'button', 'aria-pressed': 'false' });
+        b.addEventListener('click', function () { chosen = t; pick(slots, b); bad.hidden = true; });
+        slots.appendChild(b);
+      });
+    }
+    var first = null;
+    byDay.forEach(function (_, name) {
+      var b = el('button', name, { type: 'button', 'aria-pressed': 'false' });
+      b.addEventListener('click', function () { openDay(name, b); });
+      days.appendChild(b); if (!first) first = [name, b];
+    });
+    var inputs = {};
+    function field(name, label, type, required, max, auto) {
+      box.appendChild(el('label', label + (required ? '' : ' (optional)'), { 'for': name }));
+      var input = type === 'textarea' ? el('textarea') : el('input', '', { type: type });
+      input.id = name; input.name = name; input.maxLength = max;
+      if (auto) input.setAttribute('autocomplete', auto);
+      if (required) input.required = true;
+      input.value = (typed && typed[name]) || '';          // what was typed stays when the times are reloaded
+      box.appendChild(input); inputs[name] = input;
+    }
+    field('name', 'Name', 'text', true, 120, 'name');
+    field('email', 'Email', 'email', true, 200, 'email');
+    if (page.ask_phone) field('phone', 'Phone', 'tel', false, 40, 'tel');
+    if (page.ask_message) field('message', 'Anything we should know', 'textarea', false, 2000);
+    var trap = el('div', '', { 'class': 'away', 'aria-hidden': 'true' });
+    var bait = el('input', '', { type: 'text', name: 'fax_number', tabindex: '-1', autocomplete: 'off' });
+    trap.appendChild(bait); box.appendChild(trap);
+    var bad = el('p', '', { 'class': 'bad', role: 'alert' }); bad.hidden = true; box.appendChild(bad);
+    var button = el('button', 'Book this time', { type: 'submit' }); box.appendChild(button);
+    function complain(text) { bad.textContent = text; bad.hidden = false; button.disabled = false; }
+    box.addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (button.disabled) return;
+      if (!chosen) { complain('Please choose a time.'); return; }
+      var data = { fax_number: bait.value }, empty = null;
+      for (var k in inputs) { data[k] = inputs[k].value.trim(); if (inputs[k].required && !data[k] && !empty) empty = k; }
+      if (empty) { complain('Please enter your ' + empty + '.'); inputs[empty].focus(); return; }
+      button.disabled = true; bad.hidden = true;
+      rpc('booking_make', { p_token: token, p_start: chosen, p_data: data }).then(function (out) {
+        if (out && out.ok) booked(out);
+        else if (out && out.taken) load(out.error, data);
+        else complain((out && out.error) || 'The meeting could not be booked. Please try again.');
+      }).catch(function () { complain('The meeting could not be booked. Check your connection and try again.'); });
+    });
+    var by = el('div', '', { 'class': 'by' });
+    by.appendChild(el('a', 'Booking by Raptor', { href: 'https://shoonyaorigins.com/ventures/raptor/', target: '_blank', rel: 'noopener' }));
+    card.replaceChildren(box, by);
+    openDay(first[0], first[1]);
+  }
+
+  function load(notice, typed) {
+    rpc('booking_public', { p_token: token }).then(function (page) {
+      if (page) show(page, notice, typed); else only('This booking page is not available.');
+    }).catch(function () { only('This booking page could not be loaded. Please try again later.'); });
+  }
+
+  function showCancel() {
+    rpc('booking_cancel_info', { p_cancel: cancelKey }).then(function (meeting) {
+      if (!meeting) { only('This meeting was not found.'); return; }
+      if (meeting.status === 'cancelled') { only('This meeting is cancelled.'); return; }
+      var box = el('div', '', { 'class': 'row' });
+      box.appendChild(el('h1', 'Cancel your meeting?'));
+      box.appendChild(el('p', meeting.title + '\n' + longOf(meeting.starts_at) + ' (' + zone + ')'));
+      var button = el('button', 'Cancel the meeting', { type: 'button' }); box.appendChild(button);
+      var bad = el('p', '', { 'class': 'bad', role: 'alert' }); bad.hidden = true; box.appendChild(bad);
+      button.addEventListener('click', function () {
+        button.disabled = true; bad.hidden = true;
+        rpc('booking_cancel', { p_cancel: cancelKey }).then(function (out) {
+          if (out && out.ok) only('The meeting is cancelled.');
+          else { bad.textContent = (out && out.error) || 'It could not be cancelled.'; bad.hidden = false; button.disabled = false; }
+        }).catch(function () { bad.textContent = 'It could not be cancelled. Please try again.'; bad.hidden = false; button.disabled = false; });
+      });
+      card.replaceChildren(box);
+    }).catch(function () { only('This meeting could not be loaded. Please try again later.'); });
+  }
+
+  if (cancelKey) showCancel(); else if (token) load(); else only('This booking page is not available.');
+})();
+</script>
+</body>
+</html>

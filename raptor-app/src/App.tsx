@@ -32,6 +32,12 @@ import CrmMarketing from './pages/crm/CrmMarketing';
 import CrmGuide from './pages/crm/CrmGuide';
 import CrmTasks from './pages/crm/CrmTasks';
 import CrmReports from './pages/crm/CrmReports';
+import CrmForms from './pages/crm/CrmForms';
+import CrmBooking from './pages/crm/CrmBooking';
+import CrmApi from './pages/crm/CrmApi';
+import CrmDashboard from './pages/crm/CrmDashboard';
+import CrmForecast from './pages/crm/CrmForecast';
+import CrmTrash from './pages/crm/CrmTrash';
 
 /* desktop sync files */
 import SyncLayout from './layouts/SyncLayout';
@@ -102,6 +108,12 @@ export default function App() {
                       <Route path="companies" element={<CrmCompanies />} />
                       <Route path="tasks" element={<CrmTasks />} />
                       <Route path="reports" element={<CrmReports />} />
+                      <Route path="forms" element={<CrmForms />} />
+                      <Route path="booking" element={<CrmBooking />} />
+                      <Route path="api" element={<CrmApi />} />
+                      <Route path="dashboard" element={<CrmDashboard />} />
+                      <Route path="forecast" element={<CrmForecast />} />
+                      <Route path="trash" element={<CrmTrash />} />
                       <Route path="activity" element={<CrmActivity />} />
                       <Route path="automations" element={<CrmAutomations />} />
                       <Route path="campaigns" element={<CrmCampaigns />} />

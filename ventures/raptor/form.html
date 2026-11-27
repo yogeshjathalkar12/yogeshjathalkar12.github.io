@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<title>Contact form</title>
+<style>
+  :root { --ink:#18181b; --soft:#52525b; --line:#d4d4d8; --paper:#ffffff; --accent:#742469; --bad:#b91c1c; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color:var(--ink); background:#f4f4f5; }
+  body.embed { background:transparent; }
+  main { max-width:480px; margin:32px auto; background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:24px; }
+  body.embed main { margin:0 auto; border:0; padding:8px; }
+  h1 { font-size:20px; margin:0 0 6px; }
+  p { margin:0 0 16px; color:var(--soft); white-space:pre-line; }
+  label { display:block; font-size:13px; font-weight:600; margin:0 0 4px; }
+  input, textarea { width:100%; font:inherit; color:inherit; background:#fff; border:1px solid var(--line); border-radius:6px; padding:9px 11px; margin:0 0 14px; }
+  textarea { min-height:110px; resize:vertical; }
+  button { width:100%; font:inherit; font-weight:600; color:#fff; background:var(--accent); border:0; border-radius:6px; padding:11px; cursor:pointer; }
+  button:disabled { opacity:.6; cursor:default; }
+  .bad { color:var(--bad); margin:0 0 12px; }
+  .away { position:absolute; left:-10000px; width:1px; height:1px; overflow:hidden; }
+  .by { text-align:center; font-size:11px; color:#a1a1aa; margin:14px 0 0; }
+  .by a { color:inherit; }
+</style>
+</head>
+<body>
+<main id="card"><p id="status">Loading…</p></main>
+<script>
+(function () {
+  'use strict';
+  // The website's public (anonymous) key: it can do nothing here but read one form's wording and send it.
+  var URL_BASE = 'https://pcdbtcpctlnvdtbrrqoo.supabase.co', KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjZGJ0Y3BjdGxudmR0YnJycW9vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI2MjIxMjQsImV4cCI6MjA5ODE5ODEyNH0._y59k8mmSqvkCL9gPBWp5hfp2LwpP_IBvr5h7y3nP7Q';
+  var params = new URLSearchParams(location.search), token = (params.get('f') || '').slice(0, 64);
+  if (params.get('embed') === '1') document.body.className = 'embed';
+  var card = document.getElementById('card');
+
+  // Called directly, never with a visitor's own sign-in.
+  function rpc(name, body) {
+    return fetch(URL_BASE + '/rest/v1/rpc/' + name, {
+      method: 'POST', credentials: 'omit',
+      headers: { apikey: KEY, Authorization: 'Bearer ' + KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+  }
+  // Everything from the form's owner is put on the page as plain text, never as HTML.
+  function el(tag, text, attrs) {
+    var node = document.createElement(tag);
+    if (text) node.textContent = text;
+    for (var k in attrs || {}) node.setAttribute(k, attrs[k]);
+    return node;
+  }
+  function only(message) { card.replaceChildren(el('p', message, { role: 'status' })); }
+
+  function show(form) {
+    var box = el('form', '', { novalidate: 'novalidate' });
+    if (form.title) { box.appendChild(el('h1', form.title)); document.title = form.title; }
+    if (form.intro) box.appendChild(el('p', form.intro));
+    var inputs = {};
+    function field(name, label, type, required, max, auto) {
+      box.appendChild(el('label', label + (required ? '' : ' (optional)'), { 'for': name }));
+      var input = type === 'textarea' ? el('textarea') : el('input', '', { type: type });
+      input.id = name; input.name = name; input.maxLength = max;
+      if (auto) input.setAttribute('autocomplete', auto);
+      if (required) input.required = true;
+      box.appendChild(input); inputs[name] = input;
+    }
+    field('name', 'Name', 'text', true, 120, 'name');
+    field('email', 'Email', 'email', true, 200, 'email');
+    if (form.ask_phone) field('phone', 'Phone', 'tel', !!form.require_phone, 40, 'tel');
+    if (form.ask_company) field('company', 'Company', 'text', false, 160, 'organization');
+    if (form.ask_message) field('message', 'Message', 'textarea', false, 4000);
+    var trap = el('div', '', { 'class': 'away', 'aria-hidden': 'true' });
+    var bait = el('input', '', { type: 'text', name: 'fax_number', tabindex: '-1', autocomplete: 'off' });
+    trap.appendChild(bait); box.appendChild(trap);
+    var bad = el('p', '', { 'class': 'bad', role: 'alert' }); bad.hidden = true; box.appendChild(bad);
+    var button = el('button', form.button_text || 'Send', { type: 'submit' }); box.appendChild(button);
+    function complain(text) { bad.textContent = text; bad.hidden = false; button.disabled = false; }
+    box.addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (button.disabled) return;
+      var data = { fax_number: bait.value }, empty = null;
+      for (var k in inputs) { data[k] = inputs[k].value.trim(); if (inputs[k].required && !data[k] && !empty) empty = k; }
+      if (empty) { complain('Please enter your ' + empty + '.'); inputs[empty].focus(); return; }
+      button.disabled = true; bad.hidden = true;
+      rpc('lead_form_submit', { p_token: token, p_data: data }).then(function (out) {
+        if (out && out.ok) only(form.thanks_text || 'Thank you.');
+        else complain((out && out.error) || 'Your message could not be sent. Please try again.');
+      }).catch(function () { complain('Your message could not be sent. Check your connection and try again.'); });
+    });
+    var by = el('div', '', { 'class': 'by' });
+    by.appendChild(el('a', 'Form by Raptor', { href: 'https://shoonyaorigins.com/ventures/raptor/', target: '_blank', rel: 'noopener' }));
+    card.replaceChildren(box, by);
+  }
+
+  if (!token) { only('This form is not available.'); return; }
+  rpc('lead_form_public', { p_token: token }).then(function (form) {
+    if (form) show(form); else only('This form is not available.');
+  }).catch(function () { only('This form could not be loaded. Please try again later.'); });
+})();
+</script>
+</body>
+</html>

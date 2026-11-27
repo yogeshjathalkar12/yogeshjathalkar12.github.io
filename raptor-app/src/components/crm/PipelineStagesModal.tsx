@@ -8,7 +8,10 @@ import {
   renameStage,
   reorderStages,
   deleteStage,
+  setStageProbability,
 } from '../../lib/pipelineStages';
+import { useColumn } from '../../hooks/useColumn';
+import { forecastValues, stageProbability } from '../../lib/forecast';
 
 const TYPE_LABELS: Record<StageType, string> = { open: 'Open', won: 'Won', lost: 'Lost' };
 const TYPE_COLORS: Record<StageType, string> = { open: '#3b82f6', won: 'var(--green)', lost: 'var(--red)' };
@@ -32,10 +35,13 @@ interface PipelineStagesModalProps {
   stages: PipelineStage[];
   dealCountByStage: Record<string, number>;
   onChanged: () => Promise<void> | void;
+  /** the pipeline new stages are added to; empty = the main one */
+  pipelineId?: string;
 }
 
-export default function PipelineStagesModal({ open, onClose, stages, dealCountByStage, onChanged }: PipelineStagesModalProps) {
+export default function PipelineStagesModal({ open, onClose, stages, dealCountByStage, onChanged, pipelineId }: PipelineStagesModalProps) {
   const [busy, setBusy] = useState(false);
+  const forecast = useColumn('pipeline_stages', 'probability');
   const [error, setError] = useState('');
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [renamingId, setRenamingId] = useState<string | null>(null);
@@ -119,7 +125,7 @@ export default function PipelineStagesModal({ open, onClose, stages, dealCountBy
   function handleAdd() {
     run(async () => {
       if (!newLabel.trim()) throw new Error('Enter a name for the new stage.');
-      await createStage(newLabel, newType);
+      await createStage(newLabel, newType, pipelineId);
       setNewLabel('');
       setNewType('open');
     });
@@ -173,6 +179,19 @@ export default function PipelineStagesModal({ open, onClose, stages, dealCountBy
                     · {TYPE_LABELS[s.type]}{dealCountByStage[s.key] ? ` · ${dealCountByStage[s.key]} deal(s)` : ''}
                   </span>
                 </span>
+                {forecast && s.type === 'open' && (
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.58rem', color: 'var(--dim)' }} title="Chance of closing for deals in this stage, used by the forecast">
+                    <input
+                      key={`${s.id}:${s.probability ?? ''}`} type="number" min="0" max="100" aria-label={`Chance of closing in ${s.label}`}
+                      defaultValue={s.probability ?? ''} placeholder={String(stageProbability(s, stages))}
+                      style={{ ...fieldInputStyle, width: 64, marginBottom: 0, padding: '0.3rem 0.4rem' }}
+                      onBlur={(e) => {
+                        const next = forecastValues('', e.target.value).probability;
+                        if (next !== (s.probability ?? null)) run(() => setStageProbability(s, next));
+                      }}
+                    />%
+                  </label>
+                )}
                 <button style={smallBtnStyle} onClick={() => startRename(s)}>Rename</button>
                 <button style={smallBtnStyle} disabled={busy} onClick={() => askDelete(s)}>Delete</button>
               </>

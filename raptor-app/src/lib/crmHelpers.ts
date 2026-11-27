@@ -38,21 +38,3 @@ export const TYPE_ICON: Record<string, string> = {
   meeting: '◈',
   note: '✎',
 };
-
-export const TRIGGER_LABELS: Record<string, (days: number) => string> = {
-  contact_no_reply: (days) => `A hot/active contact goes ${days} day${days === 1 ? '' : 's'} without a reply`,
-  deal_stalled: (days) => `A deal sits in the same stage for ${days} day${days === 1 ? '' : 's'}`,
-  deal_won: () => `A deal is marked Won`,
-};
-
-export const ACTION_LABELS: Record<string, (a: any) => string> = {
-  log_note: (a) => `log a note: "${a.action_message || ''}"`,
-  create_reminder: (a) => `create a task: "${a.action_message || ''}"`,
-  webhook: (a) => `call the webhook ${a.action_webhook_url || '(no URL set)'}`,
-};
-
-export function describeAutomation(a: any) {
-  const triggerFn = TRIGGER_LABELS[a.trigger_type] || (() => a.trigger_type);
-  const actionFn = ACTION_LABELS[a.action_type] || (() => a.action_type);
-  return { when: triggerFn(a.trigger_days), then: actionFn(a) };
-}

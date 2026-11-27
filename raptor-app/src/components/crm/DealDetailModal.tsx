@@ -9,8 +9,15 @@ import OwnerOnly from '../OwnerOnly';
 import AssigneeSelect from './AssigneeSelect';
 import RecordHistory from './RecordHistory';
 import TasksSection from './TasksSection';
+import ActivityTimeline from './ActivityTimeline';
 import { selectAll } from '../../lib/selectAll';
 import { activeCurrencyCode } from '../../lib/currency';
+import ForecastFields from './ForecastFields';
+import { useColumn } from '../../hooks/useColumn';
+import { forecastValues, stageProbability } from '../../lib/forecast';
+import { moveToBin } from '../../lib/bulk';
+import StageOptions from './StageOptions';
+import TagsEditor from './TagsEditor';
 
 interface DealDetailModalProps {
   deal: any | null;
@@ -23,6 +30,10 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
   const [stage, setStage] = useState('');
   const [stages, setStages] = useState<PipelineStage[]>([]);
   const [campaignId, setCampaignId] = useState('');
+  const hasBin = useColumn('deals', 'deleted_at');
+  const [closeDate, setCloseDate] = useState('');
+  const [probability, setProbability] = useState('');
+  const forecast = useColumn('deals', 'expected_close');
   const [campaigns, setCampaigns] = useState<any[]>([]);
   const [contacts, setContacts] = useState<any[]>([]);
   const [contactId, setContactId] = useState('');
@@ -37,6 +48,8 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
       setValue(String(deal.value ?? 0));
       setStage(deal.stage);
       setCampaignId(deal.campaign_id || '');
+      setCloseDate(deal.expected_close || '');
+      setProbability(deal.probability === null || deal.probability === undefined ? '' : String(deal.probability));
       setContactId(deal.contact_id || '');
       setAddingContact(false);
       setNewContactName('');
@@ -95,6 +108,7 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
         campaign_id: campaignId || null,
         contact_id: finalContactId,
         updated_at: new Date().toISOString(),
+        ...(forecast ? forecastValues(closeDate, probability) : {}),
       };
       const stageType = stageByKey(stages, stage)?.type;
       if (stageType === 'won' || stageType === 'lost') payload.closed_at = new Date().toISOString();
@@ -111,10 +125,11 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
   }
 
   async function handleDelete() {
-    if (!confirm('Delete this deal? This cannot be undone.')) return;
+    if (!confirm(hasBin ? 'Delete this deal? It stays in the recycle bin for 30 days.' : 'Delete this deal? This cannot be undone.')) return;
     setSaving(true);
     setError(null);
     try {
+      if (await moveToBin(supabase, 'deals', [deal.id])) { onSaved(); onClose(); return; }
       const { error: deleteErr } = await supabase.from('deals').delete().eq('id', deal.id);
       if (deleteErr) throw deleteErr;
       onSaved();
@@ -138,10 +153,11 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
 
       <label style={fieldLabelStyle}>Stage</label>
       <select style={fieldInputStyle} value={stage} onChange={(e) => setStage(e.target.value)}>
-        {stages.map((s) => (
-          <option key={s.id} value={s.key}>{s.label}</option>
-        ))}
+        <StageOptions stages={stages} />
       </select>
+
+      {forecast && <ForecastFields closeDate={closeDate} probability={probability} stageChance={stageProbability(stages.find((s) => s.key === stage), stages)} onCloseDate={setCloseDate} onProbability={setProbability} />}
+
 
       <label style={fieldLabelStyle}>Campaign</label>
       <select style={fieldInputStyle} value={campaignId} onChange={(e) => setCampaignId(e.target.value)}>
@@ -182,8 +198,11 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
       )}
 
       <AssigneeSelect table="deals" recordId={deal.id} value={deal.assignee_id ?? null} onChanged={onSaved} />
+      <TagsEditor table="deals" recordId={deal.id} tags={deal.tags} onChanged={onSaved} />
       <CustomFieldsSection entityType="deal" entity={deal} onChanged={onSaved} />
       <TasksSection dealId={deal.id} />
+
+      <ActivityTimeline dealId={deal.id} contactId={deal.contact_id} />
 
       <AttachmentsSection entityType="deal" entityId={deal.id} />
       <RecordHistory
