@@ -3,6 +3,8 @@ import { supabase } from '../../lib/supabaseClient';
 import { fieldInputStyle, primaryBtnStyle } from '../../components/crm/Modal';
 import { toolApiBase } from '../../lib/config';
 import DesktopRelayStatus from './DesktopRelayStatus';
+import MailboxApproval from '../../components/email/MailboxApproval';
+import { canAddMailbox, mailboxBlocked, type MailboxApproval as Approval, type MailboxRow } from '../../lib/mailboxGate';
 
 const EMAIL_API = toolApiBase('email');
 
@@ -43,6 +45,10 @@ export default function EmailConnectionSetup() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  // The rule on several mailboxes. null = this database has no such rule (or it could not be read): the screen is as before, and the
+  // server and database still decide.
+  const [approval, setApproval] = useState<Approval | null>(null);
+  const [exemptIds, setExemptIds] = useState<Set<string>>(new Set());
 
   // The responsibilities statement and its version come from the server, so
   // the wording shown is exactly the wording that gets recorded.
@@ -52,7 +58,19 @@ export default function EmailConnectionSetup() {
   useEffect(() => {
     fetchAccounts();
     loadProviders();
+    loadApproval();
   }, []);
+
+  async function loadApproval() {
+    // both must exist for the rule to be in force: the approval function and the column the web rule adds
+    const [answer, exempt] = await Promise.all([
+      supabase.rpc('get_feature_approval', { p_feature: 'multi_mailbox' }),
+      supabase.from('email_accounts').select('id, pool_exempt'),
+    ]);
+    if (answer.error || exempt.error) { setApproval(null); return; }
+    setApproval(answer.data as Approval);
+    setExemptIds(new Set((exempt.data || []).filter((r: any) => r.pool_exempt).map((r: any) => r.id)));
+  }
 
   async function authHeader() {
     const { data: { session } } = await supabase.auth.getSession();
@@ -150,6 +168,7 @@ export default function EmailConnectionSetup() {
       setShowForm(false);
       setNotice('Mailbox saved. Your Raptor desktop app picks it up and checks the login the first time it sends.');
       fetchAccounts();
+      loadApproval();
     } catch (err: any) {
       console.error('Failed to save email account:', err);
       setError(err.message || 'Could not save this mailbox.');
@@ -165,6 +184,8 @@ export default function EmailConnectionSetup() {
   }
 
   const hasAccounts = accounts.length > 0;
+  const rows: MailboxRow[] = accounts.map((a) => ({ id: a.id, from_email: a.from_email, created_at: a.created_at, pool_exempt: exemptIds.has(a.id) }));
+  const room = canAddMailbox(rows, approval);
 
   const formCard = (
     <form
@@ -172,7 +193,8 @@ export default function EmailConnectionSetup() {
       onSubmit={handleConnect}
       style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '1.4rem', marginBottom: '1.6rem', maxWidth: '100%', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}
     >
-      <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.2rem' }}>{hasAccounts ? 'Add another mailbox' : 'Connect your mailbox'}</div>
+      <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.2rem' }}>{!hasAccounts ? 'Connect your mailbox' : room.canAdd ? 'Add another mailbox' : 'Change your mailbox settings'}</div>
+      {hasAccounts && !room.canAdd && <div style={noteStyle}>Use the same email address as the mailbox you are changing. To switch to another address, remove the old one first.</div>}
       <div style={noteStyle}>
         Gmail and Microsoft accounts need an <strong>app password</strong>, not your normal password (in your account's security settings).
         IMAP must be switched on so Raptor can see replies and bounces. A separate sending domain is safer than your main one.
@@ -284,6 +306,9 @@ export default function EmailConnectionSetup() {
                         : `SMTP · ${cfg.host ?? ''}`} · cap {a.daily_cap}/day, ramping to {a.warmup_target}
                     </div>
                   )}
+                  {mailboxBlocked({ id: a.id, from_email: a.from_email, created_at: a.created_at, pool_exempt: exemptIds.has(a.id) }, rows, approval) && (
+                    <div role="status" style={{ fontSize: '0.6rem', color: 'var(--red)', lineHeight: 1.6 }}>Not sending: this extra mailbox needs approval.</div>
+                  )}
                 </div>
                 <button
                   onClick={() => handleRemove(a.id)}
@@ -313,9 +338,11 @@ export default function EmailConnectionSetup() {
           {accountList}
           <div style={{ height: '1.4rem' }} />
           {accounts.some((a) => a.provider === 'desktop') && <DesktopRelayStatus />}
+          {approval && !room.canAdd && approval.status !== 'active' && <MailboxApproval approval={approval} onChange={loadApproval} />}
+          {room.note && <div style={{ ...noteStyle, marginBottom: '0.8rem' }}>{room.note}</div>}
           {showForm ? formCard : (
             <button type="button" style={ghostBtnStyle} onClick={() => { setShowForm(true); setNotice(null); }}>
-              + Add another mailbox
+              {room.canAdd ? '+ Add another mailbox' : 'Change mailbox settings'}
             </button>
           )}
         </>

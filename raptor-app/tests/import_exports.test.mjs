@@ -74,3 +74,33 @@ test('a deal value with no deal name is kept as an extra field, not dropped', ()
   const { mapped } = read([['Company', 'Revenue'], ['Acme', '100'], ['Beta', '200'], ['Gamma', '300']]);
   assert.equal(mapped.Revenue, 'custom');
 });
+
+// Column names as Apollo's contact export uses them, written from knowledge of the format, not from a real file.
+const APOLLO = ['First Name', 'Last Name', 'Title', 'Company', 'Company Name for Emails', 'Email', 'Email Status', 'Seniority', 'Departments', 'Work Direct Phone', 'Mobile Phone', 'Corporate Phone',
+  '# Employees', 'Industry', 'Keywords', 'Person Linkedin Url', 'Website', 'Company Linkedin Url', 'City', 'State', 'Country', 'Company Address', 'Company City', 'Company Country',
+  'Technologies', 'Annual Revenue', 'Total Funding', 'Latest Funding', 'Contact Owner', 'Account Owner', 'Stage', 'Apollo Contact Id', 'Apollo Account Id'];
+const apolloRow = (values) => APOLLO.map((h) => values[h] ?? '');
+const person = (n, first, last, company) => apolloRow({
+  'First Name': first, 'Last Name': last, Title: 'Head of Sales', Company: company, 'Company Name for Emails': company, Email: `${first.toLowerCase()}@${company.toLowerCase()}.com`, 'Email Status': 'Verified',
+  Seniority: 'Head', Departments: 'Master Sales', 'Work Direct Phone': `'+91 20 4000 10${n}0`, 'Mobile Phone': `'+91 98765 432${n}0`, 'Corporate Phone': `'+91 20 4000 000${n}`,
+  '# Employees': '120', Industry: 'computer software', Keywords: 'saas, crm', 'Person Linkedin Url': `http://www.linkedin.com/in/${first.toLowerCase()}`, Website: `http://www.${company.toLowerCase()}.com`,
+  'Company Linkedin Url': `http://www.linkedin.com/company/${company.toLowerCase()}`, City: 'Pune', State: 'Maharashtra', Country: 'India', 'Company Address': '1 MG Road, Pune, India', 'Company City': 'Pune', 'Company Country': 'India',
+  Technologies: 'AWS', 'Annual Revenue': '5000000', 'Total Funding': '1000000', 'Latest Funding': 'Seed', 'Contact Owner': 'ben@seller.test', 'Account Owner': 'ben@seller.test', Stage: 'Cold', 'Apollo Contact Id': `c${n}`, 'Apollo Account Id': `a${n}`,
+});
+
+test('Apollo contacts: people with their companies, no deals from "Stage" or revenue, and nothing of theirs read as ours', () => {
+  const { mapped, rowKind, plan } = read([APOLLO, person(1, 'Asha', 'Rao', 'Acme'), person(2, 'Ravi', 'Kumar', 'Beta'), person(3, 'Meera', 'Shah', 'Acme')]);
+  assert.equal(rowKind, 'contact');
+  assert.deepEqual([mapped['First Name'], mapped['Last Name'], mapped.Title, mapped.Company, mapped.Email, mapped['Person Linkedin Url'], mapped.Website],
+    ['contact.first_name', 'contact.last_name', 'contact.role', 'company.name', 'contact.email', 'contact.linkedin_url', 'company.website_url']);
+  for (const header of ['Email Status', 'Company Name for Emails', 'Contact Owner', 'Account Owner', 'Stage', 'Annual Revenue', 'Company Linkedin Url', 'Latest Funding', '# Employees']) {
+    assert.ok(['custom', 'ignore'].includes(mapped[header]), `${header} was read as ${mapped[header]}`);
+  }
+  assert.equal(plan.deals.create.length, 0);
+  assert.equal(plan.companies.create.length, 2);
+  assert.equal(plan.contacts.create.length, 3);
+  const asha = plan.contacts.create[0].rec;
+  assert.deepEqual([asha.name, asha.email, asha.job_title], ['Asha Rao', 'asha@acme.com', 'Head of Sales']);
+  assert.match(asha.phone, /^\+91/);                                   // the spreadsheet apostrophe is gone
+  assert.equal(plan.companies.create[0].rec.website_url.includes('acme.com'), true);
+});

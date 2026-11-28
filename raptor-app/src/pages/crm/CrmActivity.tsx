@@ -1,14 +1,18 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { relativeTime, TYPE_ICON } from '../../lib/crmHelpers';
+import LogActivity from '../../components/crm/LogActivity';
+import OwnerOnly from '../../components/OwnerOnly';
 
-const TYPE_FILTERS = ['all', 'note', 'email', 'call', 'meeting'];
+const TYPE_FILTERS = ['all', 'note', 'email', 'call', 'meeting', 'whatsapp'];
 
 export default function CrmActivity() {
   const [interactions, setInteractions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [typeFilter, setTypeFilter] = useState('all');
   const [search, setSearch] = useState('');
+  const [logging, setLogging] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     fetchAll();
@@ -39,6 +43,14 @@ export default function CrmActivity() {
     }
   }
 
+  async function remove(id: string) {
+    if (!confirm('Remove this entry from the timeline? This cannot be undone.')) return;
+    setError('');
+    const { data, error: failed } = await supabase.from('interactions').delete().eq('id', id).select('id');
+    if (failed || !data?.length) setError(failed?.message || 'You may not remove this entry.');
+    else fetchAll();
+  }
+
   const q = search.trim().toLowerCase();
   const filtered = interactions.filter((i) => {
     if (typeFilter !== 'all' && i.type !== typeFilter) return false;
@@ -66,7 +78,14 @@ export default function CrmActivity() {
             border: '1px solid var(--border)', color: 'var(--white)', fontFamily: 'var(--mono)', fontSize: '0.7rem', borderRadius: '4px',
           }}
         />
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <OwnerOnly permission="create"><button
+            type="button"
+            onClick={() => setLogging(!logging)}
+            style={{ background: 'var(--grad)', color: '#fff', border: 'none', padding: '0.5rem 0.9rem', borderRadius: '4px', cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: '0.6rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}
+          >
+            + Log activity
+          </button></OwnerOnly>
           {TYPE_FILTERS.map((t) => (
             <button
               key={t}
@@ -90,6 +109,9 @@ export default function CrmActivity() {
         </div>
       </div>
 
+      {logging && <LogActivity onLogged={fetchAll} onClose={() => setLogging(false)} />}
+      {error && <div role="alert" style={{ color: 'var(--red)', fontSize: '0.65rem', marginBottom: 8 }}>{error}</div>}
+
       <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', overflow: 'hidden' }}>
         {filtered.length === 0 ? (
           <div style={{ padding: '2.5rem', textAlign: 'center', color: 'var(--dim)', fontSize: '0.7rem' }}>
@@ -110,6 +132,13 @@ export default function CrmActivity() {
                 <div style={{ fontSize: '0.75rem', margin: '0.3rem 0' }}>{i.content}</div>
                 <div style={{ fontSize: '0.58rem', color: 'var(--dim2)' }}>{relativeTime(i.created_at)}</div>
               </div>
+              <OwnerOnly permission="delete"><button
+                type="button"
+                onClick={() => remove(i.id)}
+                style={{ alignSelf: 'flex-start', background: 'transparent', border: '1px solid var(--border)', color: 'var(--dim)', padding: '0.3rem 0.6rem', borderRadius: '4px', cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: '0.55rem', textTransform: 'uppercase' }}
+              >
+                Remove
+              </button></OwnerOnly>
             </div>
           ))
         )}

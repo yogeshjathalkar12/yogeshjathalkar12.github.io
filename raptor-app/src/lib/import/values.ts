@@ -62,7 +62,8 @@ export interface PhoneResult { primary: string | null; others: string[]; problem
 
 /** One phone-looking piece: '+91 98765 43210', '020-2567 1234', '9876543210.0' ... Returns null with a reason when impossible. */
 export function cleanOnePhone(piece: string): { value: string } | { problem: string } {
-  let s = piece.trim();
+  // some exports (Apollo among them) put an apostrophe in front so a spreadsheet keeps the number as text
+  let s = piece.trim().replace(/^['‘’`]+\s*/, '');
   if (!s) return { problem: 'empty' };
   // Excel stores a number typed into a General cell as a double: "9876543210.0" is harmless, "-65794813.19" is garbage.
   if (/^-?\d+\.\d+$/.test(s)) {

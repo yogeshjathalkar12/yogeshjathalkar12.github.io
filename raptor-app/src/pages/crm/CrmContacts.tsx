@@ -25,10 +25,14 @@ import { useAuth } from '../../hooks/AuthContext';
 import { shortName } from '../../lib/team';
 import { exportRecords } from '../../lib/tableView';
 import { selectAll } from '../../lib/selectAll';
+import { companyIdsNamed, useLargeList, useListSize } from '../../hooks/useLargeList';
+import { canSort, customServerField, type ServerField } from '../../lib/largeList';
+import { useDirectory } from '../../hooks/useDirectory';
 import { coalesce } from '../../lib/coalesce';
 import LoadingMore from '../../components/crm/LoadingMore';
 import { useOrg } from '../../hooks/OrgContext';
 import BulkBar from '../../components/crm/BulkBar';
+import { desktopColumns } from '../../lib/desktop';
 
 const STATUS_COLORS: Record<string, { bg: string; fg: string }> = {
   hot: { bg: 'rgba(239,68,68,0.1)', fg: 'var(--red)' },
@@ -69,8 +73,15 @@ export default function CrmContacts() {
   const [viewed, setViewed] = useState<{ rows: any[]; cols: UiColumn<any>[] }>({ rows: [], cols: [] });
   const [partial, setPartial] = useState(0);            // how many are shown while the rest of a long list is still coming
   const loadedOnce = useRef(false);
+  // A very long list is not downloaded: the database searches, filters, sorts and sends one page.
+  const size = useListSize('contacts');
+  const sizeNow = useRef(size);
+  sizeNow.current = size;
+  const { entries: people } = useDirectory();
+  const reloadPage = useRef<() => void>(() => {});
 
   useEffect(() => {
+    if (size === 'counting') return;
     fetchAll();
     const reload = coalesce(fetchAll);
 
@@ -84,12 +95,14 @@ export default function CrmContacts() {
       reload.cancel();
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [size]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function fetchAll() {
+    const big = sizeNow.current === 'large';
+    if (big) reloadPage.current();
     try {
       const [contactsRes, dealsRes, interactionsRes, fieldDefs, importsRes] = await Promise.all([
-        selectAll(() => supabase
+        big ? Promise.resolve({ data: [] as any[], error: null }) : selectAll(() => supabase
           .from('contacts')
           .select('*, companies(id, name)')
           .order('last_interaction_at', { ascending: false, nullsFirst: false }), 'id', (first: any[]) => {
@@ -99,7 +112,7 @@ export default function CrmContacts() {
             setPartial(first.length);
             setLoading(false);
           }),
-        selectAll(() => supabase.from('deals').select('id, contact_id, stage')),
+        big ? Promise.resolve({ data: [] as any[], error: null }) : selectAll(() => supabase.from('deals').select('id, contact_id, stage')),
         supabase
           .from('interactions')
           .select('*, contacts(id, name)')
@@ -117,11 +130,12 @@ export default function CrmContacts() {
       const labels: Record<string, string> = {};
       for (const i of (importsRes as any).data || []) labels[i.id] = `${i.source_name || i.file_name || 'Import'} · ${String(i.started_at || '').slice(0, 10)}`;
       setImportLabels(labels);
-      setContacts(contactsRes.data || []);
+      setInteractions(interactionsRes.data || []);
       loadedOnce.current = true;
+      if (big) return;                       // its rows and their deals come a page at a time, below
+      setContacts(contactsRes.data || []);
       setPartial(0);
       setDeals(dealsRes.data || []);
-      setInteractions(interactionsRes.data || []);
 
       setActiveContact((prev: any) =>
         prev ? (contactsRes.data || []).find((c: any) => c.id === prev.id) || null : null
@@ -137,14 +151,65 @@ export default function CrmContacts() {
   // resolves, open that contact and drop the param.
   useEffect(() => {
     const openId = searchParams.get('open');
-    if (!openId || contacts.length === 0 || partial) return;      // the wanted one may be in the part still coming
-    const match = contacts.find((c) => c.id === openId);
-    if (match) setActiveContact(match);
-    const next = new URLSearchParams(searchParams);
-    next.delete('open');
-    setSearchParams(next, { replace: true });
+    const big = size === 'large';
+    if (!openId || size === 'counting' || (!big && (contacts.length === 0 || partial))) return;      // the wanted one may be in the part still coming
+    const done = (match: any) => {
+      if (match) setActiveContact(match);
+      const next = new URLSearchParams(searchParams);
+      next.delete('open');
+      setSearchParams(next, { replace: true });
+    };
+    if (!big) done(contacts.find((c) => c.id === openId));
+    else Promise.resolve(supabase.from('contacts').select('*, companies(id, name)').eq('id', openId).maybeSingle()).then(({ data }: any) => done(data));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contacts, partial]);
+  }, [contacts, partial, size]);
+
+  const serverFields: Record<string, ServerField> = useMemo(() => {
+    const out: Record<string, ServerField> = {
+      name: { type: 'text', column: 'name' },
+      company: { type: 'lookup', column: 'company_id' },
+      last_touch: { type: 'date', column: 'last_interaction_at' },
+      status: { type: 'choice', column: 'status', emptyAs: 'cold' },
+      assigned: { type: 'lookup', column: 'assignee_id' },
+      ...(hasJobTitle ? { job_title: { type: 'text' as const, column: 'job_title' } } : {}),
+      email: { type: 'text', column: 'email' },
+      phone: { type: 'text', column: 'phone' },
+      linkedin: { type: 'text', column: 'linkedin_url' },
+      ...(scoreRules.length ? {} : { lead_score: { type: 'number' as const, column: 'lead_score' } }),
+      imported: { type: 'lookup', column: 'import_batch_id' },
+      created: { type: 'date', column: 'created_at' },
+    };
+    for (const def of defs) { const field = customServerField(def); if (field) out[`cf:${def.id}`] = field; }
+    return out;
+  }, [defs, hasJobTitle, scoreRules.length]);
+
+  const big = useLargeList({
+    enabled: size === 'large',
+    table: 'contacts',
+    select: '*, companies(id, name)',
+    fields: serverFields,
+    defaultOrder: { column: 'last_interaction_at', ascending: false },
+    search,
+    searchColumns: ['name', 'email', 'phone', ...(hasJobTitle ? ['job_title'] : [])],
+    searchCompanies: true,
+    assignee: { filter: assigneeFilter, me: user?.id || null },
+    lookup: (column, text) => {
+      if (column === 'company') return companyIdsNamed(text);
+      const wanted = text.toLowerCase();
+      if (column === 'assigned') return people.filter((p) => shortName(p.email).toLowerCase().includes(wanted)).map((p) => p.user_id);
+      return Object.entries(importLabels).filter(([, label]) => label === text).map(([id]) => id);
+    },
+  });
+  reloadPage.current = big.reload;
+  useEffect(() => {
+    if (size !== 'large') return;
+    setContacts(big.rows);
+    setActiveContact((prev: any) => (prev ? big.rows.find((c: any) => c.id === prev.id) || prev : null));
+    const ids = big.rows.map((c: any) => c.id);
+    if (!ids.length) { setDeals([]); return; }
+    // the deal counts of the people on this page only
+    Promise.resolve(supabase.from('deals').select('id, contact_id, stage').in('contact_id', ids)).then(({ data }: any) => setDeals(data || []));
+  }, [big.rows, size]);
 
   const q = search.trim().toLowerCase();
   const filtered = contacts.filter(
@@ -160,7 +225,7 @@ export default function CrmContacts() {
   );
 
   const assigneeLabels = useMemberLabels(contacts.map((c) => c.assignee_id));
-  const rows = applyAssigneeFilter(filtered, assigneeFilter, user?.id);
+  const rows = size === 'large' ? contacts : applyAssigneeFilter(filtered, assigneeFilter, user?.id);
 
   // counted once for everyone: searching the deals again for each of thousands of contacts would stall the page
   const activeDeals = useMemo(() => {
@@ -196,14 +261,24 @@ export default function CrmContacts() {
       { id: 'imported', label: 'Imported from', kind: 'select', value: (c) => (c.import_batch_id ? importLabels[c.import_batch_id] || 'an import' : null), options: importedOptions, dim: true },
       { id: 'created', label: 'Added', kind: 'date', value: (c) => c.created_at, dim: true },
     ];
-    return [...built, ...customFieldColumns(defs, (c: any) => c.custom_fields, contacts)];
+    return [...built, ...customFieldColumns(defs, (c: any) => c.custom_fields, contacts), ...desktopColumns('contact')];
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defs, importLabels, contacts, deals, assigneeLabels, hasJobTitle, tagColumn, scoreRules]);
 
   // the rows exactly as the person sees them (search, filters, sort) with every column, also the hidden ones and their own fields
   const exportFile = useMemo(() => exportRecords(viewed.rows, viewed.cols), [viewed]);
+  // a very large list: everything that matches is fetched when Export is pressed
+  const exportAll = async () => {
+    const [all, allDeals] = await Promise.all([big.everything(), selectAll(() => supabase.from('deals').select('id, contact_id, stage'))]);
+    if (allDeals.error) throw allDeals.error;
+    const open = new Map<string, number>();
+    for (const d of allDeals.data || []) if (d.contact_id && d.stage !== 'won' && d.stage !== 'lost') open.set(d.contact_id, (open.get(d.contact_id) || 0) + 1);
+    const cols = columns.map((col) => (col.id === 'active_deals' ? { ...col, value: (r: any) => open.get(r.id) || 0 }
+      : col.id === 'assigned' ? { ...col, value: (r: any) => (r.assignee_id ? shortName(people.find((p) => p.user_id === r.assignee_id)?.email) : null) } : col));
+    return exportRecords(all, cols);
+  };
 
-  if (loading) {
+  if (loading || size === 'counting') {
     return <div style={{ padding: '2rem', color: 'var(--dim)' }}>Loading contacts…</div>;
   }
 
@@ -236,7 +311,7 @@ export default function CrmContacts() {
         />
         <AssigneeFilter value={assigneeFilter} onChange={setAssigneeFilter} />
         <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
-          <ExportButton data={partial ? [] : exportFile.data} columns={exportFile.columns} filename="contacts" label="Export CSV (all columns)" />
+          <ExportButton data={partial ? [] : exportFile.data} columns={exportFile.columns} filename="contacts" label="Export CSV (all columns)" load={size === 'large' ? exportAll : undefined} />
           {hasAssignment && (isOwner || isAdmin) && <button type="button" style={toolBtnStyle} onClick={() => setShowAssignment(true)}>Assignment rules</button>}
           {hasScoring && can('manage_pipeline') && <button type="button" style={toolBtnStyle} onClick={() => setShowScoring(true)}>Scoring rules</button>}
           <OwnerOnly permission="delete"><button
@@ -301,14 +376,17 @@ export default function CrmContacts() {
 
       {bulkNote && <div role="status" style={{ fontSize: '0.65rem', color: 'var(--green)', marginBottom: 8 }}>{bulkNote}</div>}
       <LoadingMore count={partial} />
+      {size === 'large' && <div style={{ fontSize: '0.6rem', color: 'var(--dim)', marginBottom: 6 }}>A very large list: it is shown a page at a time. The search box looks at names, emails, phones, job titles and company names.</div>}
+      {size === 'large' && big.error && <div role="alert" style={{ fontSize: '0.65rem', color: 'var(--red)', marginBottom: 8 }}>{big.error}</div>}
       <ViewTable
         columns={columns}
         rows={rows}
         storageKey={`contacts:${user?.id || 'anon'}`}
         rowKey={(c) => c.id}
         onRowClick={(c) => setActiveContact(c)}
-        emptyText={contacts.length === 0 ? 'No contacts yet.' : 'No contacts match your search.'}
+        emptyText={contacts.length === 0 && !search.trim() && assigneeFilter === 'all' ? 'No contacts yet.' : 'No contacts match your search.'}
         onView={(shown, _visible, all) => setViewed({ rows: shown, cols: all })}
+        server={size === 'large' ? { total: big.total, page: big.page, loading: big.loading, onPage: big.setPage, onPrefs: big.setPrefs, sortable: (id) => canSort(serverFields[id]), filterable: (id) => !!serverFields[id] } : undefined}
         bulk={can('edit') || can('delete') ? (picked, clear) => (
           <BulkBar table="contacts" ids={picked.map((c) => c.id)} assign byRules={!!hasAssignment && (isOwner || isAdmin)}
             choices={[{ label: 'Set status', options: [['hot', 'Hot'], ['active', 'Active'], ['cold', 'Cold']], patch: (status) => ({ status }) }]}

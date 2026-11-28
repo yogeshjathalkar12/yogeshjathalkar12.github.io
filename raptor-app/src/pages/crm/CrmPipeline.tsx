@@ -35,6 +35,7 @@ import PipelinesModal from '../../components/crm/PipelinesModal';
 import { type Pipeline, MAIN, MAIN_NAME, loadPipelines, stageChoices, stagesOf } from '../../lib/pipelines';
 import { useColumn } from '../../hooks/useColumn';
 import { chipStyle } from '../../components/crm/TagsEditor';
+import { openCallScreen, reportDealOutcome } from '../../lib/desktop';
 
 // What the email on a deal card is doing. Statuses come from deal_outreach (see db/migrations/2026-10-14_crm_outreach.sql).
 interface DealEmail { status: string; error: string | null; }
@@ -158,9 +159,12 @@ export default function CrmPipeline() {
     return () => ro.disconnect();
   }, [stages, deals, loading]);
 
+  const bulkStage = useRef<{ key: string; type: string | undefined } | null>(null);
+
   const handleCall = async (e: React.MouseEvent, deal: any) => {
     e.stopPropagation();
-    if (!deal.contacts?.id || !session?.access_token) return;
+    if (!deal.contacts?.id || openCallScreen(deal.contacts.id)) return;
+    if (!session?.access_token) return;
     setCallError(null);
     setCallingDealId(deal.id);
     try {
@@ -397,6 +401,7 @@ export default function CrmPipeline() {
         .eq('id', dealId);
 
       if (error) throw error;
+      reportDealOutcome(dealToUpdate, newStageType);
     } catch (error) {
       console.error('Failed to move deal:', error);
       // Revert if the server fails
@@ -540,11 +545,17 @@ export default function CrmPipeline() {
             label: 'Move to stage', options: stageChoices(stages, pipelines),
             patch: (key) => {
               const type = stageByKey(stages, key)?.type;
+              bulkStage.current = { key, type };
               const now = new Date().toISOString();
               return { stage: key, updated_at: now, ...(type === 'won' || type === 'lost' ? { closed_at: now } : {}) };
             },
           }]}
-          onDone={(message) => { setBulkNote(message); setPicked(new Set()); setPicking(false); fetchDeals(); }} />
+          onDone={(message) => {
+            const ended = bulkStage.current;               // set only when the action was a stage move
+            bulkStage.current = null;
+            if (ended) shownDeals.filter((d) => picked.has(d.id) && d.stage !== ended.key).forEach((d) => reportDealOutcome(d, ended.type));
+            setBulkNote(message); setPicked(new Set()); setPicking(false); fetchDeals();
+          }} />
       )}
 
       <div

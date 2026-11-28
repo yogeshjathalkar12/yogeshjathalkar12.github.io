@@ -14,6 +14,8 @@ export interface ColumnDef<R> {
   exportValue?: (row: R) => string | number | null | undefined;
   /** For a select column: the choices. */
   options?: string[];
+  /** A column of buttons, with nothing to put in an exported file. */
+  noExport?: boolean;
   /** The first column: it can be moved down the list but never hidden. */
   locked?: boolean;
   defaultVisible?: boolean;
@@ -91,7 +93,8 @@ function asNumber(v: unknown): number | null {
 
 /** The rows as the person sees them (after search, filters and sort) with EVERY column, built-in and custom, hidden ones too,
  *  for a CSV. Empty is an empty cell, dates are a day, and two columns with the same label get a number so no column is lost. */
-export function exportRecords<R>(rows: R[], columns: ColumnDef<R>[]): { data: Record<string, string | number>[]; columns: { key: string; label: string }[] } {
+export function exportRecords<R>(rows: R[], all: ColumnDef<R>[]): { data: Record<string, string | number>[]; columns: { key: string; label: string }[] } {
+  const columns = all.filter((c) => !c.noExport);
   const seen = new Map<string, number>();
   const cols = columns.map((c) => {
     const n = (seen.get(c.label) || 0) + 1;

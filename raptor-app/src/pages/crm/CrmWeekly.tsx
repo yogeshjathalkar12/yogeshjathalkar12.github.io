@@ -5,6 +5,7 @@ import { isNotInstalled } from '../../lib/dbMissing';
 import { loadPipelineStages } from '../../lib/pipelineStages';
 import { formatCurrency } from '../../lib/crmHelpers';
 import { buildReport, change, reportText, weekStart, type ReportData } from '../../lib/weeklyReport';
+import WeeklyEmailSwitch from '../../components/crm/WeeklyEmailSwitch';
 
 // CRM > Weekly results: one week against the week before, to print or paste for a client (lib/weeklyReport.ts).
 
@@ -85,6 +86,7 @@ export default function CrmWeekly() {
         <button type="button" style={button} disabled={!report} onClick={copy}>{copied ? 'Copied' : 'Copy as text'}</button>
         <button type="button" style={button} disabled={!report} onClick={() => window.print()}>Print or save as PDF</button>
       </div>
+      <WeeklyEmailSwitch />
       {error && <div role="alert" style={{ ...small, color: 'var(--red)', marginBottom: 8 }}>{error}</div>}
       {!report && !error && <div style={small}>Loading…</div>}
       {report && (

@@ -47,6 +47,9 @@ for (const name of ['Modal', 'ImportUndoPanel', 'ImportHistoryModal', 'ImportWiz
   let js = strip(fs.readFileSync(path.join(ROOT, 'src/components/crm', `${name}.tsx`), 'utf8'), `${name}.tsx`, true);
   js = js.replace(/(['"])\.\.\/\.\.\/lib\/import\/([\w-]+)\1/g, "'./lib/$2'");                          // the shared logic
   js = js.replace(/(['"])\.\.\/\.\.\/lib\/pipelineStages\1/g, "'../pipelineStages'");                  // the desktop has its own copy of the pipeline helpers
+  js = js.replace(/(['"])\.\.\/\.\.\/hooks\/OrgContext\1/g, "'../../../OrgContext'");                  // the desktop's own useOrg()
+  js = js.replace(/(['"])\.\.\/\.\.\/(hooks\/useDirectory|lib\/team)\1/g, "'../../../webapp/$2'");         // made by port_web_screens.mjs
+  js = js.replace(/(['"])\.\.\/\.\.\/lib\/supabaseClient\1/g, "'../../../supabaseClient'");                 // the desktop's own database client
   js = js.replace(/ *\/\/ eslint-disable-line react-hooks\/exhaustive-deps/g, '');                          // the desktop's lint setup does not know that rule
   js = js.replace(/var\(--red\)/g, 'var(--red, #ef4444)').replace(/var\(--green\)/g, 'var(--green, #22c55e)');   // the desktop theme has no red/green variables
   written.push(write(`${name}.js`, js));
@@ -60,5 +63,15 @@ for (const name of ['Modal', 'ImportUndoPanel', 'ImportHistoryModal', 'ImportWiz
   written.push(file);
 }
 
+// a copy that points at a file that is not there would only be found when the desktop app is built
+const missing = [];
+for (const file of written) {
+  const text = fs.readFileSync(file, 'utf8');
+  for (const m of text.matchAll(/(?:^(?:import|export)\b[^'";]*?|\bimport\()(['"])(\.{1,2}\/[^'"]+)\1/gm)) {
+    const base = path.resolve(path.dirname(file), m[2]);
+    if (![base, `${base}.js`, `${base}.jsx`].some((f) => fs.existsSync(f) && fs.statSync(f).isFile())) missing.push(`${path.relative(OUT, file)} -> ${m[2]}`);
+  }
+}
+if (missing.length) throw new Error(`these imports lead nowhere on the desktop (run port_web_screens.mjs first, or add a rewrite):\n  ${missing.join('\n  ')}`);
 console.log(`wrote ${written.length} files into ${OUT}`);
 for (const f of written) console.log('  ' + path.relative(OUT, f));

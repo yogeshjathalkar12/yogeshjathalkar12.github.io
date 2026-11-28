@@ -18,6 +18,7 @@ import {
 import { selectAll } from '../../lib/selectAll';
 import { averageDaysToClose, salesVelocity as velocityOf } from '../../lib/salesVelocity';
 import { activeCurrencyCode } from '../../lib/currency';
+import { DesktopOutreachNumbers } from '../../lib/desktop';
 
 const COLORS = ['#3b82f6', '#eab308', '#f97316', '#22c55e', '#ef4444'];
 
@@ -291,6 +292,7 @@ export default function CrmAnalytics() {
           </div>
         </div>
       </div>
+      <DesktopOutreachNumbers />
     </div>
   );
 }

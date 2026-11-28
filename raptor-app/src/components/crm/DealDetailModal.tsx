@@ -23,6 +23,7 @@ import { dealMoneyRow, moneyOf, moneyProblem, ownMoney } from '../../lib/fx';
 import DealCompetitionFields, { competitionOf, competitionRow } from './DealCompetitionFields';
 import DealSurvey from './DealSurvey';
 import { Link } from 'react-router-dom';
+import { DesktopRecordTools, reportDealOutcome } from '../../lib/desktop';
 
 interface DealDetailModalProps {
   deal: any | null;
@@ -129,6 +130,7 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
       if (stageType === 'won' || stageType === 'lost') payload.closed_at = new Date().toISOString();
       const { error: updateErr } = await supabase.from('deals').update(payload).eq('id', deal.id);
       if (updateErr) throw updateErr;
+      if (stage !== deal.stage) reportDealOutcome(deal, stageType);
       onSaved();
       onClose();
     } catch (err: any) {
@@ -229,6 +231,7 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
       )}
       <ActivityTimeline dealId={deal.id} contactId={deal.contact_id} />
 
+      <DesktopRecordTools kind="deal" record={deal} onChanged={onSaved} />
       <AttachmentsSection entityType="deal" entityId={deal.id} />
       <RecordHistory
         table="deals"

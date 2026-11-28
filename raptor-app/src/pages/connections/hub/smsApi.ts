@@ -11,6 +11,10 @@ export interface SmsSettings {
   mode: 'off' | 'semi' | 'auto'; connection_id: string | null; template: string; country_code: string; sequence_id: string | null; daily_limit: number;
   send_from_hour: number; send_until_hour: number; timezone: string; autoreply_enabled: boolean; opt_in_confirmed_at: string | null;
 }
+/** India's domestic route (db: 2026-12-04_b_sms_india). Off until switched on. */
+export interface SmsTemplate { name: string; template_id: string; text: string }
+export interface SmsIndia { enabled: boolean; sender_id: string; entity_id: string; templates: SmsTemplate[]; confirmed_at: string | null }
+export const EMPTY_INDIA: SmsIndia = { enabled: false, sender_id: '', entity_id: '', templates: [], confirmed_at: null };
 export interface SmsStep { delay_hours: number; text: string }
 export interface SmsSequence { id: string; name: string; steps: SmsStep[]; stop_on_reply: boolean; is_active: boolean }
 export interface SmsRule { id: string; keyword: string; match_type: 'exact' | 'contains'; reply_text: string; is_active: boolean }
@@ -157,6 +161,19 @@ export function makeSmsApi(deps: SmsDeps) {
         p_mode: s.mode, p_connection: s.connection_id || null, p_template: s.template, p_country_code: s.country_code, p_sequence: s.sequence_id || null,
         p_daily_limit: s.daily_limit, p_from_hour: s.send_from_hour, p_until_hour: s.send_until_hour, p_timezone: s.timezone, p_autoreply: s.autoreply_enabled, p_opt_in: optIn,
       });
+      if (error) throw new Error(error.message || 'Could not save.');
+    },
+    /** The India settings, or null when the database does not have them yet (the screen then shows nothing). */
+    india: async (): Promise<SmsIndia | null> => {
+      const { data, error } = await deps.supabase.from('sms_india').select('enabled, sender_id, entity_id, templates, confirmed_at').maybeSingle();
+      if (error) {
+        if (missing(error)) return null;
+        throw new Error('Could not load the India settings.');
+      }
+      return { ...EMPTY_INDIA, ...(data || {}) };
+    },
+    saveIndia: async (s: SmsIndia, confirmed: boolean) => {
+      const { error } = await deps.supabase.rpc('sms_india_save', { p_enabled: s.enabled, p_sender: s.sender_id, p_entity: s.entity_id, p_templates: s.templates, p_confirmed: confirmed });
       if (error) throw new Error(error.message || 'Could not save.');
     },
     /** The pipeline's SMS button: queues the first text for a deal's contact. */

@@ -22,7 +22,7 @@ const FILTERS: Array<[WarningKind | '', string]> = [['', 'Everything'], ['quiet'
 const SHOWN = 50;
 
 /** What was found lately on watched companies' pages. Shown only when there is something. */
-function RecentSignals() {
+function RecentSignals({ mayDismiss }: { mayDismiss: boolean }) {
   const [rows, setRows] = useState<CompanySignal[]>([]);
   const load = useCallback(() => {
     const since = new Date(Date.now() - 30 * 86400000).toISOString();
@@ -35,7 +35,7 @@ function RecentSignals() {
   return (
     <div style={card}>
       <div style={{ ...small, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>News from companies you watch, last 30 days</div>
-      <SignalRows rows={rows} onDismiss={dismiss} withCompany />
+      <SignalRows rows={rows} onDismiss={mayDismiss ? dismiss : undefined} withCompany />
     </div>
   );
 }
@@ -90,7 +90,7 @@ export default function CrmAttention() {
         <span style={small}>{list.length} open deal{list.length === 1 ? '' : 's'}</span>
       </div>
       {error && <div role="alert" style={{ ...small, color: 'var(--red)', marginBottom: 8 }}>{error}</div>}
-      {!kind && <RecentSignals />}
+      {!kind && <RecentSignals mayDismiss={can('edit')} />}
       {data.missing.length > 0 && <div style={{ ...small, marginBottom: 8 }}>Not checked because it is not set up yet: {data.missing.join(', ')}.</div>}
       {list.length === 0 && <div style={card}><div style={small}>Nothing needs attention here. A deal appears when a date has passed, nothing has happened for two weeks, or its last call left something open.</div></div>}
       {list.slice(0, shown).map((row) => (

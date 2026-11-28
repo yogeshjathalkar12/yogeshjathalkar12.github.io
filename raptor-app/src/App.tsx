@@ -40,6 +40,7 @@ import CrmQuotes from './pages/crm/CrmQuotes';
 import CrmForecast from './pages/crm/CrmForecast';
 import CrmAttention from './pages/crm/CrmAttention';
 import CrmWeekly from './pages/crm/CrmWeekly';
+import CrmInbox from './pages/crm/CrmInbox';
 import CrmTrash from './pages/crm/CrmTrash';
 
 /* desktop sync files */
@@ -150,6 +151,7 @@ export default function App() {
                       <Route path="forecast" element={<CrmForecast />} />
                       <Route path="attention" element={<CrmAttention />} />
                       <Route path="weekly" element={<CrmWeekly />} />
+                      <Route path="inbox" element={<CrmInbox />} />
                       <Route path="trash" element={<CrmTrash />} />
                       <Route path="activity" element={<CrmActivity />} />
                       <Route path="automations" element={<CrmAutomations />} />

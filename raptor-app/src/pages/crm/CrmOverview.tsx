@@ -6,6 +6,7 @@ import { formatCurrency, relativeTime, TYPE_ICON } from '../../lib/crmHelpers';
 import NewDealModal from '../../components/crm/NewDealModal';
 import { type PipelineStage, loadPipelineStages } from '../../lib/pipelineStages';
 import { selectAll } from '../../lib/selectAll';
+import OpenReminders from '../../components/crm/OpenReminders';
 
 export default function CrmOverview() {
   const [deals, setDeals] = useState<any[]>([]);
@@ -119,6 +120,8 @@ export default function CrmOverview() {
           <div style={kpiValueStyle}>{contactsCount}</div>
         </div>
       </div>
+
+      <OpenReminders />
 
       <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '1.6rem', borderRadius: '6px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>

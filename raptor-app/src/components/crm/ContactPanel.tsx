@@ -15,6 +15,7 @@ import { selectAll } from '../../lib/selectAll';
 import { moveToBin } from '../../lib/bulk';
 import { useColumn } from '../../hooks/useColumn';
 import TagsEditor from './TagsEditor';
+import { DesktopRecordTools } from '../../lib/desktop';
 
 const WHATSAPP_API = toolApiBase('whatsapp');
 
@@ -411,6 +412,7 @@ export default function ContactPanel({ contact, interactions, onClose, onChanged
 
       <AssigneeSelect table="contacts" recordId={contact.id} value={contact.assignee_id ?? null} onChanged={onChanged} />
       <TagsEditor table="contacts" recordId={contact.id} tags={contact.tags} onChanged={onChanged} />
+      <DesktopRecordTools kind="contact" record={contact} onChanged={onChanged} />
       <CustomFieldsSection entityType="contact" entity={contact} onChanged={onChanged} />
       <TasksSection contactId={contact.id} />
 

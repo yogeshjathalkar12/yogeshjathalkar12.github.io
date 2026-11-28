@@ -1,7 +1,7 @@
 import AssigneeSelect from '../../components/crm/AssigneeSelect';
 import { useMemberLabels } from '../../hooks/useDirectory';
 import { shortName } from '../../lib/team';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { formatCurrency } from '../../lib/crmHelpers';
@@ -25,18 +25,29 @@ import RecordHistory from '../../components/crm/RecordHistory';
 import ActivityTimeline from '../../components/crm/ActivityTimeline';
 import CompanySignals from '../../components/crm/CompanySignals';
 import { selectAll } from '../../lib/selectAll';
+import { useLargeList, useListSize } from '../../hooks/useLargeList';
+import { canSort, customServerField, type ServerField } from '../../lib/largeList';
+import { useDirectory } from '../../hooks/useDirectory';
 import { coalesce } from '../../lib/coalesce';
 import { moveToBin } from '../../lib/bulk';
 import { useColumn } from '../../hooks/useColumn';
 import BulkBar from '../../components/crm/BulkBar';
 import { useOrg } from '../../hooks/OrgContext';
 import TagsEditor from '../../components/crm/TagsEditor';
+import { DesktopRecordTools, desktopColumns } from '../../lib/desktop';
 
 // Real CRM companies (Supabase `companies` table) - this app never had a
 // dedicated page for them before (they only ever showed up as a name-join
 // on contacts/deals); this mirrors the desktop app's own CrmCompanies.js,
 // adapted to this app's table+modal convention (see CrmContacts.tsx)
 // instead of desktop's inline two-column grid.
+// records grouped under the company they belong to
+function byCompany(rows: any[]): Record<string, any[]> {
+  const out: Record<string, any[]> = {};
+  for (const row of rows) if (row.company_id) (out[row.company_id] = out[row.company_id] || []).push(row);
+  return out;
+}
+
 export default function CrmCompanies() {
   const tagColumn = useColumn('companies', 'tags');
   const ownerColumn = useColumn('companies', 'assignee_id');
@@ -57,8 +68,15 @@ export default function CrmCompanies() {
   const [importLabels, setImportLabels] = useState<Record<string, string>>({});
   const [viewed, setViewed] = useState<{ rows: any[]; cols: UiColumn<any>[] }>({ rows: [], cols: [] });
   const { user } = useAuth();
+  // A very long list is not downloaded: the database searches, filters, sorts and sends one page.
+  const size = useListSize('companies');
+  const sizeNow = useRef(size);
+  sizeNow.current = size;
+  const { entries: people } = useDirectory();
+  const reloadPage = useRef<() => void>(() => {});
 
   useEffect(() => {
+    if (size === 'counting') return;
     fetchAll();
     const reload = coalesce(fetchAll);
     const channel = supabase
@@ -68,14 +86,17 @@ export default function CrmCompanies() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'deals' }, reload)
       .subscribe();
     return () => { reload.cancel(); supabase.removeChannel(channel); };
-  }, []);
+  }, [size]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function fetchAll() {
+    const big = sizeNow.current === 'large';
+    if (big) reloadPage.current();
+    const none = Promise.resolve({ data: [] as any[], error: null });
     try {
       const [companiesRes, contactsRes, dealsRes, fieldDefs, importsRes] = await Promise.all([
-        selectAll(() => supabase.from('companies').select('*').order('created_at', { ascending: false })),
-        selectAll(() => supabase.from('contacts').select('id, name, company_id')),
-        selectAll(() => supabase.from('deals').select('id, title, value, company_id')),
+        big ? none : selectAll(() => supabase.from('companies').select('*').order('created_at', { ascending: false })),
+        big ? none : selectAll(() => supabase.from('contacts').select('id, name, company_id')),
+        big ? none : selectAll(() => supabase.from('deals').select('id, title, value, company_id')),
         loadFieldDefs('company').catch(() => [] as CustomFieldDef[]),
         Promise.resolve(supabase.from('crm_imports').select('id, source_name, file_name, started_at')).catch(() => ({ data: [] as any[] })),   // the import log may not exist yet
       ]);
@@ -87,16 +108,12 @@ export default function CrmCompanies() {
       const labels: Record<string, string> = {};
       for (const i of (importsRes as any).data || []) labels[i.id] = `${i.source_name || i.file_name || 'Import'} · ${String(i.started_at || '').slice(0, 10)}`;
       setImportLabels(labels);
+      if (big) return;                       // its rows, and their contacts and deals, come a page at a time, below
       setCompanies(companiesRes.data || []);
       setActiveCompany((prev: any) => (prev ? (companiesRes.data || []).find((c: any) => c.id === prev.id) || null : prev));
 
-      const byContact: Record<string, any[]> = {};
-      (contactsRes.data || []).forEach((c: any) => { if (c.company_id) (byContact[c.company_id] = byContact[c.company_id] || []).push(c); });
-      setContactsByCompany(byContact);
-
-      const byDeal: Record<string, any[]> = {};
-      (dealsRes.data || []).forEach((d: any) => { if (d.company_id) (byDeal[d.company_id] = byDeal[d.company_id] || []).push(d); });
-      setDealsByCompany(byDeal);
+      setContactsByCompany(byCompany(contactsRes.data || []));
+      setDealsByCompany(byCompany(dealsRes.data || []));
     } catch (error) {
       console.error('Failed to load companies:', error);
     } finally {
@@ -109,14 +126,74 @@ export default function CrmCompanies() {
   // doesn't reopen it.
   useEffect(() => {
     const openId = searchParams.get('open');
-    if (!openId || companies.length === 0) return;
-    const match = companies.find((c) => c.id === openId);
-    if (match) setActiveCompany(match);
-    const next = new URLSearchParams(searchParams);
-    next.delete('open');
-    setSearchParams(next, { replace: true });
+    const big = size === 'large';
+    if (!openId || size === 'counting' || (!big && companies.length === 0)) return;
+    const done = (match: any) => {
+      if (match) setActiveCompany(match);
+      const next = new URLSearchParams(searchParams);
+      next.delete('open');
+      setSearchParams(next, { replace: true });
+    };
+    if (!big) done(companies.find((c) => c.id === openId));
+    else Promise.resolve(supabase.from('companies').select('*').eq('id', openId).maybeSingle()).then(({ data }: any) => done(data));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [companies]);
+  }, [companies, size]);
+
+  const serverFields: Record<string, ServerField> = useMemo(() => {
+    const out: Record<string, ServerField> = {
+      name: { type: 'text', column: 'name' },
+      website: { type: 'text', column: 'website_url' },
+      ...(ownerColumn ? { owner: { type: 'lookup' as const, column: 'assignee_id' } } : {}),
+      phone: { type: 'text', column: 'phone' },
+      email: { type: 'text', column: 'email' },
+      city: { type: 'text', column: 'city' },
+      industry: { type: 'text', column: 'industry' },
+      address: { type: 'text', column: 'address' },
+      description: { type: 'text', column: 'description' },
+      imported: { type: 'lookup', column: 'import_batch_id' },
+      created: { type: 'date', column: 'created_at' },
+    };
+    for (const def of defs) { const field = customServerField(def); if (field) out[`cf:${def.id}`] = field; }
+    return out;
+  }, [defs, ownerColumn]);
+
+  const big = useLargeList({
+    enabled: size === 'large',
+    table: 'companies',
+    select: '*',
+    fields: serverFields,
+    defaultOrder: { column: 'created_at', ascending: false },
+    search,
+    searchColumns: ['name', 'website_url', 'email', 'phone', 'city', 'industry', 'address'],
+    lookup: (column, text) => {
+      const wanted = text.toLowerCase();
+      if (column === 'owner') return people.filter((p) => shortName(p.email).toLowerCase().includes(wanted)).map((p) => p.user_id);
+      return Object.entries(importLabels).filter(([, label]) => label === text).map(([id]) => id);
+    },
+  });
+  reloadPage.current = big.reload;
+  const openId = activeCompany?.id as string | undefined;
+  useEffect(() => {
+    if (size !== 'large') return;
+    setCompanies(big.rows);
+    setActiveCompany((prev: any) => (prev ? big.rows.find((c: any) => c.id === prev.id) || prev : prev));
+  }, [big.rows, size]);
+  // the contacts and deals of the companies on this page (and of the one that is open), for the counts and the company window
+  useEffect(() => {
+    if (size !== 'large') return;
+    const ids = [...new Set([...big.rows.map((c: any) => c.id), ...(openId ? [openId] : [])])];
+    if (!ids.length) { setContactsByCompany({}); setDealsByCompany({}); return; }
+    let alive = true;
+    Promise.all([
+      selectAll(() => supabase.from('contacts').select('id, name, company_id').in('company_id', ids)),
+      selectAll(() => supabase.from('deals').select('id, title, value, company_id').in('company_id', ids)),
+    ]).then(([contactsRes, dealsRes]) => {
+      if (!alive || contactsRes.error || dealsRes.error) return;
+      setContactsByCompany(byCompany(contactsRes.data || []));
+      setDealsByCompany(byCompany(dealsRes.data || []));
+    });
+    return () => { alive = false; };
+  }, [big.rows, openId, size]);
 
   const ownerNames = useMemberLabels(companies.map((c) => c.assignee_id));
 
@@ -138,18 +215,32 @@ export default function CrmCompanies() {
       { id: 'imported', label: 'Imported from', kind: 'select', value: (c) => (c.import_batch_id ? importLabels[c.import_batch_id] || 'an import' : null), options: importedOptions, dim: true },
       { id: 'created', label: 'Added', kind: 'date', value: (c) => c.created_at, dim: true },
     ];
-    return [...built, ...customFieldColumns(defs, (c: any) => c.custom_fields, companies)];
+    return [...built, ...customFieldColumns(defs, (c: any) => c.custom_fields, companies), ...desktopColumns('company')];
   }, [defs, importLabels, contactsByCompany, dealsByCompany, companies, ownerColumn, ownerNames, tagColumn]);
 
   // the rows exactly as the person sees them (search, filters, sort) with every column, also the hidden ones and their own fields
   const exportFile = useMemo(() => exportRecords(viewed.rows, viewed.cols), [viewed]);
+  // a very large list: everything that matches is fetched when Export is pressed
+  const exportAll = async () => {
+    const [all, people_, deals_] = await Promise.all([
+      big.everything(),
+      selectAll(() => supabase.from('contacts').select('id, company_id')),
+      selectAll(() => supabase.from('deals').select('id, company_id')),
+    ]);
+    if (people_.error || deals_.error) throw people_.error || deals_.error;
+    const contactCount = byCompany(people_.data || []), dealCount = byCompany(deals_.data || []);
+    const cols = columns.map((col) => (col.id === 'contacts' ? { ...col, value: (r: any) => (contactCount[r.id] || []).length }
+      : col.id === 'deals' ? { ...col, value: (r: any) => (dealCount[r.id] || []).length }
+      : col.id === 'owner' ? { ...col, value: (r: any) => (r.assignee_id ? shortName(people.find((p) => p.user_id === r.assignee_id)?.email) : '') } : col));
+    return exportRecords(all, cols);
+  };
 
-  if (loading) {
+  if (loading || size === 'counting') {
     return <div style={{ padding: '2rem', color: 'var(--dim)' }}>Loading companies…</div>;
   }
 
   const q = search.trim().toLowerCase();
-  const filtered = companies.filter((c) => !q || [c.name, c.website_url, c.email, c.phone, c.city, c.industry, c.address, ...customSearchText(c.custom_fields)].some((v) => (v || '').toLowerCase().includes(q)));
+  const filtered = companies.filter((c) => size === 'large' || !q || [c.name, c.website_url, c.email, c.phone, c.city, c.industry, c.address, ...customSearchText(c.custom_fields)].some((v) => (v || '').toLowerCase().includes(q)));
 
   return (
     <div>
@@ -161,7 +252,7 @@ export default function CrmCompanies() {
           style={{ flex: 1, maxWidth: 320, padding: '0.6rem 0.9rem', background: 'var(--surface2)', border: '1px solid var(--border)', color: 'var(--white)', fontFamily: 'var(--mono)', fontSize: '0.7rem', borderRadius: '4px' }}
         />
         <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
-          <ExportButton data={exportFile.data} columns={exportFile.columns} filename="companies" label="Export CSV (all columns)" />
+          <ExportButton data={exportFile.data} columns={exportFile.columns} filename="companies" label="Export CSV (all columns)" load={size === 'large' ? exportAll : undefined} />
           <OwnerOnly permission="delete">
             <button
               onClick={() => setShowDuplicates(true)}
@@ -196,13 +287,16 @@ export default function CrmCompanies() {
       </div>
 
       {bulkNote && <div role="status" style={{ fontSize: '0.65rem', color: 'var(--green)', marginBottom: 8 }}>{bulkNote}</div>}
+      {size === 'large' && <div style={{ fontSize: '0.6rem', color: 'var(--dim)', marginBottom: 6 }}>A very large list: it is shown a page at a time.</div>}
+      {size === 'large' && big.error && <div role="alert" style={{ fontSize: '0.65rem', color: 'var(--red)', marginBottom: 8 }}>{big.error}</div>}
       <ViewTable
         columns={columns}
         rows={filtered}
         storageKey={`companies:${user?.id || 'anon'}`}
         rowKey={(c) => c.id}
         onRowClick={(c) => setActiveCompany(c)}
-        emptyText={companies.length === 0 ? 'No companies yet.' : 'No companies match your search.'}
+        emptyText={companies.length === 0 && !search.trim() ? 'No companies yet.' : 'No companies match your search.'}
+        server={size === 'large' ? { total: big.total, page: big.page, loading: big.loading, onPage: big.setPage, onPrefs: big.setPrefs, sortable: (id) => canSort(serverFields[id]), filterable: (id) => !!serverFields[id] } : undefined}
         onView={(shown, _visible, all) => setViewed({ rows: shown, cols: all })}
         bulk={can('edit') || can('delete') ? (picked, clear) => (
           <BulkBar table="companies" ids={picked.map((c) => c.id)} assign={!!ownerColumn} onDone={(message) => { setBulkNote(message); clear(); fetchAll(); }} />
@@ -385,6 +479,7 @@ function CompanyDetailModal({ company, contacts, deals, importLabel, onClose, on
             </div>
           ))}
 
+          <DesktopRecordTools kind="company" record={company} contacts={contacts} onChanged={onChanged} />
           <CompanySignals companyId={company.id} website={company.website_url} />
           <ActivityTimeline companyId={company.id} />
 

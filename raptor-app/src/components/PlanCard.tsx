@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { usageLines } from '../lib/plans';
 import type { Entitlements } from '../lib/plans';
+import BuyPlan from './BuyPlan';
 
 const PRICING_URL = 'https://shoonyaorigins.com/ventures/raptor/pricing/';
 
@@ -9,6 +10,7 @@ const PRICING_URL = 'https://shoonyaorigins.com/ventures/raptor/pricing/';
 // (2026-11-27_plans.sql) is installed, or if it cannot be read.
 export default function PlanCard() {
   const [ent, setEnt] = useState<Entitlements | null>(null);
+  const [bought, setBought] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -16,12 +18,13 @@ export default function PlanCard() {
       .then(({ data, error }) => { if (!cancelled && !error && data) setEnt(data as Entitlements); })
       .catch(() => undefined);
     return () => { cancelled = true; };
-  }, []);
+  }, [bought]);
 
   if (!ent) return null;
   const lines = usageLines(ent);
   const ends = ent.expires_at ? new Date(ent.expires_at).toLocaleDateString() : null;
   return (
+    <>
     <div style={{ border: '1px solid var(--border)', borderRadius: 8, padding: '1.2rem 1.4rem', background: 'var(--surface)', marginBottom: '1.4rem' }}>
       <div style={{ fontSize: '0.6rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--purple)' }}>Your plan</div>
       <div style={{ fontSize: '1.1rem', color: 'var(--white)', margin: '0.4rem 0' }}>{ent.expired ? `${ent.plan} (ended)` : ent.plan}</div>
@@ -34,5 +37,7 @@ export default function PlanCard() {
       ))}
       <a href={PRICING_URL} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: '0.8rem', fontSize: '0.65rem', color: 'var(--purple)' }}>See plans</a>
     </div>
+    <BuyPlan onBought={() => setBought((n) => n + 1)} />
+    </>
   );
 }

@@ -6,6 +6,7 @@ import { useColumn } from '../../hooks/useColumn';
 import { useDirectory } from '../../hooks/useDirectory';
 import { loadPipelineStages } from '../../lib/pipelineStages';
 import { loadPipelines, stageChoices } from '../../lib/pipelines';
+import { DesktopAutomationTools } from '../../lib/desktop';
 
 export default function CrmAutomations() {
   const [automations, setAutomations] = useState<any[]>([]);
@@ -161,6 +162,8 @@ export default function CrmAutomations() {
           })}
         </div>
       )}
+
+      <DesktopAutomationTools onChanged={fetchAll} />
 
       <AutomationModal
         open={modalOpen}

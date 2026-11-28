@@ -4,6 +4,8 @@ import Modal, { fieldLabelStyle, fieldInputStyle, primaryBtnStyle, ghostBtnStyle
 import { useOrg } from '../../hooks/OrgContext';
 import { useDirectory } from '../../hooks/useDirectory';
 import CalendarFeedButton from '../../components/crm/CalendarFeedButton';
+import CloudSync from '../../components/crm/CloudSync';
+import { calendarChecked, type CloudStatus } from '../../lib/cloudSync';
 import { shortName } from '../../lib/team';
 import { isNotInstalled } from '../../lib/dbMissing';
 import {
@@ -40,6 +42,7 @@ export default function CrmBooking() {
   const [problem, setProblem] = useState<string | null>(null);
   const [copied, setCopied] = useState('');
   const [showPast, setShowPast] = useState(false);
+  const [cloud, setCloud] = useState<CloudStatus | null>(null);
   const emails = useColumn('booking_pages', 'email_mode') === true;
   const [mails, setMails] = useState<BookingMail[]>([]);
   const [serverSends, setServerSends] = useState<boolean | null>(null);     // can the server send from Raptor's address?
@@ -156,13 +159,14 @@ export default function CrmBooking() {
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap', marginBottom: '1.2rem' }}>
         <div style={{ ...small, maxWidth: 600 }}>
           Share a link and people pick a free time. A booking adds the contact, a task and a notification. Free times come from your hours here,
-          other bookings and deal meetings: your Google or Outlook calendar is not checked.{emails ? '' : ' No email is sent to the visitor.'}
+          other bookings and deal meetings{calendarChecked(cloud) ? ', and the busy times of your connected calendar' : ': your Google or Outlook calendar is not checked'}.{emails ? '' : ' No email is sent to the visitor.'}
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignSelf: 'flex-start' }}>
           <CalendarFeedButton />
           <button style={toolPrimaryStyle} onClick={() => { setProblem(null); setEditing({ id: null, draft: newDraft(me, myZone()) }); }}>+ New booking page</button>
         </div>
       </div>
+      <CloudSync onStatus={setCloud} />
 
       {pages.length === 0 && <div style={{ ...card, textAlign: 'center' }}><div style={small}>No booking pages yet.</div></div>}
       <div style={{ display: 'grid', gap: '0.8rem' }}>

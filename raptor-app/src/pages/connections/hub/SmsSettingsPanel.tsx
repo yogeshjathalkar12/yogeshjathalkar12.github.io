@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { SmsApi, SmsNumber, SmsSequence, SmsSettings } from './smsApi';
 import { DEFAULT_SETTINGS, TAGS, TIME_ZONES, characters } from './smsApi';
 import { Notice, buttonStyle, inputStyle, note } from './ui';
+import IndiaSmsSettings from './IndiaSmsSettings';
 import { useCustomTags } from '../../../hooks/useCustomTags';
 
 // The SMS settings: how the pipeline texts (Off / Semi-automatic / Automatic), the first text, the sending hours and the daily limit.
@@ -164,6 +165,7 @@ export default function SmsSettingsPanel({ api, onSaved, onCancel }: { api: SmsA
         {onCancel ? <button type="button" style={buttonStyle('ghost')} onClick={onCancel}>Close</button> : null}
         <button type="button" style={buttonStyle('primary', saving)} disabled={saving} onClick={save}>{saving ? 'Saving…' : 'Save settings'}</button>
       </div>
+      <IndiaSmsSettings api={api} />
     </div>
   );
 }
