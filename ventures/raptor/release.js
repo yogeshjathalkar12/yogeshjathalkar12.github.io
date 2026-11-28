@@ -3,9 +3,9 @@
    Normally you never edit it: when a page loads, this file asks the download server (the Cloudflare Worker 'raptor-download', page /version, which reads the
    newest release published in raptor-dist) and writes the newest version into every place that carries a marker:
 
-     <span data-raptor-version="windows">0.1.18</span>            the Windows version
-     <span data-raptor-version="mac">0.1.18</span>                the Mac version
-     <span data-raptor-version="mac-file">Raptor-0.1.18-mac-arm64.dmg</span>   the Mac file name
+     <span data-raptor-version="windows">0.1.19</span>            the Windows version
+     <span data-raptor-version="mac">0.1.19</span>                the Mac version
+     <span data-raptor-version="mac-file">Raptor-0.1.19-mac-arm64.dmg</span>   the Mac file name
      <a data-raptor-label="Download Raptor {windows} for Windows" aria-label="...">   {windows} {mac} {mac-file} are filled in
 
    So publishing a release needs NO page edit and NO commit: the pages are right the moment the release is public.
@@ -15,7 +15,7 @@
 (function () {
   'use strict';
 
-  var R = window.RAPTOR_RELEASE = { windows: '0.1.18', mac: '0.1.18', macFile: 'Raptor-0.1.18-mac-arm64.dmg' };
+  var R = window.RAPTOR_RELEASE = { windows: '0.1.19', mac: '0.1.19', macFile: 'Raptor-0.1.19-mac-arm64.dmg' };
   var WORKER = 'https://raptor-download.yogeshjathalkar.workers.dev';
   var VERSION = /^\d+\.\d+\.\d+$/;
   var MAC_FILE = /^Raptor-\d+\.\d+\.\d+-mac-arm64\.dmg$/;
