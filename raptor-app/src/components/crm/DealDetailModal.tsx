@@ -21,6 +21,7 @@ import TagsEditor from './TagsEditor';
 import DealMoneyFields from './DealMoneyFields';
 import { dealMoneyRow, moneyOf, moneyProblem, ownMoney } from '../../lib/fx';
 import DealCompetitionFields, { competitionOf, competitionRow } from './DealCompetitionFields';
+import DealSurvey from './DealSurvey';
 import { Link } from 'react-router-dom';
 
 interface DealDetailModalProps {
@@ -220,6 +221,8 @@ export default function DealDetailModal({ deal, onClose, onSaved }: DealDetailMo
       <TagsEditor table="deals" recordId={deal.id} tags={deal.tags} onChanged={onSaved} />
       <CustomFieldsSection entityType="deal" entity={deal} onChanged={onSaved} />
       <TasksSection dealId={deal.id} />
+
+      {['won', 'lost'].includes(stageByKey(stages, deal.stage)?.type || '') && <DealSurvey dealId={deal.id} contactId={deal.contact_id} />}
 
       {quotes && (
         <Link to={`/crm/quotes?deal=${deal.id}`} onClick={onClose} style={{ display: 'inline-block', marginBottom: 12, fontSize: '0.65rem', color: 'var(--purple)' }}>Make a quote for this deal</Link>

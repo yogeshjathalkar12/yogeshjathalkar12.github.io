@@ -1,20 +1,23 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { loadCall, loadTrackers, saved, type CallRow } from '../../lib/callsData';
 import { allHits, linesOf, WHO_LABELS, type Tracker } from '../../lib/calls/trackers';
 import { measureCards, mmss, RELIABILITY_NOTES } from '../../lib/calls/measuresView';
-import { writeupSections, unverifiedNote, BY_LABELS, type Point } from '../../lib/calls/writeupView';
+import { writeupSections, unverifiedNote, BY_LABELS, } from '../../lib/calls/writeupView';
 import { useMemberLabels } from '../../hooks/useDirectory';
 import { useOrg } from '../../hooks/OrgContext';
 import { shortName } from '../../lib/team';
-import { fieldInputStyle, toolBtnStyle } from '../../components/crm/Modal';
+import { fieldInputStyle } from '../../components/crm/Modal';
 import { MeasureCards, Page, Problem, SpeakerBar, Transcript, body, card, chip, heading, link, small } from '../../components/calls/bits';
 import { Comments, Scores, SaveClip } from '../../components/calls/Coaching';
+import { Suggestions } from '../../components/calls/Suggestions';
 
 export default function CallDetail() {
   const { id = '' } = useParams();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const wanted = params.get('line');
   const { can } = useOrg();
   const [call, setCall] = useState<CallRow | null | undefined>(undefined);
   const [trackers, setTrackers] = useState<Tracker[]>([]);
@@ -22,7 +25,6 @@ export default function CallDetail() {
   const [contactName, setContactName] = useState('');
   const [selected, setSelected] = useState<{ key: string; lines: number[] }>({ key: '', lines: [] });
   const [error, setError] = useState('');
-  const [notice, setNotice] = useState('');
 
   const load = useCallback(async () => {
     try {
@@ -42,8 +44,10 @@ export default function CallDetail() {
     }
   }, [id]);
 
-  useEffect(() => { setCall(undefined); setSelected({ key: '', lines: [] }); setNotice(''); setError(''); setDeals([]); setContactName(''); load(); }, [load]);
+  useEffect(() => { setCall(undefined); setSelected({ key: '', lines: [] }); setError(''); setDeals([]); setContactName(''); load(); }, [load]);
   useEffect(() => { loadTrackers().then((r) => setTrackers(r.rows)).catch(() => {}); }, []);
+  // opened from an answer: the line that was found is marked and brought into view
+  useEffect(() => { if (wanted !== null && /^\d+$/.test(wanted)) setSelected({ key: `l:${wanted}`, lines: [Number(wanted)] }); }, [id, wanted, call?.id]);
 
   const lines = useMemo(() => {
     if (!call) return [];
@@ -58,20 +62,6 @@ export default function CallDetail() {
 
   const pick = (key: string, found: number[]) => setSelected(selected.key === key ? { key: '', lines: [] } : { key, lines: found });
   const warning = unverifiedNote(call.writeup);
-
-  async function addTask(point: Point) {
-    setError('');
-    setNotice('');
-    try {
-      await saved(supabase.from('tasks').insert({
-        title: `${call!.company_name}: ${point.text}`.slice(0, 200), notes: `From the call of ${new Date(call!.started_at).toLocaleDateString()}: "${point.quote}"`,
-        contact_id: call!.contact_id, deal_id: call!.deal_id || null,
-      }).select('id'), 'You may not add tasks.');
-      setNotice('Task added. Set its date under CRM > Tasks.');
-    } catch (e: any) {
-      setError(e.message);
-    }
-  }
 
   async function linkDeal(dealId: string) {
     setError('');
@@ -104,7 +94,6 @@ export default function CallDetail() {
         )}
       </div>
       <Problem text={error} />
-      {notice && <div role="status" style={{ ...small, color: 'var(--green, #22c55e)', marginBottom: 8 }}>{notice}</div>}
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))', gap: '1rem', alignItems: 'start' }}>
         <div>
@@ -114,6 +103,8 @@ export default function CallDetail() {
             {warning && <div role="alert" style={{ ...small, color: 'var(--amber, #f59e0b)', marginTop: 6 }}>{warning}</div>}
             {call.next_steps && <><div style={{ ...heading, marginTop: 12 }}>Next step</div><div style={body} dir="auto">{call.next_steps}</div></>}
           </div>
+
+          <Suggestions call={call} onShow={(i) => setSelected({ key: `l:${i}`, lines: [i] })} />
 
           {writeupSections(call.writeup).map((section) => (
             <div key={section.key} style={card}>
@@ -126,9 +117,6 @@ export default function CallDetail() {
                       <span dir="auto" style={{ display: 'block', fontSize: '0.72rem' }}>{section.key === 'promises' && item.by ? `${BY_LABELS[item.by]}: ` : ''}{item.text}</span>
                       <span dir="auto" style={{ display: 'block', color: 'var(--dim)', fontSize: '0.62rem' }}>“{item.quote}”</span>
                     </button>
-                    {(section.key === 'step' || section.key === 'promises' || section.key === 'questions') && can('create') && (
-                      <button type="button" style={toolBtnStyle} onClick={() => addTask(item)}>Add task</button>
-                    )}
                   </div>
                 );
               })}

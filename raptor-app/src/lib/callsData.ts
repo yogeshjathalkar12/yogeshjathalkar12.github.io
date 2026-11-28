@@ -59,6 +59,35 @@ export async function loadCalls(q: CallQuery): Promise<{ rows: CallRow[]; basic:
   return { rows, basic };
 }
 
+/** Everything the "ask" page needs to search: the calls of the period with their measures and words. `days` 0 means all of them. */
+export async function loadCallsForAsk(days: number): Promise<{ rows: CallRow[]; basic: boolean }> {
+  const since = days ? new Date(Date.now() - days * 86400000).toISOString() : '';
+  const build = (columns: string) => () => {
+    let query: any = supabase.from('calls').select(columns);
+    if (since) query = query.gte('started_at', since);
+    return query.order('started_at', { ascending: false });
+  };
+  let basic = false;
+  let result = await selectAll<CallRow>(build('id, company_name, started_at, metrics, segments, transcript'));
+  if (result.error && isNotInstalled(result.error)) {
+    basic = true;
+    result = await selectAll<CallRow>(build('id, company_name, started_at, transcript'));
+  }
+  if (result.error) throw result.error;
+  return { rows: result.data || [], basic };
+}
+
+/** The team's competitors by name and other names; an empty list where there is no such table yet. */
+export async function loadRivals(): Promise<Array<{ name: string; aliases?: string[] | null }>> {
+  let result: { data: any; error: any } = await supabase.from('competitors').select('name, aliases, archived').order('name');
+  if (result.error && isNotInstalled(result.error)) result = await supabase.from('competitors').select('name').order('name');
+  if (result.error) {
+    if (isNotInstalled(result.error)) return [];
+    throw result.error;
+  }
+  return ((result.data || []) as Array<{ name: string; aliases?: string[] | null; archived?: boolean }>).filter((r) => !r.archived);
+}
+
 export async function loadCall(id: string): Promise<CallRow | null> {
   const { data, error } = await supabase.from('calls').select('*').eq('id', id).limit(1);
   if (error) throw error;

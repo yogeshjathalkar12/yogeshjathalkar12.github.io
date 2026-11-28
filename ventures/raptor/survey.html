@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<title>Short survey</title>
+<style>
+  :root { --ink:#18181b; --soft:#52525b; --line:#d4d4d8; --paper:#ffffff; --accent:#742469; --bad:#b91c1c; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color:var(--ink); background:#f4f4f5; padding:0 16px; }
+  main { max-width:520px; margin:32px auto; background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:24px; }
+  h1 { font-size:20px; margin:0 0 6px; }
+  p { margin:0 0 16px; color:var(--soft); }
+  label, legend { display:block; font-size:13px; font-weight:600; margin:0 0 4px; padding:0; }
+  fieldset { border:0; margin:0 0 14px; padding:0; }
+  .choice { display:flex; gap:8px; align-items:center; font-weight:400; font-size:14px; margin:0 0 4px; }
+  .stars { display:flex; gap:14px; flex-wrap:wrap; }
+  input[type=text], textarea { width:100%; font:inherit; color:inherit; background:#fff; border:1px solid var(--line); border-radius:6px; padding:9px 11px; margin:0 0 14px; }
+  textarea { min-height:90px; resize:vertical; }
+  button { width:100%; font:inherit; font-weight:600; color:#fff; background:var(--accent); border:0; border-radius:6px; padding:11px; cursor:pointer; }
+  button:disabled { opacity:.6; cursor:default; }
+  .bad { color:var(--bad); margin:0 0 12px; }
+  .by { text-align:center; font-size:11px; color:#a1a1aa; margin:14px 0 0; }
+</style>
+</head>
+<body>
+<main id="card"><p id="status">Loading…</p></main>
+<div class="by">Sent with Raptor</div>
+<script>
+(function () {
+  'use strict';
+  // The website's public (anonymous) key: it can do nothing here but learn who is asking and send one answer.
+  var URL_BASE = 'https://pcdbtcpctlnvdtbrrqoo.supabase.co', KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjZGJ0Y3BjdGxudmR0YnJycW9vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI2MjIxMjQsImV4cCI6MjA5ODE5ODEyNH0._y59k8mmSqvkCL9gPBWp5hfp2LwpP_IBvr5h7y3nP7Q';
+  var token = (new URLSearchParams(location.search).get('q') || '').slice(0, 80);
+  var card = document.getElementById('card');
+  var REASONS = [['price', 'Price'], ['missing_feature', 'A feature we needed was missing'], ['chose_competitor', 'We chose another provider'], ['timing', 'Timing'],
+    ['no_need', 'We no longer needed it'], ['trust', 'Trust or support'], ['good_fit', 'It fitted what we needed'], ['other', 'Something else']];
+
+  // Called directly, never with a visitor's own sign-in.
+  function rpc(name, body) {
+    return fetch(URL_BASE + '/rest/v1/rpc/' + name, {
+      method: 'POST', credentials: 'omit',
+      headers: { apikey: KEY, Authorization: 'Bearer ' + KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+  }
+  // Everything shown is put on the page as plain text, never as HTML.
+  function el(tag, text, attrs) {
+    var node = document.createElement(tag);
+    if (text !== undefined && text !== null && text !== '') node.textContent = text;
+    for (var k in attrs || {}) node.setAttribute(k, attrs[k]);
+    return node;
+  }
+  function only(message) { card.replaceChildren(el('p', message, { role: 'status' })); }
+
+  function pick(name, value, text, into) {
+    var row = el('label', '', { 'class': 'choice' });
+    var input = el('input', '', { type: 'radio', name: name, value: value });
+    row.appendChild(input);
+    row.appendChild(el('span', text));
+    into.appendChild(row);
+  }
+  function chosen(form, name) { var found = form.querySelector('input[name=' + name + ']:checked'); return found ? found.value : ''; }
+
+  function show(seller) {
+    var form = el('form');
+    form.appendChild(el('h1', seller ? seller + ' would value your view' : 'Your view, please'));
+    form.appendChild(el('p', 'It takes about a minute. Your answer goes only to the team that sent you this link.'));
+    var why = el('fieldset');
+    why.appendChild(el('legend', 'What was the main reason for your decision?'));
+    REASONS.forEach(function (r) { pick('reason', r[0], r[1], why); });
+    form.appendChild(why);
+    form.appendChild(el('label', 'If you chose someone else, who? (optional)', { 'for': 'chose' }));
+    var chose = el('input', '', { type: 'text', id: 'chose', maxlength: '160' });
+    form.appendChild(chose);
+    var rating = el('fieldset');
+    rating.appendChild(el('legend', 'How was dealing with us? 1 is poor, 5 is very good (optional)'));
+    var stars = el('div', '', { 'class': 'stars' });
+    ['1', '2', '3', '4', '5'].forEach(function (n) { pick('rating', n, n, stars); });
+    rating.appendChild(stars);
+    form.appendChild(rating);
+    form.appendChild(el('label', 'What could we have done better? (optional)', { 'for': 'better' }));
+    var better = el('textarea', '', { id: 'better', maxlength: '2000' });
+    form.appendChild(better);
+    var bad = el('p', '', { 'class': 'bad', role: 'alert' });
+    bad.hidden = true;
+    form.appendChild(bad);
+    var send = el('button', 'Send my answer', { type: 'submit' });
+    form.appendChild(send);
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      var reason = chosen(form, 'reason');
+      if (!reason) { bad.textContent = 'Please choose the main reason.'; bad.hidden = false; return; }
+      bad.hidden = true;
+      send.disabled = true;
+      rpc('survey_answer', { p_token: token, p_answers: { reason: reason, chose: chose.value, better: better.value, rating: chosen(form, 'rating') } })
+        .then(function (out) {
+          if (out && out.ok) { only('Thank you. Your answer has been sent.'); return; }
+          bad.textContent = (out && out.error) || 'Your answer could not be sent.';
+          bad.hidden = false;
+          send.disabled = false;
+        })
+        .catch(function () { bad.textContent = 'Your answer could not be sent. Check your connection and try again.'; bad.hidden = false; send.disabled = false; });
+    });
+    card.replaceChildren(form);
+  }
+
+  if (!/^[a-f0-9]{64}$/.test(token)) { only('This survey link is not complete. Please open the link exactly as you received it.'); return; }
+  rpc('survey_public', { p_token: token }).then(function (s) {
+    if (!s) only('This survey is not available.');
+    else if (s.status === 'answered') only('This survey has already been answered. Thank you.');
+    else if (s.status === 'expired') only('This survey has closed.');
+    else show(s.seller);
+  }).catch(function () { only('The survey could not be loaded. Check your connection and reload the page.'); });
+})();
+</script>
+</body>
+</html>

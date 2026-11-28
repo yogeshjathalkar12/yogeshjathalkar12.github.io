@@ -12,6 +12,7 @@ import { shortName } from '../../lib/team';
 import { fieldInputStyle, fieldLabelStyle, toolBtnStyle, toolPrimaryStyle } from '../../components/crm/Modal';
 import Feed from '../../components/competitors/Feed';
 import { Needs, Page, Problem, body, card, heading, link, small, table, td, th } from '../../components/calls/bits';
+import { chatStatus, sendCompetitorCard } from '../../lib/chatAlerts';
 
 const ORIGIN_COLOURS = { confirmed: 'var(--green, #22c55e)', source: 'var(--purple)', suggestion: 'var(--amber, #f59e0b)' };
 // printing gives the card alone, black on white, however long it is
@@ -21,6 +22,29 @@ const PRINT = `@media print {
   #root a, #root span, #root strong, #root h2 { color: #000 !important; }
 }`;
 const INTERVALS: [string, string][] = [['', 'Every 12 hours (usual)'], ['6', 'Every 6 hours'], ['24', 'Daily'], ['168', 'Weekly']];
+
+/** Posts this card to the team's Slack or Teams channel; shown only when one is connected. */
+function ShareCard({ competitorId }: { competitorId: string }) {
+  const [connected, setConnected] = useState(false);
+  const [state, setState] = useState('');
+  useEffect(() => { chatStatus().then((s) => setConnected(Boolean(s.hook))).catch(() => {}); }, []);
+  useEffect(() => { setState(''); }, [competitorId]);
+  if (!connected) return null;
+  const share = async () => {
+    setState('Sending…');
+    try {
+      setState(`Sent to ${await sendCompetitorCard(competitorId)}`);
+    } catch (e: any) {
+      setState(e.message);
+    }
+  };
+  return (
+    <>
+      <button type="button" style={toolBtnStyle} disabled={state === 'Sending…'} onClick={share}>Share to chat</button>
+      {state && <span role="status" style={small}>{state}</span>}
+    </>
+  );
+}
 
 export default function CompetitorDetail() {
   const { id = '' } = useParams();
@@ -118,6 +142,7 @@ export default function CompetitorDetail() {
         </div>
         <div className="no-print" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-start' }}>
           <button type="button" style={toolBtnStyle} onClick={() => window.print()}>Print card</button>
+          <ShareCard competitorId={c.id} />
           {editable && mayEdit && !draft && <button type="button" style={toolPrimaryStyle} onClick={() => { setError(''); setDraft(draftOf(c)); }}>Edit card</button>}
         </div>
       </div>

@@ -1,9 +1,34 @@
 import { useEffect, useState } from 'react';
+import { supabase } from '../../lib/supabaseClient';
+import { selectAll } from '../../lib/selectAll';
+import { summarise, type Survey } from '../../lib/buyerSurveys';
 import { loadCompetitors, loadDeals } from '../../lib/competitorsData';
 import { winLoss, type Deal, type Outcome } from '../../lib/competitors/insight';
 import { formatCurrency } from '../../lib/crmHelpers';
 import { fieldInputStyle } from '../../components/crm/Modal';
-import { Needs, Page, Problem, small, table, td, th } from '../../components/calls/bits';
+import { Needs, Page, Problem, body, card, heading, small, table, td, th } from '../../components/calls/bits';
+
+/** What buyers themselves answered (surveys sent from a won or lost deal). Shown only once there is something. */
+function BuyerAnswers({ since }: { since: string }) {
+  const [surveys, setSurveys] = useState<Survey[]>([]);
+  useEffect(() => {
+    selectAll<Survey>(() => supabase.from('deal_surveys').select('*, deals ( title, stage )').order('created_at', { ascending: false }))
+      .then((r) => { if (!r.error) setSurveys(r.data || []); }).catch(() => {});
+  }, []);
+  const sum = summarise(surveys.filter((s) => !since || (s.answered_at || s.created_at) >= since));
+  if (!sum.sent) return null;
+  return (
+    <div style={{ ...card, marginTop: '1rem' }}>
+      <div style={heading}>What buyers said</div>
+      <div style={{ ...small, marginBottom: 8 }}>{sum.answered} of {sum.sent} surveys answered{sum.rating === null ? '' : ` · rating of our side ${sum.rating} of 5, from ${sum.ratings}`}</div>
+      {sum.reasons.length > 0 && <div style={body}>Main reasons: {sum.reasons.map((r) => `${r.label} (${r.count})`).join(', ')}</div>}
+      {sum.others.length > 0 && <div style={body}>Chose instead: {sum.others.map((o) => `${o.name} (${o.count})`).join(', ')}</div>}
+      {sum.comments.slice(0, 20).map((s) => (
+        <div key={s.id} style={{ ...small, marginTop: 8 }}><span style={{ color: 'var(--white)' }}>{s.deals?.title || 'A deal'}</span>: <span dir="auto">“{s.better}”</span></div>
+      ))}
+    </div>
+  );
+}
 
 export default function CompetitorWinLoss() {
   const [data, setData] = useState<{ deals: Deal[]; typeOf: (s: string) => Outcome; names: string[] } | null>(null);
@@ -45,6 +70,7 @@ export default function CompetitorWinLoss() {
           <div style={{ ...small, marginTop: 6 }}>A deal with two competitors counts for both. With only a few decided deals a win rate says little.</div>
         </div>
       )}
+      <BuyerAnswers since={since} />
     </Page>
   );
 }

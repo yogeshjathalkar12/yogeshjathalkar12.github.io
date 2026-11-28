@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { optional, saved } from '../../lib/callsData';
 import { useOrg } from '../../hooks/OrgContext';
 import { Needs, Page, Problem, body, card, heading, small } from '../../components/calls/bits';
+import { ChatChannel } from '../../components/competitors/ChatChannel';
 
 interface Watch { cloud_watch: boolean; weekly_digest: boolean; last_digest_at: string | null }
 
@@ -17,7 +18,7 @@ export default function CompetitorSettings() {
     .then((r) => { setInstalled(r.installed); setExists(r.rows.length > 0); setRow(r.rows[0] || { cloud_watch: false, weekly_digest: false, last_digest_at: null }); setLoaded(true); })
     .catch((e) => { setError(e.message); setLoaded(true); }), []);
   useEffect(() => { load(); }, [load]);
-  if (!installed) return <Page><Needs file="2026-11-30_h_competitor_feed.sql" /></Page>;
+  if (!installed) return <Page><Needs file="2026-11-30_h_competitor_feed.sql" /><ChatChannel /></Page>;
 
   const set = async (patch: Partial<Watch>) => {
     setError('');
@@ -49,9 +50,10 @@ export default function CompetitorSettings() {
             <div style={small}>Sent to the active members of your organization from Raptor’s address, only in a week with something to report.
               {row.last_digest_at ? ` Last sent ${new Date(row.last_digest_at).toLocaleDateString()}.` : ''}</div>
           </div>
-          {!isOwner && <div style={small}>Only your organization’s owner can change these.</div>}
+          {!isOwner && <div style={{ ...small, marginBottom: '1rem' }}>Only your organization’s owner can change these.</div>}
         </>
       )}
+      <ChatChannel />
     </Page>
   );
 }

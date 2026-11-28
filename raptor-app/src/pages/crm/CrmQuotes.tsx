@@ -10,6 +10,7 @@ import Modal, { fieldInputStyle, fieldLabelStyle, ghostBtnStyle, primaryBtnStyle
 import QuoteEditor, { type Picks } from '../../components/crm/QuoteEditor';
 import ProductsModal from '../../components/crm/ProductsModal';
 import { type Product, type Quote, type QuoteDraft, draftOfQuote, money, newQuote, quoteLink, quoteProblem, quoteRow, statusText, todayText } from '../../lib/quotes';
+import { emailQuote } from '../../lib/quoteMail';
 
 // CRM > Quotes (db/migrations/2026-11-29_f_quotes.sql): quotes made from the price list, shared by a private link.
 
@@ -132,6 +133,20 @@ export default function CrmQuotes() {
     if (!error) alert('The deal value was updated.');
   }
 
+  async function sendByEmail(quote: Quote) {
+    if (!confirm(`Email quote ${quote.number} to its contact now? It is sent from Raptor's address, and replies come to you.`)) return;
+    setProblem('');
+    setBusy(true);
+    try {
+      const to = await emailQuote(quote.id);
+      alert(`The quote was emailed to ${to}.`);
+    } catch (e: any) {
+      setProblem(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function copy(quote: Quote) {
     try { await navigator.clipboard.writeText(quoteLink(quote.token)); setCopied(quote.id); } catch { window.prompt('Copy this link:', quoteLink(quote.token)); }
   }
@@ -184,6 +199,7 @@ export default function CrmQuotes() {
                   <td style={{ padding: '0.55rem 0.4rem', color: COLORS[row.status], whiteSpace: 'nowrap' }}>{statusText(row)}{row.answered_by && <div style={{ color: 'var(--dim)' }}>by {row.answered_by}</div>}</td>
                   <td style={{ padding: '0.55rem 0.4rem', textAlign: 'right', whiteSpace: 'nowrap' }}>
                     {row.status !== 'draft' && row.status !== 'cancelled' && <button type="button" style={{ ...toolBtnStyle, marginRight: 6 }} onClick={() => copy(row)}>{copied === row.id ? 'Copied' : 'Copy link'}</button>}
+                    {row.status === 'sent' && row.contact_id && <button type="button" style={{ ...toolBtnStyle, marginRight: 6 }} disabled={busy} onClick={() => sendByEmail(row)}>Email</button>}
                     <button type="button" style={toolBtnStyle} onClick={() => { setProblem(''); setEditing({ quote: row, draft: draftOfQuote(row) }); }}>Open</button>
                   </td>
                 </tr>

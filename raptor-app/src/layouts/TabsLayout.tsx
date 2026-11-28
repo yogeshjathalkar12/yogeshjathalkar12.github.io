@@ -33,6 +33,7 @@ export const COMPETITOR_TABS = [
 
 export const CALL_TABS = [
   { name: 'All calls', path: '/calls', end: true },
+  { name: 'Ask', path: '/calls/ask' },
   { name: 'Team', path: '/calls/team' },
   { name: 'Library', path: '/calls/library' },
   { name: 'Scorecards', path: '/calls/scorecards' },

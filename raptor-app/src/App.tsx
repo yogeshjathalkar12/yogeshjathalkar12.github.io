@@ -38,6 +38,8 @@ import CrmApi from './pages/crm/CrmApi';
 import CrmDashboard from './pages/crm/CrmDashboard';
 import CrmQuotes from './pages/crm/CrmQuotes';
 import CrmForecast from './pages/crm/CrmForecast';
+import CrmAttention from './pages/crm/CrmAttention';
+import CrmWeekly from './pages/crm/CrmWeekly';
 import CrmTrash from './pages/crm/CrmTrash';
 
 /* desktop sync files */
@@ -56,6 +58,7 @@ import CompetitorSettings from './pages/competitors/CompetitorSettings';
 import CallsList from './pages/calls/CallsList';
 import CallDetail from './pages/calls/CallDetail';
 import CallsTeam from './pages/calls/CallsTeam';
+import CallsAsk from './pages/calls/CallsAsk';
 import CallsLibrary from './pages/calls/CallsLibrary';
 import CallsScorecards from './pages/calls/CallsScorecards';
 import CallsWatchWords from './pages/calls/CallsWatchWords';
@@ -122,6 +125,7 @@ export default function App() {
 
                     <Route path="/calls" element={<ProGate {...PRO_COPY.calls}><TabsLayout tabs={CALL_TABS} /></ProGate>}>
                       <Route index element={<CallsList />} />
+                      <Route path="ask" element={<CallsAsk />} />
                       <Route path="team" element={<CallsTeam />} />
                       <Route path="library" element={<CallsLibrary />} />
                       <Route path="scorecards" element={<CallsScorecards />} />
@@ -144,6 +148,8 @@ export default function App() {
                       <Route path="dashboard" element={<CrmDashboard />} />
                       <Route path="quotes" element={<CrmQuotes />} />
                       <Route path="forecast" element={<CrmForecast />} />
+                      <Route path="attention" element={<CrmAttention />} />
+                      <Route path="weekly" element={<CrmWeekly />} />
                       <Route path="trash" element={<CrmTrash />} />
                       <Route path="activity" element={<CrmActivity />} />
                       <Route path="automations" element={<CrmAutomations />} />

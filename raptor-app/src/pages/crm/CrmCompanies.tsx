@@ -23,6 +23,7 @@ import ExportButton from '../../components/crm/ExportButton';
 import { exportRecords } from '../../lib/tableView';
 import RecordHistory from '../../components/crm/RecordHistory';
 import ActivityTimeline from '../../components/crm/ActivityTimeline';
+import CompanySignals from '../../components/crm/CompanySignals';
 import { selectAll } from '../../lib/selectAll';
 import { coalesce } from '../../lib/coalesce';
 import { moveToBin } from '../../lib/bulk';
@@ -384,6 +385,7 @@ function CompanyDetailModal({ company, contacts, deals, importLabel, onClose, on
             </div>
           ))}
 
+          <CompanySignals companyId={company.id} website={company.website_url} />
           <ActivityTimeline companyId={company.id} />
 
           <RecordHistory table="companies" recordId={company.id} refreshKey={[company.name, company.website_url, company.phone, company.email, company.address, company.city, company.industry, company.description].join('|')} />
